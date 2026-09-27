@@ -3512,6 +3512,16 @@ for (const v of VIEWS) {
    which the defect cannot appear is run 106's T11 again, so this asserts the
    label actually GREW — if the two states ever stop differing it says so
    rather than passing on the short one.
+   ⚠ RESTATED 27.9.2026: the engaged label is ONE WORD now (*"rename the
+   button to just send to save space"* — "שלחו" / "Send" / "Отправить"), so
+   it no longer grows; in Hebrew it is shorter than "יש לי שאלה". The clause
+   keeps its subject — the check must measure the ENGAGED bar — and now asks
+   that the label CHANGED and that what it changed to is the on-label
+   (`.wa__on`'s own text, whatever the copy says). And the bar has FOUR
+   controls since the same day — back beside next — so the "painted under"
+   clause asks of both arrows, and a new clause asks that the four stand in
+   ONE row (every child's middle on the bar's middle): the bar's height is
+   `--quote-h`, which every fold check reads, and a wrapped row would move it.
 
    §5.15 throughout: the bar, its three children and the engagement each
    report if they were not found.
@@ -3536,6 +3546,7 @@ for (const v of VIEWS) {
           .map(x => x.textContent.trim()).join(' ');
       });
       const before = await label();
+      const onLabel = await pg.evaluate(() => (document.querySelector('.quote__send .wa__on') || {}).textContent?.trim() || null);
       const walked = await pg.evaluate(() => {
         const n = document.querySelector('.quote__next');
         if (!n || n.disabled || !n.offsetParent) return false;
@@ -3551,6 +3562,7 @@ for (const v of VIEWS) {
         const box = bar.querySelector('.quote__price');
         const send = bar.querySelector('.quote__send');
         const way = bar.querySelector('.quote__next');
+        const back = bar.querySelector('.quote__back');
         if (!fig || !box || !send) return { noParts: `${!!fig},${!!box},${!!send}` };
         const R = e => e.getBoundingClientRect();
         const f = R(fig);
@@ -3573,6 +3585,20 @@ for (const v of VIEWS) {
           spill: +(f.width - R(box).width).toFixed(1),
           onSend: +ox(f, R(send)).toFixed(0),
           onWay: way && !way.disabled && way.offsetParent ? +ox(f, R(way)).toFixed(0) : 0,
+          onBack: back && !back.disabled && back.offsetParent ? +ox(f, R(back)).toFixed(0) : 0,
+          arrows: [way, back].filter(Boolean).length,
+          /* And inside it: a control past the bar's edge is a control off the
+             screen. Since 27.9 the price has a floor (the figure) and the
+             send does not shrink, so a row that cannot fit overflows here. */
+          outside: [...bar.children].filter(k => getComputedStyle(k).display !== 'none')
+            .filter(k => R(k).left < R(bar).left - 0.5 || R(k).right > R(bar).right + 0.5)
+            .map(k => k.className.split(' ').pop()),
+          /* One row: every shown child's vertical middle on the bar's. */
+          offRow: (() => {
+            const b0 = R(bar), mid = (b0.top + b0.bottom) / 2 - (parseFloat(getComputedStyle(bar).paddingBottom) - parseFloat(getComputedStyle(bar).paddingTop)) / 2;
+            return [...bar.children].filter(k => getComputedStyle(k).display !== 'none')
+              .map(k => Math.abs((R(k).top + R(k).bottom) / 2 - mid)).reduce((a, c) => Math.max(a, c), 0);
+          })(),
           hitNear: hit(f.left + 2), hitFar: hit(f.right - 2),
           sendW: +R(send).width.toFixed(1),
         };
@@ -3585,13 +3611,20 @@ for (const v of VIEWS) {
       } else if (!walked) {
         fault(where, "the quote bar's way on could not be pressed, so the send never "
           + 'took its long label and this check measured the easy case');
-      } else if (before === after) {
-        fault(where, `walking a step did not change the send's label (still "${after}") — `
-          + 'this check is pinned to the label that GROWS on engagement, and it no '
-          + 'longer grows');
-      } else if (m.onSend || m.onWay) {
+      } else if (before === after || !onLabel || after !== onLabel) {
+        fault(where, `walking a step changed the send's label from "${before}" to "${after}", `
+          + `not to the on-label "${onLabel}" — this check is pinned to the ENGAGED bar`);
+      } else if (m.arrows !== 2) {
+        fault(where, `the quote bar holds ${m.arrows} of its two arrows — the way back and the way `
+          + 'on live in the bar below 1100 (27.9)');
+      } else if (m.outside.length) {
+        fault(where, `the quote bar's row does not fit: ${m.outside.join(', ')} stand(s) past its edge`);
+      } else if (m.offRow > 2) {
+        fault(where, `a control in the quote bar stands ${m.offRow.toFixed(1)} px off the bar's `
+          + 'middle — the row has wrapped, and `--quote-h` has moved under every fold check');
+      } else if (m.onSend || m.onWay || m.onBack) {
         fault(where, `the price ${m.text} is painted under the `
-          + `${m.onSend ? 'send button' : 'way on'} — ${m.onSend || m.onWay} px² of the `
+          + `${m.onSend ? 'send button' : m.onWay ? 'way on' : 'way back'} — ${m.onSend || m.onWay || m.onBack} px² of the `
           + `one number on the page (a ${m.figW} px figure in a ${m.boxW} px box)`);
       } else if (m.spill > 0) {
         fault(where, `the price figure is ${m.figW} px wide in a ${m.boxW} px box and `
@@ -3610,6 +3643,73 @@ for (const v of VIEWS) {
     console.log(`    ${said} width x language pairs: the figure is whole, in its own box, `
       + 'with nothing on top of it');
   }
+}
+
+/* ── ON A PHONE, BACK AND NEXT ARE IN THE BAR ON EVERY STEP — 27.9.2026 ──
+   The owner's son: *"On the phone I want the next and back buttons to be
+   removed from the bottom of each section and moved to the bottom of the page
+   and be seen at all times."* Walked FORWARD WITH THE BAR'S OWN ARROW at 320,
+   360 and 390 in Hebrew and Russian: on every step exactly one visible way on
+   and (after the first) one visible way back, both INSIDE the bar, at least
+   44 x 44; the live step's foot not shown (nothing under the options); the
+   bar the same height on every step (a disabled arrow keeps its box); and
+   from the summary the bar's back returns to the step before it. §5.15: the
+   walk must reach the summary, or it says so. Falsified by showing
+   `.sect__foot` again below 1100: every step faults. */
+{
+  console.log('\non a phone, back and next are in the bar on every step');
+  const HOME = `file://${process.cwd()}/index.html`;
+  let walked = 0;
+  for (const lang of ['he', 'ru']) for (const [w, h] of [[320, 568], [360, 740], [390, 844]]) {
+    const where = `bar-nav ${lang} ${w}`;
+    const p = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await p.goto(`${HOME}?lang=${lang}`);
+      await p.waitForSelector('#stage svg');
+      await p.waitForTimeout(300);
+      const heights = new Set();
+      let reached = false;
+      for (let i = 0; i < 12; i++) {
+        const m = await p.evaluate(() => {
+          const shown = e => e.offsetParent !== null && getComputedStyle(e).visibility !== 'hidden' && !e.disabled;
+          const bar = document.querySelector('.quote');
+          const live = document.querySelector('.sect:not([hidden])');
+          const nexts = [...document.querySelectorAll('.sect__next')].filter(shown);
+          const backs = [...document.querySelectorAll('.sect__back')].filter(shown);
+          const foot = live && live.querySelector('.sect__foot');
+          const box = e => { const r = e.getBoundingClientRect(); return [r.width, r.height]; };
+          return {
+            key: live ? live.dataset.section : null, first: live === document.querySelector('.sect'),
+            nexts: nexts.length, backs: backs.length,
+            inBar: [...nexts, ...backs].every(e => bar.contains(e)),
+            small: [...nexts, ...backs].map(box).filter(([bw, bh]) => bw < 44 || bh < 44).length,
+            foot: foot ? getComputedStyle(foot).display : 'none',
+            h: Math.round(bar.getBoundingClientRect().height * 10) / 10,
+          };
+        });
+        heights.add(m.h);
+        const isSum = m.key === 'sum';
+        if (m.foot !== 'none') fault(where, `step "${m.key}": its own foot is shown below 1100 — back and next belong in the bar`);
+        if (!m.inBar) fault(where, `step "${m.key}": a visible back or next is outside the quote bar`);
+        if (m.small) fault(where, `step "${m.key}": ${m.small} bar arrow(s) under 44 px`);
+        if (m.nexts !== (isSum ? 0 : 1)) fault(where, `step "${m.key}": ${m.nexts} visible ways on`);
+        if (m.backs !== (m.first ? 0 : 1)) fault(where, `step "${m.key}": ${m.backs} visible ways back`);
+        if (isSum) { reached = true; break; }
+        await p.evaluate(() => document.querySelector('.quote__next').click());
+        await p.waitForTimeout(260);
+      }
+      if (!reached) { fault(where, 'the bar\'s way on never reached the summary — this walk is dead'); continue; }
+      if (heights.size !== 1) fault(where, `the bar's height changed between steps: ${[...heights].join(', ')} px`);
+      await p.evaluate(() => document.querySelector('.quote__back').click());
+      await p.waitForTimeout(260);
+      const back = await p.evaluate(() => document.querySelector('.sect:not([hidden])').dataset.section);
+      if (back === 'sum') fault(where, 'the bar\'s way back did not leave the summary');
+      walked++;
+    } catch (e) {
+      fault(where, `could not be walked: ${e.message}`);
+    } finally { await p.close(); }
+  }
+  if (walked) console.log(`    ${walked} walks, 9 steps each: one way on and one way back in the bar, no foot, one bar height`);
 }
 
 /* ── A PHONE HELD SIDEWAYS CAN SEE WHAT IT IS BEING ASKED ────────────────

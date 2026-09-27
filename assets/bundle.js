@@ -581,7 +581,10 @@
     ],
     "send.waOn": ["שלחו את הדלת בוואטסאפ", "Send the door on WhatsApp", "Отправить дверь в WhatsApp"],
     "send.waOff": ["שלחו לנו הודעה בוואטסאפ", "Message us on WhatsApp", "Написать нам в WhatsApp"],
-    "send.waOnShort": ["שלחו בוואטסאפ", "Send on WhatsApp", "Отправить в WhatsApp"],
+    /* "Send", no more, 27.9.2026 — the owner's son: *"rename the button to just
+       send to save space."* The WhatsApp mark beside it says where; the green
+       send on the summary keeps its full sentence (`send.waOn`). */
+    "send.waOnShort": ["שלחו", "Send", "Отправить"],
     "send.waOffShort": ["שלחו הודעה", "Message us", "Написать нам"],
     /* ⚠ A THIRD LABEL, FOR A DOOR NOBODY HAS TOUCHED YET. Two sends are live on
        arrival and both say "send the door" — so a confused first-timer can fire
@@ -9827,6 +9830,8 @@ ${body}
     $("#clash-ok").addEventListener("click", closeClash);
     const barNext = document.querySelector(".quote__next");
     if (barNext) barNext.addEventListener("click", () => stepBy(1));
+    const barBack = document.querySelector(".quote__back");
+    if (barBack) barBack.addEventListener("click", () => stepBy(-1));
     document.querySelectorAll("[data-wa]").forEach((el) => {
       el.addEventListener("click", async (ev) => {
         if (!canSharePicture()) return;
@@ -10616,10 +10621,20 @@ ${body}
       if (Math.abs(dx) > 0.5) row.scrollBy({ left: dx, behavior: "instant" });
     }
     const i = keys.indexOf(liveStep);
-    for (const b of document.querySelectorAll(".sect__back")) b.disabled = i <= 0;
+    const word = (k) => T(k).replace(/[‹›]/g, "").trim();
+    const name = (b, k) => {
+      if (b.classList.contains("quote__arrow")) {
+        b.setAttribute("aria-label", word(k));
+        b.title = word(k);
+      } else b.textContent = T(k);
+    };
+    for (const b of document.querySelectorAll(".sect__back")) {
+      b.disabled = i <= 0;
+      if (b.classList.contains("quote__arrow")) name(b, "nav.back");
+    }
     for (const b of document.querySelectorAll(".sect__next")) {
       b.disabled = i >= keys.length - 1;
-      b.textContent = T(i === keys.length - 2 ? "nav.toSummary" : "nav.next");
+      name(b, i === keys.length - 2 ? "nav.toSummary" : "nav.next");
     }
     for (const b of document.querySelectorAll(".sect__skip")) b.hidden = i >= keys.length - 2;
   }

@@ -129,6 +129,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** Phone back/next in the bottom bar as two 44 px icon arrows, the step's
+  foot not shown below 1100, the send "שלחו / Send / Отправить" — *"moved to the
+  bottom of the page and be seen at all times … just send"*. Bar height as
+  before; the price box has a real floor at the figure now and the caption
+  yields (it had set the box: 152 px in Russian). Falsified: worded back —
+  320 he and ru 320–390 overflow; the foot shown — every step. Test 9,196,962 /
+  5 (sheets). Long form: `HISTORY.md`.
 - **27.9** Every window design in black OR the door's colour, all seven — the
   owner's son reversing his own 26.9 note (`8e1905d` reverted whole, the outline
   removal kept): base black, `-light` twin the paint; `circles-light`,
@@ -156,15 +163,6 @@ lines here. Dates are the day of the change.
   now, every viewer asked at its own radius (§5.26). A `?ey=peep-digital&w=rect`
   link had kept the ₪390 viewer on the glass in silence. Falsified: the literal
   back fails 60 digital rows, 0 optical. No sheet (rules). Test 7,483,519 / 5.
-- **26.9** Flow order `fit · colour · lock · pz · face · glass · grip · mk` —
-  *"the hardware finish … right after the lever … the pull handle … after the
-  panels and stripes"* (after the glass, asked), overruling Peretz's 30.8
-  *"handles before the panels"*; both quoted by `SECTIONS` and `WANT_ORDER`.
-  Toast walk: to the grip step, back to the glass. `fuzz` drew no bow in 30,000
-  designs — it draws every `DEFAULTS` field now. Falsified: old order 2/2
-  viewports; old walk one sentence. Sheets run 2 as predicted: 0/48 bare, 0/6
-  lockset. Gates: test 7,483,220 / 0 failed, audit clean, collide 1,488,
-  fuzz clean, latency 185 ms.
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -231,6 +229,14 @@ beside the door, placed by the owner with circles on a screenshot.
   **The price is stated once**; the SEND is stated twice (the quiet one and
   the summary's green one), and the audit requires both on every step with the
   identical href.
+- ⚠ **On a phone the bar is the way through, too** (27.9, the owner's son:
+  back and next *"moved to the bottom of the page and be seen at all times"*,
+  the send *"just send to save space"*): price · "שלחו" · two 44 px icon
+  arrows (`.quote__nav`, the word in `aria-label`/`title` from `markSteps`);
+  below 1100 no step shows its `.sect__foot`. The bar's height is unchanged
+  (67.0 px under 360, 71.3 above — `--quote-h` feeds every fold check), a
+  disabled arrow keeps its box, and below 1100 the CAPTION yields
+  (`minmax(min-content, 1fr)` floors the box at the figure), never the send.
 - ⚠ **`.stage__hud` IS ABSOLUTE AND MUST STAY ABSOLUTE.** Above 1100 px the
   stage is a flex item, so anything in the flow up there takes its height out
   of the drawing — a control that merely appeared in `.stage__bar` once cost

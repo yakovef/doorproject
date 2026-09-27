@@ -26,6 +26,76 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — ON A PHONE, BACK AND NEXT LIVE IN THE BOTTOM BAR, AND THE SEND SAYS
+  "SEND".** The owner's son: *"On the phone I want the next and back buttons to
+  be removed from the bottom of each section and moved to the bottom of the
+  page and be seen at all times like the next and 'send to WhatsApp' buttons,
+  also rename the button to just send to save space."*
+  · **Before:** below 1100 the quote bar held the price, the send ("שלחו
+    בוואטסאפ", cut to "Send on Wh…" / "Отправ…" in English and Russian at
+    every phone width) and a worded next; every step's foot held back and
+    next again, below the options, below the fold on most steps.
+  · **What changed.** `send.waOnShort` is "שלחו" / "Send" / "Отправить" (the
+    summary's green `send.waOn` and the ask/off labels untouched; `index.html`'s
+    static fallback follows). Below 1100 `.sect__foot` is not shown (after its
+    base rule, §8). The bar gains `.quote__nav`: back and next as ICON arrows,
+    44 px wide, the word in `aria-label` and `title` (written by `markSteps`
+    from `nav.back`/`nav.next`/`nav.toSummary` without the ‹ › glyph), the
+    chevron mirrored by the interface direction; they carry `sect__back` /
+    `sect__next`, so `markSteps` disables them with the others, and a disabled
+    arrow keeps its box (`visibility`), so nothing re-flows between steps. The
+    back is wired once at boot like the next (the panel is rebuilt by the
+    language picker; the bar is not).
+  · **Measured, before and after**, he/en/ru at 320/360/375/390/834: the bar
+    67.0 px tall under 360 and 71.3 above, identical — the worded next's 52 px
+    (`.btn`'s height, which beats the bar's 44 px rule by source order) set it
+    at 320, so the arrows keep 52 px of height; the group is 92 px against the
+    worded next's 73-88.
+  · **And a false comment and a false floor, found by measuring.** The 11.9
+    note said the price box's grid "stops the CAPTION setting the box's
+    width"; it did not — "ОРИЕНТИРОВОЧНАЯ ЦЕНА" set the Russian box to 152 px
+    at every width, which is what cut "Отправить" at 360-390. The first fix let
+    the box shrink "never below its min-content, which is the figure" — and the
+    falsification (a worded back beside a worded next) put the box at 13.6 px
+    under a 57.8 px figure: a `minmax(0, 1fr)` column has no minimum. Now the
+    column is `minmax(min-content, 1fr)` with the caption allowed to break
+    anywhere and clamped to one line, so the floor IS the figure (₪18,085
+    whole at 320 and 360), the caption yields (Russian, 360 to about 480 px,
+    "ОРИЕНТИРОВО…"), and the one-word send keeps its width. A row that still
+    cannot fit overflows the bar, and the audit says so.
+  · **Walked**, he and ru at 320/360/390 and at 1280: on every step exactly
+    one visible way on and (after the first) one way back, in the bar below
+    1100 and in the sticky foot above; labels in the page's language
+    (הקודם/הבא, Назад/Далее); back from the summary lands on משקוף. The tab
+    ring meets the price, the send and the next before the navigator and
+    reaches an option in 16 presses at 320, 390 and 1280.
+  · **Audit.** The price-figure sweep's "the label GREW on engagement" is
+    restated to "CHANGED, to the on-label" (the one word no longer grows); its
+    "painted under" clause asks of both arrows, and two clauses are new: the
+    four controls stand in ONE row, and none stands past the bar's edge. A new
+    walk — "on a phone, back and next are in the bar on every step" — forward
+    with the bar's arrow at 320/360/390 in he and ru: one way on and one back,
+    both inside the bar and ≥ 44 px, no foot shown, one bar height, back from
+    the summary. Falsified: a worded back beside a worded next overflows the
+    row at 320 in Hebrew and 320-390 in Russian (5 faults); the foot shown
+    again below 1100 faults every step of all six walks.
+  · **Sheets:** none of the bare sheets can move (page only, `?bare=1` hides
+    the bar); the one run is after the third commit.
+  · **And a slip of the previous commit, fixed here.** `fe65505` re-fitted
+    d106 to `circles-light` in `js/works.js` but restored
+    `screenshots/corpus-links.md` (which `npm run corpus` writes beside it)
+    to its old row, so that commit fails one assertion beyond the sheet rows
+    — *"d106: the table's query and js/works.js describe different doors"*.
+    Its recorded 9,196,962 / 5 was measured on the working tree BEFORE the
+    links file was restored. The one row (`g=circles` → `g=circles-light`) is
+    committed here.
+  · **Gates:** `node --check`, `npm run build`, `npm test` 9,196,962 passed / 5
+    failed — the five sheet-staleness rows, allowed on an intermediate commit.
+  · **Not done, on purpose:** a worded back (it does not fit a 320 px row — the
+    falsification above); moving the skip into the bar (the rail's ninth
+    circle is the phone's skip, and the row is spoken for); changing the
+    bar's height to the arrows' 44 px (every fold check reads `--quote-h`).
+
 - **27.9 — EVERY WINDOW DESIGN COMES IN BLACK OR THE DOOR'S COLOUR, ALL SEVEN.**
   The owner's son: *"Revert the change with the color of the design, it does
   follow the color of the door, so there should be 2 options for each design,
@@ -106,6 +176,15 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **26.9** Flow order `fit · colour · lock · pz · face · glass · grip · mk` —
+  *"the hardware finish … right after the lever … the pull handle … after the
+  panels and stripes"* (after the glass, asked), overruling Peretz's 30.8
+  *"handles before the panels"*; both quoted by `SECTIONS` and `WANT_ORDER`.
+  Toast walk: to the grip step, back to the glass. `fuzz` drew no bow in 30,000
+  designs — it draws every `DEFAULTS` field now. Falsified: old order 2/2
+  viewports; old walk one sentence. Sheets run 2 as predicted: 0/48 bare, 0/6
+  lockset. Gates: test 7,483,220 / 0 failed, audit clean, collide 1,488,
+  fuzz clean, latency 185 ms.
 - **26.9** The bow is its own axis on the face step, `VERSION` 25 (`BOWS`, `gb=`,
   ₪300 + the handle finish) — *"with the panels and stripes … comfortable with
   other pull handles"*: a bow and a bar together (336 doors, none touching;
