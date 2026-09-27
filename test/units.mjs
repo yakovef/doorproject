@@ -2438,10 +2438,13 @@ group('the page\'s own marks');
     `${Object.keys(SECTION_ICON).length} navigator marks and ${Object.keys(SPEC_ICON).length} ` +
     `row marks: a table that has lost entries passes every assertion above it vacuously`);
 
-  ok(SECTION_ICON.colour === SPEC_ICON.colour,
-    'the paint drop on the colour step and the paint drop on the colour row have come apart');
-  ok(SECTION_ICON.fit === SPEC_ICON.size,
-    'the ruler on the fit step and the ruler on the size row have come apart');
+  /* One idea, one mark (27.9): five rows draw their own step's picture. Three
+     of these pairs were promised by a comment and asserted nowhere. */
+  for (const [step, row] of [['colour', 'colour'], ['fit', 'size'], ['mk', 'mashkof'],
+                             ['pz', 'pirzul'], ['lock', 'lockset']]) {
+    ok(SECTION_ICON[step] === SPEC_ICON[row],
+      `the "${step}" step's mark and the "${row}" row's mark have come apart`);
+  }
 
   let threw = false;
   try { sectionIcon('no-such-step'); } catch { threw = true; }

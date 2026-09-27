@@ -129,6 +129,14 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The nine navigator marks redrawn as what each step sells — *"really
+  represent the actual content of the section and not some random circles and
+  squares"*: ajar door, swatch fan, lever on its plate, hinge with a glint,
+  panel-and-strips door, slanted pane, bar with its length, the frame alone,
+  the sheet with a tick (`js/icons.js`). Drafts failed the audit's pairwise
+  raster (face~glass 0.45, glass~sum 0.47) until the OUTLINES differed; worst
+  pair now fit~mk 0.60. Five spec rows share their step's mark by reference,
+  asserted. No bare sheet moved. Long form: `HISTORY.md`.
 - **27.9** Every window design in black OR the door's colour, all seven — the
   owner's son reversing his own 26.9 note (`8e1905d` reverted whole, the outline
   removal kept): base black, `-light` twin the paint; `circles-light`,
@@ -1103,7 +1111,7 @@ are not in `VIEWS`:
   no-photo (drawn room still painting), a wrong code says the code was not
   recognised, the language switch leaves no Hebrew behind, the order sheet
   prints on **one page** (real PDFs at 703 px, counting pages).
-- **pictures** — the navigator's nine marks and the spec's thirteen, rasterised
+- **pictures** — the navigator's nine marks and the spec's fourteen, rasterised
   at shipped size and compared pairwise (floor 0.50); the stripe pills; the
   gallery grid never one column, no tile under 132 px; the photographed floor
   and sconces measured in pixels against the drawn ones.
