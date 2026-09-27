@@ -1157,9 +1157,10 @@ export const PEEPHOLES = [
  * ⚠ AND NO DIAGONAL LATTICE ANYWHERE. `lattice` was ours. It resolves to the
  * fine etched mesh, which is the closest thing that exists.
  *
- * `light` means the ironwork is the door's own colour rather than black —
- * roughly as common as black across the gallery, so it is an axis and not a
- * variant. `glass` means the pattern is IN the pane: no shadow, no relief, and
+ * `light` means the ironwork is WHITE rather than black (27.9.2026 — it was
+ * the door's own colour, lightened; see the overrule on the twins below).
+ * Pale ironwork is roughly as common as black across the gallery, so it is an
+ * axis and not a variant. `glass` means the pattern is IN the pane: no shadow, no relief, and
  * a grille's rules about ironwork do not apply to it.
  *
  * ⚠ ONE THING THE MERGE COSTS, recorded rather than hidden: d102, d116 and
@@ -1195,12 +1196,12 @@ export const GRILLES = [
     doors: ['d094', 'd115'] },
   { id: 'grid',    he: 'סורג רשת',       en: 'Square grid', ru: 'Решётка-сетка',     aliases: ['bars', 'iron'],
     doors: ['d091', 'd100', 'd107', 'd110', 'd113', 'd117', 'd122'] },
-  { id: 'grid-light',   he: 'סורג רשת בהיר',   en: 'Square grid, door colour', ru: 'Решётка-сетка в цвет двери', light: true,
+  { id: 'grid-light',   he: 'סורג רשת לבן',   en: 'Square grid, white', ru: 'Решётка-сетка, белая', light: true,
     aliases: ['bars-light', 'iron-light'] },
   { id: 'scroll',  he: 'סורג מעוצב',     en: 'Grid with scrolls', ru: 'Кованая решётка',
     aliases: ['quatrefoil'],
     doors: ['d089', 'd093', 'd095', 'd097', 'd099', 'd102', 'd116'] },
-  { id: 'scroll-light', he: 'סורג מעוצב בהיר', en: 'Grid with scrolls, door colour', ru: 'Кованая решётка в цвет двери', light: true,
+  { id: 'scroll-light', he: 'סורג מעוצב לבן', en: 'Grid with scrolls, white', ru: 'Кованая решётка, белая', light: true,
     aliases: ['quatrefoil-light'] },
   /* ⚠ `iron` AND `iron-light` ARE WITHDRAWN — Peretz, 26.8.2026: "there is no
      זכוכית מחורצת, ברזל מחושל, מדליוני פרח". They were the heavy ornamental
@@ -1223,7 +1224,16 @@ export const GRILLES = [
      ONE door `quatrefoil` is read from and its column is painted white. We
      were drawing the only evidence door for that pattern in the wrong colour,
      with no option to correct it.
-     Appended to the end of the list, so no `VERSION` bump. */
+     Appended to the end of the list, so no `VERSION` bump.
+     ⚠ AND THE TWINS ARE WHITE NOW, NOT THE DOOR'S COLOUR — 27.9.2026, the
+     owner's son, overruling the sentence above: *"For some reason the color
+     of some designs colors change when I change the color of the door. The
+     colors of the designs are only white or black, they are not based on the
+     door color."* Peretz's 26.8 *"וכל אחד מהם גם בגוון הדלת ולא רק בשחור"* is
+     kept here beside the overrule. The drawing had painted a twin in the
+     door's paint lightened 0.10 while its tile painted a fixed #D8D8D4, so the
+     tile and the door already disagreed; both hand `GRILLE_LIGHT` now. Ids
+     unchanged — `-light` is a wire format; the labels say לבן / white / белый. */
   /* ⚠ `quatrefoil` AND `quatrefoil-light` ARE WITHDRAWN — Peretz named
      מדליוני פרח among the three he does not sell. One measured door (d104)
      carried it. Both ids resolve to `scroll`, the nearest surviving pattern. */
@@ -1306,9 +1316,9 @@ export const GRILLES = [
   /* The three missing `-light` twins, appended so the ids already in the wild
      keep their indices. `light` is the same one switch it has always been: the
      same ironwork, painted the door's colour instead of black. */
-  { id: 'arch-light', he: 'קשת בהירה', en: 'Arch, door colour', ru: 'Арка в цвет двери', light: true },
-  { id: 'deco-light', he: 'קווים גיאומטריים בהירים',
-    en: 'Art-deco lines, door colour', ru: 'Геометрические линии в цвет двери', light: true },
+  { id: 'arch-light', he: 'קשת לבנה', en: 'Arch, white', ru: 'Арка, белая', light: true },
+  { id: 'deco-light', he: 'קווים גיאומטריים לבנים',
+    en: 'Art-deco lines, white', ru: 'Геометрические линии, белые', light: true },
   /* ⚠ `reeded` IS WITHDRAWN — זכוכית מחורצת, the third of the three. It
      resolves to `mesh`, the other worked glass. */
 ];

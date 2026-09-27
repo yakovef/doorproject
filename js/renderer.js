@@ -6153,7 +6153,9 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g', ornW = null) {
     const cols = Math.max(4, Math.round(w / STEP));
     const s = w / cols, r = s;
     const sw = Math.max(1, r * 0.11);
-    const ink = scaleTone(paint, 1.06);
+    /* White, whatever the door (27.9 — it was the paint x1.06, so the rings
+       changed colour with the swatch). */
+    const ink = ETCH_WHITE;
     let out = '';                                  // no ground: the pane shows through
     const rows = Math.ceil(h / s) + 1;
     let d = '';
@@ -6199,7 +6201,7 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g', ornW = null) {
        copies overlap by a pixel at each join so no hairline of bare glass is
        left along the clip edge, and overlapping opaque white is still the
        same white. */
-    const frost = 'fill="#FFFFFF" fill-rule="evenodd"';
+    const frost = `fill="${ETCH_WHITE}" fill-rule="evenodd"`;
     let out = '';
     for (let j = 0; j < n; j++) {
       const from = j === 0 ? -1 : VINE.seam + (j - 1) * VINE.period - 1;
@@ -6231,12 +6233,11 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g', ornW = null) {
      No hairlines anywhere: nothing on that door is thinner than about 0.035 W,
      so this is filled tapering ribbons and never a stroked path. */
   if (kind === 'tree') {
-    /* `ground` is what the pane USED to be filled with under this design and
-       is kept only as the reference the ink is tested against — the
-       silhouette has to be darker than any field it could stand on. */
-    const ground = scaleTone(paint, 0.42);
-    let ink = scaleTone(paint, 0.12);
-    if (luminance(ink) > luminance(ground) * 0.30) ink = '#17120F';
+    /* A fixed near-black, whatever the door — 27.9.2026: it was the paint
+       x0.12, floored at #17120F against a `ground` of the paint x0.42 that
+       nothing else read, so a pale door drew a tinted tree. *"The colors of
+       the designs are only white or black."* The floor's value is kept. */
+    const ink = TREE_BLACK;
     let out = '';                                  // no ground: the pane shows through
     const fill = d => `<path d="${d}" fill="${ink}"/>`;
 
@@ -6589,7 +6590,7 @@ function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
            half a ring's worth of scallops appeared on the door beside the
            opening. A pattern is in the glass; the glass stops at the frame. -->
       <g clip-path="url(#${id})">${glass ? glass.veil : ''}</g>
-      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grille.light ? lighten(paint, 0.10) : null, ornW)}</g>
+      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grilleTint(grille), ornW)}</g>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
       <!-- occlusion under the head of the aperture -->
       <rect x="${x}" y="${y}" width="${w}" height="34" fill="url(#aoTop)"/>
@@ -6679,11 +6680,29 @@ function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
    origins are still different. `npm run audit`'s duplicate-id sweep is the
    check on that, and it is the reason this is safe to do here rather than by
    passing a second origin down every branch. */
+/* ⚠ A DESIGN IS WHITE OR BLACK, NEVER THE DOOR'S COLOUR — 27.9.2026, the
+   owner's son: *"The colors of the designs are only white or black, they are
+   not based on the door color."* Three constants, and nothing inside a design
+   reads the paint: the `-light` ironwork twins (they were the paint lightened
+   0.10 on the door and a fixed #D8D8D4 on the tile, so the two disagreed),
+   the etched rings and vine (frosted into the glass, and frosted is white on
+   any door; the rings were the paint x1.06), and the tree (a black
+   silhouette, 14.9 B1 — it was the paint x0.12 with a floor). Base ironwork
+   was always the fixed #232527 below. The pane, its sky and sheen and the
+   mullions still take the paint; only the DESIGN is fixed. */
+export const GRILLE_LIGHT = '#FFFFFF';
+const ETCH_WHITE = '#FFFFFF';
+const TREE_BLACK = '#17120F';
+/** What a grille's ironwork is painted on the door and on its tile alike. */
+export const grilleTint = grille => (grille.light ? GRILLE_LIGHT : null);
+
 function grillePaths(kind, x, y, w, h, tint, ornW = null) {
-  /* `tint` is the bar's own colour. Ironwork is near-black, but muntins in the
-     door's own paint are just as common — d097 is white bars on a white door,
-     legible only by their shadow — and drawing those dark inverts the most
-     visible thing about the pane. */
+  /* `tint` is the bar's own colour. Ironwork is near-black, but pale muntins
+     are just as common — d097 is white bars on a white door, legible only by
+     their shadow — and drawing those dark inverts the most visible thing about
+     the pane. The site hands it `grilleTint` (white or nothing, 27.9); the
+     corpus recreations pass a photographed door's real bar colour through the
+     same parameter, which is why it stays a parameter. */
   /* The `-light` variants share their base pattern and differ only in colour,
      so strip the suffix before dispatching. Without this they matched no
      branch at all and drew an empty pane — a grille the customer paid for,
@@ -10049,7 +10068,7 @@ export function grilleGlyph(grille) {
   return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
     <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
     ${glass ? glass.veil
-            : `<g>${grillePaths(grille.id, 0, 0, S, S, grille.light ? "#D8D8D4" : null)}</g>`}
+            : `<g>${grillePaths(grille.id, 0, 0, S, S, grilleTint(grille))}</g>`}
     <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
   </svg>`;
 }

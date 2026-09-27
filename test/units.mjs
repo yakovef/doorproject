@@ -9,7 +9,7 @@ import { L, LANG_IDS, T, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
   bellGlyph, bowGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
-  gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
+  gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, GRILLE_LIGHT, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
   bellFits, bowFeet, bowFits, bowHome, bowPlacement, locksetGlyph, mashkofGlyph, panelUnderGlass, spawnIndexOf, spawnSpots, peepholeFits,
   peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph, stripesGlyph,
   windowGlyph,
@@ -1903,6 +1903,69 @@ group('every grille draws something, and no two draw the same thing');
    the colour of the same ironwork, not the pattern, and the photographs were
    read for pattern. So it is asked for a parent that exists rather than for
    doors of its own. */
+/* ── A DESIGN IS WHITE OR BLACK, NEVER THE DOOR'S COLOUR — 27.9.2026 ──
+   The owner's son: *"For some reason the color of some designs colors change
+   when I change the color of the door. The colors of the designs are only
+   white or black, they are not based on the door color."* The `-light` twins
+   were the paint lightened 0.10, the etched rings the paint x1.06, the tree
+   the paint x0.12. Asked of the DRAWING: every design, on the two paints he
+   named (לבן 9016 and אפור פחם 7021), both windows, a single leaf and the
+   door-and-a-half, the colours inside the design's own clip groups (the
+   `cl-` clip `aperture` cuts to the hole — never the pane's rects, which do
+   take the paint) must be the same set on both doors and drawn only from the
+   fixed constants. §5.15: every door must have yielded a design group with
+   colours in it. Falsified by restoring `lighten(paint, 0.10)`: the light
+   rows go red and the black rows stay green. */
+group('a design is white or black, never the door\'s colour');
+{
+  const FIXED = new Set(['#fff', '#ffffff', '#000', '#000000', '#232527', '#8a8f94', '#17120f']);
+  const inside = (svg, open) => {                   // balanced <g>…</g> after `open`
+    let depth = 1; const tag = /<(\/?)g\b[^>]*?(\/?)>/g; tag.lastIndex = open;
+    for (let t; (t = tag.exec(svg));) {
+      if (t[1]) { if (!--depth) return svg.slice(open, t.index); } else if (!t[2]) depth++;
+    }
+    return '';
+  };
+  const hexes = markup => new Set([...markup.matchAll(/(?:stroke|fill)="(#[0-9A-Fa-f]{3,8})"/g)]
+    .map(m => m[1].toLowerCase()));
+  const designOf = svg => {
+    let groups = 0; const all = new Set();
+    for (const m of svg.matchAll(/<g clip-path="url\(#cl-[^)]+\)">/g)) {
+      groups++;
+      for (const c of hexes(inside(svg, m.index + m[0].length))) all.add(c);
+    }
+    return { groups, all };
+  };
+  const PAINTS = ['rb-9016d', 'rb-7021d'];
+  let rows = 0, lightRows = 0;
+  for (const g of GRILLES) if (g.id !== 'none') for (const window of ['rect', 'strip'])
+  for (const size of ['standard', 'half']) {
+    const read = PAINTS.map(colour => {
+      const st = repair({ ...base, size, window, detail: 'plain', grille: g.id, colour }).state;
+      return st.grille === g.id ? designOf(render(st)) : null;
+    });
+    if (!read[0] || !read[1]) continue;                // the rules refused this window for it
+    rows++; if (g.light) lightRows++;
+    const [a, b] = read;
+    ok(a.groups > 0 && a.all.size > 0, `${g.id} on ${window}/${size}: no design group with colours in it was found — this check is dead`);
+    const same = a.all.size === b.all.size && [...a.all].every(c => b.all.has(c));
+    ok(same, `${g.id} on ${window}/${size}: the design is ${[...a.all]} on white and ${[...b.all]} on charcoal — it follows the door's paint`);
+    const stray = [...a.all, ...b.all].filter(c => !FIXED.has(c));
+    ok(!stray.length, `${g.id} on ${window}/${size}: the design paints ${stray} — only white and the fixed blacks are allowed`);
+    ok(g.light ? a.all.has(GRILLE_LIGHT.toLowerCase()) && !a.all.has('#232527')
+               : g.glass ? true : a.all.has('#232527'),
+       `${g.id}: a ${g.light ? 'white' : 'black'} design must be drawn ${g.light ? 'white' : 'in the fixed ironwork black'}`);
+    /* And the tile paints what the door paints (the 10.9 rule): the door drew
+       the twins in the paint lightened while the tile drew #D8D8D4. */
+    const tile = hexes(grilleGlyph(g)); tile.delete('#7c8891');
+    ok(tile.size === a.all.size && [...tile].every(c => a.all.has(c)),
+       `${g.id}: the tile paints ${[...tile]} and the door ${[...a.all]}`);
+  }
+  ok(rows > 20 && lightRows >= 4, `the design sweep asked ${rows} doors, ${lightRows} of them light — too few to mean anything`);
+  ok(grilleGlyph(byId(GRILLES, 'grid')) !== grilleGlyph(byId(GRILLES, 'grid-light')),
+     'the black and the white grid draw the same tile');
+}
+
 group('every grille names the doors it was read from');
 {
   const byIdent = new Map(GRILLES.map(g => [g.id, g]));

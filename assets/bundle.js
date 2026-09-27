@@ -990,19 +990,19 @@
     grid: 0,
     // סורג רשת
     "grid-light": 0,
-    // סורג רשת בהיר
+    // סורג רשת לבן
     scroll: 0,
     // סורג מעוצב
     "scroll-light": 0,
-    // סורג מעוצב בהיר
+    // סורג מעוצב לבן
     arch: 0,
     // קשת
     "arch-light": 0,
-    // קשת בהירה
+    // קשת לבנה
     deco: 0,
     // קווים גיאומטריים
     "deco-light": 0,
-    // קווים גיאומטריים בהירים
+    // קווים גיאומטריים לבנים
     /* The three laser-cut ones. "laser hard ones" — more machine time, and the
        only three in the range that are cut rather than bent. */
     circles: 700,
@@ -1909,9 +1909,9 @@
     },
     {
       id: "grid-light",
-      he: "סורג רשת בהיר",
-      en: "Square grid, door colour",
-      ru: "Решётка-сетка в цвет двери",
+      he: "סורג רשת לבן",
+      en: "Square grid, white",
+      ru: "Решётка-сетка, белая",
       light: true,
       aliases: ["bars-light", "iron-light"]
     },
@@ -1925,9 +1925,9 @@
     },
     {
       id: "scroll-light",
-      he: "סורג מעוצב בהיר",
-      en: "Grid with scrolls, door colour",
-      ru: "Кованая решётка в цвет двери",
+      he: "סורג מעוצב לבן",
+      en: "Grid with scrolls, white",
+      ru: "Кованая решётка, белая",
       light: true,
       aliases: ["quatrefoil-light"]
     },
@@ -1952,7 +1952,16 @@
        ONE door `quatrefoil` is read from and its column is painted white. We
        were drawing the only evidence door for that pattern in the wrong colour,
        with no option to correct it.
-       Appended to the end of the list, so no `VERSION` bump. */
+       Appended to the end of the list, so no `VERSION` bump.
+       ⚠ AND THE TWINS ARE WHITE NOW, NOT THE DOOR'S COLOUR — 27.9.2026, the
+       owner's son, overruling the sentence above: *"For some reason the color
+       of some designs colors change when I change the color of the door. The
+       colors of the designs are only white or black, they are not based on the
+       door color."* Peretz's 26.8 *"וכל אחד מהם גם בגוון הדלת ולא רק בשחור"* is
+       kept here beside the overrule. The drawing had painted a twin in the
+       door's paint lightened 0.10 while its tile painted a fixed #D8D8D4, so the
+       tile and the door already disagreed; both hand `GRILLE_LIGHT` now. Ids
+       unchanged — `-light` is a wire format; the labels say לבן / white / белый. */
     /* ⚠ `quatrefoil` AND `quatrefoil-light` ARE WITHDRAWN — Peretz named
        מדליוני פרח among the three he does not sell. One measured door (d104)
        carried it. Both ids resolve to `scroll`, the nearest surviving pattern. */
@@ -2053,12 +2062,12 @@
     /* The three missing `-light` twins, appended so the ids already in the wild
        keep their indices. `light` is the same one switch it has always been: the
        same ironwork, painted the door's colour instead of black. */
-    { id: "arch-light", he: "קשת בהירה", en: "Arch, door colour", ru: "Арка в цвет двери", light: true },
+    { id: "arch-light", he: "קשת לבנה", en: "Arch, white", ru: "Арка, белая", light: true },
     {
       id: "deco-light",
-      he: "קווים גיאומטריים בהירים",
-      en: "Art-deco lines, door colour",
-      ru: "Геометрические линии в цвет двери",
+      he: "קווים גיאומטריים לבנים",
+      en: "Art-deco lines, white",
+      ru: "Геометрические линии, белые",
       light: true
     }
     /* ⚠ `reeded` IS WITHDRAWN — זכוכית מחורצת, the third of the three. It
@@ -5957,7 +5966,7 @@ ${body}
       const cols = Math.max(4, Math.round(w / STEP));
       const s = w / cols, r = s;
       const sw = Math.max(1, r * 0.11);
-      const ink = scaleTone(paint2, 1.06);
+      const ink = ETCH_WHITE;
       let out = "";
       const rows = Math.ceil(h / s) + 1;
       let d = "";
@@ -5977,7 +5986,7 @@ ${body}
       const need = h / k;
       const n = Math.max(1, Math.ceil((need - VINE.h) / VINE.period) + 1);
       const id = uid("vine");
-      const frost = 'fill="#FFFFFF" fill-rule="evenodd"';
+      const frost = `fill="${ETCH_WHITE}" fill-rule="evenodd"`;
       let out = "";
       for (let j = 0; j < n; j++) {
         const from = j === 0 ? -1 : VINE.seam + (j - 1) * VINE.period - 1;
@@ -5997,9 +6006,7 @@ ${body}
       return { veil: out, over: "" };
     }
     if (kind === "tree") {
-      const ground = scaleTone(paint2, 0.42);
-      let ink = scaleTone(paint2, 0.12);
-      if (luminance(ink) > luminance(ground) * 0.3) ink = "#17120F";
+      const ink = TREE_BLACK;
       let out = "";
       const fill = (d) => `<path d="${d}" fill="${ink}"/>`;
       const ribbon = (spine, hw) => {
@@ -6220,7 +6227,7 @@ ${body}
            half a ring's worth of scallops appeared on the door beside the
            opening. A pattern is in the glass; the glass stops at the frame. -->
       <g clip-path="url(#${id})">${glass ? glass.veil : ""}</g>
-      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grille.light ? lighten(paint2, 0.1) : null, ornW)}</g>
+      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grilleTint(grille), ornW)}</g>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
       <!-- occlusion under the head of the aperture -->
       <rect x="${x}" y="${y}" width="${w}" height="34" fill="url(#aoTop)"/>
@@ -6248,6 +6255,10 @@ ${body}
     }).join("")}
     </g>`;
   }
+  var GRILLE_LIGHT = "#FFFFFF";
+  var ETCH_WHITE = "#FFFFFF";
+  var TREE_BLACK = "#17120F";
+  var grilleTint = (grille) => grille.light ? GRILLE_LIGHT : null;
   function grillePaths(kind, x, y, w, h, tint, ornW = null) {
     const idKind = String(kind);
     kind = idKind.replace(/-light$/, "");
@@ -7916,7 +7927,7 @@ ${body}
     const glass = grille.glass ? glazingArt(grille.id, 0, 0, S, S, "#8E979D", "t" + grille.id) : null;
     return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
     <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
-    ${glass ? glass.veil : `<g>${grillePaths(grille.id, 0, 0, S, S, grille.light ? "#D8D8D4" : null)}</g>`}
+    ${glass ? glass.veil : `<g>${grillePaths(grille.id, 0, 0, S, S, grilleTint(grille))}</g>`}
     <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
   </svg>`;
   }

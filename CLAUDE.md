@@ -128,6 +128,12 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
 Older and long-form: **`HISTORY.md`** (verbatim to 26.9.2026). Dates are the
 day of the change.
 
+- **27.9** A design is white or black, never the door's colour — *"The colors
+  of the designs are only white or black, they are not based on the door
+  color"* (overruling Peretz's 26.8 *"…גם בגוון הדלת"*): `-light` twins white on
+  door and tile alike (`grilleTint`), etched rings white, the tree a fixed
+  near-black. Falsified: `lighten(paint, 0.10)` back fails 64 light rows, 0
+  black. Labels לבן / white / белый; ids unchanged.
 - **27.9** The digital viewer is refused beside a window, like the optical one
   — *"The digital peephole still stays when there is a window, this can't
   happen."* `conflicts` and `repair` named `'peep'`; one `viewerOn` predicate
@@ -673,6 +679,16 @@ scene was built, hit the number, made every window the busiest thing in the
 drawing, and was **reverted on the owner's word**: a configurator is not a
 photograph. Obscured and reeded glass stay patterned and measure DARKER than the
 paint — behind them is an unlit hall.
+
+⚠ **A design is white or black, never the paint** (27.9, the owner's son,
+overruling Peretz's 26.8 *"וכל אחד מהם גם בגוון הדלת"*). Black ironwork is the
+fixed `#232527` with its `#000` shadow and `#8A8F94` gleam; the `-light` twins
+are `GRILLE_LIGHT` white, handed to the door and the tile by one `grilleTint`;
+the etched rings and vine are white (frosted is white on any door); the tree is
+a fixed near-black (`TREE_BLACK`, 14.9 B1 *"a black silhouette"*). The pane, its
+sky and sheen and the mullions still take the paint. `grillePaths`' `tint`
+parameter stays: the corpus recreations pass photographed bar colours through
+it.
 
 ### The flow — `SECTIONS` and `GROUPS` in `js/app.js`
 

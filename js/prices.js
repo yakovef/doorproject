@@ -198,13 +198,13 @@ export const WINDOW = {
 export const GRILLE = {
   none:         0,   // ללא סורג
   grid:         0,   // סורג רשת
-  'grid-light': 0,   // סורג רשת בהיר
+  'grid-light': 0,   // סורג רשת לבן
   scroll:       0,   // סורג מעוצב
-  'scroll-light': 0, // סורג מעוצב בהיר
+  'scroll-light': 0, // סורג מעוצב לבן
   arch:         0,   // קשת
-  'arch-light': 0,   // קשת בהירה
+  'arch-light': 0,   // קשת לבנה
   deco:         0,   // קווים גיאומטריים
-  'deco-light': 0,   // קווים גיאומטריים בהירים
+  'deco-light': 0,   // קווים גיאומטריים לבנים
   /* The three laser-cut ones. "laser hard ones" — more machine time, and the
      only three in the range that are cut rather than bent. */
   circles:      700, // עיגולים שזורים
