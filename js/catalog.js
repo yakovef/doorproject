@@ -1232,7 +1232,10 @@ export const GRILLES = [
      was drawn pale when the real one is a black silhouette, and it forks).
      So the sheets are the instrument that is blunt here, not the drawing, and
      the honest fix is a better photograph rather than a better guess.
-     ASK-PERETZ asks for one. */
+     ASK-PERETZ asks for one.
+     ⚠ THE VINE HALF IS CLOSED, 26.9.2026: the owner's son sent the design
+     sheet itself (research/vine/design.webp) and `glazingArt` draws it traced
+     (js/vine.js), in white. d109 and d111 stay cited as the doors it is on. */
   { id: 'vine',    he: 'גפן',            en: 'Grape and vine', ru: 'Виноградная лоза',  glass: true,
     doors: ['d109', 'd111'] },
   { id: 'tree',    he: 'עץ',             en: 'Tree', ru: 'Дерево',            glass: true,

@@ -127,6 +127,10 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
 Older and long-form: **`HISTORY.md`** (verbatim to 26.9.2026). Dates are the
 day of the change.
 
+- **26.9** The גפן window design is the owner's son's own sheet, TRACED
+  (*"this is how the grape and vine design really looks… the design is really
+  white"*): `research/vine/design.webp` → `tools/trace-vine.py` (potracer) →
+  `js/vine.js`; white, pane-width scale, repeated at its measured 1207 px period.
 - **26.9** One square window, the Greek set's (`WINDOWS.rect.frac`, `glassRows`);
   the pair keeps its lower panel under it at ₪0 (A20), the trio is refused (76
   mm into the plate); a face tap never removes the window (`panelUnderGlass`).
@@ -391,6 +395,7 @@ works from `file://` and Peretz can open the folder on his own laptop.
 | `js/app.js` | the DOM: the flow, the gallery, the sheet, undo. `SECTIONS` and `GROUPS` |
 | `js/icons.js` | the navigator's and the spec's own marks, never tile art (§7). Split out so tests can read them |
 | `js/works.js` | Peretz's 30 real doors, **generated** by `npm run corpus` |
+| `js/vine.js` | the גפן window design as one traced outline, **generated** by `python3 tools/trace-vine.py` from `research/vine/design.webp` — never hand-edit |
 | `test/units.mjs` | the string-level suite, no framework |
 | `tools/*.mjs` | measuring instruments, not scripts (§7). `tools/_*.mjs` are gitignored scratch |
 | `research/works/` | 129 photographs, 31 measured records (30 usable); `INVENTORY.md` lists every fitting |
