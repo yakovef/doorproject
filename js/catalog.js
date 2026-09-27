@@ -664,7 +664,11 @@ export const HANDLE_LEGACY = {
  * a link written when it existed still opens a door.
  */
 export const LOCKSETS = [
+  /* `escutcheon: 'covered'` since 27.9.2026: four installed Coral doors and
+     RB's cut-out show the cylinder covered, only its round plug visible
+     (research/handles/coral/). A property, so no VERSION. */
   { id: 'coral',   he: 'קורל',  en: 'Coral', ru: 'Корал',      style: 'lever', aliases: ['lever'], lever: true,
+    escutcheon: 'covered',
     photo: 'research/handles/rb/enterance-handle-product-coral.png' },
 
   /* Cylinder only: a keyway escutcheon and nothing else.
@@ -883,7 +887,10 @@ export const LOCKSETS = [
  * says bronze reads differently, it is one ramp.
  */
 export const PIRZUL = [
-  { id: 'pz-nickel', he: 'ניקל',   en: 'Nickel', ru: 'Никель', tone: 'steel' },
+  /* `nickel`, not `steel`, since 27.9.2026: the lock furniture's satin nickel
+     measured warmer and darker than the pull bar's steel off four installed
+     Coral doors — see FINISH_TONES in the renderer. */
+  { id: 'pz-nickel', he: 'ניקל',   en: 'Nickel', ru: 'Никель', tone: 'nickel' },
   { id: 'pz-black',  he: 'שחור',   en: 'Black', ru: 'Чёрный',  tone: 'black' },
   { id: 'pz-bronze', he: 'ברונזה', en: 'Bronze', ru: 'Бронза', tone: 'bronze' },
   { id: 'pz-gold',   he: 'זהב',    en: 'Gold', ru: 'Золото',   tone: 'brass' },

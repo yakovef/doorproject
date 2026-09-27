@@ -3589,114 +3589,111 @@ group('the second review\'s night round — 25.9.2026');
   }
   ok(checkedPairs >= 6, `only ${checkedPairs} glazed door-and-a-half doors checked — the window clause has no subject`);
 
-  /* "it looks more like a scythe, just shorter and becomes narrower faster,
-     it is a bit shorter than the coral lever." Read off the tile, which draws
-     from the same outline as the door: shorter than the Coral's, a point at
-     the tip, and the narrowing mostly done by the middle. */
+  /* ⚠ RESTATED 27.9.2026 — FROM WORDS TO THREE PHOTOGRAPHS, AND STRONGER.
+     Until today every clause here was one of the owner's son's descriptions
+     of a lever nobody had photographed (25.9-26.9): "a scythe … shorter and
+     becomes narrower faster", "curved downwards not upwards … at the start of
+     it its a little bit wider … the curve is a little bit more curved",
+     "rotate it a little bit up", "the end of the handle needs to be the same
+     height as the start". Each was a RANGE a shape could land anywhere in.
+     Then he sent three installed doors and "I trust you to put it into the
+     app after you finish" (research/handles/curved/README.md). Rectified,
+     they give numbers, and five of the old clauses asked for shapes the
+     photographs do not have:
+       · "past half its narrowing by the middle" — the taper is LINEAR:
+         21 / ~15 / ~9.5 deep at 30 / 70 / 100 mm;
+       · "bends more than 0.055 of its chord", "the curl belongs at the tip" —
+         the blade runs nearly level; the curve is the ROOT diving into the rose;
+       · "tip level with the spindle" — the tip is level with where the blade
+         LEAVES THE ROSE, and both sit 3-6 mm above the spindle;
+       · "1.35 of the Coral's blade at the neck" — 21 where it leaves the rose.
+     So each is now asked as the photographs' number with a tolerance, which
+     pins the shape where the words only bounded it; and every one of his
+     words the photographs agree with is still asked as he said it. */
+  /* Only the sampled band — the root's hook is an arc after it. */
+  const bandOf = d => d.split(' A ')[0];
   const tile = locksetGlyph(LOCKSETS.find(k => k.id === 'lever-taper'));
   const coral = locksetGlyph(LOCKSETS.find(k => k.id === 'coral'));
   const blade = /<path d="(M [^"]+)"\/>/.exec(tile);
-  ok(blade, 'the curved lever tile has no blade path — the scythe check is dead');
+  ok(blade, 'the curved lever tile has no blade path — the shape check is dead');
+  ok(blade && / A [\d.]+ [\d.]+ 0 0 [01] /.test(blade[1]),
+     'the curved lever tile has no hook at its root — the root is where its curve is');
   if (blade) {
-    /* The outline is the top edge from the neck to the tip, one control
-       point and the tip, then the bottom edge back: N+1 pairs, 2, N+1. */
-    const P = [...blade[1].matchAll(/(-?[\d.]+) (-?[\d.]+)/g)].map(m => [Number(m[1]), Number(m[2])]);
+    /* The band is the top edge from the spindle to the tip, one control point
+       and the tip, then the bottom edge back: N+1 pairs, 2, N+1. The tile is
+       mirrored, so t runs along -x; y is DOWN, from the spindle. */
+    const P = [...bandOf(blade[1]).matchAll(/(-?[\d.]+) (-?[\d.]+)/g)].map(m => [Number(m[1]), Number(m[2])]);
     const n = (P.length - 2) / 2;
     const top = P.slice(0, n), bot = P.slice(n + 2).reverse();
     ok(Number.isInteger(n) && n > 4 && top.length === bot.length,
        `the curved lever's outline is not the sampled band it should be (${P.length} points)`);
-    /* The TRUE thickness across the blade rather than its vertical height:
-       since the blade is turned up about its spindle, top and bottom points
-       of one station no longer share an x, and a vertical reading would
-       measure the turn as well as the shape. */
-    const depth = i => Math.hypot(bot[i][0] - top[i][0], bot[i][1] - top[i][1]);
-    const mid = i => (bot[i][1] + top[i][1]) / 2;
-    const C = i => [(bot[i][0] + top[i][0]) / 2, (bot[i][1] + top[i][1]) / 2];
-    const last = n - 1, half = Math.floor(last / 2);
-    const reach = Math.abs(top[last][0]);
-    const coralReach = Number(/width="([\d.]+)"\s+height="[\d.]+" rx/.exec(coral)[1]);
-    ok(reach < coralReach, `the curved lever reaches ${reach} against the Coral's ${coralReach} — it is a bit shorter`);
-    ok(reach > coralReach * 0.75, `the curved lever reaches ${reach} — "a bit shorter" than ${coralReach}, not a stub`);
-    ok(depth(last) < depth(0) * 0.4, `the scythe's point is ${depth(last).toFixed(1)} deep against ${depth(0).toFixed(1)} at the neck`);
-    ok(depth(half) - depth(last) < (depth(0) - depth(last)) * 0.5,
-       'the curved lever narrows evenly — it should be past half its narrowing by the middle');
-    /* And later the same day: "It is curved downwards not upwards like right
-       now. 2, at the start of it its a little bit wider. 3, the curve is a
-       little bit more curved." The drawing's y runs DOWN, so a tip that hangs
-       has the larger mid. Each number below is one the morning's scythe
-       fails: it climbed, it swept 0.20 of its reach, and its neck was 1.22 of
-       the Coral's blade. */
-    /* ⚠ RESTATED 26.9.2026, SAME SUBJECT. These two read the curl straight
-       off the drawing's y — "the tip hangs below the neck", "the middle has
-       done less than 0.4 of that" — which was the blade's own frame while it
-       hung square. The owner's son has since put the tip at the neck's height
-       (below), so the drawing's y now measures the turn, and `sweep > 0` would
-       fail by being asked the wrong frame, not because the blade stopped
-       curling down. Both are asked now against the line the blade LEAVES THE
-       ROSE along (C(0) to C(1), which no turn can bend): the tip must stand
-       below that line, and the middle must have done less than 0.4 of the
-       tip's fall from it. On the 25.9 morning scythe — which climbed — the
-       first is negative, exactly as the old form was; hung square or turned
-       any amount, the second reads the same 0.23. */
-    const [nx, ny] = [C(1)[0] - C(0)[0], C(1)[1] - C(0)[1]], nl = Math.hypot(nx, ny);
-    const offNeck = i => ((C(i)[1] - C(0)[1]) * Math.abs(nx) - (C(i)[0] - C(0)[0]) * Math.sign(nx) * ny) / nl;
-    const sweep = offNeck(last), early = offNeck(half);
-    ok(sweep > 0, `the curved lever's tip stands ${(-sweep).toFixed(1)} ABOVE the line it leaves its rose along — it curves downwards, not up`);
-    ok(early < sweep * 0.4, 'the curved lever bends in a straight line — the curl belongs at the tip');
-    /* And later still: "Now the shape is right, but you need to rotate it a
-       little bit up so it will be more Horizontal looking." So the SHAPE is
-       asked in a frame no turn can move — how far the middle of the blade
-       stands off the straight line from its neck to its tip, positive when it
-       stands ABOVE that line, which is what a blade that curls down at the
-       tip does — and the TURN is asked separately. A bend held while the
-       chord flattens is a rotation; a chord that flattens because the bend
-       went is the shape the owner's son said was right, taken away.
-       (These replace "the tip sweeps more than half the neck's depth" and
-       "the drop is more than 0.25 of the reach", which measured the curve
-       and the turn as one number; hung square, the shape reads 0.064 of its
-       chord, and a 22 drop — the morning's sweep — reads 0.048.) */
-    const [x0, y0] = C(0), [xm, ym] = C(half), [x1, y1] = C(last);
-    const chord = Math.hypot(x1 - x0, y1 - y0);
-    const bend = (y0 + (y1 - y0) * (xm - x0) / (x1 - x0) - ym) * Math.abs(x1 - x0) / chord;
-    ok(bend > 0, `the middle of the curved lever stands ${(-bend).toFixed(1)} BELOW the line from its neck to its tip — it curves up, not down`);
-    ok(bend > chord * 0.055,
-       `the curved lever bends ${(bend / chord).toFixed(3)} of its chord — it should be a little more curved than 0.048`);
-    ok(C(1)[1] < C(0)[1], 'the curved lever leaves its rose falling — it should be turned up a little, so the neck rises');
-    /* ⚠ RESTATED 26.9.2026, STRONGER. This was `fall < 10` degrees — "turned
-       up a little" read as a ceiling, which the 8-degree turn met at 7.4.
-       Then: *"make it face a little bit more upward … the end of the handle
-       needs to be the same height as the start."* That is not a ceiling, it
-       is a point: the tip's centre on the spindle's height, to a millimetre,
-       and it implies the old clause (level is 0 degrees). 8 typed back leaves
-       the tip 14.5 below and fails it. */
-    ok(Math.abs(y1 - y0) < 1,
-       `the curved lever's tip is ${(y1 - y0).toFixed(1)} mm ${y1 > y0 ? 'below' : 'above'} its spindle — the end of the handle is the same height as the start`);
-    const coralBlade = Number(/height="([\d.]+)" rx/.exec(coral)[1]);
-    ok(depth(0) >= coralBlade * 1.35,
-       `the curved lever is ${depth(0).toFixed(1)} deep at the neck against the Coral's ${coralBlade} — it should start a little wider`);
+    const at = (edge, t) => {                    // an edge's y at distance t, interpolated
+      for (let i = 1; i < edge.length; i++) {
+        const [u0, v0] = [-edge[i - 1][0], edge[i - 1][1]], [u1, v1] = [-edge[i][0], edge[i][1]];
+        if (t >= u0 && t <= u1) return v0 + (v1 - v0) * (t - u0) / (u1 - u0);
+      }
+      return NaN;
+    };
+    const depth = t => at(bot, t) - at(top, t), centre = t => (at(bot, t) + at(top, t)) / 2;
+    const last = -top[top.length - 1][0];
+    const coralReach = -Number(/<rect x="(-[\d.]+)"/.exec(coral)[1]);
+    /* "a bit shorter than the coral lever" — as he said it. */
+    ok(last < coralReach, `the curved lever reaches ${last} against the Coral's ${coralReach} — it is a bit shorter`);
+    ok(last > coralReach * 0.75, `the curved lever reaches ${last} — "a bit shorter" than ${coralReach}, not a stub`);
+    /* The photographs' depths, each within 1.5 mm (one photo pixel is 1.6). */
+    for (const [t, want] of [[30, 21], [70, 15], [98, 9.5]]) {
+      ok(Math.abs(depth(t) - want) <= 1.5,
+         `the curved lever is ${depth(t).toFixed(1)} deep at ${t} mm; the three doors read ${want}`);
+    }
+    /* "becomes narrower faster" and "at the start of it its a little bit
+       wider" — as he said them: widest where it leaves the rose, narrowing
+       all the way, and a point under half that depth. */
+    let steady = true;
+    for (let t = 32; t <= 98; t += 6) if (depth(t + 3) > depth(t) + 0.01) steady = false;
+    ok(steady, 'the curved lever widens somewhere along its reach — it narrows all the way from the rose');
+    ok(depth(98) < depth(31.5) * 0.5,
+       `the point is ${depth(98).toFixed(1)} deep against ${depth(31.5).toFixed(1)} at the rose — it narrows fast`);
+    /* It runs nearly level, 3-6 mm above the spindle (the photographs), and
+       "the end … the same height as the start" — the start a customer sees,
+       where the blade leaves its rose — to 1.5 mm. */
+    ok(centre(31.5) <= -3 && centre(31.5) >= -6,
+       `where it leaves the rose the curved lever's centre is ${centre(31.5).toFixed(1)} off the spindle; the doors read 3-6 above`);
+    ok(Math.abs(centre(98) - centre(31.5)) <= 1.5,
+       `the curved lever's tip is ${(centre(98) - centre(31.5)).toFixed(1)} mm off the height where it leaves the rose — the end is the same height as the start`);
+    /* "curved downwards not upwards" — as he said it, and where the doors put
+       the curve: the ROOT, which dives from the blade's line down to the
+       spindle. Asked against the line the blade runs along outside the rose
+       (31.5 to 98 mm), extended back to the spindle: the neck must stand
+       BELOW it by at least 3 mm (the doors: 3-6). A blade that climbed out of
+       its rose, as the 26.9 turn did, stands above it. */
+    const slope = (centre(98) - centre(31.5)) / (98 - 31.5);
+    const lineAt0 = centre(31.5) - slope * 31.5;
+    ok(centre(0.5) - lineAt0 >= 3,
+       `the curved lever's root stands ${(centre(0.5) - lineAt0).toFixed(1)} below the line of its blade — it should dive down into the rose`);
   }
 
-  /* And the same "same height as the start" asked of the DOOR, every size and
-     both handings, because the tile and the door share taperAt and a check on
-     one of them is a check on a shared function only while nobody forks it.
-     The neck's centre must be the rose's centre (the rose stays on the
-     spindle) and the tip's centre must be within a millimetre of its height. */
+  /* And the DOOR, every size and both handings, because the tile and the door
+     share taperAt and a check on one of them is a check on a shared function
+     only while nobody forks it: the neck on the rose's centre (the rose stays
+     on its spindle), and the tip level with where the blade leaves the rose. */
   let doorLevers = 0;
   for (const size of Object.keys(SIZES)) for (const handing of HANDINGS.map(h => h.id)) {
     const svg = render({ ...DEFAULTS, size, handing, lockset: 'lever-taper' });
     const g = /<g data-kind="lever">([\s\S]*?)<g data-mount="rose">([\s\S]*?)<\/g>/.exec(svg);
-    const body = g && /<path d="(M [^"]+)" fill="url\(#nickel\)"\/>/.exec(g[1]);
+    const body = g && /<path d="(M [^"]+)" fill="url\(#nickel\)"\/>/.exec(svg.slice(svg.indexOf('<g data-kind="lever">')));
     const rose = g && /<circle cx="(-?[\d.]+)" cy="(-?[\d.]+)" r="[\d.]+" fill="url\(#roseFace\)"/.exec(g[2]);
     ok(body && rose, `${size}/${handing}: the curved lever's body or rose was not found on the door — the level check is dead`);
     if (!body || !rose) continue;
-    const Q = [...body[1].matchAll(/(-?[\d.]+) (-?[\d.]+)/g)].map(m => [Number(m[1]), Number(m[2])]);
+    const Q = [...bandOf(body[1]).matchAll(/(-?[\d.]+) (-?[\d.]+)/g)].map(m => [Number(m[1]), Number(m[2])]);
     const k = (Q.length - 2) / 2, up = Q.slice(0, k), dn = Q.slice(k + 2).reverse();
     const mid = i => [(up[i][0] + dn[i][0]) / 2, (up[i][1] + dn[i][1]) / 2];
     const [rx, ry] = [Number(rose[1]), Number(rose[2])];
     ok(Math.hypot(mid(0)[0] - rx, mid(0)[1] - ry) < 0.2,
        `${size}/${handing}: the curved lever's neck is centred at ${mid(0).map(v => v.toFixed(1))} and its rose at ${rx},${ry} — the rose has left the spindle`);
-    ok(Math.abs(mid(k - 1)[1] - ry) < 1,
-       `${size}/${handing}: the curved lever's tip is ${(mid(k - 1)[1] - ry).toFixed(1)} mm off its spindle's height on the door — the end is the same height as the start`);
+    /* the station nearest the rose's edge, and the last one */
+    const edge = up.findIndex(p => Math.abs(p[0] - rx) >= 31.5);
+    ok(edge > 0 && Math.abs(mid(k - 1)[1] - mid(edge)[1]) <= 1.5,
+       `${size}/${handing}: the curved lever's tip is ${(mid(k - 1)[1] - mid(edge)[1]).toFixed(1)} mm off the height where it leaves the rose on the door`);
     doorLevers++;
   }
   ok(doorLevers >= 12, `only ${doorLevers} curved levers were read off the door — the level clause has no subject`);

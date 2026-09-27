@@ -26,6 +26,75 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE CORAL AND THE CURVED LEVER, INTO THE APP OFF SEVEN INSTALLED DOORS.**
+  The owner's son, after the Coral proposal: *"Put the coral into the app and now
+  ill send you pictures of the curved handle, I trust you to put it into the app
+  after you finish."* Three photographs of curved-lever doors came with it.
+  · **The Coral, as proposed, narrowed in three places on the way in.** The
+    lever and the rose are the approved proposal pixel for pixel (diffed on all
+    four photo windows: 0 of 1.2 M pixels differ). (1) The warm nickel is the
+    פרזול's OWN ramp, `FINISH_TONES.nickel`, which `pz-nickel` points to — not a
+    replacement of `steel`: `steel` is still the pull bar's and bow's nickel,
+    the extra locks' constant metal, and the reference `CYL_LIFT`/`DOME_LIFT`
+    were measured against, so replacing it would have brightened every gold and
+    bronze cylinder in silence. (2) The covered escutcheon is the Coral's only:
+    the curved-lever doors, photographed the same day, show open euro profiles,
+    so it is a product property (`escutcheon: 'covered'`, a property — no
+    VERSION), 70 mm (`CORAL_LOCK_R`), and the rules clear that radius through
+    `escutcheonR`, one statement read by the drawing and the rules. (3) The plug
+    is DERIVED from its plate on nickel as on gold and bronze: `npm test`
+    ("the finish reaches every piece of metal") holds every finish's plug to
+    the measured 2-16% stand-off, and keeping the chrome literal over the darker
+    nickel stood it 28-46% off — the test caught it, 2 failures, and it is the
+    principle that was measured, so the code moved and not the test.
+    `LEVER_ROSETTE` 30 → 31.5; `LEVER_BLADE` a measured 23 rather than 0.377 of
+    the rose (which would have made it 24). The strips' "standard nickel follows
+    the bar" rule names `'nickel'` now. The lever tile's blade is centred and
+    runs to the root on the spindle.
+  · **The curved lever, measured for the first time.** It had been built from
+    his words 25.9-26.9 with no photograph. Rectified (two standard leaves, one
+    a 700 mm leaf whose stiles are equal in the photograph so its 0.342 aspect
+    is its own, scaled by height): rose 62.5 / 62.5 / 65 — the Coral's; spindle
+    to tip ≈106 after parallax; depth 21 / ~15 / ~9.5 at 30 / 70 / 100 mm — a
+    LINEAR taper where the square law drew 20.6 / 11 / 8; nearly level, centre
+    3-6 mm above the spindle; and the curve is the ROOT diving into the rose
+    and hooking round the spindle. What was drawn left the rose climbing 15
+    degrees (`TAPER_TILT`) and arced down. Now: `TAPER_RISE` (4.5 over the
+    first 30 mm, 0.5 more to the tip) and `TAPER_HALF` (13 → 4.5), unrotated;
+    `taperBody` closes the band with the hook, read by the door and the tile.
+    v1 read as a straight dagger beside the photographs (the root did not dive,
+    the tip looked pointed) and was redrawn once before going in.
+    `handleFootprint.levertaper.in` 118 → 114 (drawn 107 + the Coral's 7 mm).
+  · **Recorded, not changed:** the escutcheon under every other lever — three
+    curved doors, three different cylinder guards, ours widening downward where
+    the egg-shaped one narrows; 67-71 mm against 66. Every lockset's, and not
+    the lever the photographs were sent for.
+  · **Gates, one run for both:** `npm test` 9,105,074 / 0 (on the way: 8
+    failed — the two plug stand-offs, five stale sheet families, and d106's
+    corpus-table row left stale by the window-twins round, `g=circles` against
+    `circles-light`, which the sheets run rewrote); `npm run audit` no faults
+    at every view and sweep; `collide -- all` 1,488 clean and `-- boxes`
+    every fitting inside its declaration (coral drawn 32/128/32, lever-taper
+    32/107/32); `fuzz` 30,000 designs and 1,800 clicks clean; `latency` 218 ms
+    worst against 600 (measured beside a running `npm test`). Sheets: 39 of
+    the 54 committed bare and lockset sheets moved, each attributed by the size
+    and place of its changed pixels: 30 for this change alone — the four grip
+    crops and three window crops with a lever at their edge (257 and 478 px),
+    corpus 00-06 and 08-09, recreates d003 d012 d026 d048 d078 d087, all six
+    lockset sheets; 6 window crops (circles, vine and the four `-light` ones)
+    for the PREVIOUS round alone; 5 for both (recreates d097 d106 d113 d122,
+    corpus-07). ⚠ `fe65505` ("black or the door's colour") was committed with
+    its five sheet rows red and touches no screenshot, so its drawing change
+    had never been rendered — it is rendered here, with the three sheets that
+    round's new designs need (`against-circles-light`, `-tree-light`,
+    `-vine-light`) and the d106 corpus-table row. The 15 that did not move:
+    8 window-only `against-` crops and 7 `recreate-` files (d016 d030 d062 d063
+    d092 d116 d125) that no tool writes any more, left by an older case list.
+  · **Falsified:** the restated curved-lever block, lifted verbatim and run on
+    three renderers — this one 50 passed / 0 failed; the shipped HEAD (the
+    shape built from words) 33 / 17; this one with the root's dive removed
+    (`TAPER_RISE` [0, 30, 0]) 48 / 2, exactly the two root clauses.
+
 - **27.9 — THE CORAL, DRAWN AGAINST FOUR INSTALLED DOORS. A PROPOSAL; THE APP
   IS UNTOUCHED.** The owner's son set the way this work runs: *"I will send
   pictures of doors with handles … first of all draw them … then criticize your
@@ -156,6 +225,21 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** The digital viewer is refused beside a window, like the optical one
+  — *"The digital peephole still stays when there is a window, this can't
+  happen."* `conflicts` and `repair` named `'peep'`; one `viewerOn` predicate
+  now, every viewer asked at its own radius (§5.26). A `?ey=peep-digital&w=rect`
+  link had kept the ₪390 viewer on the glass in silence. Falsified: the literal
+  back fails 60 digital rows, 0 optical. No sheet (rules). Test 7,483,519 / 5.
+- **26.9** Flow order `fit · colour · lock · pz · face · glass · grip · mk` —
+  *"the hardware finish … right after the lever … the pull handle … after the
+  panels and stripes"* (after the glass, asked), overruling Peretz's 30.8
+  *"handles before the panels"*; both quoted by `SECTIONS` and `WANT_ORDER`.
+  Toast walk: to the grip step, back to the glass. `fuzz` drew no bow in 30,000
+  designs — it draws every `DEFAULTS` field now. Falsified: old order 2/2
+  viewports; old walk one sentence. Sheets run 2 as predicted: 0/48 bare, 0/6
+  lockset. Gates: test 7,483,220 / 0 failed, audit clean, collide 1,488,
+  fuzz clean, latency 185 ms.
 - **26.9** The bow is its own axis on the face step, `VERSION` 25 (`BOWS`, `gb=`,
   ₪300 + the handle finish) — *"with the panels and stripes … comfortable with
   other pull handles"*: a bow and a bar together (336 doors, none touching;

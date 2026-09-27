@@ -139,6 +139,21 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** Curved lever MEASURED off three installed doors (*"I trust you to put
+  it into the app"*; `research/handles/curved/`), replacing the shape built from
+  words 25–26.9: linear taper 21 / 15 / 9.5 (square law drew 20.6 / 11 / 8),
+  runs level 4.5 above the spindle, the curve is the ROOT diving into the rose
+  (`TAPER_TILT` gone), the Coral's 63 rose. Its tests restated from words to the
+  photographs: 50/0 now, 17 fail on the old shape, 2 on no dive.
+- **27.9** The Coral into the app — *"Put the coral into the app"* — the approved
+  proposal pixel for pixel, narrowed three ways: the warm nickel is the פרזול's
+  own ramp (`FINISH_TONES.nickel`; `steel` stays the bar's, the extra locks' and
+  the derivation's); the covered 70 mm escutcheon is the Coral's only
+  (`escutcheon: 'covered'`, `escutcheonR`); the plug is derived (test caught the
+  literal: 2 fails). Gates: test 9,105,074 / 0, audit clean, collide 1,488 +
+  boxes, fuzz clean, latency 218 ms. Sheets: 39 of 54 moved — 30 for the nickel
+  furniture alone, 6 window crops for the LAST round's unrendered twins
+  (`fe65505` committed with its sheets red), 5 both; +3 `-light` sheets it never added.
 - **27.9** The Coral drawn against four installed doors — *"fix the coral
   handle"* — **proposal only, app untouched** (`research/handles/coral/`).
   Size was right (reach, blade, keyway spacing within 4%); shape and metal were
@@ -166,21 +181,6 @@ lines here. Dates are the day of the change.
   door and tile alike (`grilleTint`), etched rings white, the tree a fixed
   near-black. Falsified: `lighten(paint, 0.10)` back fails 64 light rows, 0
   black. Labels לבן / white / белый; ids unchanged. Test 7,483,741 / 5 (sheets).
-- **27.9** The digital viewer is refused beside a window, like the optical one
-  — *"The digital peephole still stays when there is a window, this can't
-  happen."* `conflicts` and `repair` named `'peep'`; one `viewerOn` predicate
-  now, every viewer asked at its own radius (§5.26). A `?ey=peep-digital&w=rect`
-  link had kept the ₪390 viewer on the glass in silence. Falsified: the literal
-  back fails 60 digital rows, 0 optical. No sheet (rules). Test 7,483,519 / 5.
-- **26.9** Flow order `fit · colour · lock · pz · face · glass · grip · mk` —
-  *"the hardware finish … right after the lever … the pull handle … after the
-  panels and stripes"* (after the glass, asked), overruling Peretz's 30.8
-  *"handles before the panels"*; both quoted by `SECTIONS` and `WANT_ORDER`.
-  Toast walk: to the grip step, back to the glass. `fuzz` drew no bow in 30,000
-  designs — it draws every `DEFAULTS` field now. Falsified: old order 2/2
-  viewports; old walk one sentence. Sheets run 2 as predicted: 0/48 bare, 0/6
-  lockset. Gates: test 7,483,220 / 0 failed, audit clean, collide 1,488,
-  fuzz clean, latency 185 ms.
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -277,14 +277,14 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | ~7.48 M assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything (it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves, and rose with the bow's sweeps); read the failure count | 27.9 |
+| `npm test` | ~9.1 M assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything (it has swung between 7.48 M and 9.2 M with the window twins and the bow's sweeps); read the failure count | 27.9 |
 | `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) — about 20 minutes now; the price-breakdown check waits for its animation since 27.9 | 27.9 |
 | `npm run collide` | `all` (1,488 designs, 552 with the bow) and `boxes` clean | 27.9 |
 | `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, nothing broke | 27.9 |
-| `npm run latency` | 185 ms worst door against a 600 ms gate | 27.9 |
+| `npm run latency` | 218 ms worst door against a 600 ms gate (run beside `npm test`; 185 alone on 26.9) | 27.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
-| `npm run sheets` | the 48 bare sheets and 6 `lockset` sheets byte-stable across commits that do not touch the drawing; the 27.9 glass changes moved 19, every one glazed, as predicted | 27.9 |
+| `npm run sheets` | the 48 bare sheets and 6 `lockset` sheets byte-stable across commits that do not touch the drawing; the 27.9 levers moved 39 of 54 (every one with nickel lock furniture in frame, or the previous round's unrendered window twins); the 15 still are window-only crops and 7 `recreate-` files no tool writes any more. ⚠ A round that commits with its sheet rows red leaves its drawing change unrendered for the NEXT round to carry — `fe65505` did | 27.9 |
 
 ⚠ **When a bare sheet moves on a commit that could not have moved it, find out
 what did** — that is how chrome painted across every sheet was found once. And
@@ -773,12 +773,16 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
 - **`LOCKSETS` — the lock furniture**, always: what you turn and the keyway.
   ⚠ **`lever-taper` (the curved lever) has a placeholder id that can never be
   renamed** — Peretz's name for it becomes the label, never the id (1b in
-  `ASK-PERETZ.md`). It is drawn by `leverTaper`, turned up about the spindle
-  by `taperAt` until its tip's centre is level with the spindle — `TAPER_TILT`
-  is **derived**, `atan2(TAPER_DROP, taperReach())`, never typed (26.9). The
-  tile uses the same function and sizes its box off `taperExtent`. Point
-  rotation, not an SVG transform, because `getBBox` rounds rotated groups up
-  (§7).
+  `ASK-PERETZ.md`). **Both levers are measured off installed doors since 27.9**
+  (`research/handles/coral/`, `…/curved/`): the Coral a stadium blade whose
+  rounded root sits on the spindle; the curved lever a LINEAR taper (13 → 4.5
+  half-depth) on a centreline that dives from 4.5 above the spindle into it —
+  the "curve" is the root's hook, not an arc (`TAPER_TILT` and the square laws
+  built from words 25–26.9 are gone). Both on the Coral's 63 mm rose. The door
+  and the tile read one outline each (`coralStadium`; `taperBody`/`taperExtent`).
+  The Coral brings its own **covered** escutcheon (`escutcheon: 'covered'`, 70
+  mm, plug 5 mm above centre, no euro keyhole; `escutcheonR` is what the rules
+  clear); every other lever keeps the open-euro one (66).
 - **`SPECIAL_LOCKS`** — a second lock beside the first, at eye level
   (`SPECIAL_AFF` 1430). Bought-in units.
 - **`BELLS` and `PEEPHOLES`** — fittings on the face (`bl=`, `ey=`). The bell is
@@ -795,9 +799,9 @@ before it picks a fill.**
 | gradients | owner |
 |---|---|
 | `gripHard` `gripSoft` | the pull bar and the bow, in the handle finish (`hf=`) |
-| `nickel` `nickelSoft` `plateFace` `domeKnob` | the פרזול — `domeKnob` (the כדור's ball) through `domeRamp` since 26.9, the measured dome on nickel |
+| `nickel` `nickelSoft` `plateFace` `domeKnob` | the פרזול — nickel is its **own** warm ramp, `FINISH_TONES.nickel` (27.9, measured off the Coral doors: 20% darker than `steel`, hue ≈40°); `steel` stays the pull bar's nickel, the extra locks' and the derivation reference. `domeKnob` (the כדור's ball) through `domeRamp` since 26.9, the measured dome kept literal on nickel |
 | `lockUnit` `lockUnitFace` `lockUnitSoft` `mirrorKnob` | the bought-in extra locks and the ספיר — a constant steel |
-| `euroSteel` `euroRim` | the cylinder, following the פרזול at its own stand-off (`cylinderRamp`) |
+| `euroSteel` `euroRim` | the cylinder, following the פרזול at its own stand-off (`cylinderRamp`) — derived on nickel too since 27.9, so every finish's plug stands 2–16% off its plate |
 | `bellMetal` | the פעמון, following the pull handle's finish (`bellRamp` keeps Peretz's older *"nickel and gold only"* beside the instruction that overruled it) |
 
 ### ⚠ What the פרזול reaches — the list, both directions
@@ -814,11 +818,13 @@ at least once, always silently.
 
 | | value | source |
 |---|---|---|
-| blade depth ÷ rose diameter | **0.377** | RB's two Coral cut-outs — the ten corpus "coral" doors carry ten different levers |
-| the tip | **a semicircle** | RB |
-| lever → keyway | **105 mm** | the ten lever-rose corpus records; RB's 88.8 is a catalogue LAYOUT |
-| escutcheon ÷ rose | 1.082 measured, 1.100 drawn | inside the instrument's 7% |
-| rose ÷ leaf width | **unsettled** (§9) | `LEVER_BLADE` is held as a ratio to the rose |
+| blade depth | **23 mm**, a measurement since 27.9 (was 0.377 of the rose) | four installed Coral doors: 23 / 23 / 22 on a 63 rose; RB's 0.377 was an angled shot |
+| the tip | **a semicircle** | RB, and the four doors |
+| the root | **a semicircle on the spindle**, ~10 mm past it | the four doors; RB 0.38 of the rose radius |
+| lever → keyway | **105 mm** | the ten lever-rose corpus records (the four Coral doors read 102); RB's 88.8 is a catalogue LAYOUT |
+| rose | **63 mm**, both levers | 62.5–66 on seven installed doors (27.9) |
+| escutcheon | the Coral's **70** (covered); every other **66** | the four doors 66.5–72.5; the curved doors 67–71 |
+| rose ÷ leaf width | 0.074–0.078 **if** the leaves are standard (§9) | the seven doors, perspective-corrected |
 
 `handleFootprint()` returns `{ out, in, vy }`, and every number is **measured
 off the drawing** with `npm run collide -- boxes`, never declared — a declared
@@ -1289,6 +1295,12 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   mm into its handle plate (`panelUnderGlass`, `why.winPlate`). Refused, not
   redesigned; `ASK-PERETZ.md` asks the owner's son whether a glazed trio exists.
 
+- **The escutcheon under every lever but the Coral** (27.9, read, not fixed):
+  three curved-lever doors carry three different cylinder guards — an open euro
+  profile shaped like an egg, widest at the plug and narrowing down (ours WIDENS
+  down), rings with the plug near the centre, a dark field with the cam slot —
+  at 67–71 mm against our 66. It is not the lever, it varies door to door, and
+  it is every lockset's; `research/handles/curved/README.md` has it.
 - **The `plate` tile's backplate is not the door's** (19.9). The tile draws the
   Rotem's plate 90 × 240; `handleFootprint` declares about 166 × 340 — not one
   scale in both axes, so it is a redraw from `plateHandle`'s outline (moving the
@@ -1299,10 +1311,11 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   sweep reads 0.082, a hand flood fill 0.0726, our outline drawn over four
   photographs 0.095–0.103 — and that last method is the one this project
   normally trusts. RB's cut-out has no door in it and cannot settle a ratio to
-  the leaf; the corpus leaves are at widths we do not know (A2). Four installed
-  Coral doors (27.9, `research/handles/coral/`, perspective-corrected) read
-  0.074–0.078 — **if** their leaves are the standard 850, which their aspect
-  agrees with but cannot prove. A derivation
+  the leaf; the corpus leaves are at widths we do not know (A2). Seven installed
+  doors (27.9, `research/handles/coral/` and `…/curved/`, perspective-corrected)
+  read the rose 62.5–66 mm, 0.074–0.078 of the leaf — **if** their leaves are
+  the standard 850, which their aspect agrees with but cannot prove; the rose
+  was moved to 63 on them. A derivation
   via RB's 1.48 rose diameters is **refused** — that is a catalogue layout. One
   photograph of a door of stated width, or the rose's diameter from Peretz,
   settles it (`ASK-PERETZ.md` §1g).

@@ -40,6 +40,24 @@ import { VINE, VINE_D } from './vine.js';
    nothing in a six-step body ramp can say so. */
 const FINISH_TONES = {
   steel: ['#E4E7E9', '#C6CBCF', '#9FA5AA', '#80868B', '#99A0A5', '#6A7075', '#F7F9FA'],
+  /* ⚠ THE פרזול's NICKEL IS ITS OWN RAMP SINCE 27.9.2026, AND IT IS WARMER AND
+     DARKER THAN `steel`. Four installed Coral doors (research/handles/coral/,
+     the owner's son: *"fix the coral handle"*), each lock stile rectified to
+     millimetres and our render cut to the same window in the nearest paint:
+     blade over paint read 1.53 / 0.90 / 0.48 on the photographs against our
+     1.90 / 1.03 / 0.57 — 20-30% light on every door — and the rose 45-80%
+     light; the metal's hue read 37-42 degrees (warm) where `steel` is 210
+     (cold), and it held on the neutral anthracite door, so it is not white
+     balance. Each stop here is `steel`'s at 0.80 of its luminance (the
+     specular at 0.97) and hue 40, HLS saturation 0.10 (0.20 on the specular).
+     With it the blade reads 1.67 / 0.91 / 0.50 and the rose 1.60 / 0.87 /
+     0.48.
+     ⚠ `steel` IS UNTOUCHED ON PURPOSE. It is still the pull bar's and the
+     bow's nickel (`hf-nickel`), the bought-in extra locks' constant metal
+     (`lockUnit`), and the reference `CYL_LIFT` and `DOME_LIFT` were measured
+     against — moving it would have brightened every gold and bronze cylinder
+     in silence. No photograph here shows a pull bar or an extra lock. */
+  nickel: ['#BDB8AE', '#A8A194', '#8B8372', '#716A5C', '#877F6E', '#5E584D', '#F3F1ED'],
   black: ['#5E6165', '#3D4043', '#26282B', '#171819', '#313437', '#0F1011', '#8A8E93'],
   /* ⚠ WARMED 30.8.2026, AND THE FILE SAID "KEEP THE GOLD AS IS" UNTIL THEN.
      That instruction is in the bronze note below and it was right when it was
@@ -360,6 +378,11 @@ const CYL_LIFT_RIM = rawLum(CYL_CHROME_RIM) / rawLum(FINISH_TONES.steel[CYL_REF_
 
 /** The three cylinder stops and its rim, for one lock-furniture ramp. */
 export function cylinderRamp(tone) {
+  /* ⚠ THE NICKEL פרזול's PLUG IS DERIVED SINCE 27.9.2026, LIKE GOLD'S AND
+     BRONZE'S. What was measured is the plug's STAND-OFF above its own plate
+     (the multipliers above, 2-16%); the chrome literal is that stand-off
+     over the old, too-light steel plate. Kept literal over the darker nickel
+     it stood off 28-46%, and `npm test` said so. */
   if (tone === FINISH_TONES.steel) return { stops: CYL_CHROME, rim: CYL_CHROME_RIM };
   if (tone === FINISH_TONES.black) return { stops: CYL_BLACK,  rim: CYL_BLACK_RIM };
   return {
@@ -427,7 +450,7 @@ const DOME_REF = DOME.map(c => FINISH_TONES.steel
   .map((s, i) => [Math.abs(rawLum(s) - rawLum(c)), i]).sort((a, b) => a[0] - b[0])[0][1]);
 const DOME_LIFT = DOME.map((c, i) => rawLum(c) / rawLum(FINISH_TONES.steel[DOME_REF[i]]));
 export function domeRamp(tone) {
-  if (tone === FINISH_TONES.steel) return DOME;
+  if (tone === FINISH_TONES.steel || tone === FINISH_TONES.nickel) return DOME;   // measured on nickel
   return DOME_LIFT.map((m, i) => scaleTone(tone[DOME_REF[i]], m));
 }
 
@@ -871,7 +894,25 @@ const KEYWAY_BACKSET = 63;
    as a RATIO to this constant rather than as an absolute, so the fitting stays
    in proportion whichever way it eventually goes. */
 const LOCK_R       = 33;    // 0.078 W across — the escutcheon is the bigger disc
-const LEVER_ROSETTE = 30;   // 1.100 to the escutcheon; RB's own shots say 1.082
+/* ⚠ THE CORAL'S ROSE IS 63 mm SINCE 27.9.2026, AND IT WAS 60. Four installed
+   Coral doors, each leaf rectified through its four corners onto the standard
+   850 x 2050 (research/handles/coral/README.md): 62.5 / 63 / 65 / 66, about
+   1% of it parallax (the rose stands ~10 mm proud). Against the leaf that is
+   0.074-0.078 — IF those leaves are the standard 850, which their rectified
+   aspect agrees with and cannot prove (CLAUDE.md §9). The curved lever keeps
+   its own rose (`TAPER_ROSE`) until its own photographs are measured. */
+const LEVER_ROSETTE = 31.5; // the Coral's rose, 63 across
+/* ⚠ THE CORAL'S OWN ESCUTCHEON, 70 mm, AND IT IS NOT THE ONE UNDER EVERY
+   OTHER LEVER. The four Coral doors read 72.5 / 66.5 / 70 / 72 and show a
+   COVERED cylinder — rings and a round plug 5 mm above centre, no euro
+   keyhole — as RB's own Coral cut-out does. Three curved-lever doors
+   photographed the same day show the open euro profile the other escutcheon
+   draws. So it is a property of the product (`escutcheon: 'covered'` on the
+   catalogue row), not a new size for every door. */
+const CORAL_LOCK_R = 35;
+/** The radius of the separate escutcheon a lockset brings — one statement,
+ *  read by the drawing and by the rules that clear it. */
+const escutcheonR = lockset => (lockset && lockset.escutcheon === 'covered' ? CORAL_LOCK_R : LOCK_R);
 /* ⚠ THIS WAS 145 AND ITS OWN COMMENT SAID 4.0 ROSETTE RADII, WHICH IS 120.
    Three readings of one quantity, taken three ways, and the shipped constant
    was outside all of them:
@@ -912,113 +953,97 @@ const LEVER_REACH  = 128;   // 0.151 W on the door metrology, 4.27 rosette
    ⚠ And the depth is EVEN along the blade, which is not re-opened: RB reads
    40 41 40 40 40 39 37 at tenths of the reach, inside 7%, and Peretz asked
    for it in as many words on 14.9. */
-const LEVER_BLADE  = Math.round(LEVER_ROSETTE * 2 * 0.377);
+/* ⚠ 23 AS A MEASUREMENT SINCE 27.9.2026, NO LONGER A RATIO TO THE ROSE. The
+   rose moved to 63 and 0.377 of it would have made the blade 24; the four
+   installed Coral doors read the blade 23 / 23 / 22 (a fourth blurred) on
+   exactly those roses — 0.36, parallax included, where RB's cut-outs said
+   0.377 from an angled shot. The blade stays what it was, held here as the
+   measured depth it turned out to be. */
+const LEVER_BLADE  = 23;
 /* The curved lever's shape, held here rather than inside `leverTaper` because
    the TILE has to draw the same product. Both read these; neither owns them.
    ⚠ `FITTING_GLYPH`'s own header claims "the numbers are the same measured
    millimetres, so a tile cannot drift from its door", and for the two levers
-   it was not true — the tile carried a 39 rose and a 152 reach against the
-   door's 30 and 145, which is §5.10 sitting under a comment denying it. */
-/* ⚠ A SCYTHE, SINCE 25.9.2026 — the owner's son: *"i would like you to fix
-   the curved lever. it looks more like a scythe, just shorter and becomes
-   narrower faster, it is a bit shorter than the coral lever."* It was a
-   straight wedge on a straight slope: 40 deep at the neck closing LINEARLY to
-   26 at the tip, the centreline climbing 13 in a straight line — a paddle,
-   thicker than the Coral along its whole length. A scythe is three things the
-   wedge was not, and each is one constant:
-     · the SWEEP is a curve, not a slope: the centreline leaves the rose flat
-       and bends as the square of the distance, so the curl is at the tip
-       (it climbed until the note below turned it down);
-     · it NARROWS FAST: the half-depth falls as the square of what is left,
-       so it is past half its narrowing by a third of the way out, and ends
-       in a point barely a third of the Coral's blade;
-     · and it is a little shorter than the Coral, which it already was.
-   ⚠ STILL NO PHOTOGRAPH of this product anywhere — the corpus files no door
-   under it and RB has no cut-out (§7) — so these are the words turned into
-   geometry, not a measurement, and they are held as ratios to nothing but
-   each other. */
-/* ⚠ AND IT HANGS DOWN, SINCE LATER THE SAME DAY — the owner's son again, on
-   the scythe above: *"better than it was but still not it. 1. It is curved
-   downwards not upwards like right now. 2, at the start of it its a little
-   bit wider. 3, the curve is a little bit more curved."* Three constants, one
-   each: the sweep's sign flipped (the centreline still leaves the rose flat,
-   so the rose stays on its spindle, and the curl is still at the tip — it
-   now falls away from the hand instead of climbing), the drop 22 → 30 (0.20
-   of the reach → 0.28), and the neck 28 → 32 deep (1.22 → 1.39 of the
-   Coral's blade). The 25.9 morning version climbed 22 on a 28 neck. Still his
-   words, still no photograph. */
-/* ⚠ AND IT IS TURNED UP 8 DEGREES, SINCE LATER STILL — *"Now the shape is
-   right, but you need to rotate it a little bit up so it will be more
-   Horizontal looking."* So the four constants above do not move; the whole
-   blade is ROTATED about the spindle, which is the one point a rotation can
-   turn about without taking the rose off it. Hanging as drawn, the line from
-   the neck to the tip fell 15.4 degrees (30 over 109) and read as a drooping
-   lever; turned up 8 it falls about 7.4 and the tip hangs about 14.5 below
-   the spindle, where it hung 30 — the neck now leaves the rose rising a
-   little and the curl at the tip does the falling. 8 is about half the old
-   fall, which is "a little bit" read as a number, and it is this one
-   constant. The rotation is applied to the POINTS by taperAt, never as an
-   SVG transform, because a browser's getBBox rounds a rotated group up
-   (CLAUDE.md §7) and the footprint sweep measures this fitting with it. */
-/* ⚠ AND ITS TIP IS LEVEL WITH ITS SPINDLE, SINCE 26.9.2026 — the owner's son:
-   *"Keep the shape of the curved lever but make it face a little bit more
-   upward … the end of the handle needs to be the same height as the start."*
-   The start is the neck, whose centre IS the spindle, so the sentence names
-   one angle and it is not a number to type: turn the blade up until the
-   centre of its tip — (reach, TAPER_DROP) before the turn — lands on the
-   spindle's height, and that is atan2(TAPER_DROP, reach), 15.39 degrees on
-   today's 109 reach. It is DERIVED, below taperReach, so the day the drop or
-   the reach is re-measured the tip stays level without anybody remembering
-   this line; the 8 it replaces left the tip 14.5 below. Still a rotation of
-   the points about the spindle, so the four constants above do not move and
-   the rose does not leave its spindle — the shape he called right is the
-   shape drawn, turned further. */
-const TAPER_REACH_F  = 0.85;  // a bit shorter than the Coral
-const TAPER_DROP     = 30;    // how far the tip hangs below the spindle, as the square of the reach
-const TAPER_HALF_NECK = 16;   // half-depth where it leaves the rose (the Coral's is 11.5) …
-const TAPER_HALF_CAP  = 4;    // … and at the point
-const taperReach = () => Math.round(LEVER_REACH * TAPER_REACH_F);
-/* Degrees the whole blade is turned UP about the spindle: exactly enough to put
-   the tip's centre at the spindle's height (the note above). Read after
-   taperReach — a const arrow read before its own line throws. */
-const TAPER_TILT = Math.atan2(TAPER_DROP, taperReach()) * 180 / Math.PI;
-/* Positive is DOWN in the drawing's y. */
-const taperMid   = (t, L) => TAPER_DROP * (t / L) ** 2;
-const taperHalf  = (t, L) =>
-  TAPER_HALF_CAP + (TAPER_HALF_NECK - TAPER_HALF_CAP) * (1 - Math.min(1, t / L)) ** 2;
-/* A point `t` along the reach and `s` half-depths off the centreline, turned
-   UP by TAPER_TILT about the spindle: [how far along, how far down]. A true
-   rotation, not a shear, so the shape the owner's son called right is the
-   shape that is drawn, only turned. */
-const taperAt = (t, s, L) => {
-  const u = t, v = taperMid(t, L) + s * taperHalf(t, L);
-  const a = TAPER_TILT * Math.PI / 180, c = Math.cos(a), n = Math.sin(a);
-  return [u * c + v * n, v * c - u * n];
+   it was not true once — the tile carried a 39 rose and a 152 reach against
+   the door's 30 and 145, which is §5.10 sitting under a comment denying it. */
+/* ⚠ MEASURED SINCE 27.9.2026, AND UNTIL THEN IT WAS WORDS. From 25.9 to 26.9
+   the owner's son described this lever four times without a photograph —
+   *"more like a scythe, just shorter and becomes narrower faster"*, *"curved
+   downwards not upwards … at the start of it its a little bit wider … the
+   curve is a little bit more curved"*, *"rotate it a little bit up"*, *"the
+   end of the handle needs to be the same height as the start"* — and each
+   sentence became a constant: a centreline hanging as the square of the
+   reach (30 mm at the tip), a half-depth falling as the square of what was
+   left (16 at the spindle to 4), and the whole blade turned up 15.4 degrees
+   about the spindle until the tip was level with it.
+   Then he sent three photographs of installed doors (research/handles/curved/)
+   and *"I trust you to put it into the app after you finish."* Rectified onto
+   their leaves (two standard, one a 700 mm leaf whose scale rests on its
+   height), they read:
+     · the rose is the Coral's: 62.5 / 62.5 / 65 across;
+     · spindle to tip 110.5 / 106.5 / 110, about 106 once the blade's ~60 mm
+       stand-off is taken out — the 109 drawn was within that;
+     · the blade 21 deep where it leaves the rose, ~15.5 at 70 mm and ~9.5 at
+       100: an almost LINEAR taper. The square law drew 20.6 / 11 / 8 — right
+       at the rose and a third too thin through the middle;
+     · it runs NEARLY LEVEL, its centre 3-6 mm above the spindle, the top edge
+       falling 3-6 mm by the tip and the bottom edge rising 8-10. What was
+       drawn left the rose climbing 15 degrees and arced down, which none of
+       the three shows;
+     · the curve he named is the ROOT: it hooks down into the rose round the
+       spindle, with a dark hollow in the hook on two of the three.
+   His words all survive in it — narrower fast, wider at the start, curved
+   down at the tip, level end to end — at the size the photographs give them.
+   In mm from the spindle, positive DOWN, t along the reach: a CENTRELINE that
+   leaves the spindle and rises 4.5 by the rose's edge (the root diving down
+   into the rose, seen from the blade), then runs level, 0.5 more by the tip;
+   and a HALF-DEPTH falling linearly from 13 at the spindle (the hook's own
+   radius) to 4.5 at the tip. Read back: top -15 / bottom +6 at 30 mm, -9.7 /
+   -0.3 at 100, against the photographs' -13.8 / +7 and -10.5 / -1. */
+const TAPER_REACH    = 102;   // where the body ends; the round tip reaches 106
+const TAPER_ROSE     = LEVER_ROSETTE;   // the Coral's 63 mm rose, on all three doors
+const TAPER_RISE     = [4.5, 30, 0.5];  // rises 4.5 over the first 30 mm, then 0.5 more to the tip
+const TAPER_HALF     = [13, 4.5];       // half-depth at the spindle, and at the tip
+const taperReach = () => TAPER_REACH;
+const taperMid   = (t, L) => {
+  const [r, T, r2] = TAPER_RISE, u = Math.min(1, Math.max(0, t) / T);
+  return -r * (1 - (1 - u) ** 2) - r2 * Math.min(1, Math.max(0, t - T) / (L - T));
 };
+const taperHalf  = (t, L) => TAPER_HALF[0] + (TAPER_HALF[1] - TAPER_HALF[0]) * Math.min(1, Math.max(0, t) / L);
+/* A point `t` along the reach and `s` half-depths off the centreline:
+   [how far along, how far down]. No rotation any more — the photographs
+   gave the edges as they stand. */
+const taperAt = (t, s, L) => [t, taperMid(t, L) + s * taperHalf(t, L)];
 /* One outline, two readers — the door and the tile — so the blade on the tile
    cannot drift from the blade on the door. `pt(t, s)` places a point `t` along
    the reach at `s` half-depths off the centreline; the band between `s0` and
-   `s1` is sampled so the curve reads as a curve, and it ends in a round point
-   when it runs to the tip. */
+   `s1` is sampled so the taper reads as a curve, and it ends in a ROUND point
+   (a control point one depth out puts the apex half a depth past L) when it
+   runs to the tip. */
 const TAPER_STEPS = 14;
 const taperBand = (pt, L, s0 = -1, s1 = 1, t0 = 0, t1 = L) => {
   const ts = Array.from({ length: TAPER_STEPS + 1 }, (_, i) => t0 + (t1 - t0) * i / TAPER_STEPS);
   const tip = t1 >= L
-    ? ` Q ${pt(L + TAPER_HALF_CAP * 1.6 * (s1 - s0) / 2, (s0 + s1) / 2)} ${pt(L, s1)}`
+    ? ` Q ${pt(L + taperHalf(L, L) * (s1 - s0), (s0 + s1) / 2)} ${pt(L, s1)}`
     : ` L ${pt(t1, s1)}`;
   return `M ${ts.map(t => pt(t, s0)).join(' L ')}${tip} L `
        + `${ts.slice().reverse().map(t => pt(t, s1)).join(' L ')} Z`;
 };
+/* The whole blade: the band, closed at the root by the HOOK — a half circle of
+   the root's own half-depth round the spindle's end of the centreline, which
+   is where the blade turns down into the rose. `dir` is the side the blade
+   points to in the coordinates `pt` hands back (the tile mirrors, so -1). */
+const taperBody = (pt, L, dir) => {
+  const band = taperBand(pt, L);
+  const r = taperHalf(0, L);
+  return `${band.slice(0, -1)} A ${r.toFixed(2)} ${r.toFixed(2)} 0 0 ${dir > 0 ? 1 : 0} ${pt(0, -1)} Z`;
+};
 /* How far the whole blade reaches, rises and hangs, read off the same points
-   taperBand draws — both edges at every station, and the round point's apex
-   (a quadratic's midpoint is a quarter of each end and half its control) — so
-   a box that has to hold the blade grows with the outline, never with a typed
-   margin guessed for one tilt. [along, highest, lowest], `v` positive down. */
+   taperBand draws — both edges at every station and the round tip's apex. */
 const taperExtent = L => {
   const P = [];
   for (let i = 0; i <= TAPER_STEPS; i++) P.push(taperAt(L * i / TAPER_STEPS, -1, L), taperAt(L * i / TAPER_STEPS, 1, L));
-  const a = taperAt(L, -1, L), b = taperAt(L, 1, L), c = taperAt(L + TAPER_HALF_CAP * 1.6, 0, L);
-  P.push([(a[0] + b[0]) / 4 + c[0] / 2, (a[1] + b[1]) / 4 + c[1] / 2]);
+  P.push([L + taperHalf(L, L), taperMid(L, L)]);
   return [Math.max(...P.map(p => p[0])), Math.min(...P.map(p => p[1])), Math.max(...P.map(p => p[1]))];
 };
 const LOCK_CLEAR   = 15;    // air the handle must leave around the escutcheon
@@ -1661,7 +1686,7 @@ export function render(state) {
      on the leaf is the same stock as the bar; giving it a ramp of its own is
      how the pull handle and the lock furniture came to be painted with each
      other's metal (see the note above). */
-  const stripeTone = byId(PIRZUL, state.pirzul).tone === 'steel' ? tone : hwTone;
+  const stripeTone = byId(PIRZUL, state.pirzul).tone === 'nickel' ? tone : hwTone;
 
   /* SIZES gives the structural OPENING, not the leaf. We were drawing the two
      as the same thing, which made every door too squat: measured across the 20
@@ -5432,8 +5457,9 @@ export function gripPlacement(state, place = null) {
   const locks = [{ x: backset, y: leafH - lockAff(lockset), out: lock.out,
                    inward: lock.in, vy: lock.vy }];
   if (!lockset.lock) {
+    const er = escutcheonR(lockset);   // the Coral's is its own, 35
     locks.push({ x: KEYWAY_BACKSET, y: leafH - CYLINDER_AFF,
-                 out: LOCK_R, inward: LOCK_R, vy: LOCK_R });
+                 out: er, inward: er, vy: er });
   }
   /* LOCK_CLEAR of air VERTICALLY as well as across. Without it a grip laid
      down came to rest exactly touching the lockset's box — the search walks it
@@ -8232,7 +8258,10 @@ function handleFootprint(handle, leafH, panelled = false) {
        Declared on its own anyway rather than shared, because it is a different
        product and a shared line is a claim that it is not. Measured by
        `npm run collide -- boxes`, which is what the numbers below are. */
-    case 'levertaper': return { out: 40, in: 118, vy: 51 };
+    /* ⚠ `in` 118 → 114 ON 27.9.2026: re-measured off three installed doors the
+       blade reaches 107 (106 to its tip), so 118 kept bars 11 mm away from
+       metal that is not there. 114 is the Coral's own 7 mm margin (128 → 135). */
+    case 'levertaper': return { out: 40, in: 114, vy: 51 };
     case 'plate':   return { out: 47, in: 119, vy: 170 };
     case 'almog':   return { out: 42, in: 220, vy: 42 };
     /* ⚠ `out` WAS 78 AND THE DRAWING REACHES 41. Reported from outside as
@@ -9496,6 +9525,65 @@ const squareRose = (cx, cy, r) => `
       ${brushing(cx, cy, r * 0.16, r * 0.62)}
     </g>`;
 
+/* ── THE CORAL, REDRAWN AGAINST FOUR INSTALLED DOORS — 27.9.2026 ─────────
+   The owner's son sent four photographs of installed doors carrying it and
+   asked: *"fix the coral handle."* Each lock stile was rectified through the
+   leaf's four corners onto the standard 850 x 2050 and our render cut to the
+   same millimetre window in the nearest paint (research/handles/coral/, whose
+   README carries every reading). THE SIZE WAS RIGHT — reach, blade depth and
+   the gap to the keyway sit within 4% of all four — and the SHAPE was not:
+     · the root is a ROUNDED END CENTRED ON THE SPINDLE, about 10 mm past it
+       (RB's cut-out: 0.38 of the rose radius), with a shaded crescent inside
+       it where it turns down into the neck. We drew a pale 33 mm neck
+       flaring out of the rose, which no photograph shows;
+     · the rose has a bevelled rim and a RAISED inner face stepping up at 0.76
+       of its radius (RB 0.76, door 1 0.75);
+     · the metal is the פרזול's own warm nickel now (FINISH_TONES.nickel);
+     · across the section a satin strap — a thin lit arris, a flat face, a
+       narrow rolled underside — where we drew a third of the blade near-black;
+       and two soft vertical sheen bands across the face at 0.55 and 0.72 of the
+       reach, which all four doors show. The bands are a lighting judgement and
+       are said to be one. */
+
+/* One machined step with BUTT caps: the shared helper's round caps leave a dot
+   where the lit and the dark arc meet, visible at close range. */
+const coralStep = (cx, cy, r, w, lit, dark) => `
+      <path d="${arcPath(cx, cy, r, 135, 315)}" fill="none" stroke="#fff"
+            stroke-opacity="${lit}" stroke-width="${w}"/>
+      <path d="${arcPath(cx, cy, r, 315, 135)}" fill="none" stroke="#000"
+            stroke-opacity="${dark}" stroke-width="${w}"/>`;
+
+/* A pure-black wash over the Coral's turned faces (§4's tint rule): the rose
+   read 1.95 / 1.06 / 0.58 of the paint without it against the photographs'
+   1.58 / 1.02 / 0.45, and 1.60 / 0.87 / 0.48 with it. */
+const CORAL_ROSE_WASH = 0.18;
+
+/** The Coral's rose: a flange with a bevelled rim and a raised inner face. */
+const coralRose = (cx, cy, r) => `
+    <g data-mount="rose">
+      <circle cx="${cx + 2}" cy="${cy + 4}" r="${r}" fill="#000" opacity="0.36"
+              filter="url(#hwShadow)"/>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#roseFace)"/>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="#000" opacity="${CORAL_ROSE_WASH}"/>
+      ${coralStep(cx, cy, r - 1.2, 2.4, 0.62, 0.40)}
+      ${coralStep(cx, cy, r * 0.90, 1.6, 0.22, 0.22)}
+      ${coralStep(cx, cy, r * 0.76, 1.8, 0.30, 0.46)}
+      ${brushing(cx, cy, r * 0.16, r * 0.70)}
+    </g>`;
+
+/* A stadium along a lever's axis: t0..t1 measured from the spindle outward
+   (negative t is PAST the spindle, toward the closing edge), top..bot in y.
+   Both ends are semicircles of the band's own half-depth. */
+function coralStadium(cx, dir, t0, t1, top, bot) {
+  const r = (bot - top) / 2;
+  const at = t => (cx + dir * t).toFixed(2);
+  const sw = dir > 0 ? 1 : 0;
+  return `M ${at(t0 + r)} ${top.toFixed(2)} L ${at(t1 - r)} ${top.toFixed(2)}
+          A ${r.toFixed(2)} ${r.toFixed(2)} 0 0 ${sw} ${at(t1 - r)} ${bot.toFixed(2)}
+          L ${at(t0 + r)} ${bot.toFixed(2)}
+          A ${r.toFixed(2)} ${r.toFixed(2)} 0 0 ${sw} ${at(t0 + r)} ${top.toFixed(2)} Z`;
+}
+
 /**
  * Brushed-nickel lever on a turned rosette, after the supplied hardware photo:
  * a broad flat top face carrying one long specular, a rolled and shadowed
@@ -9526,120 +9614,75 @@ const squareRose = (cx, cy, r) => `
  * thing is built from the rosette outward so it cannot degenerate.
  */
 function lever(cx, cy, dir) {
-  /* HORIZONTAL. This carried a 12-degree droop, on the argument that a lever
-     hangs — sprung to level, but pulled below it by its own weight and the
-     latch's slack. The owner, who sells these, says the Coral does not: it
-     sits level, and the droop was the clearest thing wrong with it. Kept as a
-     note because the reasoning was not silly, it was just not true of this
-     product; if a future lever really does hang, the rotation goes back on
-     that lever rather than on all of them. */
-  const L = LEVER_REACH;
-  const at = t => cx + dir * t;               // distance along the lever
-  /* `data-kind` so a test can count levers. The horizontal grab bar used to
-     draw one of these itself — a leftover from when "lever + grab bar" was a
-     single product, before the grip and the lockset were split — so a grab bar
-     beside a cylinder drew a lever nobody chose, that nothing charged for, and
-     that never appeared in the message to Peretz. A thing that APPEARS rather
-     than breaks, which is the same family as CLAUDE.md §5 read backwards. */
-  /* ⚠ THE SECTION IS `LEVER_BLADE` DEEP AND EVERY BAND IS A FRACTION OF IT.
-     `T` is the top of the blade and `B` its underside; `b(f)` places a band at
-     a fraction of the depth, so changing the depth moves the banding with it.
-     It used to be `cy - 14, cy + 12` with every band at an absolute offset
-     from those two — which held the depth in one place and the PROPORTIONS in
-     nine, so the first change to the depth would have made the arris and the
-     rolled underside each take a different share of the blade than they were
-     measured at. The 1 mm the blade sits above the spindle is the old 14/12
-     asymmetry, kept: RB's own shots read the centreline within 0.02 of a rose
-     diameter of the rose's, which is that offset to the millimetre. */
-  const D = LEVER_BLADE;
-  const T = cy - D / 2 - 1, B = cy + D / 2 - 1;
+  /* HORIZONTAL, as it has been since the owner said the Coral does not droop.
+     `dir` is +1 when the lever points right, -1 when it points left. */
+  const L = LEVER_REACH;                 // spindle to tip
+  const D = LEVER_BLADE;                 // one depth from root to tip (Peretz, 14.9)
+  const h = D / 2;
+  const T = cy - h, B = cy + h;          // centred on the spindle: door 1 reads it 1 mm low, RB 1 mm high
   const b = f => T + D * f;
-  /* ⚠ THE CAP IS A SEMICIRCLE — ITS RUN IS THE HALF-DEPTH, NOT 1.54 OF IT.
-     It was a quarter ellipse 20 across against a half-depth of 13, which is a
-     nose drawn out half again past round, and it is the clearest single thing
-     wrong with the silhouette beside a photograph. Both of RB's Coral shots
-     fit a semicircular end within a pixel: predicted depth at 0.95 of the
-     reach is 0.89 of the blade against 0.85 measured, where the old ellipse
-     predicts 0.72. The owner's word for what it should be is *"a bit
-     rounded"*, and a semicircle is exactly that. */
-  const CAP = D / 2;
+  const u = `${Math.round(cx)}-${Math.round(cy)}`;
+  /* THE ROOT IS A ROUNDED END ON THE SPINDLE: one stadium from h past the
+     spindle to the tip, whose cap is a semicircle (RB, 19.9). */
+  const body = coralStadium(cx, dir, -h, L, T, B);
+  const band = (f, w, a) => {
+    const x = cx + dir * L * f - w / 2;
+    return `<rect x="${x.toFixed(2)}" y="${b(0.10).toFixed(2)}" width="${w}" height="${(D * 0.82).toFixed(2)}"
+                  fill="url(#coralBand-${u})" opacity="${a}"/>`;
+  };
+  /* `data-kind` so a test can count levers — a grab bar once drew one of these
+     itself, beside a cylinder, uncharged and absent from the message. */
   return `
     <g data-kind="lever">
-      <path d="M ${at(12)} ${b(0.27)} L ${at(L - 16)} ${b(0.42)}
-               Q ${at(L + 4)} ${b(0.42)} ${at(L + 4)} ${b(0.88)}
-               Q ${at(L + 4)} ${B + D * 0.88} ${at(L - 16)} ${B + D * 0.88}
-               L ${at(12)} ${B + D} Z"
-            fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
+      <linearGradient id="coralBand-${u}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"   stop-color="#fff" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#fff" stop-opacity="1"/>
+        <stop offset="1"   stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <!-- Its own filter box: hwShadow's is 30% of the element's height, and a
+           shadow dropped 15 mm off a 23 mm blade blurs straight out of it into
+           a hard edge. 15 mm because the blade stands about 60 mm proud; the
+           photographs' longer stairwell shadows are each one lamp's, and the
+           drawing keeps one key light for every fitting. -->
+      <filter id="coralShadow-${u}" x="-20%" y="-150%" width="140%" height="400%">
+        <feGaussianBlur stdDeviation="7"/>
+      </filter>
+      <path d="${coralStadium(cx, dir, -h + 6, L, T, B)}" transform="translate(4 15)"
+            fill="#000" opacity="0.34" filter="url(#coralShadow-${u})"/>
 
-      <!-- Body: one depth from the neck to the cap. A pointed tip reads as a
-           blade and a tapered one as a wedge; this lever is neither. -->
-      <path d="M ${at(0)} ${T}
-               L ${at(L - CAP)} ${T}
-               Q ${at(L)} ${T} ${at(L)} ${(T + B) / 2}
-               Q ${at(L)} ${B} ${at(L - CAP)} ${B}
-               L ${at(0)} ${B} Z"
-            fill="url(#nickel)"/>
-      <!-- A BLACK WASH OVER THE WHOLE BODY, because the base ramp is too light
-           for a lever seen against paint. Measured on seven photographed doors
-           as the blade's darkest point over the paint beside it: 0.22 0.27
-           0.30 0.35 0.35 0.65 0.68, median 0.35 - and DARKER THAN THE PAINT
-           even on the near-black doors (d015 at 0.65 of a paint of 33, d048 at
-           0.35 of 42), which is the rolled underside turned away from the
-           light. Ours floored at 0.41 of a pale door and its broad face sat at
-           0.73 to 1.10, so most of the blade was at or above the paint: that
-           is the whole of "it reads as grey plastic". Black at alpha, never a
-           tinted black, so the pirzul's hue survives it (see the tint rule). -->
-      <path d="M ${at(0)} ${T}
-               L ${at(L - CAP)} ${T}
-               Q ${at(L)} ${T} ${at(L)} ${(T + B) / 2}
-               Q ${at(L)} ${B} ${at(L - CAP)} ${B}
-               L ${at(0)} ${B} Z"
-            fill="#000" opacity="0.14"/>
+      ${coralRose(cx, cy, LEVER_ROSETTE)}
 
-      <!-- Metal is BANDED, not shaded: the photographs show a hard clipped
-           arris along the top (the only blown highlight anywhere in the
-           frame), a mid band under it, and a body that goes nearly as dark as
-           the paint underneath. A smooth gradient down the whole section is
-           what makes rendered hardware look like grey plastic.
-           The bands run parallel to the blade now, because the blade is
-           parallel to itself: they used to converge with the taper. -->
-      <path d="M ${at(14)} ${b(0.115)} L ${at(L - CAP)} ${b(0.115)}
-               Q ${at(L - CAP * 0.3)} ${b(0.115)} ${at(L - CAP * 0.3)} ${b(0.231)}
-               L ${at(14)} ${b(0.231)} Z"
-            fill="#fff" opacity="0.92"/>
-      <path d="M ${at(16)} ${b(0.269)} L ${at(L - CAP * 0.7)} ${b(0.269)}
-               L ${at(L - CAP * 0.7)} ${b(0.423)} L ${at(16)} ${b(0.423)} Z"
-            fill="#fff" opacity="0.18"/>
-      <!-- rolled underside, turned away from the key and nearly in shadow -->
-      <path d="M ${at(16)} ${b(0.654)} L ${at(L - CAP * 0.8)} ${b(0.654)}
-               L ${at(L - CAP * 0.8)} ${b(0.962)} L ${at(16)} ${b(0.962)} Z"
-            fill="#000" opacity="0.56"/>
-      <!-- the cap turns out of the key and picks up the darker surround -->
-      <path d="M ${at(L - CAP * 1.3)} ${b(0.115)} L ${at(L - CAP * 0.2)} ${b(0.154)}
-               Q ${at(L)} ${b(0.192)} ${at(L)} ${(T + B) / 2}
-               Q ${at(L)} ${b(0.885)} ${at(L - CAP * 0.7)} ${b(0.885)}
-               L ${at(L - CAP * 1.3)} ${b(0.846)} Z"
-            fill="#000" opacity="0.16"/>
+      <!-- the neck's shade on the rose's raised face, just proud of the root -->
+      <circle cx="${(cx - dir * 1.5).toFixed(2)}" cy="${(cy + 1.5).toFixed(2)}" r="${(h + 2.5).toFixed(2)}"
+              fill="#000" opacity="0.38" filter="url(#hwShadow)"/>
 
-      ${disc(cx, cy, LEVER_ROSETTE)}
+      <path d="${body}" fill="url(#nickel)"/>
+      <path d="${body}" fill="#000" opacity="0.10"/>
 
-      <!-- the neck swelling out of the rosette, drawn over it. It still swells
-           — a cast lever grows out of its collar — but it now closes onto the
-           blade's own depth instead of onto a wider root. -->
-      <path d="M ${at(2)} ${T - D * 0.215} Q ${at(28)} ${T - D * 0.16} ${at(33)} ${T}
-               L ${at(33)} ${B} Q ${at(28)} ${B + D * 0.16} ${at(2)} ${B + D * 0.215} Z"
-            fill="url(#nickel)"/>
-      <path d="M ${at(9)} ${b(0.038)} Q ${at(26)} ${b(0.077)} ${at(30)} ${b(0.115)}
-               L ${at(30)} ${b(0.308)} L ${at(9)} ${b(0.269)} Z"
-            fill="#fff" opacity="0.42"/>
+      <!-- across the section: a thin lit arris, the flat face, a narrow
+           rolled underside -->
+      <path d="${coralStadium(cx, dir, -h + 2, L - 1, b(0.05), b(0.16))}" fill="#fff" opacity="0.45"/>
+      <path d="${coralStadium(cx, dir, -h + 2, L - 1, b(0.78), b(0.97))}" fill="#000" opacity="0.20"/>
+
+      ${band(0.55, 12, 0.78)}
+      ${band(0.72, 6, 0.58)}
+
+      <!-- the tip turns away from the light -->
+      <path d="${coralStadium(cx, dir, L - D * 0.9, L, T, B)}" fill="#000" opacity="0.12"/>
+
+      <!-- the root rolls down into the neck: a shaded crescent inside its
+           outline and a lit lip on its edge -->
+      <path d="${arcPath(cx, cy, h - 3.2, dir > 0 ? 100 : 280, dir > 0 ? 260 : 80)}" fill="none"
+            stroke="#000" stroke-opacity="0.32" stroke-width="4.2"/>
+      <path d="${arcPath(cx, cy, h - 0.7, dir > 0 ? 120 : 300, dir > 0 ? 220 : 60)}" fill="none"
+            stroke="#fff" stroke-opacity="0.25" stroke-width="1.3"/>
     </g>`;
 }
 
 /**
- * The curved lever — a SCYTHE since 25.9.2026, one that HANGS DOWN since
- * later that day, TURNED UP about its spindle later still, and turned until
- * its tip is LEVEL with the spindle on 26.9 (see TAPER_DROP and TAPER_TILT for
- * all four sets of words and the constants).
+ * The curved lever — built from the owner's son's words 25.9-26.9 and
+ * MEASURED off three installed doors on 27.9 (the note above TAPER_REACH has
+ * both, and what the photographs changed).
  * It began as the shape the Coral was drawn as until
  * 14.9.2026, kept because Peretz recognised it as a product of its own:
  * *"the one thats there right now with the curve, add it as a different
@@ -9655,45 +9698,52 @@ function lever(cx, cy, dir) {
  */
 function leverTaper(cx, cy, dir) {
   const L = taperReach();
-  /* The sweep is in the CENTRELINE, and the tilt is a rotation about the
-     SPINDLE itself, so the rosette — drawn unturned at (cx, cy) — cannot
-     leave the spindle it turns. What this note used to warn against is a
-     rotation about any other point, which is the mistake the droop on the
-     Coral was. `dir` mirrors the along-reach coordinate, and a mirrored turn
-     upward is still a turn upward. */
   const pt = (t, s) => {
     const [u, v] = taperAt(t, s, L);
     return `${(cx + dir * u).toFixed(1)} ${(cy + v).toFixed(1)}`;
   };
-  const body = taperBand(pt, L);
+  const body = taperBody(pt, L, dir);
+  const h0 = taperHalf(0, L), m0 = taperMid(0, L);
+  const u = `${Math.round(cx)}-${Math.round(cy)}`;
+  /* One soft sheen band across the face, where two of the three doors put
+     their brightest vertical: a lighting judgement, as the Coral's are. */
+  const t0 = L * 0.42, t1 = L * 0.50;
   return `
     <g data-kind="lever">
-      <path d="${taperBand(pt, L, -0.7, 1.5, 12, L)}"
-            transform="translate(0 8)" fill="#000" opacity="0.30"
-            filter="url(#hwShadow)"/>
+      <linearGradient id="taperBand-${u}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"   stop-color="#fff" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#fff" stop-opacity="1"/>
+        <stop offset="1"   stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <!-- the Coral's shadow for the same stand-off, in its own filter box -->
+      <filter id="taperShadow-${u}" x="-20%" y="-150%" width="140%" height="400%">
+        <feGaussianBlur stdDeviation="7"/>
+      </filter>
+      <path d="${body}" transform="translate(4 15)" fill="#000" opacity="0.34"
+            filter="url(#taperShadow-${u})"/>
 
-      <!-- Body: full where it leaves the rose, narrowing fast, curving down
-           to a point. -->
+      ${coralRose(cx, cy, TAPER_ROSE)}
+
+      <!-- the hook's shade on the rose, just below and proud of the root -->
+      <circle cx="${(cx - dir * 2).toFixed(1)}" cy="${(cy + m0 + 3).toFixed(1)}" r="${(h0 + 2.5).toFixed(1)}"
+              fill="#000" opacity="0.40" filter="url(#hwShadow)"/>
+
       <path d="${body}" fill="url(#nickel)"/>
-      <!-- ⚠ AND THE SAME BLACK WASH AS THE CORAL, FOR THE SAME REASON AND OFF
-           THE SAME MEASUREMENT. The seven photographed levers put the blade's
-           darkest point at 0.22 to 0.68 of the paint beside it, median 0.35,
-           and that is a fact about a lever seen against a painted door rather
-           than about the Coral in particular. Leaving this one out would give
-           the range two nickel levers made of visibly different metal. -->
-      <path d="${body}" fill="#000" opacity="0.14"/>
+      <path d="${body}" fill="#000" opacity="0.10"/>
 
-      <!-- the same banding as the Coral, bent to the sweep: clipped arris,
-           mid band, dark roll -->
-      <path d="${taperBand(pt, L, -0.85, -0.62, 14, L - 6)}" fill="#fff" opacity="0.92"/>
-      <path d="${taperBand(pt, L, -0.55, -0.22, 16, L - 10)}" fill="#fff" opacity="0.18"/>
-      <path d="${taperBand(pt, L, 0.18, 0.84, 16, L - 8)}" fill="#000" opacity="0.56"/>
+      <!-- across the section, as the Coral: a lit arris along the top and a
+           rolled underside; the tip turns away from the light -->
+      <path d="${taperBand(pt, L, -0.94, -0.70, 0, L - 3)}" fill="#fff" opacity="0.45"/>
+      <path d="${taperBand(pt, L, 0.55, 0.95, 0, L - 3)}" fill="#000" opacity="0.22"/>
+      <path d="${taperBand(pt, L, -0.8, 0.8, t0, t1)}" fill="url(#taperBand-${u})" opacity="0.70"/>
+      <path d="${taperBand(pt, L, -1, 1, L * 0.90, L)}" fill="#000" opacity="0.07"/>
 
-      ${disc(cx, cy, LEVER_ROSETTE)}
-
-      <!-- the neck over the rose, as on the Coral -->
-      <path d="${taperBand(pt, L, -0.95, 0.95, 2, 33)}" fill="url(#nickel)"/>
-      <path d="${taperBand(pt, L, -0.70, -0.32, 9, 30)}" fill="#fff" opacity="0.42"/>
+      <!-- the hook: a dark hollow inside the root's curl and a lit lip on its
+           edge, round the root's own centre -->
+      <path d="${arcPath(cx, cy + m0, h0 - 3.4, dir > 0 ? 100 : 280, dir > 0 ? 260 : 80)}" fill="none"
+            stroke="#000" stroke-opacity="0.45" stroke-width="5"/>
+      <path d="${arcPath(cx, cy + m0, h0 - 0.7, dir > 0 ? 120 : 300, dir > 0 ? 220 : 60)}" fill="none"
+            stroke="#fff" stroke-opacity="0.28" stroke-width="1.3"/>
     </g>`;
 }
 
@@ -9935,6 +9985,55 @@ const bellKnocker = (cx, cy) => {
     </g>`;
 };
 
+/* ── THE CORAL'S ESCUTCHEON — `escutcheon: 'covered'`, 27.9.2026 ───────────
+   Read off the four installed Coral doors and RB's Coral cut-out: 70 mm
+   (`CORAL_LOCK_R`); a bevelled rim, a groove at 0.83 R, a raised ring, a
+   shadowed step at 0.61 R; and the euro cylinder COVERED — only its round plug
+   shows, carrying RB's horizontal slot, and it stands 5 mm ABOVE the plate's
+   centre (6.5 / 5 / 4 on the doors, 5.4 on RB), which is where a euro
+   profile's plug sits. We drew it 2 mm below and drew the whole keyhole
+   silhouette round it, which none of the four shows.
+   The slot is 1.4 plug-radii wide, not `keySlot`'s 1.84: the doors read it
+   14-15 mm on a 21 mm plug. */
+const coralSlot = (kx, ky, r) => `
+      <g data-hw="keyway">
+        <circle cx="${kx}" cy="${ky}" r="${r}" fill="url(#euroSteel)"/>
+        <path d="${arcPath(kx, ky, r - 1, 145, 320)}" fill="none" stroke="#fff"
+              stroke-opacity="0.5" stroke-width="1.4"/>
+        <rect x="${kx - r * 0.70}" y="${ky - r * 0.18}" width="${r * 1.40}" height="${r * 0.36}"
+              rx="${r * 0.10}" fill="#1E2023"/>
+      </g>`;
+
+function coveredEscutcheon(cx, cy, owned) {
+  const R = CORAL_LOCK_R;
+  const kx = cx, ky = cy - 5;
+  const dome = `dome-${Math.round(cx)}-${Math.round(cy)}`;
+  return `
+    <g data-hw="lock"${owned ? ' data-owner="lockset"' : ''} data-kind="cylinder"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R}" data-plate="covered">
+      <g data-mount="rose">
+        <circle cx="${cx + 2}" cy="${cy + 4}" r="${R}" fill="#000" opacity="0.36"
+                filter="url(#hwShadow)"/>
+        <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#roseFace)"/>
+        <circle cx="${cx}" cy="${cy}" r="${R}" fill="#000" opacity="${CORAL_ROSE_WASH}"/>
+        ${coralStep(cx, cy, R - 1.2, 2.4, 0.62, 0.40)}
+        ${coralStep(cx, cy, R * 0.83, 1.8, 0.24, 0.44)}
+        ${coralStep(cx, cy, R * 0.61, 2.2, 0.30, 0.55)}
+        ${brushing(cx, cy, R * 0.16, R * 0.58)}
+      </g>
+      <radialGradient id="${dome}" cx="0.36" cy="0.30" r="0.78">
+        <stop offset="0"    stop-color="#fff" stop-opacity="0.30"/>
+        <stop offset="0.55" stop-color="#fff" stop-opacity="0.04"/>
+        <stop offset="1"    stop-color="#000" stop-opacity="0.16"/>
+      </radialGradient>
+      <circle cx="${cx}" cy="${cy}" r="${R * 0.60}" fill="url(#${dome})"/>
+      ${coralSlot(kx, ky, R * 0.30)}
+      <ellipse cx="${cx - R * 0.55}" cy="${cy - R * 0.55}" rx="5" ry="2.6"
+               fill="#fff" opacity="0.45" transform="rotate(-45 ${cx - R * 0.55} ${cy - R * 0.55})"/>
+      <circle cx="${cx + R * 0.62}" cy="${cy + R * 0.58}" r="1.8" fill="#fff" opacity="0.28"/>
+    </g>`;
+}
+
 /**
  * The lock: a turned brushed-nickel escutcheon with a euro cylinder.
  * Modelled on the supplied hardware photograph — stepped concentric rings,
@@ -9963,6 +10062,7 @@ const bellKnocker = (cx, cy) => {
    a square — a circle ramps (the Coral's escutcheon in the same folder reads
    19 52 68 80 ... 121 ... 18). 1.065 of the knob plate above it. */
 const cylinder = (cx, cy, owned = false, shape = 'round') => {
+  if (shape === 'covered') return coveredEscutcheon(cx, cy, owned);
   const R = LOCK_R;
   const kx = cx, ky = cy + 2;          // cylinder sits marginally low, as it does in life
   const plate = shape === 'square' ? squareRose(cx, cy, R) : disc(cx, cy, R);
@@ -10202,10 +10302,14 @@ const FITTING_GLYPH = {
      moved the door and left the tile drawing the old one, which is the very
      fault the paragraph above is about, one number over. `rx` is the
      half-depth because the door's cap is a semicircle. */
+  /* ⚠ AND THE ROOT MOVED WITH THE DOOR ON 27.9.2026: the blade is one stadium
+     from half its depth past the spindle to the tip, centred on the spindle,
+     as `lever()` draws it now. The root lies inside the rose, so the
+     silhouette's outline moved by the rose's 1.5 mm only. */
   lever: () => ({ box: [-(LEVER_REACH + 16), -(LEVER_ROSETTE + 12),
                         LEVER_ROSETTE + 12, LEVER_ROSETTE + 12], art: `
     <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
-    <rect x="${-LEVER_REACH}" y="${-LEVER_BLADE / 2 - 1}" width="${LEVER_REACH}"
+    <rect x="${-LEVER_REACH}" y="${-LEVER_BLADE / 2}" width="${LEVER_REACH + LEVER_BLADE / 2}"
           height="${LEVER_BLADE}" rx="${LEVER_BLADE / 2}"/>` }),
 
   /* The curved lever: the tile has to carry all three things that make it a
@@ -10226,10 +10330,10 @@ const FITTING_GLYPH = {
        hung; turned level, the lowest point is the neck, and the tip reaches
        further along than the reach it was typed as. */
     const [along, high, low] = taperExtent(L);
-    return { box: [-(Math.max(L, along) + 16), Math.min(-LEVER_ROSETTE, high) - 12,
-                   LEVER_ROSETTE + 12, Math.max(LEVER_ROSETTE, low) + 12], art: `
-    <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
-    <path d="${taperBand(pt, L)}"/>` };
+    return { box: [-(Math.max(L, along) + 16), Math.min(-TAPER_ROSE, high) - 12,
+                   TAPER_ROSE + 12, Math.max(TAPER_ROSE, low) + 12], art: `
+    <circle cx="0" cy="0" r="${TAPER_ROSE}"/>
+    <path d="${taperBody(pt, L, -1)}"/>` };
   },
 
   /* Cylinder only: an escutcheon with a euro keyway and nothing else. It had

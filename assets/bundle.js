@@ -1574,6 +1574,9 @@
     barblack: { handleFinish: "hf-black" }
   };
   var LOCKSETS = [
+    /* `escutcheon: 'covered'` since 27.9.2026: four installed Coral doors and
+       RB's cut-out show the cylinder covered, only its round plug visible
+       (research/handles/coral/). A property, so no VERSION. */
     {
       id: "coral",
       he: "קורל",
@@ -1582,6 +1585,7 @@
       style: "lever",
       aliases: ["lever"],
       lever: true,
+      escutcheon: "covered",
       photo: "research/handles/rb/enterance-handle-product-coral.png"
     },
     /* Cylinder only: a keyway escutcheon and nothing else.
@@ -1780,7 +1784,10 @@
     }
   ];
   var PIRZUL2 = [
-    { id: "pz-nickel", he: "ניקל", en: "Nickel", ru: "Никель", tone: "steel" },
+    /* `nickel`, not `steel`, since 27.9.2026: the lock furniture's satin nickel
+       measured warmer and darker than the pull bar's steel off four installed
+       Coral doors — see FINISH_TONES in the renderer. */
+    { id: "pz-nickel", he: "ניקל", en: "Nickel", ru: "Никель", tone: "nickel" },
     { id: "pz-black", he: "שחור", en: "Black", ru: "Чёрный", tone: "black" },
     { id: "pz-bronze", he: "ברונזה", en: "Bronze", ru: "Бронза", tone: "bronze" },
     { id: "pz-gold", he: "זהב", en: "Gold", ru: "Золото", tone: "brass" }
@@ -2999,6 +3006,24 @@
   // js/renderer.js
   var FINISH_TONES = {
     steel: ["#E4E7E9", "#C6CBCF", "#9FA5AA", "#80868B", "#99A0A5", "#6A7075", "#F7F9FA"],
+    /* ⚠ THE פרזול's NICKEL IS ITS OWN RAMP SINCE 27.9.2026, AND IT IS WARMER AND
+       DARKER THAN `steel`. Four installed Coral doors (research/handles/coral/,
+       the owner's son: *"fix the coral handle"*), each lock stile rectified to
+       millimetres and our render cut to the same window in the nearest paint:
+       blade over paint read 1.53 / 0.90 / 0.48 on the photographs against our
+       1.90 / 1.03 / 0.57 — 20-30% light on every door — and the rose 45-80%
+       light; the metal's hue read 37-42 degrees (warm) where `steel` is 210
+       (cold), and it held on the neutral anthracite door, so it is not white
+       balance. Each stop here is `steel`'s at 0.80 of its luminance (the
+       specular at 0.97) and hue 40, HLS saturation 0.10 (0.20 on the specular).
+       With it the blade reads 1.67 / 0.91 / 0.50 and the rose 1.60 / 0.87 /
+       0.48.
+       ⚠ `steel` IS UNTOUCHED ON PURPOSE. It is still the pull bar's and the
+       bow's nickel (`hf-nickel`), the bought-in extra locks' constant metal
+       (`lockUnit`), and the reference `CYL_LIFT` and `DOME_LIFT` were measured
+       against — moving it would have brightened every gold and bronze cylinder
+       in silence. No photograph here shows a pull bar or an extra lock. */
+    nickel: ["#BDB8AE", "#A8A194", "#8B8372", "#716A5C", "#877F6E", "#5E584D", "#F3F1ED"],
     black: ["#5E6165", "#3D4043", "#26282B", "#171819", "#313437", "#0F1011", "#8A8E93"],
     /* ⚠ WARMED 30.8.2026, AND THE FILE SAID "KEEP THE GOLD AS IS" UNTIL THEN.
          That instruction is in the bronze note below and it was right when it was
@@ -3173,7 +3198,7 @@ ${stops}
   var DOME_REF = DOME.map((c) => FINISH_TONES.steel.map((s, i) => [Math.abs(rawLum(s) - rawLum(c)), i]).sort((a, b) => a[0] - b[0])[0][1]);
   var DOME_LIFT = DOME.map((c, i) => rawLum(c) / rawLum(FINISH_TONES.steel[DOME_REF[i]]));
   function domeRamp(tone) {
-    if (tone === FINISH_TONES.steel) return DOME;
+    if (tone === FINISH_TONES.steel || tone === FINISH_TONES.nickel) return DOME;
     return DOME_LIFT.map((m, i) => scaleTone(tone[DOME_REF[i]], m));
   }
   var LIGHT = {
@@ -3233,33 +3258,37 @@ ${stops}
   };
   var KEYWAY_BACKSET = 63;
   var LOCK_R = 33;
-  var LEVER_ROSETTE = 30;
+  var LEVER_ROSETTE = 31.5;
+  var CORAL_LOCK_R = 35;
+  var escutcheonR = (lockset) => lockset && lockset.escutcheon === "covered" ? CORAL_LOCK_R : LOCK_R;
   var LEVER_REACH = 128;
-  var LEVER_BLADE = Math.round(LEVER_ROSETTE * 2 * 0.377);
-  var TAPER_REACH_F = 0.85;
-  var TAPER_DROP = 30;
-  var TAPER_HALF_NECK = 16;
-  var TAPER_HALF_CAP = 4;
-  var taperReach = () => Math.round(LEVER_REACH * TAPER_REACH_F);
-  var TAPER_TILT = Math.atan2(TAPER_DROP, taperReach()) * 180 / Math.PI;
-  var taperMid = (t, L2) => TAPER_DROP * (t / L2) ** 2;
-  var taperHalf = (t, L2) => TAPER_HALF_CAP + (TAPER_HALF_NECK - TAPER_HALF_CAP) * (1 - Math.min(1, t / L2)) ** 2;
-  var taperAt = (t, s, L2) => {
-    const u = t, v = taperMid(t, L2) + s * taperHalf(t, L2);
-    const a = TAPER_TILT * Math.PI / 180, c = Math.cos(a), n = Math.sin(a);
-    return [u * c + v * n, v * c - u * n];
+  var LEVER_BLADE = 23;
+  var TAPER_REACH = 102;
+  var TAPER_ROSE = LEVER_ROSETTE;
+  var TAPER_RISE = [4.5, 30, 0.5];
+  var TAPER_HALF = [13, 4.5];
+  var taperReach = () => TAPER_REACH;
+  var taperMid = (t, L2) => {
+    const [r, T2, r2] = TAPER_RISE, u = Math.min(1, Math.max(0, t) / T2);
+    return -r * (1 - (1 - u) ** 2) - r2 * Math.min(1, Math.max(0, t - T2) / (L2 - T2));
   };
+  var taperHalf = (t, L2) => TAPER_HALF[0] + (TAPER_HALF[1] - TAPER_HALF[0]) * Math.min(1, Math.max(0, t) / L2);
+  var taperAt = (t, s, L2) => [t, taperMid(t, L2) + s * taperHalf(t, L2)];
   var TAPER_STEPS = 14;
   var taperBand = (pt, L2, s0 = -1, s1 = 1, t0 = 0, t1 = L2) => {
     const ts = Array.from({ length: TAPER_STEPS + 1 }, (_, i) => t0 + (t1 - t0) * i / TAPER_STEPS);
-    const tip = t1 >= L2 ? ` Q ${pt(L2 + TAPER_HALF_CAP * 1.6 * (s1 - s0) / 2, (s0 + s1) / 2)} ${pt(L2, s1)}` : ` L ${pt(t1, s1)}`;
+    const tip = t1 >= L2 ? ` Q ${pt(L2 + taperHalf(L2, L2) * (s1 - s0), (s0 + s1) / 2)} ${pt(L2, s1)}` : ` L ${pt(t1, s1)}`;
     return `M ${ts.map((t) => pt(t, s0)).join(" L ")}${tip} L ${ts.slice().reverse().map((t) => pt(t, s1)).join(" L ")} Z`;
+  };
+  var taperBody = (pt, L2, dir) => {
+    const band = taperBand(pt, L2);
+    const r = taperHalf(0, L2);
+    return `${band.slice(0, -1)} A ${r.toFixed(2)} ${r.toFixed(2)} 0 0 ${dir > 0 ? 1 : 0} ${pt(0, -1)} Z`;
   };
   var taperExtent = (L2) => {
     const P = [];
     for (let i = 0; i <= TAPER_STEPS; i++) P.push(taperAt(L2 * i / TAPER_STEPS, -1, L2), taperAt(L2 * i / TAPER_STEPS, 1, L2));
-    const a = taperAt(L2, -1, L2), b = taperAt(L2, 1, L2), c = taperAt(L2 + TAPER_HALF_CAP * 1.6, 0, L2);
-    P.push([(a[0] + b[0]) / 4 + c[0] / 2, (a[1] + b[1]) / 4 + c[1] / 2]);
+    P.push([L2 + taperHalf(L2, L2), taperMid(L2, L2)]);
     return [Math.max(...P.map((p) => p[0])), Math.min(...P.map((p) => p[1])), Math.max(...P.map((p) => p[1]))];
   };
   var LOCK_CLEAR = 15;
@@ -3452,7 +3481,7 @@ ${stops}
     const cyl = cylinderRamp(hwTone);
     const dome = domeRamp(hwTone);
     const bellTone = bellRamp(tone);
-    const stripeTone = byId(PIRZUL2, state2.pirzul).tone === "steel" ? tone : hwTone;
+    const stripeTone = byId(PIRZUL2, state2.pirzul).tone === "nickel" ? tone : hwTone;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const sideW = size.side ? size.side - REBATE : 0;
     const totalW = leafW + (sideW ? sideW + MULLION : 0);
@@ -5764,12 +5793,13 @@ ${body}
       vy: lock.vy
     }];
     if (!lockset.lock) {
+      const er = escutcheonR(lockset);
       locks.push({
         x: KEYWAY_BACKSET,
         y: leafH - CYLINDER_AFF,
-        out: LOCK_R,
-        inward: LOCK_R,
-        vy: LOCK_R
+        out: er,
+        inward: er,
+        vy: er
       });
     }
     for (const L2 of locks) {
@@ -7077,8 +7107,11 @@ ${body}
          Declared on its own anyway rather than shared, because it is a different
          product and a shared line is a claim that it is not. Measured by
          `npm run collide -- boxes`, which is what the numbers below are. */
+      /* ⚠ `in` 118 → 114 ON 27.9.2026: re-measured off three installed doors the
+         blade reaches 107 (106 to its tip), so 118 kept bars 11 mm away from
+         metal that is not there. 114 is the Coral's own 7 mm margin (128 → 135). */
       case "levertaper":
-        return { out: 40, in: 118, vy: 51 };
+        return { out: 40, in: 114, vy: 51 };
       case "plate":
         return { out: 47, in: 119, vy: 170 };
       case "almog":
@@ -7673,119 +7706,137 @@ ${body}
             rx="${r * 0.14}" fill="none" stroke="#000" stroke-opacity="0.26" stroke-width="2"/>
       ${brushing(cx, cy, r * 0.16, r * 0.62)}
     </g>`;
+  var coralStep = (cx, cy, r, w, lit, dark) => `
+      <path d="${arcPath(cx, cy, r, 135, 315)}" fill="none" stroke="#fff"
+            stroke-opacity="${lit}" stroke-width="${w}"/>
+      <path d="${arcPath(cx, cy, r, 315, 135)}" fill="none" stroke="#000"
+            stroke-opacity="${dark}" stroke-width="${w}"/>`;
+  var CORAL_ROSE_WASH = 0.18;
+  var coralRose = (cx, cy, r) => `
+    <g data-mount="rose">
+      <circle cx="${cx + 2}" cy="${cy + 4}" r="${r}" fill="#000" opacity="0.36"
+              filter="url(#hwShadow)"/>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#roseFace)"/>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="#000" opacity="${CORAL_ROSE_WASH}"/>
+      ${coralStep(cx, cy, r - 1.2, 2.4, 0.62, 0.4)}
+      ${coralStep(cx, cy, r * 0.9, 1.6, 0.22, 0.22)}
+      ${coralStep(cx, cy, r * 0.76, 1.8, 0.3, 0.46)}
+      ${brushing(cx, cy, r * 0.16, r * 0.7)}
+    </g>`;
+  function coralStadium(cx, dir, t0, t1, top, bot) {
+    const r = (bot - top) / 2;
+    const at = (t) => (cx + dir * t).toFixed(2);
+    const sw = dir > 0 ? 1 : 0;
+    return `M ${at(t0 + r)} ${top.toFixed(2)} L ${at(t1 - r)} ${top.toFixed(2)}
+          A ${r.toFixed(2)} ${r.toFixed(2)} 0 0 ${sw} ${at(t1 - r)} ${bot.toFixed(2)}
+          L ${at(t0 + r)} ${bot.toFixed(2)}
+          A ${r.toFixed(2)} ${r.toFixed(2)} 0 0 ${sw} ${at(t0 + r)} ${top.toFixed(2)} Z`;
+  }
   function lever(cx, cy, dir) {
     const L2 = LEVER_REACH;
-    const at = (t) => cx + dir * t;
     const D = LEVER_BLADE;
-    const T2 = cy - D / 2 - 1, B = cy + D / 2 - 1;
+    const h = D / 2;
+    const T2 = cy - h, B = cy + h;
     const b = (f) => T2 + D * f;
-    const CAP = D / 2;
+    const u = `${Math.round(cx)}-${Math.round(cy)}`;
+    const body = coralStadium(cx, dir, -h, L2, T2, B);
+    const band = (f, w, a) => {
+      const x = cx + dir * L2 * f - w / 2;
+      return `<rect x="${x.toFixed(2)}" y="${b(0.1).toFixed(2)}" width="${w}" height="${(D * 0.82).toFixed(2)}"
+                  fill="url(#coralBand-${u})" opacity="${a}"/>`;
+    };
     return `
     <g data-kind="lever">
-      <path d="M ${at(12)} ${b(0.27)} L ${at(L2 - 16)} ${b(0.42)}
-               Q ${at(L2 + 4)} ${b(0.42)} ${at(L2 + 4)} ${b(0.88)}
-               Q ${at(L2 + 4)} ${B + D * 0.88} ${at(L2 - 16)} ${B + D * 0.88}
-               L ${at(12)} ${B + D} Z"
-            fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
+      <linearGradient id="coralBand-${u}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"   stop-color="#fff" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#fff" stop-opacity="1"/>
+        <stop offset="1"   stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <!-- Its own filter box: hwShadow's is 30% of the element's height, and a
+           shadow dropped 15 mm off a 23 mm blade blurs straight out of it into
+           a hard edge. 15 mm because the blade stands about 60 mm proud; the
+           photographs' longer stairwell shadows are each one lamp's, and the
+           drawing keeps one key light for every fitting. -->
+      <filter id="coralShadow-${u}" x="-20%" y="-150%" width="140%" height="400%">
+        <feGaussianBlur stdDeviation="7"/>
+      </filter>
+      <path d="${coralStadium(cx, dir, -h + 6, L2, T2, B)}" transform="translate(4 15)"
+            fill="#000" opacity="0.34" filter="url(#coralShadow-${u})"/>
 
-      <!-- Body: one depth from the neck to the cap. A pointed tip reads as a
-           blade and a tapered one as a wedge; this lever is neither. -->
-      <path d="M ${at(0)} ${T2}
-               L ${at(L2 - CAP)} ${T2}
-               Q ${at(L2)} ${T2} ${at(L2)} ${(T2 + B) / 2}
-               Q ${at(L2)} ${B} ${at(L2 - CAP)} ${B}
-               L ${at(0)} ${B} Z"
-            fill="url(#nickel)"/>
-      <!-- A BLACK WASH OVER THE WHOLE BODY, because the base ramp is too light
-           for a lever seen against paint. Measured on seven photographed doors
-           as the blade's darkest point over the paint beside it: 0.22 0.27
-           0.30 0.35 0.35 0.65 0.68, median 0.35 - and DARKER THAN THE PAINT
-           even on the near-black doors (d015 at 0.65 of a paint of 33, d048 at
-           0.35 of 42), which is the rolled underside turned away from the
-           light. Ours floored at 0.41 of a pale door and its broad face sat at
-           0.73 to 1.10, so most of the blade was at or above the paint: that
-           is the whole of "it reads as grey plastic". Black at alpha, never a
-           tinted black, so the pirzul's hue survives it (see the tint rule). -->
-      <path d="M ${at(0)} ${T2}
-               L ${at(L2 - CAP)} ${T2}
-               Q ${at(L2)} ${T2} ${at(L2)} ${(T2 + B) / 2}
-               Q ${at(L2)} ${B} ${at(L2 - CAP)} ${B}
-               L ${at(0)} ${B} Z"
-            fill="#000" opacity="0.14"/>
+      ${coralRose(cx, cy, LEVER_ROSETTE)}
 
-      <!-- Metal is BANDED, not shaded: the photographs show a hard clipped
-           arris along the top (the only blown highlight anywhere in the
-           frame), a mid band under it, and a body that goes nearly as dark as
-           the paint underneath. A smooth gradient down the whole section is
-           what makes rendered hardware look like grey plastic.
-           The bands run parallel to the blade now, because the blade is
-           parallel to itself: they used to converge with the taper. -->
-      <path d="M ${at(14)} ${b(0.115)} L ${at(L2 - CAP)} ${b(0.115)}
-               Q ${at(L2 - CAP * 0.3)} ${b(0.115)} ${at(L2 - CAP * 0.3)} ${b(0.231)}
-               L ${at(14)} ${b(0.231)} Z"
-            fill="#fff" opacity="0.92"/>
-      <path d="M ${at(16)} ${b(0.269)} L ${at(L2 - CAP * 0.7)} ${b(0.269)}
-               L ${at(L2 - CAP * 0.7)} ${b(0.423)} L ${at(16)} ${b(0.423)} Z"
-            fill="#fff" opacity="0.18"/>
-      <!-- rolled underside, turned away from the key and nearly in shadow -->
-      <path d="M ${at(16)} ${b(0.654)} L ${at(L2 - CAP * 0.8)} ${b(0.654)}
-               L ${at(L2 - CAP * 0.8)} ${b(0.962)} L ${at(16)} ${b(0.962)} Z"
-            fill="#000" opacity="0.56"/>
-      <!-- the cap turns out of the key and picks up the darker surround -->
-      <path d="M ${at(L2 - CAP * 1.3)} ${b(0.115)} L ${at(L2 - CAP * 0.2)} ${b(0.154)}
-               Q ${at(L2)} ${b(0.192)} ${at(L2)} ${(T2 + B) / 2}
-               Q ${at(L2)} ${b(0.885)} ${at(L2 - CAP * 0.7)} ${b(0.885)}
-               L ${at(L2 - CAP * 1.3)} ${b(0.846)} Z"
-            fill="#000" opacity="0.16"/>
+      <!-- the neck's shade on the rose's raised face, just proud of the root -->
+      <circle cx="${(cx - dir * 1.5).toFixed(2)}" cy="${(cy + 1.5).toFixed(2)}" r="${(h + 2.5).toFixed(2)}"
+              fill="#000" opacity="0.38" filter="url(#hwShadow)"/>
 
-      ${disc(cx, cy, LEVER_ROSETTE)}
+      <path d="${body}" fill="url(#nickel)"/>
+      <path d="${body}" fill="#000" opacity="0.10"/>
 
-      <!-- the neck swelling out of the rosette, drawn over it. It still swells
-           — a cast lever grows out of its collar — but it now closes onto the
-           blade's own depth instead of onto a wider root. -->
-      <path d="M ${at(2)} ${T2 - D * 0.215} Q ${at(28)} ${T2 - D * 0.16} ${at(33)} ${T2}
-               L ${at(33)} ${B} Q ${at(28)} ${B + D * 0.16} ${at(2)} ${B + D * 0.215} Z"
-            fill="url(#nickel)"/>
-      <path d="M ${at(9)} ${b(0.038)} Q ${at(26)} ${b(0.077)} ${at(30)} ${b(0.115)}
-               L ${at(30)} ${b(0.308)} L ${at(9)} ${b(0.269)} Z"
-            fill="#fff" opacity="0.42"/>
+      <!-- across the section: a thin lit arris, the flat face, a narrow
+           rolled underside -->
+      <path d="${coralStadium(cx, dir, -h + 2, L2 - 1, b(0.05), b(0.16))}" fill="#fff" opacity="0.45"/>
+      <path d="${coralStadium(cx, dir, -h + 2, L2 - 1, b(0.78), b(0.97))}" fill="#000" opacity="0.20"/>
+
+      ${band(0.55, 12, 0.78)}
+      ${band(0.72, 6, 0.58)}
+
+      <!-- the tip turns away from the light -->
+      <path d="${coralStadium(cx, dir, L2 - D * 0.9, L2, T2, B)}" fill="#000" opacity="0.12"/>
+
+      <!-- the root rolls down into the neck: a shaded crescent inside its
+           outline and a lit lip on its edge -->
+      <path d="${arcPath(cx, cy, h - 3.2, dir > 0 ? 100 : 280, dir > 0 ? 260 : 80)}" fill="none"
+            stroke="#000" stroke-opacity="0.32" stroke-width="4.2"/>
+      <path d="${arcPath(cx, cy, h - 0.7, dir > 0 ? 120 : 300, dir > 0 ? 220 : 60)}" fill="none"
+            stroke="#fff" stroke-opacity="0.25" stroke-width="1.3"/>
     </g>`;
   }
   function leverTaper(cx, cy, dir) {
     const L2 = taperReach();
     const pt = (t, s) => {
-      const [u, v] = taperAt(t, s, L2);
-      return `${(cx + dir * u).toFixed(1)} ${(cy + v).toFixed(1)}`;
+      const [u2, v] = taperAt(t, s, L2);
+      return `${(cx + dir * u2).toFixed(1)} ${(cy + v).toFixed(1)}`;
     };
-    const body = taperBand(pt, L2);
+    const body = taperBody(pt, L2, dir);
+    const h0 = taperHalf(0, L2), m0 = taperMid(0, L2);
+    const u = `${Math.round(cx)}-${Math.round(cy)}`;
+    const t0 = L2 * 0.42, t1 = L2 * 0.5;
     return `
     <g data-kind="lever">
-      <path d="${taperBand(pt, L2, -0.7, 1.5, 12, L2)}"
-            transform="translate(0 8)" fill="#000" opacity="0.30"
-            filter="url(#hwShadow)"/>
+      <linearGradient id="taperBand-${u}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"   stop-color="#fff" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#fff" stop-opacity="1"/>
+        <stop offset="1"   stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <!-- the Coral's shadow for the same stand-off, in its own filter box -->
+      <filter id="taperShadow-${u}" x="-20%" y="-150%" width="140%" height="400%">
+        <feGaussianBlur stdDeviation="7"/>
+      </filter>
+      <path d="${body}" transform="translate(4 15)" fill="#000" opacity="0.34"
+            filter="url(#taperShadow-${u})"/>
 
-      <!-- Body: full where it leaves the rose, narrowing fast, curving down
-           to a point. -->
+      ${coralRose(cx, cy, TAPER_ROSE)}
+
+      <!-- the hook's shade on the rose, just below and proud of the root -->
+      <circle cx="${(cx - dir * 2).toFixed(1)}" cy="${(cy + m0 + 3).toFixed(1)}" r="${(h0 + 2.5).toFixed(1)}"
+              fill="#000" opacity="0.40" filter="url(#hwShadow)"/>
+
       <path d="${body}" fill="url(#nickel)"/>
-      <!-- ⚠ AND THE SAME BLACK WASH AS THE CORAL, FOR THE SAME REASON AND OFF
-           THE SAME MEASUREMENT. The seven photographed levers put the blade's
-           darkest point at 0.22 to 0.68 of the paint beside it, median 0.35,
-           and that is a fact about a lever seen against a painted door rather
-           than about the Coral in particular. Leaving this one out would give
-           the range two nickel levers made of visibly different metal. -->
-      <path d="${body}" fill="#000" opacity="0.14"/>
+      <path d="${body}" fill="#000" opacity="0.10"/>
 
-      <!-- the same banding as the Coral, bent to the sweep: clipped arris,
-           mid band, dark roll -->
-      <path d="${taperBand(pt, L2, -0.85, -0.62, 14, L2 - 6)}" fill="#fff" opacity="0.92"/>
-      <path d="${taperBand(pt, L2, -0.55, -0.22, 16, L2 - 10)}" fill="#fff" opacity="0.18"/>
-      <path d="${taperBand(pt, L2, 0.18, 0.84, 16, L2 - 8)}" fill="#000" opacity="0.56"/>
+      <!-- across the section, as the Coral: a lit arris along the top and a
+           rolled underside; the tip turns away from the light -->
+      <path d="${taperBand(pt, L2, -0.94, -0.7, 0, L2 - 3)}" fill="#fff" opacity="0.45"/>
+      <path d="${taperBand(pt, L2, 0.55, 0.95, 0, L2 - 3)}" fill="#000" opacity="0.22"/>
+      <path d="${taperBand(pt, L2, -0.8, 0.8, t0, t1)}" fill="url(#taperBand-${u})" opacity="0.70"/>
+      <path d="${taperBand(pt, L2, -1, 1, L2 * 0.9, L2)}" fill="#000" opacity="0.07"/>
 
-      ${disc(cx, cy, LEVER_ROSETTE)}
-
-      <!-- the neck over the rose, as on the Coral -->
-      <path d="${taperBand(pt, L2, -0.95, 0.95, 2, 33)}" fill="url(#nickel)"/>
-      <path d="${taperBand(pt, L2, -0.7, -0.32, 9, 30)}" fill="#fff" opacity="0.42"/>
+      <!-- the hook: a dark hollow inside the root's curl and a lit lip on its
+           edge, round the root's own centre -->
+      <path d="${arcPath(cx, cy + m0, h0 - 3.4, dir > 0 ? 100 : 280, dir > 0 ? 260 : 80)}" fill="none"
+            stroke="#000" stroke-opacity="0.45" stroke-width="5"/>
+      <path d="${arcPath(cx, cy + m0, h0 - 0.7, dir > 0 ? 120 : 300, dir > 0 ? 220 : 60)}" fill="none"
+            stroke="#fff" stroke-opacity="0.28" stroke-width="1.3"/>
     </g>`;
   }
   var keySlot = (kx, ky, r = 13) => `
@@ -7889,7 +7940,45 @@ ${body}
                fill="#fff" fill-opacity=".26"/>
     </g>`;
   };
+  var coralSlot = (kx, ky, r) => `
+      <g data-hw="keyway">
+        <circle cx="${kx}" cy="${ky}" r="${r}" fill="url(#euroSteel)"/>
+        <path d="${arcPath(kx, ky, r - 1, 145, 320)}" fill="none" stroke="#fff"
+              stroke-opacity="0.5" stroke-width="1.4"/>
+        <rect x="${kx - r * 0.7}" y="${ky - r * 0.18}" width="${r * 1.4}" height="${r * 0.36}"
+              rx="${r * 0.1}" fill="#1E2023"/>
+      </g>`;
+  function coveredEscutcheon(cx, cy, owned) {
+    const R = CORAL_LOCK_R;
+    const kx = cx, ky = cy - 5;
+    const dome = `dome-${Math.round(cx)}-${Math.round(cy)}`;
+    return `
+    <g data-hw="lock"${owned ? ' data-owner="lockset"' : ""} data-kind="cylinder"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R}" data-plate="covered">
+      <g data-mount="rose">
+        <circle cx="${cx + 2}" cy="${cy + 4}" r="${R}" fill="#000" opacity="0.36"
+                filter="url(#hwShadow)"/>
+        <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#roseFace)"/>
+        <circle cx="${cx}" cy="${cy}" r="${R}" fill="#000" opacity="${CORAL_ROSE_WASH}"/>
+        ${coralStep(cx, cy, R - 1.2, 2.4, 0.62, 0.4)}
+        ${coralStep(cx, cy, R * 0.83, 1.8, 0.24, 0.44)}
+        ${coralStep(cx, cy, R * 0.61, 2.2, 0.3, 0.55)}
+        ${brushing(cx, cy, R * 0.16, R * 0.58)}
+      </g>
+      <radialGradient id="${dome}" cx="0.36" cy="0.30" r="0.78">
+        <stop offset="0"    stop-color="#fff" stop-opacity="0.30"/>
+        <stop offset="0.55" stop-color="#fff" stop-opacity="0.04"/>
+        <stop offset="1"    stop-color="#000" stop-opacity="0.16"/>
+      </radialGradient>
+      <circle cx="${cx}" cy="${cy}" r="${R * 0.6}" fill="url(#${dome})"/>
+      ${coralSlot(kx, ky, R * 0.3)}
+      <ellipse cx="${cx - R * 0.55}" cy="${cy - R * 0.55}" rx="5" ry="2.6"
+               fill="#fff" opacity="0.45" transform="rotate(-45 ${cx - R * 0.55} ${cy - R * 0.55})"/>
+      <circle cx="${cx + R * 0.62}" cy="${cy + R * 0.58}" r="1.8" fill="#fff" opacity="0.28"/>
+    </g>`;
+  }
   var cylinder = (cx, cy, owned = false, shape = "round") => {
+    if (shape === "covered") return coveredEscutcheon(cx, cy, owned);
     const R = LOCK_R;
     const kx = cx, ky = cy + 2;
     const plate = shape === "square" ? squareRose(cx, cy, R) : disc(cx, cy, R);
@@ -8036,6 +8125,10 @@ ${body}
        moved the door and left the tile drawing the old one, which is the very
        fault the paragraph above is about, one number over. `rx` is the
        half-depth because the door's cap is a semicircle. */
+    /* ⚠ AND THE ROOT MOVED WITH THE DOOR ON 27.9.2026: the blade is one stadium
+       from half its depth past the spindle to the tip, centred on the spindle,
+       as `lever()` draws it now. The root lies inside the rose, so the
+       silhouette's outline moved by the rose's 1.5 mm only. */
     lever: () => ({ box: [
       -(LEVER_REACH + 16),
       -(LEVER_ROSETTE + 12),
@@ -8043,7 +8136,7 @@ ${body}
       LEVER_ROSETTE + 12
     ], art: `
     <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
-    <rect x="${-LEVER_REACH}" y="${-LEVER_BLADE / 2 - 1}" width="${LEVER_REACH}"
+    <rect x="${-LEVER_REACH}" y="${-LEVER_BLADE / 2}" width="${LEVER_REACH + LEVER_BLADE / 2}"
           height="${LEVER_BLADE}" rx="${LEVER_BLADE / 2}"/>` }),
     /* The curved lever: the tile has to carry all three things that make it a
        different product from the Coral above — it tapers, it curves down, and
@@ -8060,12 +8153,12 @@ ${body}
       const [along, high, low] = taperExtent(L2);
       return { box: [
         -(Math.max(L2, along) + 16),
-        Math.min(-LEVER_ROSETTE, high) - 12,
-        LEVER_ROSETTE + 12,
-        Math.max(LEVER_ROSETTE, low) + 12
+        Math.min(-TAPER_ROSE, high) - 12,
+        TAPER_ROSE + 12,
+        Math.max(TAPER_ROSE, low) + 12
       ], art: `
-    <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
-    <path d="${taperBand(pt, L2)}"/>` };
+    <circle cx="0" cy="0" r="${TAPER_ROSE}"/>
+    <path d="${taperBody(pt, L2, -1)}"/>` };
     },
     /* Cylinder only: an escutcheon with a euro keyway and nothing else. It had
        no entry here, so it fell to the `else` branch and drew a lever — the

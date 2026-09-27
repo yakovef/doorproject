@@ -1,8 +1,10 @@
 # The Coral (קורל), against four installed doors — 27.9.2026
 
-**Status: a drawing and a critique only. Nothing here is in the app.** The owner's
-son sent four photographs of installed doors carrying the Coral and asked: *"fix
-the coral handle."* The drawing goes into the app only when he says so.
+**Status: in the app since 27.9.2026** — *"Put the coral into the app."* The
+owner's son sent four photographs of installed doors carrying the Coral and
+asked: *"fix the coral handle."* What went in differs from the proposal below in
+three places, each narrower than the proposal, and the section at the end says
+which and why.
 
 | file | what it is |
 |---|---|
@@ -88,7 +90,28 @@ the coral handle."* The drawing goes into the app only when he says so.
   and RB (40 41 40 40 40 39 37) do not, and Peretz asked for an even blade on
   14.9. Constant.
 
-## If it goes into the app — what it touches beyond the Coral
+## What went into the app, and where it differs from the proposal
+
+The lever and the rose are the proposal pixel for pixel (checked on all four
+windows). Three things were narrowed on the way in:
+
+1. **The warm nickel is the פרזול's own ramp** (`FINISH_TONES.nickel`, which
+   `pz-nickel` points to), not a replacement of `steel`. `steel` stays the pull
+   bar's and bow's nickel (`hf-nickel`), the extra locks' constant metal, and the
+   reference the gold and bronze cylinders were derived against — replacing it
+   would have brightened every gold and bronze cylinder in silence. No
+   photograph here shows a pull bar or an extra lock.
+2. **The covered escutcheon is the Coral's only** (`escutcheon: 'covered'` on
+   its catalogue row, `CORAL_LOCK_R = 35`, and the rules clear that radius
+   through `escutcheonR`). Three curved-lever doors photographed the same day
+   show open euro profiles, so it is the product's, not every door's.
+3. **The plug is derived from its plate**, like gold's and bronze's, rather
+   than kept as the old chrome literal: `npm test` holds every finish's plug to
+   the measured 2–16% stand-off above its own plate, and the literal over the
+   darker nickel stood 28–46% off. It reads a little less distinct than the
+   bright plugs in the photographs.
+
+## What the proposal touched beyond the Coral (kept for the record)
 
 - **`FINISH_TONES.steel`** repaints every nickel fitting: every lever and knob,
   the cylinder (`CYL_LIFT`), the hinges, the strips, a nickel pull bar and the
