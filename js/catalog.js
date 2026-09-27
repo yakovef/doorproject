@@ -1128,10 +1128,15 @@ export const PEEPHOLES = [
 export const GRILLES = [
   { id: 'none',    he: 'ללא סורג',       en: 'None', ru: 'Без решётки',
     doors: ['d094', 'd115'] },
-  { id: 'grid',    he: 'סורג רשת',       en: 'Square grid', ru: 'Решётка-сетка',     aliases: ['bars', 'iron'],
+  /* ⚠ `iron` AND `iron-light` WERE ALIASED ONTO THIS ENTRY AND ARE LIVE AGAIN
+     — 27.9.2026. They are their own rows at the foot of this list now; see the
+     note there for whose word revived them and what arrived with it. An `?g=`
+     naming either opens the ironwork it always named, which is what those ids
+     have meant to every customer who was ever sent one. */
+  { id: 'grid',    he: 'סורג רשת',       en: 'Square grid', ru: 'Решётка-сетка',     aliases: ['bars'],
     doors: ['d091', 'd100', 'd107', 'd110', 'd113', 'd117', 'd122'] },
   { id: 'grid-light',   he: 'סורג רשת בהיר',   en: 'Square grid, door colour', ru: 'Решётка-сетка в цвет двери', light: true,
-    aliases: ['bars-light', 'iron-light'] },
+    aliases: ['bars-light'] },
   { id: 'scroll',  he: 'סורג מעוצב',     en: 'Grid with scrolls', ru: 'Кованая решётка',
     aliases: ['quatrefoil'],
     doors: ['d089', 'd093', 'd095', 'd097', 'd099', 'd102', 'd116'] },
@@ -1243,6 +1248,38 @@ export const GRILLES = [
     en: 'Art-deco lines, door colour', ru: 'Геометрические линии в цвет двери', light: true },
   /* ⚠ `reeded` IS WITHDRAWN — זכוכית מחורצת, the third of the three. It
      resolves to `mesh`, the other worked glass. */
+
+  /* ── ברזל מחושל, BACK — 27.9.2026 ───────────────────────────────────
+     Peretz withdrew this on 26.8.2026 in a list of three: *"there is no:
+     זכוכית מחורצת, ברזל מחושל, מדליוני פרח."* The withdrawal note four
+     entries up records the disagreement it left behind and says, in as many
+     words, that it is not ours to resolve: TEN of his own measured doors
+     carry this grille, and the likeliest reading was that he had stopped
+     ordering it rather than never having fitted it.
+
+     ⚠ HE HAS NOT STOPPED. The owner's son sent three photographs of doors
+     installed since — a single door, a דו כנפי, and a transom over a second
+     דו כנפי — and all three carry this pattern, which makes thirteen doors
+     against one sentence a month old. They are in `research/ironwork/` and
+     the drawing has been re-measured off them; see `grillePaths`.
+
+     ⚠ SO THIS REVERSES AN OWNER'S DECISION, WHICH IS NORMALLY FORBIDDEN, AND
+     THE GROUND IS THAT HIS SON ASKED FOR IT WITH THE PHOTOGRAPHS IN HAND:
+     *"upload the pattern next to the other designs that we have, but in two
+     options, one black and one in the color that match the door."* That is
+     the `light` axis stated exactly, so it is these two rows and not one.
+     `ASK-PERETZ.md` asks him to confirm, because a withdrawal he repeats is
+     his to repeat.
+
+     APPENDED, so every index already in the wild is untouched and no
+     `VERSION` bump is owed — the ids come back at the END of the list rather
+     than where they stood. They are also removed from `grid`'s aliases above,
+     or `byId` would have two answers for one name. */
+  { id: 'iron',    he: 'ברזל מחושל',     en: 'Wrought ironwork', ru: 'Кованое железо',
+    doors: ['ironwork', 'd090', 'd092', 'd101', 'd103', 'd108',
+            'd112', 'd119', 'd124', 'd128', 'd129'] },
+  { id: 'iron-light', he: 'ברזל מחושל בגוון הדלת',
+    en: 'Wrought ironwork, door colour', ru: 'Кованое железо в цвет двери', light: true },
 ];
 
 /**

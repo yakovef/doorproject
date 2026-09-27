@@ -339,7 +339,9 @@ walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
 
-- `npm test` — **9,086,139 / 0** (25.9.2026; 11,809,879 on 23.9 — the drop is
+- `npm test` — **10,478,780 / 0** (27.9.2026; 9,086,139 on 25.9 — the rise is
+  the two revived ironwork entries lengthening every sweep over `GRILLES`;
+  11,809,879 on 23.9 — the drop before that is
   the buildable sweeps shrinking, see §0b 24.9). ⚠ A CHANGE IN THIS
   NUMBER IS NOT EVIDENCE OF ANYTHING; it is the product of the catalogue's list
   lengths. Read the failure count. (This line said **5,403,239** for two rounds
@@ -445,11 +447,21 @@ counted; this said fifteen after four had closed), of which one is expensive:
 ⚠ **A13 — which of our two windows is his "tall".** ₪500 on the majority of
 glazed orders, resting on nothing but the shape of two Hebrew names.
 
-And one place where he contradicted his own doors, recorded rather than
-resolved: he says there is no ברזל מחושל and it is on **ten** of his installed
-doors. (There were two until 20.9: the second — almost every bar over his
-one-metre threshold as stocked — went with the 20 cm steps, when the bars
-became two bands and the Idan's stock length a metre.)
+⚠ **AND THE ONE PLACE WHERE HE CONTRADICTED HIS OWN DOORS IS CLOSED THE OTHER
+WAY ROUND — 27.9.2026.** It stood here for a month as a thing recorded rather
+than resolved: he said on 26.8 that there is no ברזל מחושל, and it is on **ten**
+of his installed doors. Three photographs of doors he has installed SINCE then
+arrived on 27.9 and every one of them carries it — a single door, a דו כנפי and
+a transom — which makes thirteen doors against one sentence. `iron` and
+`iron-light` are live entries again at his son's instruction, appended so no
+index moved, and the drawing is re-measured off those three photographs
+(`research/ironwork/`). ⚠ **This reverses an owner's decision, which §0a
+otherwise forbids**, so `ASK-PERETZ.md` §2a asks him to confirm — and asks for
+a PRICE, because it is carried at ₪0 like the other bent-bar grilles and it is
+by far the most work in the list. (There were two contradictions until 20.9:
+the second — almost every bar over his one-metre threshold as stocked — went
+with the 20 cm steps, when the bars became two bands and the Idan's stock
+length a metre.)
 
 ### What is NOT built, and why
 
@@ -2710,6 +2722,124 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ ברזל מחושל IS BACK, REDRAWN FROM THREE NEW PHOTOGRAPHS, AND IT HAD
+  SEVEN BARS WHERE WE DREW FIVE — 27.9.2026.** The owner's son sent three
+  doors his father has installed since the withdrawal — a single door with a
+  rectangular light, a דו כנפי, and a transom over a second דו כנפי — with one
+  instruction: *"do the same thing that you did previously and also upload the
+  pattern next to the other designs that we have, but in two options, one
+  black and one in the color that match the door."* All three carry the same
+  grille, and it is the one Peretz withdrew on 26.8 as *"there is no ברזל
+  מחושל"*.
+
+  ⚠ **SO THIS REVERSES AN OWNER'S DECISION, AND §0a NORMALLY FORBIDS THAT.**
+  The ground is that his son asked for it with the photographs in hand and
+  that the contradiction was already on the record: §0c has said for a month
+  that ten of Peretz's own measured doors carry this grille. Three more makes
+  **thirteen doors against one sentence a month old**. `ASK-PERETZ.md` §2a
+  asks him to confirm, and asks for a price — it is carried at **₪0** like
+  every other bent-bar grille and it is by a distance the most work in the
+  list, so if any grille here is not free it is this one. **No number was
+  invented.**
+
+  **`iron` and `iron-light` are live entries again**, APPENDED to `GRILLES` so
+  every index already in the wild is untouched and **no `VERSION` bump is
+  owed** (12 entries → 14, and `BITS.grille` is 4). They are removed from
+  `grid`'s and `grid-light`'s `aliases`, or `byId` would have two answers for
+  one name; a link carrying `?g=iron` now opens the ironwork it always named.
+
+  ── **how it was measured, because all three photographs have reflections** ──
+  The single door has the photographer standing in the middle of its pane and
+  a pylon across the upper half. The design is symmetric about BOTH axes, so
+  the rectified pane's ink map was mirrored left-right and top-bottom and the
+  **elementwise MINIMUM** taken each time: anything present in only one
+  quadrant — a person, a pylon, a cloud — dies, and anything the design
+  carries survives in all four. That one move turned an unreadable photograph
+  into a clean line drawing. Every fraction in the branch is read off it, row
+  by row.
+
+  ⚠ **AND THE TRANSOM IS THE PIECE OF EVIDENCE THAT SETTLED THE TOPOLOGY.**
+  It is the same composition turned on its side, backlit, with no reflection
+  on it at all. Two things could not have been settled without it:
+
+  · **SEVEN vertical bars, not five.** Measured on the single door the
+    verticals stand at 0.029 0.158 0.329 0.500 0.671 0.842 0.979 of the pane's
+    width, and on the double door's main leaf at the same fractions to within
+    0.01 — an outer pair hugging the rebate and five inner bars at sixths. The
+    old drawing had five, and the two it was missing are the two the corner
+    volutes hang off, which is why it had nothing for them to hang off. They
+    are the hardest members in the photograph to see, because they sit against
+    the frame; in the transom they run the whole length and curl at each end.
+  · **The rings are NOT threaded on a rail.** The transom shows clear glass
+    inside every one of the six and a short stub of bar between each pair. The
+    old drawing ran a rail the full width, through the middle of all six.
+
+  ── **what else moved, with the reading behind it** ──
+  · **Six rings at the midpoints of the seven bars**, radius 0.065 W, with a
+    stub and a collar at each crossing. Measured centres 0.078 0.243 0.415
+    0.601 0.764 0.924 against the midpoints 0.094 0.244 0.415 0.586 0.757
+    0.911 — the middle four agree to 0.002 and the two end ones to 0.015,
+    which is the measurement error on the rings nearest the frame.
+  · **The band is at the pane's MID-HEIGHT**, 0.499 of it on the single door
+    and the same on the double. That is the one offset in this branch that is
+    not a fraction of the width, and it is measured rather than assumed.
+  · **The crown is one measured polyline, not an arch plus a limb.** Read row
+    by row off the mirrored mask the oval crowns at 0.090 W, turns a tight
+    shoulder at (0.30, 0.12), runs almost straight down to its widest at
+    0.186, then sweeps out to 0.51 and closes on the centre boss at 0.404. No
+    two-arc fit gets that shape; the twenty-one points are the readings.
+  · **The lance, the boss and the flanking volutes** are re-fitted to the same
+    map — lance point at 0.190 W, leaf 0.026 W wide at 0.250, boss 0.060 W at
+    0.377, volute eyes at (0.385, 0.392) with a turn and a fifth each.
+  · **The old cap was scaled by the pane's HEIGHT** through a `UH` factor that
+    only became width-scaling on a slender pane. It is pure width now, per
+    this function's own standing rule, with one clamp for a pane wide enough
+    for the two crowns to reach the band.
+
+  ⚠ **AND THE WIDTH RULE WAS CHECKED RATHER THAN ASSUMED.** The crown stands
+  0.62 of the pane's width tall on the single door; on the double door's
+  narrower leaf — a pane 0.72 as wide and half again as slender — it measures
+  **104 px against the 107 that fraction predicts**. The extra height goes
+  into bare glass, which on the double door is most of the pane.
+
+  ⚠ **`flow` IS A NEW HELPER AND IT IS LOCAL TO THIS BRANCH ON PURPOSE.**
+  `poly` is a chain of straight chords, which is right everywhere it is
+  already used — a spiral at tile size, where the chords are under a pixel —
+  and wrong here: this oval is the largest single member in the range and its
+  chords showed as flats along the shoulders. `flow` runs a quadratic through
+  the midpoint of every pair of segments, so it passes through none of the
+  control points and cannot pull the curve off the measurements. Hoisting it
+  beside `poly` would have moved every other grille and 48 committed sheets
+  with them.
+
+  **Gates.** `npm test` **10,478,780 / 0** once the sheets were regenerated.
+  Its first pass read 10,478,779 / 5 and the five were exactly the sheet
+  staleness rows, which is those checks doing their one job: the drawing
+  moved. Every substantive assertion passed on that pass too — both new
+  entries carry a price, both cite evidence that exists on disk, every tile
+  draws its own picture, and the wire format is unchanged.
+  ⚠ **And a comment-only edit after the stamping cost a second round of two
+  families**, which is worth recording because it is the cheapest possible
+  version of §7's rule: the stamp hashes the BUNDLE, and a JS comment moves
+  the bundle while moving no pixel. Proof rather than assertion —
+  `recreate-d003.png` came back **byte-identical** across that re-run, and
+  `phone.png` did not, which is the `shot` family being the one that
+  photographs a live browser (§7).
+
+  ⚠ **AND THREE DOORS IN THE GALLERY HAD BEEN DRAWN WITH NO IRONWORK AT ALL.**
+  `npm run corpus` fits each measured door from its own record by asking which
+  catalogue entry CITES it, and when `iron` went so did its `doors` list — so
+  d092, d108 and d128 fell through to `grille: 'none'` and Peretz's own
+  front page drew three glazed doors with bare panes where the photographs
+  carry a full forged grille. They read `grille: 'iron'` now and draw it.
+  That is the gallery change in this commit, and it is the whole of it: the
+  other twenty-seven doors are byte-identical.
+
+  **Sheets.** The drawing changed, so bare sheets are ALLOWED to move, and
+  `npm run against` now builds `against-iron.png` and `against-iron-light.png`
+  — our drawing beside the eight corpus doors filed under this id, which is
+  the instrument that will say when it is wrong again.
 
 - **⚠ THE CURVED LEVER IS TURNED 8° UP ABOUT ITS SPINDLE, AND ITS SHAPE DID
   NOT MOVE — 25.9.2026.** The owner's son on the version that hangs down

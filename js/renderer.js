@@ -6970,84 +6970,178 @@ function grillePaths(kind, x, y, w, h, tint, ornW = null) {
     return out.join('');
   }
 
-  /* ── ברזל מחושל — the arch-and-chain grille ─────────────────────────
-     ONE composition, not a repeating pattern, and mirror-symmetric about the
-     pane's own middle. Five vertical bars at sixths with a heavier centre
-     spine; a single band of six open circles threaded on a rail at half
-     height; and at each end a cap — corner volutes, a tall dome, a shallow
-     impost with two rosettes, and a fleur-de-lis whose lance points at the
-     spine. Between the caps and the band, about 45% of the pane's height is
-     BARE GLASS crossed only by five thin bars. That emptiness is the loudest
-     fact about the design.
-     Ours drew four bands of S-waves, four verticals at fifths, a flat crown
-     and nothing at the foot. Two doors are the reason it went wrong: d128
-     carries an all-over scroll diaper and d124's crop missed the leaf, and a
-     dense uniform field is what you get if you average those in.
-     The stroke ratio is the other half of it. Ornament runs about twice the
-     weight of the field — ours drew the ornament THINNER than the structure,
-     which is backwards, and figure never separated from ground. */
+  /* ── ברזל מחושל — the arch-and-ring grille ──────────────────────────
+     ⚠ REDRAWN 27.9.2026 FROM THREE PHOTOGRAPHS OF DOORS PERETZ HAS JUST
+     INSTALLED, in `research/ironwork/`: a single door with a rectangular
+     light (`full.jpg`), a דו כנפי whose two leaves carry it at two widths
+     (`pair.jpg`), and — the one that settles the topology — a TRANSOM in
+     which the whole composition is turned on its side and lit from behind,
+     with no reflection on it at all (`transom.jpg`). Everything below was
+     measured off those; what stood here before was read off the works-page
+     thumbnails, and its own note said which two doors had misled it.
+
+     ── how it was measured, because the reflections are severe ──────────
+     `full.jpg` has the photographer standing in the middle of the pane and a
+     pylon across its upper half. The design is symmetric about BOTH axes, so
+     the ink map of the rectified pane was mirrored left-right and top-bottom
+     and the ELEMENTWISE MINIMUM taken each time: anything present in only one
+     quadrant — a person, a pylon, a cloud — dies, and anything the design
+     actually carries survives in all four. That one move turned an unreadable
+     photograph into a clean line drawing, and every fraction below is off it.
+
+     ── the composition ─────────────────────────────────────────────────
+     SEVEN vertical bars, not five. Measured on the single door the verticals
+     stand at 0.029 0.158 0.329 0.500 0.671 0.842 0.979 of the pane's width
+     and on the double door's main leaf at the same fractions to within 0.01 —
+     an outer pair hugging the rebate and five inner bars at sixths. The outer
+     pair is what the corner volutes hang off, and it is why the old reading
+     had nothing for them to hang off: it had dropped the two bars that are
+     hardest to see against the frame. The transom shows them plainly, running
+     the length of the opening and curling at each end.
+
+     SIX open rings at half height, one in each gap between adjacent bars.
+     They are NOT threaded on a rail: the transom, which is the only one of
+     the three with no reflection over the band, shows clear glass inside
+     every ring and a short stub of bar between each pair. The old reading ran
+     a rail the full width, straight through the middle of all six.
+
+     A CROWN at the head and the same crown mirrored at the foot: a big oval
+     springing off the two 1/6 bars and closing on a boss at the centre, a
+     lance standing up out of that boss, a pair of volutes flanking it, a
+     volute low on each outer bar, and collars at the joints.
+
+     ── the rule this design obeys, and the evidence for it ─────────────
+     ORNAMENT IS SIZED BY THE PANE'S WIDTH (see the note over this function).
+     Checked rather than assumed: the crown on the single door stands 0.62 of
+     the pane's width tall and on the DOUBLE door's narrower leaf — a pane
+     0.72 as wide and half again as slender — it measures 104 px against the
+     107 that fraction predicts. The extra height goes into bare glass, which
+     on the double door is most of the pane.
+
+     ⚠ AND THE RING BAND IS AT THE PANE'S MID-HEIGHT, which is the one offset
+     here that is NOT a fraction of the width. Measured: 0.499 of the pane's
+     height on the single door, and the same on the double. A band of rings
+     placed a fixed distance below the crown would climb away from the middle
+     on a 1415 mm light, and the photographs put it in the middle on both. */
   if (kind === 'iron') {
-    /* The caps do not stretch. `UH` compresses every ornament offset on a
-       slender opening so the cap stays a compact ornament at the head of a
-       long bare run — which is exactly what d129, the most slender pane in the
-       corpus, does. At the photographed aspect it is 1 and changes nothing. */
-    const UH = Math.min(1, (2.2 * w) / h);
-    const thin = w * 0.013, spine = w * 0.020, rib = w * 0.026;
+    /* The seven verticals, and everything else hangs off them. The outer pair
+       is inset by a rebate's width rather than sitting on 0 and 1: a bar
+       drawn on the glass line would be half eaten by the clip. */
+    const BAR = [0.030, 1 / 6, 1 / 3, 0.5, 2 / 3, 5 / 6, 0.970];
+    /* ⚠ A POLYLINE DRAWN AS A CURVE, AND IT IS LOCAL TO THIS BRANCH ON
+       PURPOSE. `poly` above is a chain of straight chords, which is right
+       everywhere it is already used — a spiral at tile size, where the chords
+       are under a pixel — and wrong here: this oval is the largest single
+       member in the range and its chords show as flats along the shoulders.
+       `flow` runs a quadratic through the midpoint of every pair of segments,
+       which is the cheapest smoothing that passes through none of the control
+       points and so cannot pull the curve off the measurements. Left as a
+       local rather than hoisted beside `poly`, because changing `poly` would
+       move every other grille and 48 committed sheets with them. */
+    const flow = pts => {
+      if (pts.length < 3) return poly(pts);
+      const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+      let d = `M ${n2(pts[0][0])} ${n2(pts[0][1])}`;
+      for (let i = 1; i < pts.length - 1; i++) {
+        const m = mid(pts[i], pts[i + 1]);
+        d += ` Q ${n2(pts[i][0])} ${n2(pts[i][1])} ${n2(m[0])} ${n2(m[1])}`;
+      }
+      const e = pts[pts.length - 1];
+      return d + ` L ${n2(e[0])} ${n2(e[1])}`;
+    };
+
+    const thin = Math.max(2, w * 0.016), spine = Math.max(2, w * 0.018);
+    const rib = Math.max(2, w * 0.020);
     const out = [];
-    const capY = (f, up) => up ? y + h * f * UH : y + h * (1 - f * UH);
 
-    for (const k of [1, 5]) out.push(line(U(k / 6), V(0.02), U(k / 6), V(0.98), thin));
-    for (const k of [2, 4]) {
-      out.push(line(U(k / 6), capY(0.245, true), U(k / 6), capY(0.245, false), thin));
+    /* ⚠ THE CROWN MAY NOT REACH THE RINGS. It is 0.62 W tall and the band is
+       at half height, so on any pane slenderer than about 2.5 the two never
+       meet — which is every opening this catalogue sells. The clamp is here
+       for the one that is not: a pane wide enough for the two ends to collide
+       compresses the ornament rather than drawing it through the band. */
+    const K = Math.min(1, (h * 0.46) / (w * 0.62));
+    /* `T(f)` is a crown offset from the pane's own head; `B(f)` the same
+       distance up from its foot. Both are fractions of the WIDTH. */
+    const T = f => y + w * f * K;
+    const B = f => y + h - w * f * K;
+
+    const yb = V(0.5);
+    const RING = [];
+    for (let k = 0; k < BAR.length - 1; k++) RING.push((BAR[k] + BAR[k + 1]) / 2);
+    const cr = w * 0.065;
+
+    /* THE BARS. The outer pair runs the whole opening; the sixths stop under
+       the crown's oval; the spine stops at the lance's point. */
+    for (const f of [BAR[0], BAR[6]]) out.push(line(U(f), T(0.150), U(f), B(0.150), thin));
+    for (const f of [BAR[1], BAR[5]]) out.push(line(U(f), T(0.100), U(f), B(0.100), thin));
+    for (const f of [BAR[2], BAR[4]]) out.push(line(U(f), T(0.512), U(f), B(0.512), thin));
+    out.push(line(U(0.5), T(0.188), U(0.5), B(0.188), spine));
+
+    /* THE RING BAND. Six rings, a stub of bar between each pair, and a collar
+       where that stub crosses the vertical it is welded to. Nothing runs
+       through the rings themselves. */
+    for (const f of RING) {
+      out.push(ink(`M ${n2(U(f) - cr)} ${n2(yb)} a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(cr * 2)} 0
+                    a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(-cr * 2)} 0`, w * 0.022));
     }
-    out.push(line(U(0.5), capY(0.19, true), U(0.5), capY(0.19, false), spine));
-
-    /* THE CHAIN. Six open circles on a straight rail, the two end ones clipped
-       by the glass edge — which is correct, and they must not be shrunk to
-       fit. Ours drew an S-wave squiggle: corrugation, where the door has a
-       chain. */
-    const yb = V(0.51), cr = w * 0.065;
-    out.push(line(x, yb, x + w, yb, w * 0.022));
-    for (let k = 0; k < 6; k++) {
-      const ccx = U((2 * k + 1) / 12);
-      out.push(ink(`M ${n2(ccx - cr)} ${n2(yb)} a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(cr * 2)} 0
-                    a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(-cr * 2)} 0`, w * 0.023));
+    for (let k = 0; k < RING.length - 1; k++) {
+      out.push(line(U(RING[k]) + cr, yb, U(RING[k + 1]) - cr, yb, w * 0.022, 'butt'));
+      out.push(collar(U(BAR[k + 1]), yb, w * 0.042, w * 0.026));
     }
-    for (let k = 1; k <= 5; k++) out.push(collar(U(k / 6), yb, w * 0.045, w * 0.028));
 
+    /* ONE CROWN, AUTHORED ONCE AND EMITTED TWICE. `up` picks which end, and
+       every offset goes through `Y`, so the head and the foot cannot drift
+       apart — which is what the photographs show: the foot is the head turned
+       over, to the limit of what can be read off them. */
     const cap = up => {
-      const Y = f => capY(f, up);
+      const Y = f => (up ? T(f) : B(f));
       const s = up ? 1 : -1;
       const o = [];
-      /* Corner volutes: all four corners of the real pane carry one, and ours
-         had bare glass in every corner. */
+
+      /* The oval, as ONE polyline per side from the apex down to the boss.
+         It is not an ellipse and no two-arc fit gets it: read row by row off
+         the mirrored mask it crowns at 0.095, turns a tight shoulder at
+         (0.30, 0.12), runs almost straight down to its widest at 0.186, and
+         then sweeps out to 0.51 before closing on the centre. Every point
+         below is one of those readings. */
+      const OVAL = [[0.500, 0.090], [0.440, 0.091], [0.392, 0.095], [0.348, 0.104],
+                    [0.316, 0.117], [0.288, 0.134], [0.262, 0.152], [0.238, 0.175],
+                    [0.219, 0.203], [0.205, 0.235], [0.194, 0.272], [0.188, 0.315],
+                    [0.187, 0.360], [0.196, 0.412], [0.215, 0.452], [0.245, 0.490],
+                    [0.288, 0.514], [0.335, 0.514], [0.388, 0.496], [0.446, 0.452],
+                    [0.500, 0.404]];
       for (const sx of [-1, 1]) {
-        const vx = U(0.5 + sx * 0.425), vy = Y(0.054);
-        o.push(ink(poly(curl(vx, vy, U(0.5 + sx * 0.5), Y(0.012), 1.25, sx * s)), rib));
+        o.push(ink(flow(OVAL.map(([f, t]) => [U(0.5 + sx * (0.5 - f)), Y(t)])), rib));
       }
-      /* The dome, and it is a dome: it springs at 0.217 and crowns at 0.030, a
-         rise of 0.19 H. Ours rose 0.09 from 0.11 — an eyebrow drawn OVER the
-         pattern rather than a vault the ornament sits inside. */
-      o.push(ink(`M ${n2(U(1 / 6))} ${n2(Y(0.217))} Q ${n2(U(0.5))} ${n2(Y(-0.120))}
-                  ${n2(U(5 / 6))} ${n2(Y(0.217))}`, rib));
-      o.push(ink(`M ${n2(U(1 / 6))} ${n2(Y(0.245))} Q ${n2(U(0.5))} ${n2(Y(0.199))}
-                  ${n2(U(5 / 6))} ${n2(Y(0.245))}`, w * 0.022));
-      for (const f of [0.28, 0.72]) o.push(dot(U(f), Y(0.232), w * 0.028));
-      /* The fleur. Its lance is the eye's first landing point on every
-         readable photograph and ours had nothing on the centreline at all. */
+      /* The lance. It stands ON the boss and its point is the top of the
+         spine, which is why the spine stops where it does. */
       const lx = U(0.5);
-      o.push(solid(`M ${n2(lx)} ${n2(Y(0.094))}
-                    Q ${n2(lx + w * 0.025)} ${n2(Y(0.128))} ${n2(lx + w * 0.009)} ${n2(Y(0.185))}
-                    L ${n2(lx - w * 0.009)} ${n2(Y(0.185))}
-                    Q ${n2(lx - w * 0.025)} ${n2(Y(0.128))} ${n2(lx)} ${n2(Y(0.094))} Z`, w * 0.05));
-      o.push(collar(lx, Y(0.192), w * 0.048, w * 0.022));
+      o.push(solid(`M ${n2(lx)} ${n2(Y(0.190))}
+                    C ${n2(lx + w * 0.008)} ${n2(Y(0.220))} ${n2(lx + w * 0.013)} ${n2(Y(0.234))}
+                      ${n2(lx + w * 0.013)} ${n2(Y(0.250))}
+                    C ${n2(lx + w * 0.013)} ${n2(Y(0.282))} ${n2(lx + w * 0.010)} ${n2(Y(0.296))}
+                      ${n2(lx + w * 0.010)} ${n2(Y(0.350))}
+                    L ${n2(lx - w * 0.010)} ${n2(Y(0.350))}
+                    C ${n2(lx - w * 0.010)} ${n2(Y(0.296))} ${n2(lx - w * 0.013)} ${n2(Y(0.282))}
+                      ${n2(lx - w * 0.013)} ${n2(Y(0.250))}
+                    C ${n2(lx - w * 0.013)} ${n2(Y(0.234))} ${n2(lx - w * 0.008)} ${n2(Y(0.220))}
+                      ${n2(lx)} ${n2(Y(0.190))} Z`, w * 0.04));
+      o.push(collar(lx, Y(0.377), w * 0.060, w * 0.038));
+      o.push(collar(lx, Y(0.415), w * 0.040, w * 0.020));
+
       for (const sx of [-1, 1]) {
-        o.push(ink(poly(curl(U(0.5 + sx * 0.105), Y(0.152),
-                             U(0.5 + sx * 0.200), Y(0.216), 1.0, sx * s)), rib));
-        /* Shoulder scrolls, hung off the outer verticals behind a collar. */
-        o.push(collar(U(0.5 + sx / 3), Y(0.280), w * 0.045, w * 0.025));
-        o.push(ink(poly(curl(U(0.5 + sx * 0.265), Y(0.262),
-                             U(0.5 + sx / 3), Y(0.280), 1.0, -sx * s)), w * 0.024));
+        /* The flanking volutes. A turn and a bit each, running up out of the
+           boss, over, and back into a stopped eye — the shape that separates
+           forged scrollwork from a squiggle. */
+        o.push(ink(flow(curl(U(0.5 + sx * 0.115), Y(0.392),
+                             U(0.5 + sx * 0.045), Y(0.325), 1.20, -sx * s)), rib));
+        /* The volute low on each outer bar, and the collar it hangs from. */
+        o.push(collar(U(0.5 + sx / 3), Y(0.560), w * 0.040, w * 0.024));
+        o.push(ink(flow(curl(U(0.5 + sx * 0.278), Y(0.594),
+                             U(0.5 + sx / 3), Y(0.534), 1.10, -sx * s)), w * 0.020));
+        /* The corner volute, on the outer bar, at the very edge of the pane. */
+        o.push(ink(flow(curl(U(0.5 + sx * 0.452), Y(0.150),
+                             U(0.5 + sx * 0.395), Y(0.098), 1.15, sx * s)), w * 0.020));
       }
       return o.join('');
     };

@@ -205,6 +205,16 @@ export const GRILLE = {
   'arch-light': 0,   // קשת בהירה
   deco:         0,   // קווים גיאומטריים
   'deco-light': 0,   // קווים גיאומטריים בהירים
+  /* ⚠ ברזל מחושל is BACK (27.9.2026, see `catalog.js`) and it is priced at
+     ZERO like every other bent-bar grille here, which is a placeholder and
+     not a figure he gave. It is by some distance the most work in the list —
+     seven bars, six rings and two crowns of scrollwork against `grid`'s five
+     straight muntins — so if any grille in this table is not free, it is this
+     one. `ASK-PERETZ.md` asks him for the number; until he answers, charging
+     an invented surcharge would be worse than charging nothing, because a
+     customer can see a price and cannot see that we made it up. */
+  iron:         0,   // ברזל מחושל
+  'iron-light': 0,   // ברזל מחושל בגוון הדלת
   /* The three laser-cut ones. "laser hard ones" — more machine time, and the
      only three in the range that are cut rather than bent. */
   circles:      700, // עיגולים שזורים
