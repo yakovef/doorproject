@@ -122,34 +122,53 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
 
 ---
 
-## 0b. Change log — one line each, newest first
+## 0b. Change log — newest first, a few lines each
 
 Older and long-form: **`HISTORY.md`** (verbatim to 26.9.2026). Dates are the
 day of the change.
 
-- **26.9** Flow order `fit · colour · lock · pz · face · glass · grip · mk`: the
-  finish right after the lever, the pull handle after the glass — the owner's
-  son overruling Peretz's 30.8 *"handles before the panels"* (both quoted by
-  `SECTIONS` and `WANT_ORDER`). The toast-placement walk goes to the grip step
-  and back to the glass by the navigator. `fuzz` now draws the bow too.
+- **26.9** Flow order `fit · colour · lock · pz · face · glass · grip · mk` —
+  *"the hardware finish … right after the lever … the pull handle … after the
+  panels and stripes"* (after the glass, asked), overruling Peretz's 30.8
+  *"handles before the panels"*; both quoted by `SECTIONS` and `WANT_ORDER`.
+  Toast walk: to the grip step, back to the glass. `fuzz` drew no bow in 30,000
+  designs — it draws every `DEFAULTS` field now. Falsified: old order 2/2
+  viewports; old walk one sentence. Sheets run 2 as predicted: 0/48 bare, 0/6
+  lockset. Gates: test 7,483,220 / 0 failed, audit clean, collide 1,488,
+  fuzz clean, latency 185 ms.
 - **26.9** The bow is its own axis on the face step, `VERSION` 25 (`BOWS`, `gb=`,
-  ₪300 + the handle finish): a bow and a bar together; `n=grab`/`n=dee` migrate
-  quietly, never onto a bar. `homeKey` completed — the stale cache had hidden a
-  2 m Nitzan refused beside the Greek set on `extra2`/`halfextra2` (named, §9);
-  the Greek set's obstacles gain the fittings and the bow (`fittingBoxes`).
+  ₪300 + the handle finish) — *"with the panels and stripes … comfortable with
+  other pull handles"*: a bow and a bar together (336 doors, none touching;
+  54 bows refused beside the strip). `n=grab`/`n=dee` migrate quietly, never
+  onto a bar. `homeKey` completed — the stale cache had hidden a 2 m Nitzan
+  refused beside the Greek set on `extra2`/`halfextra2` (named, §9); the Greek
+  set's obstacles gain the fittings and the bow (`fittingBoxes`, 0 of 31,104
+  placements moved). Falsified: alias onto `idan` 4, no migration 6, the old
+  key both ways + 889. `collide -- all` 1,082 → 1,488. No sheet moved (run 2).
+  Gates: test 7,483,219 / 5 (the sheet rows, intermediate).
 - **26.9** The גפן window design is the owner's son's own sheet, TRACED
   (*"this is how the grape and vine design really looks… the design is really
   white"*): `research/vine/design.webp` → `tools/trace-vine.py` (potracer) →
   `js/vine.js`; white, pane-width scale, repeated at its measured 1207 px period.
-- **26.9** One square window, the Greek set's (`WINDOWS.rect.frac`, `glassRows`);
-  the pair keeps its lower panel under it at ₪0 (A20), the trio is refused (76
-  mm into the plate); a face tap never removes the window (`panelUnderGlass`).
+- **26.9** One square window, the Greek set's (`WINDOWS.rect.frac`, `glassRows`)
+  — *"the window needs to stay on … the window size and placement then needs to
+  be the same"*: the pair keeps its lower panel under it at ₪0 (A20), the trio
+  is refused (76 mm into the plate); a face tap never removes the window
+  (`panelUnderGlass`). Falsified: the intent arm back fails 18 of 192 taps.
+  Sheets run 1, predicted: 15 bare moved, all square-window sheets (corpus-06–09,
+  recreate d097 d106 d122, against grid/scroll/arch ±light, circles, vine).
+  Gates: test 7,374,750 / 0 (the Coral greyed on the widest glazed leaves took
+  the sweeps down from 9.09 M); collide 1,082.
 - **26.9** The כדור follows the פרזול (*"a bug"*, overruling 31.8): ball via
   `domeRamp` (measured literal on nickel, `scaleTone` elsewhere), shank on
   `nickelSoft`; the ספיר stays constant. `exp.pz.a` names both via `expArgs`.
+  Falsified: a constant `domeKnob` fails the three ball clauses, every ספיר
+  clause green. No sheet moved (d030, d031 carry nickel). Test 9,086,180 / 5.
 - **26.9** Curved lever's tip level with its spindle (*"the end of the handle
   needs to be the same height as the start"*): `TAPER_TILT` derived, 15.39°;
   lock-tile raster coral~curved 0.300 → 0.277, no audit floor exists for it.
+  Falsified: 8° typed back fails 13 (the tile and 12 doors). No sheet moved (no
+  fixture carries the curved lever). Test 9,086,175 / 5.
 - **26.9** `CLAUDE.md` rewritten to what is true now; the log and the old §0–§10
   moved verbatim to `HISTORY.md`. Fixed: code is 60 bits not 40 (§8), the
   flow not the cabinet (§3), five August plans are in the tree (§2).
@@ -277,13 +296,14 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | ~7.37 M assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything (it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves); read the failure count | 27.9 |
-| `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) | 25.9 |
-| `npm run collide` | `all` (1,082 designs) and `boxes` clean | 27.9 |
-| `npm run latency` | 215 ms worst door against a 600 ms gate | 25.9 |
+| `npm test` | ~7.48 M assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything (it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves, and rose with the bow's sweeps); read the failure count | 27.9 |
+| `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) — about 20 minutes now | 27.9 |
+| `npm run collide` | `all` (1,488 designs, 552 with the bow) and `boxes` clean | 27.9 |
+| `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, nothing broke | 27.9 |
+| `npm run latency` | 185 ms worst door against a 600 ms gate | 27.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
-| `npm run sheets` | the 48 bare sheets and 6 `lockset` sheets byte-stable across commits that do not touch the drawing | 26.9 |
+| `npm run sheets` | the 48 bare sheets and 6 `lockset` sheets byte-stable across commits that do not touch the drawing (the bow and the reorder moved none) | 27.9 |
 
 ⚠ **When a bare sheet moves on a commit that could not have moved it, find out
 what did** — that is how chrome painted across every sheet was found once. And
@@ -592,6 +612,9 @@ and the ogee row `panel2o`/`panel3o` (20.9). ⚠ **Never put a count in a headin
 or a table here** — two withdrawals once went unreflected in the one table
 people consult.
 
+**The horizontal bow is on this step too** — not a handle, a piece of the face
+(`BOWS`, `gb=`, 26.9), with one home per face; see `BOWS` under Hardware.
+
 **Every family is a MEASURED composition with its own doors named** — the
 recurring mistake here has been deriving one from another (`trio` from `pair`,
 a stripe count from a span formula). `PANEL_ROWS` holds `pair`, `trio`, `top`
@@ -779,7 +802,7 @@ at least once, always silently.
 | | |
 |---|---|
 | follows it | the lever and its furniture, the כדור's ball and shank (26.9 — the owner's son called the constant ball a bug, overruling 31.8), the keyhole, the hinges, the peephole (both kinds), the security latch, the metal strips. The כדור על אורך (`knobplate`) too — d092 is bronze |
-| never | the pull handle and the פעמון (their own `hf=`) · the extra lock (`#lockUnit`) · the ספיר (the maker's finish, 31.8) |
+| never | the pull handle, the bow and the פעמון (their own `hf=`) · the extra lock (`#lockUnit`) · the ספיר (the maker's finish, 31.8) |
 
 ### The lock furniture's measurements (`npm run lockset`, 19.9)
 
