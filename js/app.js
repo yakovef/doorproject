@@ -293,11 +293,17 @@ const GROUPS = [
    BANDS stay empty — `ASK-PERETZ.md` §8: overlapping bands make a customer
    choose wrong and feel certain about it. */
 /**
- * ⚠ THE HARDWARE COMES BEFORE THE FACE, AND THAT IS PERETZ, 30.8.2026:
- * *"handles before the panels."*
+ * ⚠ THE LOCK AND ITS FINISH COME BEFORE THE FACE, THE PULL HANDLE AFTER THE
+ * GLASS — 26.9.2026, the owner's son: *"The section with the hardware finish
+ * needs to be right after the lever handles section. The pull handle section
+ * needs to be after the section with the panels and stripes."* (after the
+ * glass, asked). It overrules Peretz, 30.8.2026: *"handles before the
+ * panels"*, which had put all three hardware steps above `face`.
+ * A bar chosen last meets a face and a window already there, which is the
+ * ranking the rules keep anyway: face and window first, the bar yields.
  *
- * The three hardware steps — grip, lock, pirzul, which together are the old
- * cabinet's one ידיות ומנעול section — moved above `face`. Nothing else moved:
+ * On 30.8 the three hardware steps — grip, lock, pirzul, which together are the
+ * old cabinet's one ידיות ומנעול section — moved above `face`. Nothing else moved:
  * `face` and `glass` stay adjacent because a panel and a window compete for
  * the same half of the leaf and `repair` trades between them, and splitting
  * that pair would put a rule's two halves either side of three unrelated
@@ -328,10 +334,11 @@ const GROUPS = [
    before the customer had made a single choice they enjoyed. A flow that opens
    with its hardest question is a flow people leave.
 
-   ⚠ AND PERETZ'S OWN ORDERING RULE IS THE CONSTRAINT THAT SHAPED THE REST.
-   30.8: *"handles before the panels."* So `grip` and `lock` stay ahead of
+   ⚠ AND PERETZ'S OWN ORDERING RULE WAS THE CONSTRAINT THAT SHAPED THE REST.
+   30.8: *"handles before the panels."* So `grip` and `lock` stayed ahead of
    `face`, which they already were, and that reorder was only `mk` travelling
-   to the end. What is left reads as: the door's shape, its colour, what locks
+   to the end. (Overruled 26.9 on the owner's son's word — the pull handle is
+   asked after the glass now; see the note on `grip` in `SECTIONS`.) What is left reads as: the door's shape, its colour, what locks
    it, what you hold, the metal's finish, the face, the glass — and then the
    frame it all hangs in, which is the one thing we measure at the customer's
    wall anyway. (The lock and the grip swapped on 14.9, on a second sentence
@@ -360,9 +367,9 @@ const SECTIONS = [
   /* ⚠ THE LOCK COMES BEFORE THE GRIP, 14.9.2026 — Peretz: *"the lockset
      section should come before the pull handle section."* They were the other
      way round and had been since the two were split.
-     His own earlier rule, *"handles before the panels"* (30.8), is untouched:
-     both of these still stand ahead of `face`, which is what that sentence was
-     about. This is an order WITHIN the pair.
+     His own earlier rule, *"handles before the panels"* (30.8), was untouched
+     by this: an order WITHIN the pair. It was overruled on 26.9 — the grip is
+     after the glass now; see its own note below.
      ⚠ AND IT IS THE THIRD TIME THIS LIST HAS MOVED FOR ONE SENTENCE FROM HIM
      — `mk` from second to last, `pz` after the two fittings, and now this. The
      keys do not change, so no link goes stale and no `VERSION` moves; the
@@ -374,8 +381,6 @@ const SECTIONS = [
   { key: 'lock',   title: 'step.lock.t',   sub: 'step.lock.s',   lede: 'step.lock.l', exp: 'exp.lock',
     expArgs: () => [formatAgorot(byId(SPECIAL_LOCKS, 'kasefet').delta),
                     formatAgorot(byId(SPECIAL_LOCKS, 'kodan').delta)] },
-  { key: 'grip',   title: 'step.grip.t',   sub: 'step.grip.s',   lede: 'step.grip.l', exp: 'exp.grip',
-    expArgs: () => [L(byId(BOWS, 'grab')), L(byId(HANDLES, 'channel'))] },
   { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz',
     expArgs: () => [L(byId(LOCKSETS, 'cadoor')), L(byId(LOCKSETS, 'sapir'))] },
   { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face',
@@ -383,6 +388,21 @@ const SECTIONS = [
                     L(byId(DETAILS, 'panel2')), L(byId(DETAILS, 'panel3'))] },
   { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass',
     expArgs: () => [L(SIZES.half)] },
+  /* ⚠ THE PULL HANDLE COMES AFTER THE GLASS, 26.9.2026 — the owner's son:
+     *"The section with the hardware finish needs to be right after the lever
+     handles section. The pull handle section needs to be after the section
+     with the panels and stripes."* Asked whether after the face or after the
+     glass, he said after the glass.
+     ⚠ THIS OVERRULES PERETZ, on the owner's son's word. Peretz, 30.8.2026:
+     *"handles before the panels"* — the reason `grip` stood ahead of `face`
+     for a month. Both sentences are kept here because the next person to read
+     the older one in the history should find the newer one beside it.
+     The handle finish stays on this step: a bow chosen on the face takes the
+     finish chosen here, later, as the bell does. Keys unchanged, so no link
+     goes stale and no `VERSION` moves; `WANT_ORDER` in `tools/audit.mjs`
+     moved with it. */
+  { key: 'grip',   title: 'step.grip.t',   sub: 'step.grip.s',   lede: 'step.grip.l', exp: 'exp.grip',
+    expArgs: () => [L(byId(BOWS, 'grab')), L(byId(HANDLES, 'channel'))] },
   { key: 'mk',     title: 'step.mk.t',     sub: 'step.mk.s',     lede: 'step.mk.l', exp: 'exp.mk',
     expArgs: () => [formatAgorot(MASHKOF_WIDER_A), formatAgorot(BUILD_A.mashkof)] },
 ];

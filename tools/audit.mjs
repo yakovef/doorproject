@@ -1176,9 +1176,8 @@ for (const v of VIEWS) {
       const n = [...document.querySelectorAll('.sect__next')].filter(x => !x.disabled && x.offsetParent)[0];
       if (!n) return false; n.click(); return true;
     });
-    let picked = 0;
+    let picked = 0, onGrip = false;
     for (let i = 0; i < 9; i++) {
-      if (await p.evaluate(() => !!document.querySelector('.sect:not([hidden]) [data-id="rect"]'))) break;
       /* ⚠ RE-AIMED 25.9.2026. It tapped the Idan and the two-panel face, and
          the square window then said two sentences: the face went, and the
          lever went. Since the lever yields the moment a bar is chosen, that
@@ -1186,10 +1185,23 @@ for (const v of VIEWS) {
          came down to one — the §5.15 clause below fired on all eight
          viewports. The window still takes two things off a door that carries
          a פעמון and an עינית, both on its centre line, so the walk puts them
-         there. Asserted by the clause below, not assumed. */
+         there. Asserted by the clause below, not assumed.
+         ⚠ AND RE-AIMED AGAIN 26.9.2026: the pull handle comes AFTER the glass
+         now, so walking forward to the first step that shows `rect` would
+         arrive with no Idan and no bell. It walks on to the grip step, taps
+         the three there (the viewer on the way, on the פרזול step), and goes
+         BACK to the glass by the navigator — which is also the order a
+         customer who changes their mind about the window takes. */
       for (const id of ['idan', 'bell', 'peep']) if (await tap(id)) picked++;
+      if (await p.evaluate(() => !!document.querySelector('.sect:not([hidden]) [data-id="idan"]'))) { onGrip = true; break; }
       if (!(await fwd())) break;
       await p.waitForTimeout(260);
+    }
+    if (onGrip) {
+      await p.evaluate(() => window.scrollTo(0, 0));
+      await p.waitForTimeout(40);
+      await p.click('.steps__step[data-step="glass"]');
+      await p.waitForTimeout(320);
     }
     const onGlass = await p.evaluate(() => !!document.querySelector('.sect:not([hidden]) [data-id="rect"]'));
     const tapped = onGlass && await tap('rect');
@@ -1218,7 +1230,7 @@ for (const v of VIEWS) {
     }) : null;
     if (!tapped || !m) {
       fault(v.name, 'the toast-placement check never reached the window step '
-        + `(picked ${picked} options, on the glass step: ${onGlass}) — it is dead`);
+        + `(picked ${picked} options, reached the grip step: ${onGrip}, back on the glass step: ${onGlass}) — it is dead`);
     } else if (m.noToast) {
       fault(v.name, 'choosing the square window on a door with a bar, a bell and a peephole '
         + 'raised no toast at all — this check has lost its subject');
@@ -1349,11 +1361,20 @@ for (const v of VIEWS) {
        before the pull handle section."* His "handles before the panels" is
        untouched — both still stand ahead of `face` — so this is an order
        within the pair and the sequence below is the whole of the change. */
-    const WANT_ORDER = ['fit', 'colour', 'lock', 'grip', 'pz', 'face', 'glass', 'mk', 'sum'];
+    /* ⚠ RESTATED 26.9.2026 — `pz` right after `lock`, `grip` after `glass`.
+       The owner's son: *"The section with the hardware finish needs to be
+       right after the lever handles section. The pull handle section needs to
+       be after the section with the panels and stripes"* — after the glass,
+       asked. It overrules Peretz's 30.8 "handles before the panels"; the
+       fault text names both. Falsified by the old SECTIONS: fires at every
+       viewport and prints both sequences. */
+    const WANT_ORDER = ['fit', 'colour', 'lock', 'pz', 'face', 'glass', 'grip', 'mk', 'sum'];
     if (keys.join(',') !== WANT_ORDER.join(',')) {
       fault(v.name, `the flow asks its questions as ${keys.join(' → ')}, `
         + `and it should be ${WANT_ORDER.join(' → ')} `
-        + '(Peretz, 30.8.2026: handles before the panels; משקוף last, 30.8)');
+        + '(the owner\'s son, 26.9.2026: the finish right after the lever, the pull '
+        + 'handle after the panels and the glass — overruling Peretz\'s 30.8 "handles '
+        + 'before the panels"; משקוף last, 30.8)');
     }
 
     for (const k of keys) {

@@ -127,6 +127,11 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
 Older and long-form: **`HISTORY.md`** (verbatim to 26.9.2026). Dates are the
 day of the change.
 
+- **26.9** Flow order `fit · colour · lock · pz · face · glass · grip · mk`: the
+  finish right after the lever, the pull handle after the glass — the owner's
+  son overruling Peretz's 30.8 *"handles before the panels"* (both quoted by
+  `SECTIONS` and `WANT_ORDER`). The toast-placement walk goes to the grip step
+  and back to the glass by the navigator. `fuzz` now draws the bow too.
 - **26.9** The bow is its own axis on the face step, `VERSION` 25 (`BOWS`, `gb=`,
   ₪300 + the handle finish): a bow and a bar together; `n=grab`/`n=dee` migrate
   quietly, never onto a bar. `homeKey` completed — the stale cache had hidden a
@@ -185,11 +190,15 @@ gave the numbers on 26.8; `PLACEHOLDER` is `false`. Not deployed on the
 instruction *"dont deploy it, i want to see that its finished."*
 
 **The page is a flow of eight steps and a summary**, one live at every width:
-fit · colour · **lock · grip** · pz · face · glass · **mk** · sum. Peretz's
-*"handles before the panels"* (30.8) fixes the middle; the lock stands before
-the grip on his *"the lockset section should come before the pull handle
-section"* (14.9). משקוף is last because its answer is a wall thickness the
-customer has not measured, and we measure it for them. `npm run audit` asserts
+fit · colour · lock · **pz** · face · glass · **grip** · mk · sum. The owner's
+son, 26.9: *"The section with the hardware finish needs to be right after the
+lever handles section. The pull handle section needs to be after the section
+with the panels and stripes"* — after the glass, asked. ⚠ That **overrules
+Peretz's 30.8 *"handles before the panels"***, on the owner's son's word; his
+14.9 *"the lockset section should come before the pull handle section"* still
+holds. The handle finish stays on the grip step (a bow chosen on the face takes
+it later, as the bell does). משקוף is last because its answer is a wall
+thickness the customer has not measured, and we measure it for them. `npm run audit` asserts
 the whole sequence off the rendered navigator.
 
 **A standard door with nothing on it is ₪3,195**, and tapping the figure opens
@@ -1026,7 +1035,7 @@ against nothing and landed on "slightly better".
 | `npm run audit` | the real page, driven — see below |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against 600 ms. It requires the design code to change on every tap, or a throwing handler would pass |
 | `npm run collide` | real `getBBox()` over the buildable designs, no declared number in the loop; asserts the SIZES it sweeps exist. `-- boxes` measures every fitting's footprint and keeps `handleFootprint` and `SPECIAL_BOX` honest |
-| `npm run fuzz` | random combinations, then click-walks in a browser |
+| `npm run fuzz` | random combinations of every `DEFAULTS` field (it faults on one it does not draw — the bow was missed for a run, 26.9), then click-walks in a browser |
 | `npm run profile` | the leaf's VERTICAL fall against the medians `FALLOFF` was fitted to |
 | `npm run mottle` | slow horizontal unevenness of the PAINT; strips `[data-room="lamp-wash"]` first |
 | `npm run glass` | what is inside the pane, band by band, against the corpus — a description, not a target (§3) |

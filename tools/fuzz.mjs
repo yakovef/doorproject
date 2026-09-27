@@ -31,7 +31,7 @@
  */
 import { chromium } from 'playwright';
 import { assertFreshBundle } from './fresh.mjs';
-import { BELLS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES, HANDLE_LENS,
+import { BELLS, BOWS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES, HANDLE_LENS,
          LOCKSETS, MASHKOFS, PEEPHOLES, PIRZUL, SIZES, SPECIAL_LOCKS, STRIPE_SLOTS,
          unpackStripes, WINDOWS }
   from '../js/catalog.js';
@@ -118,8 +118,18 @@ console.log(`seed ${SEED}\n\nA. ${CASES} random designs, all nine axes at once`)
       peephole: pick(PEEPHOLES).id,
       handleFinish: pick(HANDLE_FINISHES).id,
       handleLen: pick(HANDLE_LENS),
+      grab:    pick(BOWS).id,
       ...unpackStripes(Math.floor(r() * STRIPE_SLOTS)),
     };
+    /* ⚠ AND THE BOW WAS LEFT OUT THE SAME WAY — 26.9.2026, the day it became a
+       field: the second slow run passed 30,000 designs none of which carried
+       one. So the list is checked against `DEFAULTS` itself now, once: a
+       field the generator does not draw is a field this tool says nothing
+       about, and it says so rather than passing. */
+    if (i === 0) {
+      const missing = Object.keys(DEFAULTS).filter(k => k !== 'grip' && !(k in raw));
+      if (missing.length) fault('fuzz does not vary every field', `left at their defaults: ${missing.join(', ')}`);
+    }
     /* ⚠ A QUARTER OF EVERY SAMPLE USED TO CARRY A DRAGGED HANDLE, anywhere on
        a 950 x 2100 leaf and well outside it, because a link could carry any
        two numbers. `gp=` was retired on 18.9.2026 and `state.grip` with it, so

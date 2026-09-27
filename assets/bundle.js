@@ -439,9 +439,9 @@
        under the square window and only the trio is refused. The two face names
        are `{2}` and `{3}` out of DETAILS, not typed (§0c). */
     "exp.face.a": [
-      "פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — {0} לפס אופקי ו‑{1} לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, ולא פסים עם חלון. עם חלון מרובע, ב„{2}” החלון תופס את מקום הפאנל העליון והתחתון נשאר; דלת חלקה מקבלת את הפאנל שהחלון מביא איתו; ו„{3}” לא משתלבים עם חלון — מסגרת החלון נכנסת ללוחית הידית שבאמצע. כל עיצוב חזית מתאים לכל ידית משיכה.",
-      "Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — {0} a horizontal strip and {1} a vertical one. Panels and strips do not go on the same door, and strips do not go with a window. With the square window, on “{2}” the window takes the upper panel’s place and the lower one stays; a plain door gets the panel the window brings below it; and “{3}” does not go with a window — its frame would run into the handle plate in the middle. Every face goes with every pull handle.",
-      "Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: {0} за горизонтальную и {1} за вертикальную. Панели и полосы не совмещаются на одной двери, а полосы — с окном. С квадратным окном у варианта «{2}» окно занимает место верхней панели, а нижняя остаётся; гладкая дверь получает нижнюю панель, которую приносит окно; а «{3}» с окном не сочетаются — рама окна заходит на среднюю накладку под ручку. Любое оформление полотна сочетается с любой ручкой-скобой."
+      "פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — {0} לפס אופקי ו‑{1} לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, ולא פסים עם חלון. עם חלון מרובע, ב„{2}” החלון תופס את מקום הפאנל העליון והתחתון נשאר; דלת חלקה מקבלת את הפאנל שהחלון מביא איתו; ו„{3}” לא משתלבים עם חלון — מסגרת החלון נכנסת ללוחית הידית שבאמצע. המאחז האופקי נבחר כאן, עם החזית; ידית המשיכה מגיעה בהמשך, ואפשר את שניהם יחד.",
+      "Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — {0} a horizontal strip and {1} a vertical one. Panels and strips do not go on the same door, and strips do not go with a window. With the square window, on “{2}” the window takes the upper panel’s place and the lower one stays; a plain door gets the panel the window brings below it; and “{3}” does not go with a window — its frame would run into the handle plate in the middle. The horizontal bow is chosen here, with the face; the pull handle comes later, and the two can go together.",
+      "Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: {0} за горизонтальную и {1} за вертикальную. Панели и полосы не совмещаются на одной двери, а полосы — с окном. С квадратным окном у варианта «{2}» окно занимает место верхней панели, а нижняя остаётся; гладкая дверь получает нижнюю панель, которую приносит окно; а «{3}» с окном не сочетаются — рама окна заходит на среднюю накладку под ручку. Горизонтальная скоба выбирается здесь, вместе с полотном; ручка-скоба — дальше, и их можно сочетать."
     ],
     "exp.glass.q": ["מה נכנס לתוך החלון?", "What goes inside the window?", "Что ставится в окно?"],
     /* ⚠ THE SIDELIGHT IS NOT A PRODUCT AND THIS SENTENCE WAS STILL SELLING IT —
@@ -509,9 +509,9 @@
          The two names come through {0} (the כדור) and {1} (the ספיר), out of
          LOCKSETS, so a renamed knob cannot leave this paragraph behind. */
     "exp.pz.a": [
-      "את הגוון של הידית שמסובבים (וגם של ידית ה{0}), חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה ואת הפעמון — לשניהם גימור משלהם, שנבחר בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את ידית ה{1}: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
-      "The tone of the lever you turn (and of the {0} knob), the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle or the doorbell — those two have a finish of their own, chosen on the pull-handle step — nor the safe lock, the keypad, or the {1} handle: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
-      "Оттенок нажимной ручки (и ручки «{0}»), замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу и звонок — у них своя отделка, выбираемая на шаге ручки-скобы — и не меняет сейфовый и кодовый замки и ручку «{1}»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
+      "את הגוון של הידית שמסובבים (וגם של ידית ה{0}), חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה, את המאחז האופקי ואת הפעמון — לשלושתם גימור משלהם, שנבחר בהמשך, בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את ידית ה{1}: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
+      "The tone of the lever you turn (and of the {0} knob), the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle, the horizontal bow or the doorbell — those three have a finish of their own, chosen later, on the pull-handle step — nor the safe lock, the keypad, or the {1} handle: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
+      "Оттенок нажимной ручки (и ручки «{0}»), замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу, горизонтальную скобу и звонок — у них своя отделка, которую выбирают дальше, на шаге ручки-скобы, — и не меняет сейфовый и кодовый замки и ручку «{1}»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
     ],
     "exp.sum.q": [
       "מה קורה אחרי שאני שולח?",
@@ -9624,9 +9624,9 @@ ${body}
     /* ⚠ THE LOCK COMES BEFORE THE GRIP, 14.9.2026 — Peretz: *"the lockset
        section should come before the pull handle section."* They were the other
        way round and had been since the two were split.
-       His own earlier rule, *"handles before the panels"* (30.8), is untouched:
-       both of these still stand ahead of `face`, which is what that sentence was
-       about. This is an order WITHIN the pair.
+       His own earlier rule, *"handles before the panels"* (30.8), was untouched
+       by this: an order WITHIN the pair. It was overruled on 26.9 — the grip is
+       after the glass now; see its own note below.
        ⚠ AND IT IS THE THIRD TIME THIS LIST HAS MOVED FOR ONE SENTENCE FROM HIM
        — `mk` from second to last, `pz` after the two fittings, and now this. The
        keys do not change, so no link goes stale and no `VERSION` moves; the
@@ -9645,14 +9645,6 @@ ${body}
         formatAgorot(byId(SPECIAL_LOCKS, "kasefet").delta),
         formatAgorot(byId(SPECIAL_LOCKS, "kodan").delta)
       ]
-    },
-    {
-      key: "grip",
-      title: "step.grip.t",
-      sub: "step.grip.s",
-      lede: "step.grip.l",
-      exp: "exp.grip",
-      expArgs: () => [L(byId(BOWS, "grab")), L(byId(HANDLES, "channel"))]
     },
     {
       key: "pz",
@@ -9682,6 +9674,27 @@ ${body}
       lede: "step.glass.l",
       exp: "exp.glass",
       expArgs: () => [L(SIZES.half)]
+    },
+    /* ⚠ THE PULL HANDLE COMES AFTER THE GLASS, 26.9.2026 — the owner's son:
+       *"The section with the hardware finish needs to be right after the lever
+       handles section. The pull handle section needs to be after the section
+       with the panels and stripes."* Asked whether after the face or after the
+       glass, he said after the glass.
+       ⚠ THIS OVERRULES PERETZ, on the owner's son's word. Peretz, 30.8.2026:
+       *"handles before the panels"* — the reason `grip` stood ahead of `face`
+       for a month. Both sentences are kept here because the next person to read
+       the older one in the history should find the newer one beside it.
+       The handle finish stays on this step: a bow chosen on the face takes the
+       finish chosen here, later, as the bell does. Keys unchanged, so no link
+       goes stale and no `VERSION` moves; `WANT_ORDER` in `tools/audit.mjs`
+       moved with it. */
+    {
+      key: "grip",
+      title: "step.grip.t",
+      sub: "step.grip.s",
+      lede: "step.grip.l",
+      exp: "exp.grip",
+      expArgs: () => [L(byId(BOWS, "grab")), L(byId(HANDLES, "channel"))]
     },
     {
       key: "mk",
