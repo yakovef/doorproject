@@ -129,6 +129,19 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The square window displaces NO face now, and the two audit clauses
+  about that displacement are restated (§5.27 — a new shape). The trio commit
+  stranded two of them, not one: the first guarded its own precondition and
+  failed at all eight viewports (*"this check has lost its subject"*), the second
+  did not and **passed while testing nothing**. Measured: `rect` leaves all four
+  faces alone; the tall SLOT still takes the pair (`why.noRoomBelow`, 337 mm) and
+  the trio (`why.winPlate`, 488), so the displacement claims move there and sweep
+  both faces, and *the square window takes nothing* is asserted beside them
+  (§5.22). ⚠ The deliberate-choice clause moved to the STRIPES: a deliberate
+  `plain` tap was measured and does NOT disarm the memory, so asserting it would
+  have demanded behaviour the page lacks. Falsified three ways, each flipping only
+  its own clause — 24.9 rows back → 1a; the slot displacing nothing → both 1b;
+  the restore guard dropped → 3. Long form: `HISTORY.md`.
 - **27.9** No figures on the משקוף section — *"…it's better to not show a number
   than show a false one."* The three figures (46/82, 62/112, 148/198) and the
   dimension marks they sat on go from `mashkofGlyph`; the C, the three part NAMES
@@ -929,7 +942,7 @@ often wrong at drawing scale.
 
 ## 5. The failure mode that keeps recurring
 
-**Things that vanish rather than break.** Twenty-six so far. None threw. All
+**Things that vanish rather than break.** Twenty-seven so far. None threw. All
 looked like a working page. **The item numbers are cited from code — never
 renumber.**
 
@@ -1073,6 +1086,31 @@ door is buildable; the drawn keyhole is where the photograph puts it.
     **A rule that names an id is a rule for that id only**: ask the question the
     drawing asks (`viewerOn` — "is the field not its none entry"), of every
     entry, each at its own size, and sweep the list in the test.
+
+27. **TWO CLAUSES ABOUT ONE VANISHED REPAIR — ONE SCREAMED, THE OTHER WENT
+    QUIET.** `5676973` made a three-panel face stand beside the square window,
+    so that window displaces **no** face any longer (measured: `rect` with each
+    of the four faces returns it unchanged; the pair stopped being displaced on
+    26.9 and the Greek set brings its own light). Two `audit` clauses were about
+    that displacement. The first asserted its own precondition — *the window
+    took the face away* — and failed at all eight viewports with **"this check
+    has lost its subject"**, which is the only reason any of it was found. The
+    second, *a deliberate choice beats the memory*, took the face with the
+    window, chose another face on purpose, then removed the window; with nothing
+    displaced it walked all three steps and **passed while testing nothing**, for
+    a whole commit. ⚠ **A clause about a state TRANSITION must assert the
+    transition happened before asserting what followed** — §5.15's demand that a
+    selector prove it found something, moved from markup to behaviour. And the
+    cure was not a third fixture of the same shape (this one had already moved
+    pair → trio on 26.9): the window that still displaces — the tall slot, which
+    takes the pair for want of room and the trio by the handle plate — carries
+    the displacement claims over BOTH faces, and the square window taking
+    nothing is asserted beside them (§5.22). ⚠ The replacement for the quiet
+    clause was **measured and rejected** before being written: a deliberate
+    `plain` tap does not disarm the memory either, because the guard asks whether
+    the field still holds what the repair made it and a tap on that same value
+    changes nothing — so it moved to the stripes, the one field where a
+    deliberate different value is reachable.
 
 ⚠ **And one assertion was counting PROSE.** `render(st).match(/data-pane/g)`
 counted the attribute's name inside XML comments too, and twenty-five

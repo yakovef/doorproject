@@ -633,9 +633,12 @@ for (const v of VIEWS) {
          `changed`, which is the ANNOUNCEMENT vocabulary and carries
          `'stripes'` where the state carries `stripeDir`, so it recorded
          nothing and restored nothing while looking entirely correct;
-       · a DELIBERATE choice beats the memory. Pick a window, then pick a
-         different face on purpose, then remove the window: the face you chose
-         stays. The memory only offers back a value the field still holds;
+       · a DELIBERATE choice beats the memory. The memory only offers back a
+         value the field still holds. ⚠ Read on the STRIPES since 27.9.2026, not
+         on the face: the square window displaces no face at all now, and no
+         panelled face stands beside the slot, so "pick a different face beside
+         the window" has nothing left to pick. The claim is unchanged and its
+         subject is live — see the clause for what was measured and rejected;
        · and it never arrives down a link. A memory that travelled would hand
          somebody else's panels to a customer opening a shared door.
      Driven on the page because the memory is app.js's alone — not in `state`,
@@ -652,6 +655,15 @@ for (const v of VIEWS) {
       }, [group, id]);
       await p.waitForTimeout(320);
     };
+    /* The direction pills are not tiles and carry no `data-id`; a blocked one is
+       `aria-disabled` and Playwright refuses it, so this clicks it outright (§8). */
+    const tapDir = async dir => {
+      await p.evaluate(d => {
+        const e = document.querySelector(`.stripes__dirs .pill[data-dir="${d}"]`);
+        if (e) e.click();
+      }, dir);
+      await p.waitForTimeout(320);
+    };
     const now = () => p.evaluate(() => ({
       face: (document.querySelector('.field[data-group="detail"] [aria-checked="true"]')
              || {}).dataset?.id,
@@ -663,23 +675,45 @@ for (const v of VIEWS) {
       await p.waitForTimeout(400);
     };
 
-    /* ⚠ THE TRIO, NOT THE PAIR, SINCE 26.9.2026 — same subject. The square
-       window used to take the PAIR away, and that was this clause's fixture;
-       the owner's son made the pair stand beside it (the window replaces its
-       upper panel), so a window tap on the pair takes nothing and the clause
-       would have faulted "lost its subject" everywhere. The window still takes
-       the TRIO, whose handle plate its casing would stand in. */
+    /* ⚠ THE SLOT, NOT THE SQUARE WINDOW, SINCE 27.9.2026 — and this fixture has
+       now moved TWICE for the same reason, which is the thing to notice. On
+       26.9 the square window stopped taking the PAIR (it replaces its upper
+       panel), so the fixture moved pair → trio. On 27.9 the trio's rows were
+       derived from the casing and the square window stopped taking that too, so
+       the square window now displaces NOTHING: not the pair, not the trio, and
+       not the Greek set, which brings its own light. Measured with `repair`
+       rather than assumed — `rect` + each of the four faces returns that face
+       unchanged and says nothing.
+       ⚠ So the clause did not need a third fixture of the same shape: it needed
+       BOTH halves of the new truth (§5.22). The square window taking nothing is
+       now asserted as the thing that must stay true, and the displacement claim
+       moved to the window that still displaces — the tall SLOT, which takes the
+       pair for want of room (`why.noRoomBelow`, 337 mm) and the trio by the
+       handle plate (`why.winPlate`, 488 mm into it on the standard leaf,
+       `WHY_UNDER_GLASS` in `rules.js` mapping both). Both faces are
+       swept, so the day the slot stops taking one of them this fails instead of
+       going quiet, which is what the old clause did for a whole commit. */
     await fresh('?d=panel3&w=none&n=none&k=coral&lang=he');
     await tap('window', 'rect');
-    const took = await now();
-    await tap('window', 'none');
-    const gave = await now();
-    if (took.face !== 'plain') {
-      fault(v.name, `a square window left the face at ${took.face} — this check has lost `
-        + 'its subject, nothing was taken away to give back');
-    } else if (gave.face !== 'panel3') {
-      fault(v.name, `window → rect → none left the face at ${gave.face} and it was panel3 `
-        + 'before the window took it — going back does not give the panels back');
+    const stood = await now();
+    if (stood.face !== 'panel3') {
+      fault(v.name, `the SQUARE window took the three-panel face to ${stood.face} — since `
+        + '27.9 its rows are the casing\'s and it stands beside the glass; a face tap never '
+        + 'costs the window and a window tap no longer costs this face');
+    }
+    for (const face of ['panel3', 'panel2']) {
+      await fresh(`?d=${face}&w=none&n=none&k=coral&lang=he`);
+      await tap('window', 'strip');
+      const took = await now();
+      await tap('window', 'none');
+      const gave = await now();
+      if (took.face !== 'plain') {
+        fault(v.name, `the tall slot left the face at ${took.face} — this check has lost `
+          + `its subject on ${face}, nothing was taken away to give back`);
+      } else if (gave.face !== face) {
+        fault(v.name, `window → strip → none left the face at ${gave.face} and it was ${face} `
+          + 'before the window took it — going back does not give the panels back');
+      }
     }
 
     await fresh('?sp=13&d=plain&w=none&n=none&k=coral&lang=he');
@@ -695,22 +729,48 @@ for (const v of VIEWS) {
         + 'horizontal before — the memory is only working for the window');
     }
 
-    /* The trio is taken by the window, then the PAIR is chosen on purpose
-       beside it (it fits since 26.9.2026); taking the window off must leave
-       the pair, not hand back the trio. */
-    await fresh('?d=panel3&w=none&n=none&k=coral&lang=he');
-    await tap('window', 'rect');
+    /* ⚠ AND THE MEMORY MUST YIELD TO A DELIBERATE CHOICE — ON THE STRIPES,
+       SINCE 27.9.2026, because that is the only field where a deliberate choice
+       is reachable at all. This clause used to take the trio with the square
+       window, then choose the PAIR on purpose beside it, then remove the window:
+       the pair had to survive. Both of its moves are gone — the square window
+       takes nothing, and no panelled face stands beside the SLOT, so there is no
+       "another face beside the window" to choose.
+       ⚠ The obvious replacement was MEASURED AND REJECTED rather than written:
+       taking the trio with the slot and then tapping `plain` deliberately does
+       NOT disarm the memory — the trio still comes back when the window goes,
+       because the guard asks whether the field still holds what the repair made
+       it and a tap on that same value changes nothing. Asserting otherwise would
+       have been a check demanding behaviour the page does not have.
+       The stripes do carry it: a panelled face displaces the direction, and a
+       tap on a stripe pill performs its own repair (the panel goes, §3), so the
+       deliberate `v` and the remembered `h` collide in one gesture — and `v`
+       must win, both immediately and after the face is set back to plain. */
+    await fresh('?sp=13&d=plain&w=none&n=none&k=coral&lang=he');
+    const dir0 = await now();
     await tap('detail', 'panel2');
-    await tap('window', 'none');
+    const hid = await now();
+    await tapDir('v');
+    const chose = await now();
+    await tap('detail', 'plain');
     const kept = await now();
-    if (kept.face !== 'panel2') {
-      fault(v.name, `a face chosen on purpose (panel2) was overwritten with ${kept.face} `
-        + 'when the window came off — the memory must yield to a deliberate choice');
+    if (dir0.dir !== 'h') {
+      fault(v.name, `the stripe fixture arrived at ${dir0.dir}, not horizontal — this clause `
+        + 'has lost its subject before it starts');
+    } else if (hid.dir !== 'none') {
+      fault(v.name, `a panelled face left the stripes at ${hid.dir} — nothing was displaced, `
+        + 'so there is no memory to yield');
+    } else if (chose.dir !== 'v') {
+      fault(v.name, `a deliberate tap on the vertical pill landed on ${chose.dir}`);
+    } else if (kept.dir !== 'v') {
+      fault(v.name, `a direction chosen on purpose (v) was overwritten with ${kept.dir} `
+        + 'when the face went back to plain — the memory must yield to a deliberate choice');
     }
 
-    /* And nothing of it rides in the address. */
+    /* And nothing of it rides in the address — driven on the SLOT, the window
+       that actually displaces, so the check is about a live memory. */
     await fresh('?d=panel3&w=none&n=none&k=coral&lang=he');
-    await tap('window', 'rect');
+    await tap('window', 'strip');
     const url = await p.evaluate(() => location.search + location.hash);
     if (/displaced|memo|was%3A|back=/.test(url)) {
       fault(v.name, `the displaced-value memory reached the address bar: ${url}`);

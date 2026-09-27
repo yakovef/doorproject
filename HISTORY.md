@@ -26,6 +26,65 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE SQUARE WINDOW DISPLACES NOTHING, AND THE TWO CLAUSES ABOUT THAT
+  DISPLACEMENT ARE RESTATED.** No instruction behind this one: it is the audit
+  answering the trio commit, and it is a new §5 shape (**§5.27**).
+
+  **WHAT THE AUDIT SAID.** Eight faults, one per viewport, all of them one
+  clause: *"a square window left the face at panel3 — this check has lost its
+  subject, nothing was taken away to give back"*. That clause asserts its own
+  precondition, so the day its subject vanished it failed loudly. **It is the
+  only reason any of this was found** — and it was found by running the tool,
+  after the same commit's other stranded assertion had been found by reading it.
+  Two, not one.
+
+  **WHAT WAS MEASURED.** `repair` with the square window and each of the four
+  faces returns that face unchanged and says nothing: the pair stopped being
+  displaced on 26.9 (the window replaces its upper panel), the trio on 27.9 (its
+  rows are the casing's), and the Greek set brings its own light. So **the square
+  window displaces no face at all** — this is not a fixture that can move a third
+  time. The tall SLOT still displaces both: the pair for want of room
+  (`why.noRoomBelow`, 337 mm) and the trio by the handle plate (`why.winPlate`,
+  488 mm on the standard leaf), `WHY_UNDER_GLASS` mapping each.
+
+  **SO BOTH HALVES OF THE NEW TRUTH, NOT A THIRD FIXTURE (§5.22).** *The square
+  window takes nothing* is now asserted — the thing commit `5676973` actually
+  delivered, and the thing the old clause used to contradict. The displacement
+  claim moved to the slot and sweeps **both** panelled faces, so the day the slot
+  stops taking one of them this fails instead of going quiet.
+
+  ⚠ **AND THE CLAUSE THAT WENT QUIET IS THE INTERESTING ONE.** *A deliberate
+  choice beats the memory* took the trio with the square window, chose the pair
+  on purpose beside it, removed the window, and required the pair to survive.
+  With nothing displaced it walked all three steps and **passed while testing
+  nothing**, for a whole commit. A clause about a state TRANSITION has to assert
+  the transition happened before asserting what followed it — §5.15's demand that
+  a selector prove it found something, moved from markup to behaviour.
+  ⚠ Its replacement was **measured and rejected** rather than written: taking the
+  trio with the slot and then tapping `plain` deliberately does NOT disarm the
+  memory (the trio still comes back), because the guard asks whether the field
+  still holds what the repair made it and a tap on that same value changes
+  nothing. Asserting it would have been a check demanding behaviour the page does
+  not have. It moved to the STRIPES, the one field where a deliberate different
+  value is reachable: a panelled face displaces the direction, a stripe pill's tap
+  performs its own repair, so the deliberate `v` and the remembered `h` collide in
+  one gesture and `v` must win — immediately and after the face goes back to
+  plain. Clause 4 (nothing of the memory in the address) was re-pointed to the
+  slot too, so it is about a live memory rather than a dead one.
+
+  **FALSIFIED THREE WAYS, EACH FLIPPING ONLY ITS OWN CLAUSE**, which is what
+  makes them three checks and not one: the 24.9 trio rows typed back → 1a fails
+  ("face plain" — the square window displaces again) and 1b stays green;
+  `panelUnderGlass` returning null → both 1b cases fail on the lost-subject
+  branch ("took panel3", "took panel2") and 1a stays green; the
+  `state[k] === m.became` guard dropped → 3 fails ("kept h") and the rest stay
+  green. ⚠ Done in a gitignored scratch harness (`tools/_memo.mjs`) that
+  replicates the four clauses in ~15 s — **that is why three falsifications were
+  run instead of one.** A 20-minute audit per experiment is how a round ends up
+  trusting one. The first attempt at the first falsification silently did not
+  apply (an indentation mismatch in the patch) and printed all-PASS about an
+  unchanged tree; it is only a falsification when the named clause flips.
+
 - **27.9 — NO FIGURES ON THE משקוף SECTION.** The owner's son: *"Remove the
   numbers from the mashkof section, maybe in the future I will give you accurate
   numbers but right now I don't have them so I think it's better to not show a
