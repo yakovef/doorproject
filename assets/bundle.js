@@ -222,9 +222,9 @@
        price. */
     "g.handleFinish": ["גימור ידית המשיכה", "Pull handle finish", "Отделка ручки-скобы"],
     "g.handleFinish.h": [
-      "הגוון של ידית המשיכה והפעמון. התוספת היא לכל פריט.",
-      "The tone of the pull handle and the doorbell. The surcharge is per item.",
-      "Оттенок ручки-скобы и звонка. Доплата — за каждый предмет."
+      "הגוון של ידית המשיכה, המאחז האופקי והפעמון. התוספת היא לכל פריט.",
+      "The tone of the pull handle, the horizontal pull and the doorbell. The surcharge is per item.",
+      "Оттенок ручки-скобы, горизонтальной скобы и звонка. Доплата — за каждый предмет."
     ],
     "g.lockset": ["מנעול וידית", "Lever and cylinder", "Ручка и цилиндр"],
     "g.lockset.h": [
@@ -271,6 +271,14 @@
       "טבעת נוקשת במרכז הדלת, מתחת לעינית. בגימור של ידית המשיכה.",
       "A ring knocker on the centre of the door, below the viewer. In the pull handle’s finish.",
       "Кольцо-стучалка по центру двери, под глазком. В отделке ручки-скобы."
+    ],
+    /* The horizontal bow, a piece of the face since 26.9.2026 — its own group
+       on the face step (`BOWS`, `gb=`). */
+    "g.grab": ["מאחז אופקי", "Horizontal pull", "Горизонтальная скоба"],
+    "g.grab.h": [
+      "מוט אופקי שמותקן על פני הדלת — אפשר יחד עם ידית משיכה. בגימור של ידית המשיכה.",
+      "A horizontal bar fitted across the face of the door — it can go with a pull handle too. In the pull handle’s finish.",
+      "Горизонтальная скоба на лицевой стороне двери — можно вместе с ручкой-скобой. В отделке ручки-скобы."
     ],
     "g.peephole.h": [
       "עינית לראות מי בחוץ. הרגילה כלולה במחיר; הדיגיטלית מצלמת.",
@@ -454,10 +462,13 @@
        and the same shape for the rectangle. The 20 cm rate this sentence used
        to explain is gone with the rule, and the finish and the bell are named
        because both arrived on the same step the same day. */
+    /* ⚠ 26.9.2026: the bow left the pull handles for the face step, so its
+       sentence here went, and the finish's surcharge names it among the things
+       the finish is charged on. The two product names are {0} and {1}. */
     "exp.grip.a": [
-      "ידית המשיכה היא המוט שמושכים בו כדי לפתוח. יש מוט עגול ומוט מלבני, ולכל אחד שני מחירים: עד מטר, ומעל מטר. האורך מוגבל לגובה הכנף, כך שדלת נמוכה לא תקבל מוט ארוך מדי. אפשר לבחור לידית גימור שחור או זהב — התוספת היא לידית ולפעמון, לכל אחד בנפרד. אפשר גם בלי ידית משיכה בכלל. המאחז האופקי והידית השקועה מותקנים לרוחב הדלת ואין להם בחירת אורך.",
-      "The pull handle is the bar you pull to open the door. There is a round bar and a rectangular one, and each has two prices: up to a metre, and past a metre. The length is capped by the height of the leaf, so a short door cannot take a bar that would not fit. The handle can be finished in black or gold — the surcharge is on the handle and on the doorbell, each on its own. Going without one is a choice too. The grab bar and the recessed channel are fitted across the door and have no length to choose.",
-      "Ручка-скоба — это то, за что тянут дверь. Есть круглая и прямоугольная, и у каждой две цены: до метра и свыше метра. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Отделку можно выбрать чёрную или золотую — доплата за ручку и за звонок, за каждый отдельно. Можно обойтись и без ручки. Горизонтальная скоба и врезная ручка ставятся поперёк двери, и длина у них не выбирается."
+      "ידית המשיכה היא המוט שמושכים בו כדי לפתוח. יש מוט עגול ומוט מלבני, ולכל אחד שני מחירים: עד מטר, ומעל מטר. האורך מוגבל לגובה הכנף, כך שדלת נמוכה לא תקבל מוט ארוך מדי. אפשר לבחור גימור שחור או זהב — התוספת היא לכל פריט בנפרד: לידית, ל{0} ולפעמון. אפשר גם בלי ידית משיכה בכלל. ל{1} אין בחירת אורך — היא חרוצה בדלת עצמה.",
+      "The pull handle is the bar you pull to open the door. There is a round bar and a rectangular one, and each has two prices: up to a metre, and past a metre. The length is capped by the height of the leaf, so a short door cannot take a bar that would not fit. The finish can be black or gold — the surcharge is per item: on the handle, on the {0} and on the doorbell. Going without one is a choice too. The {1} has no length to choose — it is cut into the door itself.",
+      "Ручка-скоба — это то, за что тянут дверь. Есть круглая и прямоугольная, и у каждой две цены: до метра и свыше метра. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Отделку можно выбрать чёрную или золотую — доплата за каждый предмет: за ручку, за «{0}» и за звонок. Можно обойтись и без ручки. У «{1}» длина не выбирается — она врезана в само полотно."
     ],
     "exp.lock.q": ["כספת וקודן — במקום המנעול או בנוסף?", "Safe lock and keypad — instead of the lock, or as well?", "Сейфовый и кодовый замок — вместо основного или вдобавок?"],
     /* ⚠ THE TWO FIGURES WERE TYPED HERE AND THEY WENT STALE — 25.9.2026. This
@@ -543,6 +554,7 @@
     "bd.window": ["חלון", "Window", "Окно"],
     "bd.grille": ["עיצוב החלון", "Inside the window", "Наполнение окна"],
     "bd.handle": ["ידית משיכה", "Pull handle", "Ручка-скоба"],
+    "bd.grab": ["מאחז אופקי", "Horizontal pull", "Горизонтальная скоба"],
     "bd.lockset": ["מנעול וידית", "Lever and cylinder", "Ручка и цилиндр"],
     "bd.speciallock": ["מנעול מיוחד", "Extra lock", "Дополнительный замок"],
     "bd.pirzul": ["פרזול", "Hardware finish", "Отделка фурнитуры"],
@@ -743,6 +755,15 @@
     "why.noRoomHandleWindow": ["החלון בדרך — והוא נשאר", "The window is in the way — it stays", "Мешает окно — оно остаётся"],
     "why.noRoomHandleFace": ["העיצוב בדרך — והוא נשאר", "The design is in the way — it stays", "Мешает узор — он остаётся"],
     "why.leverBar": ["ידית המשיכה בדרך", "The pull handle is in the way", "Мешает ручка-скоба"],
+    /* The horizontal bow, 26.9.2026 — ranked face and window > bow > bar >
+       lever. A greyed bow names what outranks it; a lever greyed for the bow
+       names the bow; a bar that the bow leaves nowhere names the bow. */
+    "why.bowWindow": ["אין מקום למאחז האופקי ליד החלון הזה", "No room for the horizontal pull beside this window", "Рядом с этим окном нет места для горизонтальной скобы"],
+    "why.bowFace": ["אין מקום למאחז האופקי על עיצוב החזית הזה", "No room for the horizontal pull on this face", "На этом оформлении нет места для горизонтальной скобы"],
+    "why.bowDoor": ["אין מקום למאחז האופקי על הדלת", "No room for the horizontal pull on the door", "На двери нет места для горизонтальной скобы"],
+    "why.bowWithWindow": ["עם החלון הזה אין מקום למאחז האופקי", "This window leaves no room for the horizontal pull", "С этим окном нет места для горизонтальной скобы"],
+    "why.leverBow": ["המאחז האופקי בדרך", "The horizontal pull is in the way", "Мешает горизонтальная скоба"],
+    "why.noRoomHandleBow": ["המאחז האופקי לא משאיר מקום לידית הזו", "The horizontal pull leaves no room for this handle", "Горизонтальная скоба не оставляет места для этой ручки"],
     "fix.windowAdded": ["הוספנו חלון — הסורג והזכוכית צריכים אותו", "We added a window — the grille and the glass need one", "Мы добавили окно — решётке и стеклу оно необходимо"],
     "fix.windowGone": ["הסרנו את החלון", "We removed the window", "Мы убрали окно"],
     "fix.lineWorkGone": ["הסרנו את קווי המתכת — לא משלבים אותם עם חלון", "We removed the metal strips — they do not go with a window", "Мы убрали металлические полосы — с окном они не сочетаются"],
@@ -759,6 +780,7 @@
     "fix.faceCleared": ["החלקנו את הדלת — ידית שקועה דורשת פנים חלקות", "We smoothed the face — a recessed channel needs it plain", "Мы сделали полотно гладким — врезная ручка этого требует"],
     "fix.grilleGone": ["הסרנו את הסורג — אין חלון", "We removed the grille — there is no window", "Мы убрали решётку — окна нет"],
     "fix.gripGone": ["הסרנו את ידית המשיכה — אין לה מקום כאן", "We removed the pull handle — there is no room for it here", "Мы убрали ручку-скобу — для неё здесь нет места"],
+    "fix.bowGone": ["הסרנו את המאחז האופקי — אין לו מקום כאן", "We removed the horizontal pull — there is no room for it here", "Мы убрали горизонтальную скобу — для неё здесь нет места"],
     "fix.locksetSwapped": ["החלפנו את המנעול — אין לו מקום ליד המאחז", "We swapped the lockset — there is no room for it beside the grip", "Мы заменили замок — рядом со скобой ему нет места"],
     "fix.setWindow": ["התאמנו את החלון — הסט היווני מגיע עם חלון מלבני משלו", "We adjusted the window — the Greek set comes with a rectangular one of its own", "Мы изменили окно — у греческого комплекта своё прямоугольное"],
     /* ⚠ `fix.setGone` USED TO ANSWER FOR THIS TOO AND IT IS THE WRONG SENTENCE.
@@ -834,6 +856,7 @@
     ],
     "why.gripTouchesLock": ["הידית נוגעת במנעול", "The handle touches the lock", "Ручка задевает замок"],
     "why.gripCrossesWindow": ["הידית חוצה את החלון", "The handle crosses the window", "Ручка пересекает окно"],
+    "why.gripOnBow": ["הידית נוגעת במאחז האופקי", "The handle touches the horizontal pull", "Ручка задевает горизонтальную скобу"],
     /* ── the no-JS fallback and the footer ────────────────────────── */
     "down.h": [
       "הדלת לא נטענת בדפדפן הזה.",
@@ -897,6 +920,7 @@
     "row.grille": ["סורג", "Grille", "Решётка"],
     "row.glass": ["זכוכית", "Glass", "Стекло"],
     "row.handle": ["ידית משיכה", "Pull handle", "Ручка-скоба"],
+    "row.grab": ["מאחז אופקי", "Horizontal pull", "Горизонтальная скоба"],
     "row.lockset": ["מנעול וידית", "Lever and cylinder", "Ручка и цилиндр"],
     "row.speciallock": ["מנעול מיוחד", "Extra lock", "Дополнительный замок"],
     "row.bell": ["פעמון", "Doorbell", "Звонок"],
@@ -1086,8 +1110,9 @@
     // עידן — מוט עגול, עד מטר / מעל מטר
     nitzan: { short: 600, long: 900 },
     // ניצן — מוט מלבני, עד מטר / מעל מטר
-    grab: 300,
-    // מאחז אופקי   — Peretz, flat, no length choice
+    /* `grab` — the horizontal bow, ₪300 — is not a pull handle any more
+       (26.9.2026): it is a piece of the FACE with a list of its own. Its price
+       moved to `BOW` below, unchanged. */
     channel: 1900
     // ידית שקועה   — Peretz, 20.9.2026 ("shkua 1900")
   };
@@ -1144,6 +1169,12 @@
     // ללא
     bell: 300
     // פעמון — Peretz, 30.8.2026; + the handle finish
+  };
+  var BOW = {
+    nograb: 0,
+    // ללא
+    grab: 300
+    // מאחז אופקי — Peretz, 20.9.2026; + the handle finish
   };
   var PEEPHOLE = {
     nopeep: 0,
@@ -1479,21 +1510,15 @@
        range drawn from nothing, and the note there says in as many words "it is
        the one grip whose picture we cannot check". Peretz, 26.8.2026: "there is
        no: שירן, להב שטוח." The id resolves to `idan`. */
-    /* `finishes: true` — the bow's rods paint from the grip's metal
-       (`gripHard`/`gripSoft` in the renderer), so it takes the finish and its
-       surcharge like a bar does. */
-    {
-      id: "grab",
-      he: "מאחז אופקי",
-      en: "Grab bar",
-      ru: "Горизонтальная скоба",
-      len: 0,
-      style: "grab",
-      finishes: true,
-      aliases: ["dee"],
-      doors: ["d078"],
-      photo: null
-    },
+    /* ⚠ `grab` — THE HORIZONTAL BOW — LEFT THIS LIST ON 26.9.2026 AND IS `BOWS`
+       BELOW. The owner's son: *"I want the horizontal pull handle to be with the
+       panels and stripes … and also the horizontal handle can be comfortable
+       with other pull handles."* So it is chosen on the face step, on a list of
+       its own, and a door may carry it AND a bar. Its id — and `dee`'s — are a
+       wire format and are NOT aliased onto a bar here: that would hand a
+       customer's `n=grab` link a ₪500 bar for a ₪300 bow in silence. `fromQuery`
+       MIGRATES them instead (`n=grab` → no pull handle plus the bow), and the
+       short code's `VERSION` went to 25 because `channel`'s index moved up. */
     /* d084's recess measures 0.099 of leaf width and 0.906 of leaf height — it
          runs nearly the whole leaf and it is twice as wide as we drew it.
     
@@ -1832,6 +1857,21 @@
   var BELLS = [
     { id: "nobell", he: "ללא", en: "None", ru: "Нет" },
     { id: "bell", he: "פעמון", en: "Doorbell", ru: "Звонок" }
+  ];
+  var BOWS = [
+    { id: "nograb", he: "ללא", en: "None", ru: "Нет", style: "none", len: 0, photo: null },
+    {
+      id: "grab",
+      he: "מאחז אופקי",
+      en: "Horizontal pull",
+      ru: "Горизонтальная скоба",
+      style: "grab",
+      len: 0,
+      finishes: true,
+      aliases: ["dee"],
+      doors: ["d078"],
+      photo: null
+    }
   ];
   var PEEPHOLES = [
     { id: "nopeep", he: "ללא", en: "None", ru: "Нет" },
@@ -2602,6 +2642,7 @@
   priceInto("special lock", SPECIAL_LOCKS, SPECIAL_LOCK, "delta");
   priceInto("pirzul", PIRZUL2, PIRZUL, "delta");
   priceInto("bell", BELLS, BELL, "delta");
+  priceInto("bow", BOWS, BOW, "delta");
   priceInto("peephole", PEEPHOLES, PEEPHOLE, "delta");
   for (const [id, shekels] of Object.entries(DETAIL_GLAZED)) {
     const o = DETAILS.find((d) => d.id === id);
@@ -2663,6 +2704,11 @@
       /* Per stripe, at his rate — ₪150 horizontal, ₪300 vertical, no base. */
       stripes: stripePrice(state2),
       handle: handlePrice(state2),
+      /* The horizontal bow, 26.9.2026 — a piece of the face with its own list,
+         ₪300, and in the door's one handle finish per object like the bell: a
+         door with a bar and a bow in gold pays the gold twice, once on each
+         thing it gilds. Nothing on a door with no bow. */
+      grab: byId(BOWS, state2.grab).delta + (state2.grab !== "nograb" ? finishExtra(state2) : 0),
       lockset: byId(LOCKSETS, state2.lockset).delta,
       speciallock: byId(SPECIAL_LOCKS, state2.speciallock).delta,
       pirzul: byId(PIRZUL2, state2.pirzul).delta,
@@ -2815,6 +2861,10 @@
       id: hd.id,
       value: `${L(hd)}${fin ? ` · ${L(fin)}` : ""}${barLen}`
     });
+    const bw = byId(BOWS, state2.grab);
+    if (bw && bw.id !== "nograb") {
+      rows.push({ key: "grab", label: T("row.grab"), id: bw.id, value: `${L(bw)} · ${L(hf)}` });
+    }
     rows.push({ key: "lockset", label: T("row.lockset"), id: lk.id, value: L(lk) });
     if (xl.id !== "nospecial") {
       rows.push({ key: "speciallock", label: T("row.speciallock"), id: xl.id, value: L(xl) });
@@ -4940,6 +4990,10 @@ ${stops}
 
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
+    ${/* The bow FIRST, at its one home — face and window > bow > bar > lever —
+        and the bar after it, placed against the bow's box. */
+    ""}
+    ${state2.grab === "grab" ? bowArt(state2, lockX, inward, lockset, y0, leafH, leverDir, paint2, centreX, leafW) : ""}
     ${gripArt(
       handle,
       handleX,
@@ -5317,48 +5371,8 @@ ${body}
       return v;
     };
   };
-  var faceObstacles = memo(function faceObstacles2(state2) {
-    const size = SIZES[state2.size] || SIZES.standard;
-    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-    const detail = byId(DETAILS, state2.detail);
-    const openings = apertureLayout(byId(WINDOWS, state2.window), leafW, leafH);
-    const paneBand = detail.classic ? CLASSIC_BAND : MOULD_BAND;
-    const paneFoot = paneBand;
-    const out = openings.map((o) => ({
-      kind: "window",
-      x: o.x - paneBand,
-      y: o.top - paneBand,
-      w: o.w + paneBand * 2,
-      h: o.h + paneBand + paneFoot
-    }));
-    if (detail.classic) {
-      for (const q of classicPieces(leafW, leafH, openings.length > 0)) {
-        out.push({
-          kind: q.kind,
-          x: q.x,
-          y: q.y,
-          w: q.w,
-          h: q.h,
-          band: MOULD_BAND,
-          ...q.piece === "band" ? { plate: true } : {}
-        });
-      }
-      return out;
-    }
-    {
-      const f = faceRowsOn(detail, byId(WINDOWS, state2.window), openings, leafW, leafH);
-      for (const [t, b] of f.rows) {
-        const r = {
-          kind: "panel",
-          x: f.inset,
-          y: leafH * t,
-          w: leafW - f.inset * 2,
-          h: leafH * (b - t),
-          band: MOULD_BAND
-        };
-        if (r.w > MOULD_BAND * 2.2 && r.h > MOULD_BAND * 2.2) out.push(r);
-      }
-    }
+  function fittingBoxes(state2, leafW, leafH) {
+    const out = [];
     if (state2.bell && state2.bell !== "nobell") {
       out.push({
         kind: "fitting",
@@ -5391,8 +5405,56 @@ ${body}
         h: sp.h
       });
     }
+    if (state2.grab === "grab" && state2.handle !== BOW_AS_GRIP) {
+      out.push({ kind: "bow", band: 0, ...bowBox(state2, leafW, leafH) });
+    }
     return out;
-  }, (st) => `${st.size}|${st.detail}|${st.window}|${st.bell}|${st.peephole}|${st.speciallock}`);
+  }
+  var faceObstacles = memo(function faceObstacles2(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const detail = byId(DETAILS, state2.detail);
+    const openings = apertureLayout(byId(WINDOWS, state2.window), leafW, leafH);
+    const paneBand = detail.classic ? CLASSIC_BAND : MOULD_BAND;
+    const paneFoot = paneBand;
+    const out = openings.map((o) => ({
+      kind: "window",
+      x: o.x - paneBand,
+      y: o.top - paneBand,
+      w: o.w + paneBand * 2,
+      h: o.h + paneBand + paneFoot
+    }));
+    if (detail.classic) {
+      for (const q of classicPieces(leafW, leafH, openings.length > 0)) {
+        out.push({
+          kind: q.kind,
+          x: q.x,
+          y: q.y,
+          w: q.w,
+          h: q.h,
+          band: MOULD_BAND,
+          ...q.piece === "band" ? { plate: true } : {}
+        });
+      }
+      return out.concat(fittingBoxes(state2, leafW, leafH));
+    }
+    {
+      const f = faceRowsOn(detail, byId(WINDOWS, state2.window), openings, leafW, leafH);
+      for (const [t, b] of f.rows) {
+        const r = {
+          kind: "panel",
+          x: f.inset,
+          y: leafH * t,
+          w: leafW - f.inset * 2,
+          h: leafH * (b - t),
+          band: MOULD_BAND
+        };
+        if (r.w > MOULD_BAND * 2.2 && r.h > MOULD_BAND * 2.2) out.push(r);
+      }
+    }
+    out.push(...fittingBoxes(state2, leafW, leafH));
+    return out;
+  }, (st) => `${st.size}|${st.detail}|${st.window}|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}|${st.handing}|${st.handle === BOW_AS_GRIP}`);
   function peepholeFits(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
@@ -5450,7 +5512,7 @@ ${body}
     }
     return null;
   }
-  var homeKey = (st) => `${st.size}|${st.handle}|${st.lockset}|${st.detail}|${st.window}|${st.handing}`;
+  var homeKey = (st) => `${st.size}|${st.handle}|${st.handleLen}|${st.lockset}|${st.detail}|${st.window}|${st.handing}|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}`;
   var HOME_CACHE = /* @__PURE__ */ new Map();
   function gripHome(state2) {
     const key = homeKey(state2);
@@ -5477,6 +5539,14 @@ ${body}
         const rows = panelRows(detail);
         if (rows.length >= 3) return leafH * (rows[1][0] + rows[1][1]) / 2;
         if (rows.length === 2) return leafH * (rows[0][1] + rows[1][0]) / 2;
+      }
+      if (detail.panel && (detail.keeps || []).length && glassRows(byId(WINDOWS, state2.window))) {
+        const obs = faceObstacles(state2);
+        const wins = obs.filter((o) => o.kind === "window"), kept = obs.filter((o) => o.kind === "panel");
+        if (wins.length && kept.length) {
+          const foot = Math.max(...wins.map((o) => o.y + o.h)), top = Math.min(...kept.map((o) => o.y));
+          if (top > foot) return (foot + top) / 2;
+        }
       }
       return leafH * GRAB.fromTop;
     };
@@ -5569,7 +5639,19 @@ ${body}
                fill="#fff" fill-opacity=".22"/>
     </g>`;
   }
-  var gripOf = (state2) => ({ ...byId(HANDLES, state2.handle), len: handleLength(state2) });
+  var gripOf = (state2) => state2.handle === BOW_AS_GRIP ? { ...byId(BOWS, "grab"), len: 0 } : { ...byId(HANDLES, state2.handle), len: handleLength(state2) };
+  var BOW_AS_GRIP = "(bow)";
+  var bowState = (state2) => ({ ...state2, handle: BOW_AS_GRIP, handleLen: 0, grab: "nograb" });
+  var bowHome = (state2) => gripIdeal(bowState(state2));
+  var bowPlacement = (state2, place = null) => gripPlacement(bowState(state2), place || bowHome(state2));
+  var bowFits = (state2) => !gripClashesLockset(bowState(state2)) && bowPlacement(state2).ok;
+  function bowBox(state2, leafW, leafH) {
+    const p = bowHome(state2);
+    const f = handleFootprint(byId(BOWS, "grab"), leafH);
+    const gx0 = p.x - f.out, gx1 = p.x + f.in;
+    const x0 = hingeLeftOf(state2) ? leafW - gx1 : gx0;
+    return { x: x0, y: p.y - f.vy, w: gx1 - gx0, h: f.vy * 2 };
+  }
   function gripAt(state2) {
     return gripHome(state2);
   }
@@ -5630,7 +5712,7 @@ ${body}
       }
       for (const ob of obstacles) {
         if (footHits(f, ob)) {
-          return bad(ob.kind === "window" ? T("why.feetOnWindow") : ob.kind === "moulding" ? T("why.feetOnFace") : T("why.feetOnPanel"));
+          return bad(ob.kind === "window" ? T("why.feetOnWindow") : ob.kind === "moulding" ? T("why.feetOnFace") : ob.kind === "bow" ? T("why.gripOnBow") : T("why.feetOnPanel"));
         }
       }
     }
@@ -5682,7 +5764,7 @@ ${body}
           ob.y + ob.h - ob.band
         )) continue;
       }
-      return bad(ob.kind === "window" ? T("why.gripCrossesWindow") : ob.kind === "moulding" ? T("why.feetOnFace") : T("why.feetOnPanel"));
+      return bad(ob.kind === "window" ? T("why.gripCrossesWindow") : ob.kind === "moulding" ? T("why.feetOnFace") : ob.kind === "bow" ? T("why.gripOnBow") : T("why.feetOnPanel"));
     }
     return at;
   }
@@ -6703,7 +6785,7 @@ ${body}
     const s = flip ? -1 : 1, ox = flip ? x + w : x;
     const REEDS = 4;
     const pitch = w / REEDS;
-    const BOW = w * 0.07;
+    const BOW2 = w * 0.07;
     const at = (t) => ox + s * t;
     let out = `
     ${/* ⚠ `data-face`: the bracket is part of the BAND piece, and the band's
@@ -6718,7 +6800,7 @@ ${body}
     for (let i = 0; i < REEDS; i++) {
       const top = (i + 0.5) * pitch;
       const bot = top * 0.58;
-      const waist = (top + bot) / 2 - BOW;
+      const waist = (top + bot) / 2 - BOW2;
       const foot = y + h * (0.86 + 0.14 * i / (REEDS - 1));
       const d = `M ${n(at(top))} ${n(y)}
                C ${n(at(top))} ${n(y + h * 0.18)}
@@ -7072,6 +7154,22 @@ ${body}
              data-cx="${cx}" data-cy="${cy}" data-aty="${atY}"
              data-out="${box.out}" data-in="${box.in}"
              data-vy="${box.vy}" data-rot="${rot}"${turned}>${art}</g>`;
+  }
+  function bowArt(state2, lockX, inward, lockset, y0, leafH, dir, paint2, centreX, leafW) {
+    const bow = byId(BOWS, "grab");
+    const p = bowHome(state2);
+    const cx = lockX + inward * (p.x - lockBackset(bow, lockset));
+    const cy = y0 + p.y;
+    const drawn = GRIP_ART.grab(bow, { cx, cy, dir, paint: paint2, centreX, leafW, leafH, y0, panelled: false });
+    const art = typeof drawn === "string" ? drawn : drawn && drawn.svg;
+    const own = typeof drawn === "string" ? null : drawn && drawn.box;
+    if (!art) return "";
+    const foot = handleFootprint(bow, leafH);
+    const atY = own ? own.y + own.h / 2 : cy;
+    return `<g data-hw="bow" data-style="grab" data-len="${foot.vy * 2}"
+             data-cx="${cx}" data-cy="${cy}" data-aty="${atY}"
+             data-out="${foot.out}" data-in="${foot.in}"
+             data-vy="${foot.vy}" data-rot="0">${art}</g>`;
   }
   var lockAff = (lockset) => lockset.style === "cylinder" ? CYLINDER_AFF : HANDLE_AFF;
   function locksetArt(lockset, cx, cy, dir) {
@@ -8189,6 +8287,28 @@ ${body}
     <g fill="currentColor">${art}</g>
   </svg>`;
   }
+  function bowGlyph(x) {
+    if (x.id === "nograb") {
+      return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">
+    <rect x="-56" y="-10" width="112" height="20" rx="10" fill="none" stroke="currentColor"
+          stroke-width="6" opacity=".3"/>
+    <circle cx="-34" cy="0" r="14" fill="none" stroke="currentColor" stroke-width="5" opacity=".3"/>
+    <circle cx="34" cy="0" r="14" fill="none" stroke="currentColor" stroke-width="5" opacity=".3"/>
+    <path d="M-34 34 L34 -34" stroke="currentColor" stroke-width="7" opacity=".45"/></g>
+  </svg>`;
+    }
+    const { box, art } = FITTING_GLYPH.grab();
+    const [x0, y0, x1, y1] = box;
+    const w = x1 - x0, side = w;
+    const id = `bowg-${x.id}`;
+    const ramp = barRamp("barTube", FINISH_TONES.steel, id).replace('x1="0" y1="0" x2="1" y2="0"', 'x1="0" y1="0" x2="0" y2="1"');
+    return `<svg viewBox="${x0} ${-side / 2} ${w} ${side}" class="glyph glyph--hw" aria-hidden="true">
+    <defs>${ramp}</defs>
+    <g fill="url(#${id})" stroke="currentColor" stroke-opacity=".45" stroke-width="1"
+       vector-effect="non-scaling-stroke">${art}</g>
+  </svg>`;
+  }
   function peepholeGlyph(x) {
     const art = {
       nopeep: `
@@ -8318,13 +8438,22 @@ ${body}
   var isLineWork = (state2) => !!(state2 && state2.stripeDir && state2.stripeDir !== "none" && state2.stripeCount);
   var faceWorked = (state2) => !!byId(DETAILS, state2.detail).panel || isLineWork(state2);
   var detailWorked = (d) => !!d.panel;
-  var locksetFits = (state2, id) => !gripClashesLockset({ ...state2, lockset: id });
+  var locksetFits = (state2, id) => state2.grab !== "grab" || bowFits({ ...state2, lockset: id });
   function fallbackLockset(state2) {
     if (locksetFits(state2, "cylinder")) return "cylinder";
     const k = LOCKSETS.find((x) => locksetFits(state2, x.id));
     return k ? k.id : null;
   }
-  var gripFits = (state2) => !gripClashesLockset(state2) && gripFitsAnywhere({ ...state2, grip: null });
+  var gripFits = (state2) => gripFitsAnywhere({ ...state2, grip: null });
+  function bowObstacle(state2) {
+    const s = { ...state2, grab: "grab" };
+    if (bowFits(s)) return null;
+    const k = fallbackLockset(s);
+    if (k && k !== s.lockset && bowFits({ ...s, lockset: k })) return "lock";
+    if (leafGlazed(s) && bowFits({ ...s, window: "none" })) return "window";
+    if (faceWorked(s) && bowFits({ ...s, detail: "plain", stripeDir: "none", stripeCount: 0 })) return "face";
+    return "door";
+  }
   function gripObstacle(state2, handleId) {
     const s = { ...state2, handle: handleId };
     if (gripFits(s)) return null;
@@ -8332,6 +8461,7 @@ ${body}
     if (k && k !== s.lockset && gripFits({ ...s, lockset: k })) return "lock";
     if (leafGlazed(s) && gripFits({ ...s, window: "none" })) return "window";
     if (faceWorked(s) && gripFits({ ...s, detail: "plain", stripeDir: "none", stripeCount: 0 })) return "face";
+    if (s.grab === "grab" && gripFits({ ...s, grab: "nograb" })) return "bow";
     return "door";
   }
   var gripResolvable = (state2) => {
@@ -8376,6 +8506,8 @@ ${body}
          the fitting is not simply moved, is over it. */
       peephole: {},
       bell: {},
+      /* The horizontal bow, a field of its own since 26.9.2026. */
+      grab: {},
       /* ⚠ A STRING, NOT A MAP OF IDS, because the stripes are no
          longer options with ids. Every other key here is
          `{ optionId: reason }`; this one is either null or the one
@@ -8427,12 +8559,30 @@ ${body}
     const GRIP_WHY = {
       window: "why.noRoomHandleWindow",
       face: "why.noRoomHandleFace",
+      bow: "why.noRoomHandleBow",
       door: "why.noRoomHandle"
     };
     for (const h of HANDLES) {
       if (h.style === "none" || out.handle[h.id]) continue;
       const what = gripObstacle(state2, h.id);
       if (what && what !== "lock") out.handle[h.id] = T(GRIP_WHY[what]);
+    }
+    {
+      const what = bowObstacle(state2);
+      if (what && what !== "lock") out.grab.grab = T(BOW_WHY[what]);
+    }
+    if (state2.grab === "grab") {
+      for (const k of LOCKSETS) {
+        if (out.lockset[k.id]) continue;
+        if (!bowFits({ ...state2, lockset: k.id })) out.lockset[k.id] = T("why.leverBow");
+      }
+    }
+    if (state2.grab === "grab") {
+      for (const w of WINDOWS) {
+        if (out.window[w.id] || w.id === state2.window) continue;
+        const what = bowObstacle({ ...state2, window: w.id });
+        if (what && what !== "lock") out.window[w.id] = T("why.bowWithWindow");
+      }
     }
     if (grip.style !== "none") {
       for (const w of WINDOWS) {
@@ -8485,9 +8635,13 @@ ${body}
        were withdrawn by Peretz on 14.9.2026; see `conflicts`. */
     stripesCapped: "fix.stripesCapped",
     /* 26.9.2026: the trio refused beside a window, on a link — see repair. */
-    trioPlate: "fix.trioPlate"
+    trioPlate: "fix.trioPlate",
+    /* 26.9.2026: the bow has no home on this door (a link, or a window tapped
+       beside it) — see repair. */
+    bowGone: "fix.bowGone"
   };
   var WHY_UNDER_GLASS = { top: "why.winTakesTop", plate: "why.winPlate", room: "why.noRoomBelow" };
+  var BOW_WHY = { window: "why.bowWindow", face: "why.bowFace", door: "why.bowDoor" };
   function repair(state2, intent = null) {
     let s = { ...state2 };
     const changed = [];
@@ -8561,6 +8715,17 @@ ${body}
     if (byId(HANDLES, s.handle).style === "channel" && (leafGlazed(s) || faceWorked(s))) {
       s.handle = "none";
       change("handle", SAID.gripGone);
+    }
+    if (s.grab === "grab" && !bowFits(s)) {
+      const k = fallbackLockset(s);
+      if (k && k !== s.lockset && bowFits({ ...s, lockset: k })) {
+        s.lockset = k;
+        change("lockset", SAID.locksetSwapped);
+      }
+      if (!bowFits(s)) {
+        s.grab = "nograb";
+        change("grab", SAID.bowGone);
+      }
     }
     if (!gripFits(s)) {
       if (intent !== "lockset") {
@@ -8636,6 +8801,9 @@ ${body}
     /* the ironwork itself, not the pane it sits in */
     grille: '<path d="M4.6 12 12 4.6M4.6 19.4 19.4 4.6M12 19.4 19.4 12"/><path d="M4.6 12 12 19.4M4.6 4.6 19.4 19.4M12 4.6 19.4 12"/>',
     handle: '<path d="M8.4 5.6h3v12.8h-3Z"/><path d="M11.4 12h4.6"/>',
+    /* the horizontal bow, 26.9.2026: a bar lying across two posts — the handle's
+       mark turned on its side would be the handle's mark */
+    grab: '<path d="M4.4 8.6h15.2v3.4H4.4Z"/><path d="M8 12v5.4M16 12v5.4"/>',
     /* a key going into the case */
     lockset: '<circle cx="7.4" cy="12" r="2.4"/><path d="M9.8 12h3.8"/><path d="M13.6 9.2h4.4v5.6h-4.4Z"/>',
     detail: '<path d="M5.2 4.4h13.6v15.2H5.2Z"/><path d="M8.4 7.6h7.2v8.8H8.4Z"/>',
@@ -8660,7 +8828,7 @@ ${body}
   var specIcon = (key) => Object.prototype.hasOwnProperty.call(SPEC_ICON, key) ? `<svg class="spec__ico" viewBox="0 0 24 24" aria-hidden="true">${SPEC_ICON[key]}</svg>` : '<span class="spec__ico" aria-hidden="true"></span>';
 
   // js/url-state.js
-  var VERSION = 24;
+  var VERSION = 25;
   var DEFAULTS = {
     /* ⚠ 7126D, NOT THE ANTHRACITE, AND THE REASON IS THE OPENING PRICE.
        Peretz priced colour on 30.8.2026: 9016T, 9001T and 7126D are in the
@@ -8698,6 +8866,9 @@ ${body}
        it". */
     bell: "nobell",
     peephole: "nopeep",
+    /* The horizontal bow, a piece of the face since 26.9.2026 — off, like every
+       other thing the customer adds. */
+    grab: "nograb",
     mashkof: "mk-std",
     pirzul: "pz-nickel",
     /* ⚠ THE PULL HANDLE'S FINISH, 20.9.2026 — nickel until the customer picks,
@@ -8732,6 +8903,7 @@ ${body}
     p.set("hf", state2.handleFinish);
     p.set("bl", state2.bell);
     p.set("ey", state2.peephole);
+    p.set("gb", state2.grab);
     p.set("hl", String(state2.handleLen));
     p.set("sp", String(packStripes(state2)));
     p.set("d", state2.detail);
@@ -8761,6 +8933,7 @@ ${body}
       "h",
       "bl",
       "ey",
+      "gb",
       "code",
       "bare",
       "sheet",
@@ -8803,6 +8976,12 @@ ${body}
     }
     const legacyHandle = HANDLE_LEGACY[rawN];
     if (legacyHandle && !p.get("hf")) Object.assign(state2, legacyHandle);
+    const bowN = rawN && !p.get("gb") && BOWS.find((o) => o.id !== "nograb" && (o.id === rawN || (o.aliases || []).includes(rawN)));
+    if (bowN && !HANDLES.find((o) => o.id === rawN || (o.aliases || []).includes(rawN))) {
+      state2.grab = bowN.id;
+      state2.handle = "none";
+      if (handleRaisedIt) notice = beforeHandle;
+    }
     const legacy = STRIPE_LEGACY[p.get("d")];
     if (legacy) {
       Object.assign(state2, legacy);
@@ -8815,6 +8994,7 @@ ${body}
     take("handleFinish", "hf", HANDLE_FINISHES);
     take("bell", "bl", BELLS);
     take("peephole", "ey", PEEPHOLES);
+    take("grab", "gb", BOWS);
     const rawStripes = p.get("sp");
     if (rawStripes != null) {
       const v = Number(rawStripes);
@@ -8857,7 +9037,12 @@ ${body}
     stripes: 5,
     bell: 1,
     peephole: 2,
-    handleFinish: 2
+    handleFinish: 2,
+    /* The bow, 26.9.2026: one bit, APPENDED at the end of
+       the pack order like the bell before it. Payload 54;
+       `TOTAL_BITS` reserves the check nibble before rounding
+       and stays at 60, so the code stays twelve characters. */
+    grab: 1
   };
   var PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
   var CHECK_MIN = 4;
@@ -8897,7 +9082,8 @@ ${body}
       [packStripes(state2), BITS.stripes],
       [Math.max(0, BELLS.findIndex((x) => x.id === state2.bell)), BITS.bell],
       [Math.max(0, PEEPHOLES.findIndex((x) => x.id === state2.peephole)), BITS.peephole],
-      [Math.max(0, HANDLE_FINISHES.findIndex((x) => x.id === state2.handleFinish)), BITS.handleFinish]
+      [Math.max(0, HANDLE_FINISHES.findIndex((x) => x.id === state2.handleFinish)), BITS.handleFinish],
+      [Math.max(0, BOWS.findIndex((x) => x.id === state2.grab)), BITS.grab]
     ];
     let bits = 0n;
     for (const [value, width] of parts) {
@@ -8944,7 +9130,8 @@ ${body}
     const bell = BELLS[read(BITS.bell)];
     const peep = PEEPHOLES[read(BITS.peephole)];
     const hf = HANDLE_FINISHES[read(BITS.handleFinish)];
-    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul || hLen === void 0 || !bell || !peep || !hf) return null;
+    const bow = BOWS[read(BITS.grab)];
+    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul || hLen === void 0 || !bell || !peep || !hf || !bow) return null;
     return {
       colour: colour.id,
       size,
@@ -8960,6 +9147,7 @@ ${body}
       bell: bell.id,
       peephole: peep.id,
       handleFinish: hf.id,
+      grab: bow.id,
       handleLen: hLen,
       ...unpackStripes(sp)
     };
@@ -9126,36 +9314,36 @@ ${body}
 
   // js/works.js
   var WORKS = [
-    { id: "d003", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d004", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
-    { id: "d012", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d015", state: { colour: "rb-9005d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d016", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
-    { id: "d022", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d026", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d029", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d030", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "cadoor", size: "standard", handing: "left-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
-    { id: "d031", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "cadoor", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
-    { id: "d034", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "nitzan", handleFinish: "hf-nickel", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
-    { id: "d038", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 3, stripeTight: false } },
-    { id: "d043", state: { colour: "rb-7126d", detail: "plain", window: "none", grille: "none", handle: "idan", handleFinish: "hf-nickel", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 3, stripeTight: false } },
-    { id: "d048", state: { colour: "rb-5103d", detail: "panel2", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d051", state: { colour: "rb-7240d", detail: "panel2", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d063", state: { colour: "rb-7240d", detail: "plain", window: "none", grille: "none", handle: "idan", handleFinish: "hf-nickel", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 4, stripeTight: false } },
-    { id: "d064", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "h", stripeCount: 7, stripeTight: false } },
-    { id: "d072", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "nitzan", handleFinish: "hf-black", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
-    { id: "d078", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "idan", handleFinish: "hf-nickel", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 11, stripeTight: false } },
-    { id: "d087", state: { colour: "rb-7021d", detail: "panel2", window: "none", grille: "none", handle: "idan", handleFinish: "hf-black", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d092", state: { colour: "rb-6219d", detail: "plain", window: "rect", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "knobplate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d097", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d099", state: { colour: "rb-7126d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d106", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "circles", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d108", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "idan", handleFinish: "hf-black", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d116", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d122", state: { colour: "rb-7240d", detail: "plain", window: "rect", grille: "grid", handle: "idan", handleFinish: "hf-black", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d125", state: { colour: "rb-9001d", detail: "plain", window: "strip", grille: "none", handle: "idan", handleFinish: "hf-nickel", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "strip", grille: "none", handle: "idan", handleFinish: "hf-nickel", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } }
+    { id: "d003", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d004", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
+    { id: "d012", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d015", state: { colour: "rb-9005d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d016", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
+    { id: "d022", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d026", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d029", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d030", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "cadoor", size: "standard", handing: "left-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
+    { id: "d031", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "cadoor", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
+    { id: "d034", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "nitzan", handleFinish: "hf-nickel", grab: "nograb", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
+    { id: "d038", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 3, stripeTight: false } },
+    { id: "d043", state: { colour: "rb-7126d", detail: "plain", window: "none", grille: "none", handle: "idan", handleFinish: "hf-nickel", grab: "nograb", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 3, stripeTight: false } },
+    { id: "d048", state: { colour: "rb-5103d", detail: "panel2", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d051", state: { colour: "rb-7240d", detail: "panel2", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d063", state: { colour: "rb-7240d", detail: "plain", window: "none", grille: "none", handle: "idan", handleFinish: "hf-nickel", grab: "nograb", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 4, stripeTight: false } },
+    { id: "d064", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "h", stripeCount: 7, stripeTight: false } },
+    { id: "d072", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "nitzan", handleFinish: "hf-black", grab: "nograb", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
+    { id: "d078", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "idan", handleFinish: "hf-nickel", grab: "nograb", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 11, stripeTight: false } },
+    { id: "d087", state: { colour: "rb-7021d", detail: "panel2", window: "none", grille: "none", handle: "idan", handleFinish: "hf-black", grab: "nograb", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d092", state: { colour: "rb-6219d", detail: "plain", window: "rect", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "knobplate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d097", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d099", state: { colour: "rb-7126d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d106", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "circles", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d108", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "idan", handleFinish: "hf-black", grab: "nograb", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d116", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d122", state: { colour: "rb-7240d", detail: "plain", window: "rect", grille: "grid", handle: "idan", handleFinish: "hf-black", grab: "nograb", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d125", state: { colour: "rb-9001d", detail: "plain", window: "strip", grille: "none", handle: "idan", handleFinish: "hf-nickel", grab: "nograb", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "strip", grille: "none", handle: "idan", handleFinish: "hf-nickel", grab: "nograb", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } }
   ];
 
   // js/app.js
@@ -9232,6 +9420,21 @@ ${body}
       glyph: detailGlyph,
       subs: DETAIL_SUBS,
       hint: "g.detail.h"
+    },
+    /* ⚠ THE HORIZONTAL BOW, ON THE FACE STEP SINCE 26.9.2026 — the owner's son:
+       *"I want the horizontal pull handle to be with the panels and stripes …
+       and also the horizontal handle can be comfortable with other pull
+       handles."* A list of its own (`BOWS`, `gb=`) on the doorbell's template,
+       after the face it sits on. Its finish is chosen later, on the pull-handle
+       step, as the bell's is — the finish is the door's, not a product's. */
+    {
+      key: "grab",
+      title: "g.grab",
+      in: "face",
+      kind: "hw",
+      list: () => BOWS,
+      glyph: bowGlyph,
+      hint: "g.grab.h"
     },
     {
       key: "window",
@@ -9443,7 +9646,14 @@ ${body}
         formatAgorot(byId(SPECIAL_LOCKS, "kodan").delta)
       ]
     },
-    { key: "grip", title: "step.grip.t", sub: "step.grip.s", lede: "step.grip.l", exp: "exp.grip" },
+    {
+      key: "grip",
+      title: "step.grip.t",
+      sub: "step.grip.s",
+      lede: "step.grip.l",
+      exp: "exp.grip",
+      expArgs: () => [L(byId(BOWS, "grab")), L(byId(HANDLES, "channel"))]
+    },
     {
       key: "pz",
       title: "step.pz.t",
@@ -9900,6 +10110,7 @@ ${body}
     window: "bd.window",
     grille: "bd.grille",
     handle: "bd.handle",
+    grab: "bd.grab",
     lockset: "bd.lockset",
     speciallock: "bd.speciallock",
     pirzul: "bd.pirzul",
@@ -10334,7 +10545,7 @@ ${body}
   }
   function choose(g, id) {
     noteEngaged();
-    if ((g.key === "handle" || g.key === "lockset") && id !== state[g.key]) {
+    if ((g.key === "handle" || g.key === "lockset" || g.key === "grab") && id !== state[g.key]) {
       const why = conflicts(state)[g.key][id];
       if (why) {
         if (g.key === "lockset") openClash();

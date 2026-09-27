@@ -927,26 +927,30 @@ for (const v of VIEWS) {
       if (!e) return false; e.click(); return true;
     }, [group, id]).then(hit => p.waitForTimeout(320).then(() => hit));
 
-    /* 1 · the bow against the slot. */
+    /* 1 · the bow against the slot.
+       ⚠ ON THE FACE STEP SINCE 26.9.2026, with its own reason: the bow left
+       the pull handles for a list of its own beside the panels (`BOWS`,
+       `gb=`), and the window outranks it, so its tile says the window is why
+       and its tap changes nothing — the window stays, no bow is added. */
     await load('?w=strip&d=plain&n=none&k=cylinder&s=standard&lang=he');
     const a0 = await read();
     const s1 = decodeCode(a0.code);
-    if (!s1 || s1.window !== 'strip' || s1.handle !== 'none') {
+    if (!s1 || s1.window !== 'strip' || s1.grab !== 'nograb') {
       fault(v.name, `the bow-against-the-slot fixture arrived repaired (window ${s1?.window}, `
-        + `handle ${s1?.handle}) — the check has no subject`);
+        + `bow ${s1?.grab}) — the check has no subject`);
     } else {
-      await goStep('grip');
-      const want = withLang('he', () => T('why.noRoomHandleWindow'));
-      const t = await tile('handle', 'grab');
+      await goStep('face');
+      const want = withLang('he', () => T('why.bowWindow'));
+      const t = await tile('grab', 'grab');
       const before = await read();
-      if (!t) fault(v.name, 'no bow tile on the grip step — the check has no subject');
+      if (!t) fault(v.name, 'no bow tile on the face step — the check has no subject');
       else {
         if (t.ariaDisabled !== 'true') fault(v.name, 'the bow beside the vertical slot is not greyed');
         if (t.disabled) fault(v.name, 'the bow tile is `disabled` — a keyboard cannot reach it and the tap cannot say why');
         if (t.why !== want) {
           fault(v.name, `the bow's reason reads "${t.why}" and the window is what stands in its way ("${want}")`);
         }
-        if (!(await tap('handle', 'grab'))) fault(v.name, 'the bow tile could not be tapped');
+        if (!(await tap('grab', 'grab'))) fault(v.name, 'the bow tile could not be tapped');
         const after = await read();
         const s2 = decodeCode(after.code);
         if (after.code !== before.code || after.price !== before.price) {
@@ -954,7 +958,7 @@ for (const v of VIEWS) {
             + `${after.code} ${after.price}`);
         }
         if (s2 && s2.window !== 'strip') fault(v.name, 'tapping the greyed bow took the WINDOW away');
-        if (s2 && s2.handle !== 'none') fault(v.name, `tapping the greyed bow put a ${s2.handle} on the door`);
+        if (s2 && s2.grab !== 'nograb') fault(v.name, 'tapping the greyed bow put a bow on the door');
         if (after.toast !== want) fault(v.name, `the tap on the greyed bow said "${after.toast}" and the tile says "${want}"`);
         if (after.open) fault(v.name, 'the bow opened the lever dialog');
       }

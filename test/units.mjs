@@ -2,21 +2,21 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { BELLS, glassRows, PEEPHOLES, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
+import { BELLS, BOWS, glassRows, PEEPHOLES, STRIPE_SLOTS, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { SECTION_ICON, sectionIcon, SPEC_ICON, specIcon } from '../js/icons.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
-  bellGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
+  bellGlyph, bowGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
-  bellFits, locksetGlyph, mashkofGlyph, panelUnderGlass, spawnIndexOf, spawnSpots, peepholeFits,
+  bellFits, bowFeet, bowFits, bowHome, bowPlacement, locksetGlyph, mashkofGlyph, panelUnderGlass, spawnIndexOf, spawnSpots, peepholeFits,
   peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph, stripesGlyph,
   windowGlyph,
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
-import { conflicts, detailWorked, fallbackLockset, gripObstacle, repair } from '../js/rules.js';
+import { bowObstacle, conflicts, detailWorked, fallbackLockset, gripObstacle, repair } from '../js/rules.js';
 import { describeSentence, handingWords, specLines, specRows, summaryLine } from '../js/spec.js';
 import { WORKS } from '../js/works.js';
 import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, isUntouched, toQuery, VERSION } from '../js/url-state.js';
@@ -60,13 +60,16 @@ const base = { colour: 'rb-7126d', window: 'none', grille: 'none',
                mashkof: 'mk-std', pirzul: 'pz-nickel', handleLen: 0,
                /* The pull handle's finish, 20.9.2026 — added with the field. */
                handleFinish: 'hf-nickel',
+               /* The horizontal bow, 26.9.2026 — added with the field, and the
+                  check below that every DEFAULTS key is here said so first. */
+               grab: 'nograb',
                detail: 'plain', size: 'standard', handing: 'right-in' };
 
 /** The keys a design is made of, in one place, so a new one cannot be forgotten
  *  by half the round-trip checks below. */
 const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle',
               'lockset', 'speciallock', 'bell', 'peephole', 'mashkof', 'pirzul',
-              'handleLen', 'handleFinish', 'detail'];
+              'handleLen', 'handleFinish', 'grab', 'detail'];
 
 /* ⚠ THE GUARD THAT WOULD HAVE CAUGHT TWO STALE FIXTURES, AND IT COST NOTHING.
    `base` and `everyState`'s stem are both descriptions of "a door" written by
@@ -219,10 +222,25 @@ group('short code round-trip');
      field never varied.
      This is the assertion that makes a catalogue APPEND safe, which is the
      operation the whole VERSION discipline exists to keep free. */
-  for (const [field, list] of [['colour', COLOURS], ['size', Object.keys(SIZES)],
-                               ['handing', HANDINGS], ['window', WINDOWS],
-                               ['grille', GRILLES], ['handle', HANDLES],
-                               ['lockset', LOCKSETS], ['detail', DETAILS]]) {
+  /* ⚠ EVERY KEY OF `BITS`, NOT EIGHT OF THEM — RESTATED 26.9.2026, STRONGER.
+     The list here was typed and stopped at `detail`, so the nine fields added
+     since — `speciallock`, `mashkof`, `pirzul`, `handleLen`, `stripes`, `bell`,
+     `peephole`, `handleFinish` and today's `grab` — were never asked whether
+     they still fit their width. It walks `BITS` itself now, and a field with
+     no list named here FAILS rather than being skipped, so the next field
+     cannot arrive unasked. */
+  const FIELD_LIST = {
+    colour: COLOURS, size: Object.keys(SIZES), handing: HANDINGS, window: WINDOWS,
+    grille: GRILLES, handle: HANDLES, lockset: LOCKSETS, detail: DETAILS,
+    speciallock: SPECIAL_LOCKS, mashkof: MASHKOFS, pirzul: PIRZUL, handleLen: HANDLE_LENS,
+    stripes: { length: STRIPE_SLOTS }, bell: BELLS, peephole: PEEPHOLES,
+    handleFinish: HANDLE_FINISHES, grab: BOWS,
+  };
+  for (const field of Object.keys(BITS)) {
+    if (field === 'version') continue;
+    const list = FIELD_LIST[field];
+    ok(list, `BITS.${field} has no list named in this check — a field nobody asks about fills up in silence`);
+    if (!list) continue;
     const cap = 2 ** BITS[field];
     ok(list.length <= cap,
        `${field} has ${list.length} entries and ${BITS[field]} bits (max ${cap}); `
@@ -703,7 +721,9 @@ group('a pull bar is a length');
      'the length list must hold the metre and the first step past it, and nothing between');
   /* The two flat ones never reach the bands: a channel is CUT into the leaf. */
   for (const L of HANDLE_LENS) {
-    ok(P({ ...big, handle: 'grab', handleLen: L }) === bare + 300,
+    /* RESTATED 26.9.2026 onto the bow's own field: it is `gb=grab` now, with
+       no pull handle, and still flat-priced whatever length the state holds. */
+    ok(P({ ...big, handle: 'none', grab: 'grab', handleLen: L }) === P({ ...big, handle: 'none', handleLen: L }) + 300,
        'the horizontal bow is flat-priced and must ignore the length');
     ok(P({ ...big, handle: 'channel', handleLen: L }) === bare + 1900,
        'the recessed channel is flat-priced and must ignore the length');
@@ -1437,7 +1457,27 @@ group('a grip is checked where it is actually bolted');
        rule's feet and the drawn fixings cannot part company. */
     ok(feet.length >= 1,
        `${h.id} declares no feet at all, so no position of it can ever be refused`);
-    if (h.id === 'grab') {
+    for (const f of feet) {
+      ok(Number.isFinite(f.x) && Number.isFinite(f.y) && f.r > 0,
+         `${h.id} has a foot at ${f.x},${f.y} r=${f.r} — a foot with no geometry `
+       + 'refuses nothing and permits everything');
+      /* A foot bigger than the leaf is a foot that refuses everything, which
+         reads to a customer as "you cannot put the handle anywhere". */
+      ok(f.r < (SIZES.standard.w) / 4,
+         `${h.id} is checked at a ${f.r.toFixed(1)} mm foot, which is a quarter `
+       + 'of the leaf — that refuses every position on the door');
+    }
+  }
+  /* ⚠ THE BOW'S FEET ON ITS ROSES, RESTATED 26.9.2026 ONTO ITS OWN FIELD. This
+     ran inside the loop above as `if (h.id === 'grab')`, and the bow is not in
+     `HANDLES` any more — left there, the branch would never have run again and
+     the loop would have stayed green about a fitting it no longer visits. Same
+     subject, asked of `bowFeet` against the roses `grabHandle` draws. */
+  {
+    const h = { id: 'grab' };
+    const st = { ...base, handle: 'none', grab: 'grab', lockset: 'cylinder', window: 'none' };
+    const feet = bowFeet(st);
+    {
       const svg = render(st);
       const grp = /<g data-hw="grab">([\s\S]*?)<\/g>/.exec(svg);
       const leaf = /<g id="leaf"[^>]*>[\s\S]*?<rect x="([\d.]+)" y="([\d.]+)"/.exec(svg);
@@ -1454,16 +1494,7 @@ group('a grip is checked where it is actually bolted');
         }
       }
     }
-    for (const f of feet) {
-      ok(Number.isFinite(f.x) && Number.isFinite(f.y) && f.r > 0,
-         `${h.id} has a foot at ${f.x},${f.y} r=${f.r} — a foot with no geometry `
-       + 'refuses nothing and permits everything');
-      /* A foot bigger than the leaf is a foot that refuses everything, which
-         reads to a customer as "you cannot put the handle anywhere". */
-      ok(f.r < (SIZES.standard.w) / 4,
-         `${h.id} is checked at a ${f.r.toFixed(1)} mm foot, which is a quarter `
-       + 'of the leaf — that refuses every position on the door');
-    }
+    void h;
   }
 
   /* And the fault itself, on a grip that still exists: a position that puts a
@@ -1968,6 +1999,18 @@ group('every option tile draws its own picture');
   for (const x of BELLS) check('bell', x.id, bellGlyph(x));
   for (const x of PEEPHOLES) check('peephole', x.id, peepholeGlyph(x));
   for (const x of SPECIAL_LOCKS) check('special', x.id, specialLockGlyph(x));
+  for (const x of BOWS) check('bow', x.id, bowGlyph(x));
+  /* ⚠ AND THE "NONE" TILES ACROSS LISTS, 26.9.2026. The key above carries the
+     list's name, so it can never see two different questions declined with
+     one picture — and the bow is the fourth "none" on the face and fittings
+     steps. Falsified by giving `nograb` the bell's struck ring. */
+  {
+    const nones = [['nobell', bellGlyph(byId(BELLS, 'nobell'))], ['nopeep', peepholeGlyph(byId(PEEPHOLES, 'nopeep'))],
+                   ['nograb', bowGlyph(byId(BOWS, 'nograb'))], ['nospecial', specialLockGlyph(byId(SPECIAL_LOCKS, 'nospecial'))]]
+      .map(([id, svg]) => [id, svg.replace(/\s+/g, ' ').trim()]);
+    for (let i = 0; i < nones.length; i++) for (let j = i + 1; j < nones.length; j++)
+      ok(nones[i][1] !== nones[j][1], `the ${nones[i][0]} and ${nones[j][0]} tiles are one picture for two different absences`);
+  }
   /* The stripe control's three pills, 23.9.2026 — not an option list, but
      three pictures a customer chooses between, which is this loop's subject. */
   for (const d of ['none', 'h', 'v']) check('stripes', d, stripesGlyph(d));
@@ -2840,13 +2883,21 @@ group('the bow has a home on the faces that have a place for it');
      means as a number. Then the clause that must stay true: each of those
      homes passes `gripPlacement` with its two real feet, and moving it 60 mm
      onto the moulding above is REFUSED, so the feet are doing the refusing. */
-  const at = detail => ({ ...base, handle: 'grab', detail, window: 'none', lockset: 'plate' });
+  /* ⚠ RESTATED 26.9.2026 ONTO THE BOW'S OWN FIELD, same subjects. The bow left
+     `HANDLES` for `BOWS` (`gb=`), so `handle: 'grab'` names nothing and every
+     clause here would have asked about a door with no pull handle at all. It
+     is asked now through the bow's own functions — `bowHome`, `bowPlacement`,
+     `bowFeet` — which run the SAME placement machinery the bow ran as a grip.
+     "Rung 0" is restated as what it now is by construction: the bow has one
+     home per face and no ladder, so the clause is that the home IS accepted
+     (20.9 measured every home at rung 0, which is why the ladder could go). */
+  const at = detail => ({ ...base, handle: 'none', grab: 'grab', detail, window: 'none', lockset: 'plate' });
   const mid = r => r.y + r.h / 2;
-  const home = detail => { const st = at(detail); return { st, h: gripHome(st), obs: faceObstacles(st), i: spawnIndexOf(st, gripHome(st)) }; };
+  const home = detail => { const st = at(detail); return { st, h: bowHome(st), obs: faceObstacles({ ...st, grab: 'nograb' }) }; };
   for (const d of ['plain', 'panel2', 'panel3', 'classic']) {
-    const { st, h, i } = home(d);
-    ok(i === 0, `the bow on ${d} landed on rung ${i}, not on its own ideal`);
-    ok(gripPlacement(st, h).ok, `the bow's home on ${d} is refused by the rules: ${gripPlacement(st, h).why}`);
+    const { st, h } = home(d);
+    ok(bowPlacement(st, h).ok, `the bow's home on ${d} is refused by the rules: ${bowPlacement(st, h).why}`);
+    ok(bowFits(st), `the bow does not fit its own face ${d}`);
   }
   {
     const { h, obs } = home('panel3');
@@ -2864,18 +2915,26 @@ group('the bow has a home on the faces that have a place for it');
        `the bow on the pair sits at ${h.y}, not centred on the rail between ${up && up.y + up.h} and ${lo && lo.y}`);
   }
   {
+    /* ⚠ AND THE PAIR UNDER THE SQUARE WINDOW, 26.9.2026: the upper panel is
+       glass, so the rail is between the casing's foot and the lower panel —
+       read off the obstacles, not off `PANEL_ROWS`. */
+    const st = { ...at('panel2'), window: 'rect' };
+    const h = bowHome(st), obs = faceObstacles({ ...st, grab: 'nograb' });
+    const win = obs.find(o => o.kind === 'window'), lo = obs.find(o => o.kind === 'panel');
+    ok(win && lo, 'the glazed pair has no window or no lower panel among its obstacles — this check is dead');
+    ok(win && lo && Math.abs(h.y - (win.y + win.h + lo.y) / 2) < 0.5,
+       `the bow on the glazed pair sits at ${h.y}, not centred between the casing (${win && win.y + win.h}) and the lower panel (${lo && lo.y})`);
+    ok(bowFits(st), 'the bow does not fit on the glazed pair\'s rail');
+  }
+  {
     const { st, h, obs } = home('classic');
     const band = obs.find(o => o.plate);
     ok(band, 'the Greek set has no plate among its obstacles — this check is dead');
     ok(band && Math.abs(h.y - mid(band)) < 0.5, `the bow on the Greek set sits at ${h.y}, not centred on the band (${band && mid(band)})`);
-    /* And the plate rule is what admits it: with the band a plain ring, as it
-       was, the same spot is refused — falsified by construction. */
-    const asRing = obs.map(o => o.plate ? { ...o, plate: false } : o);
-    const feet = gripFeet(st, h);
+    const feet = bowFeet(st, h);
     ok(feet.length === 2 && feet.every(f => Math.abs(f.y - mid(band)) < 0.5), 'the bow\'s feet are not on the band');
-    ok(!gripPlacement(st, { ...h, y: h.y - 60 }).ok,
+    ok(!bowPlacement(st, { ...h, y: h.y - 60 }).ok,
        'the bow lifted 60 mm onto the shelf was not refused — its feet are not being checked');
-    void asRing;
   }
 }
 
@@ -3001,12 +3060,78 @@ group('a pull handle never costs the window — 20.9.2026');
      and a gate on it would be a gate on the catalogue rather than on the
      rule. The channel arm is the `faceWorked` fix of the same day — it was 0
      before it, on every panelled door. */
-  ok(fit > 0 && swapped > 0 && refused.window > 0 && refused.channel > 0,
-     `the sweep saw ${fit} fit, ${swapped} lever swaps, ${refused.window} refused for the `
-   + `window and ${refused.channel} channels refused a worked face — every arm needs a subject`);
+  /* ⚠ THE WINDOW ARM MOVED TO THE BOW, 26.9.2026 — restated, not dropped. The
+     only pull handle the glass ever refused was the bow beside the vertical
+     slot, and the bow is not a pull handle any more: every bar that is left
+     finds room beside every window (the lever yields, or it drops). So the
+     handles' window arm is PRINTED like the face arm, and the refusal-for-the-
+     window subject is required of the bow's own sweep just below, where it
+     now lives. */
+  ok(fit > 0 && swapped > 0 && refused.channel > 0,
+     `the sweep saw ${fit} fit, ${swapped} lever swaps and ${refused.channel} channels `
+   + 'refused a worked face — every arm needs a subject');
   console.log(`  (${bases.length} doors: ${fit} handles fit, ${swapped} swap the lever, `
             + `refused for the window ${refused.window}, the face ${refused.face}, `
             + `the leaf ${refused.door}; the channel refused a worked face ${refused.channel} times)`);
+
+  /* ⚠ AND THE BOW, ITS OWN FIELD SINCE 26.9.2026, RANKED face and window >
+     bow > bar > lever. The same three clauses on the same raw doors, asked of
+     a BOW tap: (1) it never moves the window, the face or the stripes;
+     (2) when only the lever is in its way it is offered and the tap swaps the
+     lever and keeps the bow; (3) when the window or the face is in its way it
+     is greyed with a reason naming that, and a link carrying it lands with the
+     bow gone and the window and face kept. Then the bar beside it: a door
+     carrying a bar that is tapped to carry the bow too keeps the bow, always —
+     the bar yields, never the bow. Falsified by greying the bow in `conflicts`
+     for a lever (clause 2), by letting `repair` drop the window for a bow
+     intent (clause 1), and by putting the bow after the bar in `repair`. */
+  let bowFit = 0, bowSwapped = 0, bowByWindow = 0, bowByFace = 0, barYields = 0, bowKept = 0;
+  for (const st of bases) {
+    const c = conflicts(st);
+    const label = `the bow onto ${st.size}/${st.window}/${st.detail}/${st.stripeDir}${st.stripeCount}/${st.lockset}`;
+    const { state: r, said } = repair({ ...st, grab: 'grab' }, 'grab');
+    for (const key of KEEP) {
+      ok(r[key] === st[key], `${label}: a bow tap moved ${key} ${st[key]} → ${r[key]} — the window and the face outrank the bow`);
+    }
+    ok(buildable(r), `${label}: the door after the bow tap is not buildable (${said.join(' · ')})`);
+    const what = bowObstacle(st);
+    if (c.grab.grab) {
+      ok(what === 'window' || what === 'face' || what === 'door', `${label}: greyed with the ${what} in its way`);
+      ok(r.grab === 'nograb' && said.includes(T('fix.bowGone')), `${label}: greyed, and a link carrying it kept it (${said.join(' · ')})`);
+      ok(c.grab.grab === T({ window: 'why.bowWindow', face: 'why.bowFace', door: 'why.bowDoor' }[what]),
+         `${label}: the obstacle is the ${what} and the tile says "${c.grab.grab}"`);
+      if (what === 'window') bowByWindow++;
+      if (what === 'face') bowByFace++;
+    } else {
+      ok(r.grab === 'grab', `${label}: offered, and the tap did not add it (${said.join(' · ')})`);
+      if (what === 'lock') {
+        bowSwapped++;
+        ok(r.lockset !== st.lockset && said.includes(T('fix.locksetSwapped')),
+           `${label}: the lever was in the bow's way and the tap left it (${said.join(' · ')})`);
+      } else {
+        bowFit++;
+        ok(what === null && r.lockset === st.lockset, `${label}: a bow that fits changed the lockset`);
+      }
+    }
+    /* A bar already on the door, then the bow: the bow stays; the bar goes
+       only if the bow leaves it nowhere, and says so. */
+    for (const h of HANDLES) {
+      if (h.style !== 'bar' || c.grab.grab) continue;
+      const withBar = repair({ ...st, handle: h.id }, 'handle').state;
+      if (withBar.handle !== h.id) continue;
+      const { state: r2, said: said2 } = repair({ ...withBar, grab: 'grab' }, 'grab');
+      ok(r2.grab === 'grab', `${label} beside ${h.id}: the BOW went — the bar outranks nothing but the lever`);
+      for (const key of KEEP) ok(r2[key] === withBar[key], `${label} beside ${h.id}: moved ${key}`);
+      if (r2.handle !== h.id) {
+        barYields++;
+        ok(said2.includes(T('fix.gripGone')), `${label} beside ${h.id}: the bar went and the tap did not say so`);
+      } else bowKept++;
+    }
+  }
+  ok(bowFit > 0 && bowByWindow > 0 && bowKept > 0,
+     `the bow sweep saw ${bowFit} fit, ${bowByWindow} refused for the window and ${bowKept} bars kept beside it — every arm needs a subject`);
+  console.log(`  (the bow: ${bowFit} fit, ${bowSwapped} swap the lever, refused for the window ${bowByWindow}, `
+            + `the face ${bowByFace}; beside a bar, ${bowKept} bars kept and ${barYields} yielded to it)`);
 
   /* The lockset's side. */
   let greyedK = 0, offeredK = 0;
@@ -3094,10 +3219,13 @@ group('a pull bar never stands across a window or a panel — 24.9.2026');
   /* The grip's body, from the CATALOGUE's width and length and the feet the
      renderer places — not from `handleFootprint`, which is the rule's own
      number and would agree with it by construction. */
-  const bodyOf = (st, home) => {
-    const f = gripFeet(st, home);
+  /* ⚠ THE BOW IS ITS OWN FIELD SINCE 26.9.2026, so it is measured here with
+     `bow: true` — its feet off `bowFeet`, its obstacles without its own box —
+     rather than as `handle: 'grab'`, which names no pull handle any more. */
+  const bodyOf = (st, home, bow = false) => {
+    const f = bow ? bowFeet(st, home) : gripFeet(st, home);
     const h = byId(HANDLES, st.handle);
-    if (h.style === 'grab') {
+    if (bow) {
       const [a, b] = [...f].sort((p, q) => p.x - q.x);
       const ext = (b.x - a.x) * 0.175 / 0.65;
       return { x0: a.x - ext, x1: b.x + ext, y0: a.y - a.r, y1: a.y + a.r };
@@ -3109,10 +3237,10 @@ group('a pull bar never stands across a window or a panel — 24.9.2026');
       ? { x0: f[0].x - half, x1: f[0].x + half, y0: home.y - w, y1: home.y + w }
       : { x0: f[0].x - w, x1: f[0].x + w, y0: home.y - half, y1: home.y + half };
   };
-  const crosses = (st, b) => faceObstacles(st).some(ob => {
+  const crosses = (st, b, bow = false) => faceObstacles(bow ? { ...st, grab: 'nograb' } : st).some(ob => {
     const e = 0.5;
     if (!(b.x0 < ob.x + ob.w - e && b.x1 > ob.x + e && b.y0 < ob.y + ob.h - e && b.y1 > ob.y + e)) return false;
-    if (byId(HANDLES, st.handle).style !== 'grab') return true;
+    if (!bow) return true;
     const inside = (x0, y0, x1, y1) => b.x0 >= x0 - e && b.x1 <= x1 + e && b.y0 >= y0 - e && b.y1 <= y1 + e;
     if (ob.plate) return !inside(ob.x, ob.y, ob.x + ob.w, ob.y + ob.h);
     if (ob.band) return !inside(ob.x + ob.band, ob.y + ob.band, ob.x + ob.w - ob.band, ob.y + ob.h - ob.band);
@@ -3131,21 +3259,24 @@ group('a pull bar never stands across a window or a panel — 24.9.2026');
   for (const size of Object.keys(SIZES)) for (const detail of faces) for (const w of WINDOWS)
   for (const handle of ['idan', 'nitzan', 'grab']) for (const hl of (handle === 'grab' ? [0] : [0, 700]))
   for (const k of LOCKSETS) for (const handing of HANDINGS.map(x => x.id)) {
-    const st = { ...DEFAULTS, size, detail, window: w.id, handle, handleLen: hl, lockset: k.id, handing, grip: null };
-    const what = gripObstacle(st, handle);
+    const bow = handle === 'grab';
+    const st = bow
+      ? { ...DEFAULTS, size, detail, window: w.id, handle: 'none', grab: 'grab', handleLen: 0, lockset: k.id, handing, grip: null }
+      : { ...DEFAULTS, size, detail, window: w.id, handle, handleLen: hl, lockset: k.id, handing, grip: null };
+    const what = bow ? bowObstacle(st) : gripObstacle(st, handle);
     if (what === 'lock' && detail !== 'plain') swaps++;
     if (what === 'face') refusedFace++;
     if (detail === 'plain' && w.id === 'none' && k.id === 'cylinder' && what !== null) plainMiss++;
-    if (!gripFitsAnywhere(st)) continue;
+    if (!(bow ? bowFits(st) : gripFitsAnywhere(st))) continue;
     placed++;
     if (detail !== 'plain') panelPlaced++;
-    const home = gripHome(st);
-    if (crosses(st, bodyOf(st, home)) && bad++ < 5) {
+    const home = bow ? bowHome(st) : gripHome(st);
+    if (crosses(st, bodyOf(st, home, bow), bow) && bad++ < 5) {
       ok(false, `${handle} ${hl || ''} on ${detail}/${w.id}/${size}/${k.id}/${handing} stands across a frame at ${Math.round(home.x)},${Math.round(home.y)}`);
     }
     /* The bar is drawn at the length it is priced at, on every face. The
        panelled clamp stretched a 70 cm bar to 786 mm on panel2 and panel3. */
-    if (handle !== 'grab' && home.rot !== 90) {
+    if (!bow && home.rot !== 90) {
       const h = byId(HANDLES, handle);
       const leafH = SIZES[size].h - REBATE;
       const want = Math.min(handleLength(st), leafH - 320);
@@ -3158,6 +3289,30 @@ group('a pull bar never stands across a window or a panel — 24.9.2026');
     }
   }
   ok(bad === 0, `${bad} accepted grips stand across a window or a panel`);
+
+  /* ⚠ AND A BAR AND A BOW ON ONE DOOR NEVER TOUCH — 26.9.2026, new. The owner's
+     son: the horizontal pull *"can be comfortable with other pull handles"*.
+     The bow is placed first at its home; the bar is placed against the bow's
+     box (`faceObstacles`), so wherever both are drawn their bodies — measured
+     off the feet each rule places, not off either footprint — must be apart,
+     on every face, window, size, bar, length and handing. The counts are
+     gated (§5.15): a sweep that never put the two together proves nothing. */
+  let together = 0, touching = 0;
+  for (const size of Object.keys(SIZES)) for (const detail of faces) for (const w of WINDOWS)
+  for (const handle of ['idan', 'nitzan']) for (const hl of [0, 700])
+  for (const handing of HANDINGS.map(x => x.id)) {
+    const st = { ...DEFAULTS, size, detail, window: w.id, handle, handleLen: hl, grab: 'grab',
+                 lockset: 'cylinder', handing, grip: null };
+    if (!bowFits(st) || !gripFitsAnywhere(st)) continue;
+    together++;
+    const a = bodyOf(st, gripHome(st)), c = bodyOf(st, bowHome(st), true);
+    if (a.x0 < c.x1 && a.x1 > c.x0 && a.y0 < c.y1 && a.y1 > c.y0 && touching++ < 5) {
+      ok(false, `${handle} ${hl || ''} and the bow touch on ${detail}/${w.id}/${size}/${handing}`);
+    }
+  }
+  ok(together > 100 && touching === 0,
+     `${touching} of ${together} doors carrying a bar and a bow draw the two through each other`);
+  console.log(`  (${together} doors carry a bar and a bow, none touching)`);
   ok(lenBad === 0, `${lenBad} bars drawn at a length they are not priced at`);
   /* §5.15: each arm must have a subject, or the sweep passes by finding nothing. */
   ok(panelPlaced > 500, `only ${panelPlaced} grips placed on a worked face — the across-a-frame check has no subject`);
@@ -3184,14 +3339,34 @@ group('a pull bar never stands across a window or a panel — 24.9.2026');
      fit."* Every stock bar, every length, every size, glazed or solid, beside
      the cylinder — which is what the lever yields to. */
   let greekMiss = 0, greekN = 0;
+  const greekExempt = [];
   for (const size of Object.keys(SIZES)) for (const window of ['none', 'rect'])
   for (const handle of ['idan', 'nitzan', 'grab']) for (const hl of (handle === 'grab' ? [0] : [0, ...handleLensFor({ ...DEFAULTS, size })])) {
-    const st = { ...DEFAULTS, size, detail: 'classic', window, handle, handleLen: hl, lockset: 'cylinder', grip: null };
+    /* The bow through its own field since 26.9.2026 (it is not a pull handle). */
+    const st = handle === 'grab'
+      ? { ...DEFAULTS, size, detail: 'classic', window, handle: 'none', grab: 'grab', handleLen: 0, lockset: 'cylinder', grip: null }
+      : { ...DEFAULTS, size, detail: 'classic', window, handle, handleLen: hl, lockset: 'cylinder', grip: null };
     greekN++;
-    const o = gripObstacle(st, handle);
+    const o = handle === 'grab' ? bowObstacle(st) : gripObstacle(st, handle);
+    /* ⚠ ONE NAMED EXEMPTION, FOUND 26.9.2026 BY THE COMPLETE `homeKey`. This
+       clause passed for the 2 m Nitzan beside the set on the two widest leaves
+       only because the placement cache left out the bar's LENGTH, so the 2 m
+       bar was handed the short bar's answer. Asked honestly it has no rung: a
+       2000 mm run between the cornice and the plinth leaves a 15 mm band of
+       centres on a 2350 leaf, and the Nitzan's 44 mm fixings land on the
+       set's mouldings at every rung there, where the Idan's 32 fit. His words
+       were *"there should be still enough space at least for idan handle"* —
+       the Idan, every length and size, stays asserted without exception. The
+       four are named here and asserted STILL REFUSED below, so the day they
+       fit, this fails and the exemption goes (§7). */
+    const exempt = handle === 'nitzan' && hl === 2000 && (size === 'extra2' || size === 'halfextra2');
+    if (exempt) { greekExempt.push(`${size}/${window}:${o}`); continue; }
     if (o !== null && greekMiss++ < 5) ok(false, `${handle} ${hl || ''} does not fit beside the Greek set on ${size}/${window}: ${o}`);
   }
   ok(greekN > 50 && greekMiss === 0, `${greekMiss} of ${greekN} bars do not fit beside the Greek set`);
+  ok(greekExempt.length === 4 && greekExempt.every(x => !x.endsWith(':null')),
+     `the named Nitzan-2000 exemption beside the Greek set is ${greekExempt.join(', ')} — `
+   + 'if any of the four now fits, the exemption is no longer needed and must go');
   /* The clause that must stay true: a plain solid leaf with the cylinder takes every grip. */
   ok(plainMiss === 0, `${plainMiss} grips no longer fit a plain solid leaf with the cylinder`);
   console.log(`  ${placed} placed (${panelPlaced} on a worked face), ${swaps} lever swaps, ${refusedFace} refused for the face`);
@@ -3537,6 +3712,20 @@ group('the finish reaches every piece of metal');
   }
   ok(fromQuery(`?v=${VERSION}&n=nosuchbar`).notice === 'option-unknown',
      'an invented handle id must still raise a notice');
+  /* ⚠ AND THE THIRD MIGRATION, 26.9.2026 — the bow left the pull handles for
+     the face. It sits beside the two above and on their terms: quiet, a
+     finish on the same link kept, and it stands only while `gb=` is absent —
+     a link that carries both was never written by any page, so its `n=grab`
+     is a stale id and says so. */
+  {
+    const q = fromQuery(`?v=${VERSION}&n=grab&hf=hf-gold`);
+    ok(q.notice === null && q.state.grab === 'grab' && q.state.handle === 'none' && q.state.handleFinish === 'hf-gold',
+       `n=grab&hf=hf-gold must open the bow in gold, quietly — got ${q.state.handle}/${q.state.grab}/${q.state.handleFinish}, ${q.notice}`);
+    const both = fromQuery(`?v=${VERSION}&n=grab&gb=nograb`);
+    ok(both.state.grab === 'nograb' && both.notice === 'option-unknown',
+       `an explicit gb= must win over the n=grab migration, and the stale n= must say so — got ${both.state.grab}, ${both.notice}`);
+    ok(fromQuery('?n=dee&k=coral').state.lockset === 'coral', 'the bow migration took the lever off the link');
+  }
 
   /* ── WHAT THE FINISH REACHES, AND WHAT IT MUST NOT ──────────────────
      Peretz stated this as law on 30.8.2026, in two sentences:
@@ -4386,6 +4575,176 @@ group('the doorbell and the peephole');
 
    Asserted against the CYLINDER, which is the one lockset carrying no lever at
    all — so any lever left on the door had to come from the grip. */
+group('the horizontal bow is its own field on the face step — 26.9.2026');
+{
+  /* The owner's son: *"I want the horizontal pull handle to be with the panels
+     and stripes … and also the horizontal handle can be comfortable with other
+     pull handles."* On the doorbell's template — this group is the doorbell
+     group's shape for the new axis: the drawing, the price, the order, the
+     wire format, the old links. */
+  const solid = { ...base, window: 'none', detail: 'plain', handle: 'none' };
+
+  /* ── the drawing ── at most one `data-hw="handle"` per door, and it is the
+     bar's: `app.js` makes the first one draggable and writes a gp= for it, so
+     a bow tagged that way beside no bar would become a grip with nothing to
+     move — the knobPlate fault of 23.8 over again. The bow is drawn in its own
+     wrapper with the inner `data-hw="grab"` it always carried. */
+  const count = (svg, sel) => (svg.match(new RegExp(sel, 'g')) || []).length;
+  for (const [h, gb] of [['none', 'grab'], ['idan', 'grab'], ['idan', 'nograb']]) {
+    const svg = render({ ...solid, handle: h, grab: gb, lockset: 'cylinder' });
+    ok(count(svg, 'data-hw="handle"') === (h === 'none' ? 0 : 1),
+       `${h}/${gb}: ${count(svg, 'data-hw="handle"')} data-hw="handle" groups — three assertions read the ONE bar`);
+    ok(count(svg, 'data-hw="bow"') === (gb === 'grab' ? 1 : 0) && count(svg, 'data-hw="grab"') === (gb === 'grab' ? 1 : 0),
+       `${h}/${gb}: the bow is drawn ${count(svg, 'data-hw="bow"')} times`);
+  }
+
+  /* ── the price ── ₪300, and the door's one handle finish per object, like
+     the bell: a gold bar and a gold bow pay the gold twice. */
+  const P = st => shekels(priceAgorot({ ...base, ...st }));
+  ok(P({ handle: 'none', grab: 'grab' }) - P({ handle: 'none' }) === 300, 'the bow must add ₪300');
+  ok(P({ handle: 'none', grab: 'grab', handleFinish: 'hf-gold' }) - P({ handle: 'none', handleFinish: 'hf-gold' }) === 500,
+     'a gold bow must add ₪500 — ₪300 and the gold on it');
+  ok(P({ handle: 'idan', grab: 'grab', handleFinish: 'hf-gold' })
+     - P({ handle: 'idan', grab: 'nograb', handleFinish: 'hf-gold' }) === 500,
+     'beside a gold bar the gold is charged on the bow as well');
+  ok(tileAgorot('grab', { ...base, grab: 'grab' }) === 30000, 'the bow tile must print ₪300');
+
+  /* ── the order ── */
+  const rows = specRows({ ...solid, handle: 'idan', grab: 'grab' });
+  const ih = rows.findIndex(r => r.key === 'handle'), ig = rows.findIndex(r => r.key === 'grab');
+  ok(ig === ih + 1, `the bow's row must come straight after the pull handle's (handle ${ih}, bow ${ig})`);
+  ok(withLang('he', () => specLines({ ...solid, grab: 'grab' }).join('\n')).includes('מאחז אופקי'),
+     'the order must name the bow in Hebrew');
+  ok(!specRows(solid).some(r => r.key === 'grab'), 'a door without a bow must not carry its row');
+
+  /* ── the brief's "done", as one clause ── a bow on the face step and an Idan
+     on the grip step, both drawn, both priced, both in the message, on the
+     four faces that have a home for it. Falsified by dropping the bow's spec
+     row (four fail) and by making the bar yield to the bow (four fail). */
+  for (const detail of ['plain', 'panel2', 'panel3', 'classic']) {
+    const st = repair({ ...solid, detail, handle: 'idan', grab: 'grab', lockset: 'cylinder' }).state;
+    const svg = render(st);
+    const msg = withLang('he', () => specLines(st).join('\n'));
+    ok(st.handle === 'idan' && st.grab === 'grab', `${detail}: repair kept ${st.handle} and ${st.grab} — the bar and the bow both belong on it`);
+    ok(count(svg, 'data-hw="handle"') === 1 && count(svg, 'data-hw="bow"') === 1, `${detail}: the bar and the bow are not both drawn`);
+    ok(P(st) - P({ ...st, grab: 'nograb' }) === 300 && P(st) - P({ ...st, handle: 'none' }) > 0, `${detail}: the bar and the bow are not both priced`);
+    ok(msg.includes(withLang('he', () => L(byId(HANDLES, 'idan')))) && msg.includes('מאחז אופקי'), `${detail}: the message does not name both`);
+  }
+
+  /* ── and the Greek set asks about the bow at all ── `faceObstacles`
+     answered the set from its own table and returned before the fittings, so
+     on a סט יווני the bow — and the bell, the viewer and the extra lock, since
+     18.9 — were no obstacle to a bar. Measured when it was closed: 0 of 31,104
+     Greek-set placements changed, so no door moved; the bar was simply never
+     asked. Falsified by restoring the early return: the set's clause fails,
+     the plain face beside it is the control. */
+  for (const face of ['classic', 'plain']) {
+    const kinds = faceObstacles({ ...solid, detail: face, grab: 'grab', bell: 'bell', peephole: 'peep',
+                                  speciallock: SPECIAL_LOCKS.find(x => x.id !== 'nospecial').id }).map(o => o.kind);
+    ok(kinds.includes('bow') && kinds.filter(k => k === 'fitting').length === 3,
+       `${face}: the obstacle list carries ${kinds.join(',')} — the bow and three fittings must be on it`);
+  }
+
+  /* ── the wire format ── the code is still the length it was — read off the
+     encoder, never typed — and the bow round-trips a link and a code. */
+  ok(encodeCode({ ...DEFAULTS, grab: 'grab', handle: 'idan' }).length === encodeCode(DEFAULTS).length,
+     'a code with the bow is not the length of every other code');
+  /* The code is fixed-width, so the line above only says the encoder is. What
+     the bow must not do is cost a character: without its bit the payload and
+     the four-bit check still round to the same number of five-bit characters
+     the default door encodes to. Falsified by giving the bow seven bits. */
+  {
+    const payload = Object.values(BITS).reduce((a, b) => a + b, 0);
+    ok(Math.ceil((payload - BITS.grab + 4) / 5) === CODE_LEN && Math.ceil((payload + 4) / 5) === CODE_LEN,
+       `the bow's bit cost a character: ${Math.ceil((payload - BITS.grab + 4) / 5)} without it, `
+     + `${Math.ceil((payload + 4) / 5)} with it, the default door encodes to ${CODE_LEN}`);
+  }
+  for (const gb of BOWS) {
+    const st = repair({ ...solid, grab: gb.id }).state;
+    ok(fromQuery(toQuery(st)).state.grab === gb.id, `a link lost the bow ${gb.id}`);
+    const c = decodeCode(encodeCode(st));
+    ok(c && c.grab === gb.id, `a code lost the bow ${gb.id}`);
+  }
+  ok(toQuery({ ...solid, grab: 'grab' }).includes('gb=grab'), 'the bow rides in gb=');
+
+  /* ── the old links: a MIGRATION, NOT AN ALIAS — and the pair ── `n=grab` and
+     `n=dee` open no pull handle and the bow, with NO notice (withdrawing it
+     from the pull handles is our change); never a bar, which would charge the
+     customer ₪500 for a ₪300 bow in silence. An invented `n=` still says so.
+     Falsified by aliasing `grab` onto `idan` (the bar clause) and by dropping
+     the migration (the notice clause). */
+  for (const old of ['grab', 'dee']) {
+    const r = fromQuery(`?n=${old}`);
+    ok(r.state.handle === 'none' && r.state.grab === 'grab',
+       `n=${old} opened handle ${r.state.handle} and bow ${r.state.grab} — it must open no bar and the bow`);
+    ok(!r.notice, `n=${old} raised "${r.notice}" — the bow moving to the face is our change, not the customer's mistake`);
+    ok(P(r.state) - P({ ...r.state, grab: 'nograb' }) === 300 && byId(HANDLES, r.state.handle).id === 'none',
+       `n=${old} is charged as something other than a ₪300 bow`);
+  }
+  ok(fromQuery('?n=no-such-handle').notice === 'option-unknown', 'an invented n= must still raise its notice');
+  ok(fromQuery('?n=idan&gb=grab').state.handle === 'idan' && fromQuery('?n=idan&gb=grab').state.grab === 'grab',
+     'a link with a bar AND a bow must open both');
+
+  /* ── `homeKey`, BOTH WAYS ── The placement cache left out the bar's length,
+     the bell, the viewer, the extra lock — and now the bow. Asked in one order
+     it handed the second door the first door's answer. Driven here both ways
+     on doors no other group asks, each answer compared with the placement
+     asked fresh off the spawn table (the cache cannot answer that). Falsified
+     by the old key: the 2 m Nitzan beside the set on the widest leaf reads
+     "fits" after the short one was asked. */
+  const fresh = st => spawnSpots(st).some(c => gripPlacement(st, c).ok);
+  const probe = size => ({ ...DEFAULTS, size, detail: 'classic', window: 'none', handle: 'nitzan',
+                          lockset: 'cylinder', handing: 'left-in', grip: null });
+  for (const [size, order] of [['extra2', [0, 2000]], ['halfextra2', [2000, 0]]]) {
+    for (const hl of order) {
+      const st = { ...probe(size), handleLen: hl };
+      ok(gripFitsAnywhere(st) === fresh(st),
+         `${size}: the ${hl || 'stock'} Nitzan asked after the ${order[0] === hl ? 'nothing' : order[0]} one reads `
+       + `${gripFitsAnywhere(st)} from the cache and ${fresh(st)} fresh — the placement key leaves the length out`);
+    }
+  }
+  /* And COMPLETENESS, one way over every field: each field of the state
+     varied on its own across its list, on 1,512 doors, the cached answer
+     against the fresh one — 67,392 asks, about three seconds. Measured on
+     26.9.2026 by dropping one field at a time from the key: size 3,940
+     disagreements, handle 10,524, length 1,952, lockset 2,320, face 11,089,
+     window 7,218. The other five — handing, bell, viewer, extra lock and the
+     bow — disagree nowhere in this sweep, because none of their boxes stands
+     where a bar goes today; they are in the key because `faceObstacles`,
+     which the placement reads, carries their boxes, and a key keyed on what
+     happens to bind today is the key this group caught. Falsified by the old
+     key: 889 disagreements in the suite's order, every one a pair of doors
+     that differ only in the bar's length. */
+  {
+    const ids = l => l.map(o => o.id ?? o);
+    const VARY = {
+      size: Object.keys(SIZES), handle: ids(HANDLES), handleLen: HANDLE_LENS, lockset: ids(LOCKSETS),
+      detail: ids(DETAILS), window: ids(WINDOWS), handing: ids(HANDINGS), bell: ids(BELLS),
+      peephole: ids(PEEPHOLES), speciallock: ids(SPECIAL_LOCKS), grab: ids(BOWS),
+      colour: ids(COLOURS).slice(0, 3), grille: ids(GRILLES).slice(0, 4), mashkof: ids(MASHKOFS),
+      pirzul: ids(PIRZUL), handleFinish: ids(HANDLE_FINISHES),
+      stripeDir: ['none', 'h', 'v'], stripeCount: [0, 1, 3], stripeTight: [false, true],
+    };
+    ok(Object.keys(DEFAULTS).every(k => k === 'grip' || VARY[k]),
+       `the completeness sweep does not vary ${Object.keys(DEFAULTS).filter(k => k !== 'grip' && !VARY[k])} — a new field is a field the key may need`);
+    let asked = 0; const wrong = {};
+    for (const size of VARY.size) for (const handle of ['idan', 'nitzan', 'channel']) for (const handleLen of [0, 2000])
+    for (const detail of VARY.detail) for (const window of ['none', 'rect', 'strip']) for (const handing of VARY.handing) {
+      const b = { ...DEFAULTS, size, handle, handleLen, detail, window, handing, lockset: 'cylinder', grip: null };
+      for (const [f, vals] of Object.entries(VARY)) for (const v of vals) {
+        const st = { ...b, [f]: v };
+        let cached, now;
+        try { cached = gripFitsAnywhere(st); now = fresh(st); } catch { continue; }   // not a door the catalogue can draw
+        asked++;
+        if (cached !== now) wrong[f] = (wrong[f] || 0) + 1;
+      }
+    }
+    ok(asked > 60000, `the completeness sweep asked only ${asked} doors`);
+    ok(!Object.keys(wrong).length, `the placement cache disagrees with a fresh placement: ${JSON.stringify(wrong)} — a field the placement reads is missing from homeKey`);
+    console.log(`  (homeKey: ${asked} single-field variations, cached and fresh agree on every one)`);
+  }
+}
+
 group('a grip never draws lock furniture');
 for (const h of HANDLES) {
   const svg = render({ ...base, handle: h.id, lockset: 'cylinder' });
@@ -4882,6 +5241,7 @@ group('a handle the customer moved reaches the order');
     speciallock: other(SPECIAL_LOCKS, DEFAULTS.speciallock),
     bell:        other(BELLS, DEFAULTS.bell),
     peephole:    other(PEEPHOLES, DEFAULTS.peephole),
+    grab:        other(BOWS, DEFAULTS.grab),
     mashkof:     other(MASHKOFS, DEFAULTS.mashkof),
     pirzul:      other(PIRZUL, DEFAULTS.pirzul),
     handleFinish: other(HANDLE_FINISHES, DEFAULTS.handleFinish),

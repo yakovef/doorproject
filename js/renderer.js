@@ -16,7 +16,7 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { byId, COLOURS, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
+import { BOWS, byId, COLOURS, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
          glassRows, handleLength, LOCKSETS, MASHKOF_MAX, MASHKOF_PARTS, MASHKOFS, PEEPHOLES, PIRZUL,
          REBATE, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS } from './catalog.js';
 import { L, T } from './copy.js';
@@ -3357,6 +3357,11 @@ export function render(state) {
 
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
+    ${/* The bow FIRST, at its one home — face and window > bow > bar > lever —
+          and the bar after it, placed against the bow's box. */''}
+    ${state.grab === 'grab'
+        ? bowArt(state, lockX, inward, lockset, y0, leafH, leverDir, paint, centreX, leafW)
+        : ''}
     ${gripArt(handle, handleX, handleY, leafH, leverDir, paint,
               centreX, leafW, y0, false, place.rot)}
     ${locksetArt(lockset, lockX, y(lockAff(lockset)), leverDir)}
@@ -4314,87 +4319,15 @@ const memo = (fn, key) => {
  * question in node. `npm test` checks the answers against the mouldings the
  * browser actually draws, which is what keeps the two honest.
  */
-export const faceObstacles = memo(function faceObstacles(state) {
-  const size = SIZES[state.size] || SIZES.standard;
-  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-  const detail = byId(DETAILS, state.detail);
-  const openings = apertureLayout(byId(WINDOWS, state.window), leafW, leafH);
-  /* ⚠ THE SAME BAND THE DRAWING CASES IT IN. This said MOULD_BAND flat, and
-     for the Greek set the drawing now says 59: an obstacle eleven
-     millimetres bigger than the thing it describes is the §5 shape again. */
-  const paneBand = detail.classic ? CLASSIC_BAND : MOULD_BAND;
-  const paneFoot = paneBand;
-  const out = openings.map(o => ({
-    kind: 'window', x: o.x - paneBand, y: o.top - paneBand,
-    w: o.w + paneBand * 2, h: o.h + paneBand + paneFoot,
-  }));
-
-  /* ⚠ THE CLASSICAL SET IS NOT A PANELLED FACE PLUS A WINDOW, and asking the
-     panel arithmetic below about it gives four wrong answers at once.
-     It has `panel: true`, so before this branch existed the code fell through
-     and produced ONE obstacle from `PANEL_ROWS.lone` — 0.68 to 0.90 of the
-     leaf against the set's own 0.665 to 0.886, and an inset of 0.224 against
-     0.228. Fifteen millimetres out in three places, which is the same drift
-     the comment below this one is about, arriving from a new direction.
-     And the three misses are worse than the near-miss: the CORNICE, the
-     FRIEZE and the corbelled SHELF are not panels, `panel` does not describe
-     them, and nothing here knew they were on the door at all — so `npm run
-     collide` would happily stand a pull bar through the middle of the shelf.
-     Read off the set's own tables, like everything else about it. */
-  if (detail.classic) {
-    /* ⚠ OFF `classicPieces`, THE SAME TABLE `classicSet` DRAWS FROM. It used
-       to be a second list written here, and that is the §5 shape exactly: the
-       band's columns had already drifted — the rules said the shelf's span,
-       the drawing had narrowed the face to 0.286-0.714 and hung the brackets
-       outside it. Nothing caught that, because `collide.mjs`'s drift reader
-       had no way to see a moulding at all. Both ends of that are fixed
-       together or neither is worth fixing. */
-    for (const q of classicPieces(leafW, leafH, openings.length > 0)) {
-      /* ⚠ THE BAND IS A PLATE, NOT A RING — 20.9.2026. The shelf's band is
-         the raised face the set's own pull was bolted through ("the band
-         moulding and its three tablets ARE the backplate"), and as a 70 mm
-         ring its hole was one millimetre tall, so no fitting could stand on
-         it and the bow Peretz wants there was refused by the rules the moment
-         it had feet. `plate: true` says a foot WHOLLY on it is fine and a
-         foot half off its edge is not — see `footHits`. */
-      out.push({ kind: q.kind, x: q.x, y: q.y, w: q.w, h: q.h, band: MOULD_BAND,
-                 ...(q.piece === 'band' ? { plate: true } : {}) });
-    }
-    return out;
-  }
-
-  /* ⚠ `win.panel` IS ASKED HERE TOO, 14.9.2026, AND FORGETTING IT WOULD HAVE
-     BEEN THE §5 SHAPE AGAIN. A square light brings its own lower panel now and
-     the face on such a door is `plain`, so asking only `detail.panel` would
-     have told every placement rule in the project that the bottom of the leaf
-     was bare timber while the drawing had a moulded rectangle on it — a pull
-     bar's feet bolted through a panel frame, on every plain door with a square
-     window, with `npm run collide` the only thing that would have noticed.
-     It is the same one-line omission as in `panelFits`, which is why both read
-     the same two flags. The row arithmetic below is already the glazed one:
-     `openings.length` is non-zero here by construction. */
-  /* ⚠ `win.panel` IS ASKED HERE TOO, 14.9.2026 — a square light brings its
-     own lower panel on a plain face, and a placement rule told the bottom of
-     the leaf was bare timber would bolt a bar's feet through a panel frame.
-     ⚠ AND THE ROWS ARE `faceRowsOn`'s SINCE 26.9.2026, not arithmetic of this
-     function's own. This block computed the inset and the lone row itself —
-     the second description of the panel, which drifted 19 mm from the drawing
-     once (`npm run collide` caught it) — and asked `hasUpperPanel` to decide
-     between the face's rows and the lone one. Under glass the pair now keeps
-     its lower panel, and a copy of the old arithmetic here would have told
-     every placement rule that panel was the window's lone one, 20 mm off each
-     side. One function draws it and the same function declares it. */
-  {
-    const f = faceRowsOn(detail, byId(WINDOWS, state.window), openings, leafW, leafH);
-    for (const [t, b] of f.rows) {
-      const r = { kind: 'panel', x: f.inset, y: leafH * t,
-                  w: leafW - f.inset * 2, h: leafH * (b - t), band: MOULD_BAND };
-      /* `moulding` draws nothing at all below this size, and an obstacle that
-         is not on the door would refuse a handle for a frame nobody can see. */
-      if (r.w > MOULD_BAND * 2.2 && r.h > MOULD_BAND * 2.2) out.push(r);
-    }
-  }
-
+/* The bolted-on fittings and the bow, as obstacles — one list for every face.
+   ⚠ A FUNCTION OF ITS OWN SINCE 26.9.2026, BECAUSE THE GREEK SET NEVER GOT
+   THEM. `faceObstacles` answers the set from its own table and returned
+   before this block, so on a סט יווני the bell, the viewer, the extra lock and
+   — from today — the bow were not obstacles at all: a bar beside the bow on
+   the set was never asked whether it stood on it. Both branches read this
+   now. */
+function fittingBoxes(state, leafW, leafH) {
+  const out = [];
   /* ⚠ AND THE FOUR BOLTED-ON FITTINGS, WHICH NOTHING HERE KNEW ABOUT UNTIL
      18.9.2026. This list held windows, mouldings and the classical set — the
      things a face is MADE of — and the owner's rule for the spawn table is
@@ -4441,13 +4374,107 @@ export const faceObstacles = memo(function faceObstacles(state) {
                x: KEYWAY_BACKSET - sp.w / 2, y: leafH - SPECIAL_AFF - sp.h / 2,
                w: sp.w, h: sp.h });
   }
+  /* ⚠ AND THE HORIZONTAL BOW, SINCE 26.9.2026 — the bar's placement treats the
+     bow's drawn box as an obstacle, which is the "bow > bar" half of the
+     ranking. `band: 0`: it is a bolted object, nothing to stand inside. Not
+     when the question is the bow's own home (`bowState` clears `grab`). */
+  if (state.grab === 'grab' && state.handle !== BOW_AS_GRIP) {
+    out.push({ kind: 'bow', band: 0, ...bowBox(state, leafW, leafH) });
+  }
+  return out;
+}
+
+export const faceObstacles = memo(function faceObstacles(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const detail = byId(DETAILS, state.detail);
+  const openings = apertureLayout(byId(WINDOWS, state.window), leafW, leafH);
+  /* ⚠ THE SAME BAND THE DRAWING CASES IT IN. This said MOULD_BAND flat, and
+     for the Greek set the drawing now says 59: an obstacle eleven
+     millimetres bigger than the thing it describes is the §5 shape again. */
+  const paneBand = detail.classic ? CLASSIC_BAND : MOULD_BAND;
+  const paneFoot = paneBand;
+  const out = openings.map(o => ({
+    kind: 'window', x: o.x - paneBand, y: o.top - paneBand,
+    w: o.w + paneBand * 2, h: o.h + paneBand + paneFoot,
+  }));
+
+  /* ⚠ THE CLASSICAL SET IS NOT A PANELLED FACE PLUS A WINDOW, and asking the
+     panel arithmetic below about it gives four wrong answers at once.
+     It has `panel: true`, so before this branch existed the code fell through
+     and produced ONE obstacle from `PANEL_ROWS.lone` — 0.68 to 0.90 of the
+     leaf against the set's own 0.665 to 0.886, and an inset of 0.224 against
+     0.228. Fifteen millimetres out in three places, which is the same drift
+     the comment below this one is about, arriving from a new direction.
+     And the three misses are worse than the near-miss: the CORNICE, the
+     FRIEZE and the corbelled SHELF are not panels, `panel` does not describe
+     them, and nothing here knew they were on the door at all — so `npm run
+     collide` would happily stand a pull bar through the middle of the shelf.
+     Read off the set's own tables, like everything else about it. */
+  if (detail.classic) {
+    /* ⚠ OFF `classicPieces`, THE SAME TABLE `classicSet` DRAWS FROM. It used
+       to be a second list written here, and that is the §5 shape exactly: the
+       band's columns had already drifted — the rules said the shelf's span,
+       the drawing had narrowed the face to 0.286-0.714 and hung the brackets
+       outside it. Nothing caught that, because `collide.mjs`'s drift reader
+       had no way to see a moulding at all. Both ends of that are fixed
+       together or neither is worth fixing. */
+    for (const q of classicPieces(leafW, leafH, openings.length > 0)) {
+      /* ⚠ THE BAND IS A PLATE, NOT A RING — 20.9.2026. The shelf's band is
+         the raised face the set's own pull was bolted through ("the band
+         moulding and its three tablets ARE the backplate"), and as a 70 mm
+         ring its hole was one millimetre tall, so no fitting could stand on
+         it and the bow Peretz wants there was refused by the rules the moment
+         it had feet. `plate: true` says a foot WHOLLY on it is fine and a
+         foot half off its edge is not — see `footHits`. */
+      out.push({ kind: q.kind, x: q.x, y: q.y, w: q.w, h: q.h, band: MOULD_BAND,
+                 ...(q.piece === 'band' ? { plate: true } : {}) });
+    }
+    return out.concat(fittingBoxes(state, leafW, leafH));
+  }
+
+  /* ⚠ `win.panel` IS ASKED HERE TOO, 14.9.2026, AND FORGETTING IT WOULD HAVE
+     BEEN THE §5 SHAPE AGAIN. A square light brings its own lower panel now and
+     the face on such a door is `plain`, so asking only `detail.panel` would
+     have told every placement rule in the project that the bottom of the leaf
+     was bare timber while the drawing had a moulded rectangle on it — a pull
+     bar's feet bolted through a panel frame, on every plain door with a square
+     window, with `npm run collide` the only thing that would have noticed.
+     It is the same one-line omission as in `panelFits`, which is why both read
+     the same two flags. The row arithmetic below is already the glazed one:
+     `openings.length` is non-zero here by construction. */
+  /* ⚠ `win.panel` IS ASKED HERE TOO, 14.9.2026 — a square light brings its
+     own lower panel on a plain face, and a placement rule told the bottom of
+     the leaf was bare timber would bolt a bar's feet through a panel frame.
+     ⚠ AND THE ROWS ARE `faceRowsOn`'s SINCE 26.9.2026, not arithmetic of this
+     function's own. This block computed the inset and the lone row itself —
+     the second description of the panel, which drifted 19 mm from the drawing
+     once (`npm run collide` caught it) — and asked `hasUpperPanel` to decide
+     between the face's rows and the lone one. Under glass the pair now keeps
+     its lower panel, and a copy of the old arithmetic here would have told
+     every placement rule that panel was the window's lone one, 20 mm off each
+     side. One function draws it and the same function declares it. */
+  {
+    const f = faceRowsOn(detail, byId(WINDOWS, state.window), openings, leafW, leafH);
+    for (const [t, b] of f.rows) {
+      const r = { kind: 'panel', x: f.inset, y: leafH * t,
+                  w: leafW - f.inset * 2, h: leafH * (b - t), band: MOULD_BAND };
+      /* `moulding` draws nothing at all below this size, and an obstacle that
+         is not on the door would refuse a handle for a frame nobody can see. */
+      if (r.w > MOULD_BAND * 2.2 && r.h > MOULD_BAND * 2.2) out.push(r);
+    }
+  }
+
+  out.push(...fittingBoxes(state, leafW, leafH));
   return out;
   /* ⚠ AND THE MEMO KEY GREW BY THREE FIELDS. It was `size|detail|window`, and
      an obstacle list that depends on the bell, the viewer and the extra lock
      while being cached on three keys that ignore them is the quietest defect
      this file knows how to produce: the first door of a session would decide
      the answer for every door after it. */
-}, st => `${st.size}|${st.detail}|${st.window}|${st.bell}|${st.peephole}|${st.speciallock}`);
+  /* ⚠ AND BY THE BOW AND THE HANDING, 26.9.2026: the bow's box is an obstacle
+     now, and it sits on the side of the leaf away from the closing edge. */
+}, st => `${st.size}|${st.detail}|${st.window}|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}|${st.handing}|${st.handle === BOW_AS_GRIP}`);
 
 /**
  * Is there room under the glazing for the panel the customer is paying for?
@@ -4698,8 +4725,18 @@ export const panelFits = state => !panelUnderGlass(state);
    ⚠ A KEY THAT LEAVES SOMETHING OUT IS A WRONG ANSWER CACHED. If a new field
    ever moves a handle, it belongs in this line, and the symptom of forgetting
    would be a door drawn with the previous door's handle position. */
+/* ⚠ AND IT HAD ALREADY LEFT FOUR THINGS OUT — found 26.9.2026, before the bow
+   made it five. `gripHome` reads the handle's LENGTH (`gripOf`), and
+   `faceObstacles` — which every placement is checked against — reads the
+   פעמון, the עינית and the extra lock; none was in this key. Demonstrated: an
+   Idan at `handleLen` 2000 on `extra2`, asked after the same door at
+   `handleLen` 0, was handed the short bar's cached home, and the reverse order
+   gave a different answer — a refusal or an acceptance decided by which door
+   the session happened to ask about first. The key is now every field the
+   placement reads, and the bow, whose box is an obstacle to the bar. */
 const homeKey = st =>
-  `${st.size}|${st.handle}|${st.lockset}|${st.detail}|${st.window}|${st.handing}`;
+  `${st.size}|${st.handle}|${st.handleLen}|${st.lockset}|${st.detail}|${st.window}|${st.handing}`
+  + `|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}`;
 const HOME_CACHE = new Map();
 
 export function gripHome(state) {
@@ -4768,6 +4805,23 @@ function gripIdeal(state) {
       const rows = panelRows(detail);
       if (rows.length >= 3) return leafH * (rows[1][0] + rows[1][1]) / 2;
       if (rows.length === 2) return leafH * (rows[0][1] + rows[1][0]) / 2;
+    }
+    /* ⚠ AND UNDER A WINDOW, THE RAIL IS BETWEEN THE CASING AND THE PANEL THE
+       FACE KEEPS — 26.9.2026. The pair beside the square window keeps its
+       lower panel and the glass takes the upper one, so "the rail between the
+       two panels" is now the flat between the window's casing foot and the
+       lower panel's top: 1148 to 1353 mm on the standard leaf, centred at
+       1250. Read off `faceObstacles`' own rectangles — the ones the placement
+       is then checked against — rather than off `PANEL_ROWS`, which knows
+       nothing about the glass. A face that keeps no rows under glass (plain,
+       with the window's lone panel under it) keeps the corpus's 0.59. */
+    if (detail.panel && (detail.keeps || []).length && glassRows(byId(WINDOWS, state.window))) {
+      const obs = faceObstacles(state);
+      const wins = obs.filter(o => o.kind === 'window'), kept = obs.filter(o => o.kind === 'panel');
+      if (wins.length && kept.length) {
+        const foot = Math.max(...wins.map(o => o.y + o.h)), top = Math.min(...kept.map(o => o.y));
+        if (top > foot) return (foot + top) / 2;
+      }
     }
     return leafH * GRAB.fromTop;
   };
@@ -5046,7 +5100,50 @@ function specialLockArt(special, cx, cy, dir) {
  * nobody sees. So the length is resolved ONCE, here, and every reader
  * downstream gets a handle whose `len` is already true.
  */
-const gripOf = state => ({ ...byId(HANDLES, state.handle), len: handleLength(state) });
+const gripOf = state => state.handle === BOW_AS_GRIP
+  ? { ...byId(BOWS, 'grab'), len: 0 }
+  : ({ ...byId(HANDLES, state.handle), len: handleLength(state) });
+
+/* ── THE HORIZONTAL BOW, A PIECE OF THE FACE — 26.9.2026 ─────────────────
+   The owner's son: *"I want the horizontal pull handle to be with the panels
+   and stripes … and also the horizontal handle can be comfortable with other
+   pull handles."* So the bow left `HANDLES` for `BOWS` and a door can carry it
+   beside a bar. Everything this file knew about placing it — `gripIdeal`'s
+   homes, `gripFeet`'s two roses, `gripPlacement`'s whole-object and lock
+   checks, the `GRAB` table, `grabHandle` — was written for it as a grip and
+   is right; so the bow is asked those same questions as a grip, through a
+   state whose `handle` is the bow, rather than through a second copy of the
+   geometry (§5.10). `BOW_AS_GRIP` is not an id anywhere, and the state that
+   carries it never leaves this file.
+   ⚠ ONE HOME PER FACE AND NO LADDER. The 20.9 round measured every bow home
+   at rung 0 of `SPAWN`, so the bow is asked at its ideal and nowhere else: it
+   stands there or it is refused. ⚠ AND ITS OWN BOX IS NOT AN OBSTACLE TO
+   ITSELF, and the bar is not an obstacle to it: the ranking settled in chat is
+   face and window > bow > bar > lever, so the bow is placed against the face,
+   the window and the lock furniture, and the BAR is then placed against the
+   bow (`faceObstacles` carries the bow's box). */
+const BOW_AS_GRIP = '(bow)';
+const bowState = state => ({ ...state, handle: BOW_AS_GRIP, handleLen: 0, grab: 'nograb' });
+/** Where the bow stands on this door: its one home, leaf-local, `x` from the
+ *  closing edge (the bow's outboard tip) and `y` down from the head. */
+export const bowHome = state => gripIdeal(bowState(state));
+/** Whether the bow stands at its home (or at `place`, which only a test asks
+ *  — the customer positions nothing), and if not, the placement's reason. */
+export const bowPlacement = (state, place = null) =>
+  gripPlacement(bowState(state), place || bowHome(state));
+/** The bow's two bolted feet — its roses — where it stands. */
+export const bowFeet = (state, place = null) => gripFeet(bowState(state), place || bowHome(state));
+export const bowFits = state =>
+  !gripClashesLockset(bowState(state)) && bowPlacement(state).ok;
+/** The bow's box on this leaf, in the leaf-left coordinates `faceObstacles`
+ *  works in — off the same footprint `gripPlacement` measures it with. */
+function bowBox(state, leafW, leafH) {
+  const p = bowHome(state);
+  const f = handleFootprint(byId(BOWS, 'grab'), leafH);
+  const gx0 = p.x - f.out, gx1 = p.x + f.in;
+  const x0 = hingeLeftOf(state) ? leafW - gx1 : gx0;
+  return { x: x0, y: p.y - f.vy, w: gx1 - gx0, h: f.vy * 2 };
+}
 
 /** Is this grip cut into the leaf rather than bolted onto it? */
 export const gripIsFixed = state => !!gripOf(state).fixed;
@@ -5285,6 +5382,7 @@ export function gripPlacement(state, place = null) {
            where to look and looking at the wrong thing. */
         return bad(ob.kind === 'window'   ? T('why.feetOnWindow')
                  : ob.kind === 'moulding' ? T('why.feetOnFace')
+                 : ob.kind === 'bow'      ? T('why.gripOnBow')
                                           : T('why.feetOnPanel'));
       }
     }
@@ -5444,6 +5542,7 @@ export function gripPlacement(state, place = null) {
     }
     return bad(ob.kind === 'window' ? T('why.gripCrossesWindow')
              : ob.kind === 'moulding' ? T('why.feetOnFace')
+             : ob.kind === 'bow'      ? T('why.gripOnBow')
                                       : T('why.feetOnPanel'));
   }
 
@@ -8286,6 +8385,9 @@ export function gripClashesGlass(state) {
  * LEAF and ignores the standoff entirely, so on a narrow leaf its bow reaches
  * back past a long lever. Asked directly rather than assumed.
  */
+/* ⚠ THE BOW'S OWN CLAUSE SINCE 26.9.2026. No pull handle is `grab` any more,
+   so this answers only for the bow, asked through `bowState` by `bowFits` —
+   and when it fires the LEVER yields (`repair`): bow > lever. */
 export function gripClashesLockset(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const handle = gripOf(state);
@@ -8483,6 +8585,36 @@ function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled
              data-cx="${cx}" data-cy="${cy}" data-aty="${atY}"
              data-out="${box.out}" data-in="${box.in}"
              data-vy="${box.vy}" data-rot="${rot}"${turned}>${art}</g>`;
+}
+
+/**
+ * The horizontal bow on the door, 26.9.2026 — drawn by the same `grabHandle`
+ * it always was, at `bowHome`, in the door's one handle finish (`gripHard`,
+ * `gripSoft`).
+ *
+ * ⚠ `data-hw="bow"`, NOT `"handle"`. Three assertions and `tools/collide.mjs`
+ * read the ONE `data-hw="handle"` on a door as its pull handle, and a door
+ * can carry a bar and a bow now; a second `"handle"` would have them measuring
+ * whichever came first. The inner `data-hw="grab"` that `grabHandle` writes is
+ * unchanged, so everything that already found the bow by it still does. The
+ * same `data-cx`/`data-out`/`data-in`/`data-vy` the handle wrapper carries, so
+ * a tool reading one reads the other.
+ */
+function bowArt(state, lockX, inward, lockset, y0, leafH, dir, paint, centreX, leafW) {
+  const bow = byId(BOWS, 'grab');
+  const p = bowHome(state);
+  const cx = lockX + inward * (p.x - lockBackset(bow, lockset));
+  const cy = y0 + p.y;
+  const drawn = GRIP_ART.grab(bow, { cx, cy, dir, paint, centreX, leafW, leafH, y0, panelled: false });
+  const art = typeof drawn === 'string' ? drawn : drawn && drawn.svg;
+  const own = typeof drawn === 'string' ? null : drawn && drawn.box;
+  if (!art) return '';
+  const foot = handleFootprint(bow, leafH);
+  const atY = own ? own.y + own.h / 2 : cy;
+  return `<g data-hw="bow" data-style="grab" data-len="${foot.vy * 2}"
+             data-cx="${cx}" data-cy="${cy}" data-aty="${atY}"
+             data-out="${foot.out}" data-in="${foot.in}"
+             data-vy="${foot.vy}" data-rot="0">${art}</g>`;
 }
 
 /**
@@ -10493,6 +10625,41 @@ export function bellGlyph(x) {
   }[x.id] || '';
   return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">${art}</g>
+  </svg>`;
+}
+
+/**
+ * The horizontal bow's tile, 26.9.2026 — on the face step now, a list of its
+ * own. The picture is `FITTING_GLYPH.grab`, the silhouette that traces what the
+ * door draws (a straight spindle, two posts inboard, the stems and beads), so
+ * the tile cannot come to show another object; it is painted from `BAR_RAMP`
+ * — the round tube's measured section, the same table the door's bars read —
+ * turned to run ACROSS the bow, in nickel, as every grip tile is: the finish is
+ * the customer's and its own tiles show the metals.
+ * ⚠ THE `nograb` TILE IS NOT THE `nobell` TILE. "None" beside "none" on two
+ * different questions should say which absence it is: this one is the bow's
+ * outline struck through, where the bell's is a ring struck through. */
+export function bowGlyph(x) {
+  if (x.id === 'nograb') {
+    return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">
+    <rect x="-56" y="-10" width="112" height="20" rx="10" fill="none" stroke="currentColor"
+          stroke-width="6" opacity=".3"/>
+    <circle cx="-34" cy="0" r="14" fill="none" stroke="currentColor" stroke-width="5" opacity=".3"/>
+    <circle cx="34" cy="0" r="14" fill="none" stroke="currentColor" stroke-width="5" opacity=".3"/>
+    <path d="M-34 34 L34 -34" stroke="currentColor" stroke-width="7" opacity=".45"/></g>
+  </svg>`;
+  }
+  const { box, art } = FITTING_GLYPH.grab();
+  const [x0, y0, x1, y1] = box;
+  const w = x1 - x0, side = w;                     // square tile, the bow across its middle
+  const id = `bowg-${x.id}`;
+  const ramp = barRamp('barTube', FINISH_TONES.steel, id)
+    .replace('x1="0" y1="0" x2="1" y2="0"', 'x1="0" y1="0" x2="0" y2="1"');
+  return `<svg viewBox="${x0} ${-side / 2} ${w} ${side}" class="glyph glyph--hw" aria-hidden="true">
+    <defs>${ramp}</defs>
+    <g fill="url(#${id})" stroke="currentColor" stroke-opacity=".45" stroke-width="1"
+       vector-effect="non-scaling-stroke">${art}</g>
   </svg>`;
 }
 

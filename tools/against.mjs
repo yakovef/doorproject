@@ -167,7 +167,13 @@ for (const g of GRILLES) {
   sheet(g.id, cells);
 }
 
-for (const h of HANDLES) {
+/* ⚠ THE BOW IS NOT IN `HANDLES` SINCE 26.9.2026 — it is its own field, `gb=`
+   — so walking `HANDLES` alone would have stopped writing `against-grab.png`
+   and left last round's sheet in the folder looking current. It is walked
+   here as the one extra entry, drawn with no pull handle and the bow. */
+const GRIPS = [...HANDLES.map(h => ({ id: h.id, q: `n=${h.id}` })),
+               { id: 'grab', q: 'gb=grab&n=none' }];
+for (const h of GRIPS) {
   const ids = GRIP_DOORS[h.id];
   if (!ids || (want && want !== h.id)) continue;
   const cells = [];
@@ -176,7 +182,7 @@ for (const h of HANDLES) {
     if (c) cells.push({ img: c.img, x: c.cx, y: c.cy, w: c.cw, h: c.ch,
                         label: id + (c.sure ? '' : '?') });
   }
-  const img = await ours(`c=rb-9302d&w=none&g=none&n=${h.id}&k=cylinder&d=plain&s=standard&h=right-in`,
+  const img = await ours(`c=rb-9302d&w=none&g=none&${h.q}&k=cylinder&d=plain&s=standard&h=right-in`,
     (leaf) => ({ x: leaf.x, y: leaf.y, width: leaf.width, height: leaf.height }));
   cells.push({ img, x: 0, y: 0, w: img.w, h: img.h, label: 'ours', ours: true });
   sheet(h.id, cells);

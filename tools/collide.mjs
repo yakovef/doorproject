@@ -99,19 +99,28 @@ const cases = [];
    deliberately a SUBSET: the tight cases plus the widest, not all six. The
    subset is now standard, both single חריגות, the דו כנפי and its widest
    band, which is the extremes of both families. */
+/* ⚠ AND BAR × BOW, SINCE 26.9.2026: the bow is its own field and a door can
+   carry both, so every grip × lockset × window is swept with the bow off and
+   on. The bow is drawn first and the bar placed against it — this is where a
+   real getBBox says whether the two bodies ever touch. */
+let bowCases = 0;
 for (const h of HANDLES) for (const k of LOCKSETS) for (const w of WINDOWS)
-  for (const sz of SWEEP_SIZES) for (const hd of ['right-in', 'left-in']) {
+  for (const sz of SWEEP_SIZES) for (const hd of ['right-in', 'left-in'])
+  for (const gb of ['nograb', 'grab']) {
     const st = {
       colour: 'rb-0097d', window: w.id, grille: 'none',
       handle: h.id, lockset: k.id, detail: 'plain',
-      size: sz, handing: hd,
+      size: sz, handing: hd, grab: gb,
     };
     /* Only designs the rules allow: a collision inside a combination the site
        already refuses is not a bug, it is the refusal working. */
     const c = conflicts(st);
-    if (c.handle[h.id] || c.lockset[k.id] || c.window[w.id]) continue;
+    if (c.handle[h.id] || c.lockset[k.id] || c.window[w.id] || c.grab[gb]) continue;
     cases.push(st);
+    if (gb === 'grab') bowCases++;
   }
+console.log(`  (${cases.length} base designs, ${bowCases} of them carrying the bow)`);
+if (!bowCases) { console.error('  ✗ no swept design carries the bow — bar × bow is unmeasured'); process.exit(1); }
 if (deep) {
   /* Every face detail against every window, on both sizes and both handings.
      The fixture pairs the bar with the CYLINDER: it used to say `coral`, and
@@ -121,14 +130,18 @@ if (deep) {
      success exactly as loudly as one that works. */
   let added = 0;
   for (const d of DETAILS) for (const w of WINDOWS)
-    for (const sz of SWEEP_SIZES) for (const hd of ['right-in', 'left-in']) {
+    for (const sz of SWEEP_SIZES) for (const hd of ['right-in', 'left-in'])
+    for (const gb of ['nograb', 'grab']) {
+      /* The bow too (26.9.2026): its home is a different place on every face
+         — the plate's field, the pair's rail, the set's band — so every face
+         is swept with it, beside the Idan. */
       const st = {
         colour: 'rb-0097d', window: w.id, grille: 'none',
         handle: 'idan', lockset: 'cylinder', detail: d.id,
-        size: sz, handing: hd,
+        size: sz, handing: hd, grab: gb,
       };
       const c = conflicts(st);
-      if (c.detail[d.id] || c.handle.idan || c.window[w.id]) continue;
+      if (c.detail[d.id] || c.handle.idan || c.window[w.id] || c.grab[gb]) continue;
       cases.push(st);
       added++;
     }
@@ -207,9 +220,14 @@ if (boxes) {
       host.innerHTML = window.__render(st);
       const svg = host.querySelector('svg');
       const el = svg.querySelector(sel);
-      if (!el) return;
+      /* ⚠ A FITTING THAT IS NOT FOUND IS A FAILURE, NOT A SKIPPED ROW (§5.15).
+         This returned in silence, and on 26.9.2026 the bow left `HANDLES` for a
+         field of its own: the "grip grab" row would have asked for a pull
+         handle id that no longer draws anything, found nothing, and the table
+         would have come out one row shorter and green. */
+      if (!el) { out.push({ label, missing: sel }); return; }
       const b = metalBox(el, svg);
-      if (!b) return;
+      if (!b) { out.push({ label, missing: sel }); return; }
       const cx = Number(el.dataset.cx);
       /* OUT and IN are named from the CLOSING EDGE, not from the screen, so
          the numbers can be compared with `handleFootprint` directly whichever
@@ -242,7 +260,9 @@ if (boxes) {
         declOut: Number(el.dataset.out), declIn: Number(el.dataset.in),
         declVy: Number(el.dataset.vy) });
     };
-    for (const h of handles) read({ ...base, handle: h }, '[data-hw="handle"]', 'grip ' + h);
+    for (const h of handles) if (h !== 'none') read({ ...base, handle: h }, '[data-hw="handle"]', 'grip ' + h);
+    /* The bow, its own field since 26.9.2026, drawn in its own wrapper. */
+    read({ ...base, grab: 'grab' }, '[data-hw="bow"]', 'grip grab');
     for (const k of locksets) read({ ...base, lockset: k }, '[data-hw="lockset"]', 'lock ' + k);
 
     /* How far inboard from the CLOSING EDGE does anything BOLTED reach? That
@@ -308,6 +328,7 @@ if (boxes) {
   const n = (v, w) => String(Math.round(v)).padStart(w);
   let bad = 0;
   for (const r of rowsOut) {
+    if (r.missing) { bad++; console.log(`✗ ${r.label.padEnd(17)} NOT DRAWN — ${r.missing} found nothing`); continue; }
     const off = r.out > r.declOut + 1 || r.in > r.declIn + 1 || r.vy > r.declVy + 1;
     if (off) bad++;
     console.log((off ? '✗ ' : '  ') + r.label.padEnd(17)
@@ -364,7 +385,15 @@ if (boxes) {
    Windows are compared to the pane group's own bounds, which include the
    architrave — that is deliberate on both sides, since the architrave is what
    a foot would land on. Panels are compared to the moulding paths. */
-const obstacleCases = cases.map(st => ({ st, want: faceObstacles(st) }));
+/* ⚠ THE BOW'S BOX IS NOT A MOULDING, 26.9.2026. `faceObstacles` carries the
+   horizontal bow's box since the bow became a field (the bar is placed against
+   it), and that box is the bow's DECLARED footprint — deliberately a shade
+   generous, like every `handleFootprint` — so it cannot match a drawn outline
+   to the 2 mm this reader asks of mouldings. It is measured where footprints
+   are: `-- boxes` puts the drawn bow inside its declaration, and the pair sweep
+   below puts a bar and a bow side by side in real getBBox. Filtered here BY
+   KIND, so a moulding kind added later is still compared. */
+const obstacleCases = cases.map(st => ({ st, want: faceObstacles(st).filter(o => o.kind !== 'bow') }));
 
 const drift = await p.evaluate(rows => {
   const host = document.getElementById('stage');

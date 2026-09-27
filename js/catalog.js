@@ -24,7 +24,7 @@ import { agorot, PLACEHOLDER as PRICES_ARE_PLACEHOLDER,
          HANDLE as HANDLE_PRICE, HANDLE_BAND, HANDLE_FINISH as HANDLE_FINISH_PRICE,
          LOCKSET as LOCKSET_PRICE, STRIPE,
          SPECIAL_LOCK as SPECIAL_LOCK_PRICE,
-         BELL as BELL_PRICE, PEEPHOLE as PEEPHOLE_PRICE } from './prices.js';
+         BELL as BELL_PRICE, BOW as BOW_PRICE, PEEPHOLE as PEEPHOLE_PRICE } from './prices.js';
 
 /* Re-exported so nothing else has to know the flag moved. It belongs beside
    the figures it describes — flipping it is the last edit of the evening the
@@ -565,12 +565,15 @@ export const HANDLES = [
      range drawn from nothing, and the note there says in as many words "it is
      the one grip whose picture we cannot check". Peretz, 26.8.2026: "there is
      no: שירן, להב שטוח." The id resolves to `idan`. */
-  /* `finishes: true` — the bow's rods paint from the grip's metal
-     (`gripHard`/`gripSoft` in the renderer), so it takes the finish and its
-     surcharge like a bar does. */
-  { id: 'grab',    he: 'מאחז אופקי', en: 'Grab bar', ru: 'Горизонтальная скоба', len: 0, style: 'grab',
-    finishes: true,
-    aliases: ['dee'], doors: ['d078'], photo: null },
+  /* ⚠ `grab` — THE HORIZONTAL BOW — LEFT THIS LIST ON 26.9.2026 AND IS `BOWS`
+     BELOW. The owner's son: *"I want the horizontal pull handle to be with the
+     panels and stripes … and also the horizontal handle can be comfortable
+     with other pull handles."* So it is chosen on the face step, on a list of
+     its own, and a door may carry it AND a bar. Its id — and `dee`'s — are a
+     wire format and are NOT aliased onto a bar here: that would hand a
+     customer's `n=grab` link a ₪500 bar for a ₪300 bow in silence. `fromQuery`
+     MIGRATES them instead (`n=grab` → no pull handle plus the bow), and the
+     short code's `VERSION` went to 25 because `channel`'s index moved up. */
   /* d084's recess measures 0.099 of leaf width and 0.906 of leaf height — it
      runs nearly the whole leaf and it is twice as wide as we drew it.
 
@@ -1031,6 +1034,33 @@ export const SPECIAL_LOCKS = [
 export const BELLS = [
   { id: 'nobell', he: 'ללא',    en: 'None', ru: 'Нет' },
   { id: 'bell',   he: 'פעמון',  en: 'Doorbell', ru: 'Звонок' },
+];
+
+/**
+ * THE HORIZONTAL BOW — מאחז אופקי — a piece of the FACE, 26.9.2026.
+ *
+ * It was the fourth pull handle. The owner's son: *"I want the horizontal pull
+ * handle to be with the panels and stripes … and also the horizontal handle can
+ * be comfortable with other pull handles."* So it is its own yes/no, on the
+ * doorbell's template exactly (a two-entry list, a field, a parameter `gb=`,
+ * one bit at the END of the code, a price table, a spec row), chosen on the
+ * face step, and a door can carry it beside an Idan or a Nitzan.
+ * The ranking when things compete for the leaf, settled in chat: **face and
+ * window > bow > bar > lever** — see `repair`.
+ *
+ * `style: 'grab'` and `finishes: true` because the renderer draws it with the
+ * same `grabHandle`, `GRAB` table and `gripHard`/`gripSoft` metal it always
+ * had: the door's one handle finish, charged per object like the bell. The
+ * id `grab` is the id the bow always had and `dee` stays its alias; `n=grab`
+ * and `n=dee` from before are migrated onto it by `fromQuery`.
+ * d078 — the curved bow pull on the corpus list — is fitted as an Idan by
+ * `npm run corpus` and stays so; `doors` names it as this product's nearest
+ * photograph, not as a door the gallery draws with one.
+ */
+export const BOWS = [
+  { id: 'nograb', he: 'ללא',        en: 'None', ru: 'Нет', style: 'none', len: 0, photo: null },
+  { id: 'grab',   he: 'מאחז אופקי', en: 'Horizontal pull', ru: 'Горизонтальная скоба',
+    style: 'grab', len: 0, finishes: true, aliases: ['dee'], doors: ['d078'], photo: null },
 ];
 
 /**
@@ -2303,6 +2333,7 @@ priceInto('lockset', LOCKSETS,             LOCKSET_PRICE, 'delta');
 priceInto('special lock', SPECIAL_LOCKS,    SPECIAL_LOCK_PRICE, 'delta');
 priceInto('pirzul',  PIRZUL,               PIRZUL_PRICE,  'delta');
 priceInto('bell',    BELLS,                BELL_PRICE,    'delta');
+priceInto('bow',     BOWS,                 BOW_PRICE,     'delta');
 priceInto('peephole', PEEPHOLES,           PEEPHOLE_PRICE, 'delta');
 
 /* ⚠ THE CLASSICAL SET COSTS LESS ON A GLAZED DOOR, and this is the only place

@@ -167,6 +167,9 @@ export const SPEC_ICON = {
   grille:  '<path d="M4.6 12 12 4.6M4.6 19.4 19.4 4.6M12 19.4 19.4 12"/>'
          + '<path d="M4.6 12 12 19.4M4.6 4.6 19.4 19.4M12 4.6 19.4 12"/>',
   handle:  '<path d="M8.4 5.6h3v12.8h-3Z"/><path d="M11.4 12h4.6"/>',
+  /* the horizontal bow, 26.9.2026: a bar lying across two posts — the handle's
+     mark turned on its side would be the handle's mark */
+  grab:    '<path d="M4.4 8.6h15.2v3.4H4.4Z"/><path d="M8 12v5.4M16 12v5.4"/>',
   /* a key going into the case */
   lockset: '<circle cx="7.4" cy="12" r="2.4"/><path d="M9.8 12h3.8"/>'
          + '<path d="M13.6 9.2h4.4v5.6h-4.4Z"/>',

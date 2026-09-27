@@ -127,6 +127,11 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
 Older and long-form: **`HISTORY.md`** (verbatim to 26.9.2026). Dates are the
 day of the change.
 
+- **26.9** The bow is its own axis on the face step, `VERSION` 25 (`BOWS`, `gb=`,
+  ₪300 + the handle finish): a bow and a bar together; `n=grab`/`n=dee` migrate
+  quietly, never onto a bar. `homeKey` completed — the stale cache had hidden a
+  2 m Nitzan refused beside the Greek set on `extra2`/`halfextra2` (named, §9);
+  the Greek set's obstacles gain the fittings and the bow (`fittingBoxes`).
 - **26.9** The גפן window design is the owner's son's own sheet, TRACED
   (*"this is how the grape and vine design really looks… the design is really
   white"*): `research/vine/design.webp` → `tools/trace-vine.py` (potracer) →
@@ -325,7 +330,7 @@ screen. Two different questions, and for a long time only one had been put.
   retire an option, alias its id onto the nearest real one, for ever.
 - **The short code stores INDICES**, which no alias can rescue. Any change to
   an option list's ORDER or to the bit layout needs a `VERSION` bump in
-  `js/url-state.js` (**24** on 26.9 — read the file, do not trust this figure),
+  `js/url-state.js` (**25** on 26.9 — read the file, do not trust this figure),
   so an old code is refused with a notice rather than decoded into a different
   door. **Appending to the end of a list, or changing a property, costs no
   bump.**
@@ -697,7 +702,8 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
   one `repair` branch — the lever yields first (`fallbackLockset`,
   `SAID.locksetSwapped`), the handle second, glass and face never.
   `gripObstacle(state, id)` is the one statement of what stands in a bar's way
-  (`null` · `lock` · `window` · `face` · `door`). A greyed handle names its
+  (`null` · `lock` · `window` · `face` · `door` · `bow`); `bowObstacle(state)`
+  is the bow's (`null` · `lock` · `window` · `face` · `door`). A greyed handle names its
   obstacle; a lever that would displace the bar opens `<dialog id="clash">`,
   and both taps return before `repair`. Every other greyed tile performs its
   repair on a tap.
@@ -706,11 +712,27 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
 
 ### Hardware
 
-- **`HANDLES` — the grip**, optional: `idan` (round) and `nitzan` (square),
-  each in two length bands (up to a metre, and over), the recessed `channel`
-  and the horizontal bow `grab`. Their finish is `HANDLE_FINISHES` under `hf=`
+- **`HANDLES` — the grip**, optional: three products — `idan` (round) and
+  `nitzan` (square), each in two length bands (up to a metre, and over), and
+  the recessed `channel` — plus a finish, `HANDLE_FINISHES` under `hf=`
   (nickel included, black +₪100, gold +₪200, per object). `ella` and
   `barblack` are migrations onto `idan` plus a finish (`HANDLE_LEGACY`).
+- **`BOWS` — the horizontal bow**, on the face step since 26.9 (`gb=`, one bit
+  appended, `VERSION` 25): *"I want the horizontal pull handle to be with the
+  panels and stripes … and also … comfortable with other pull handles."* ₪300
+  (Peretz 20.9, *"horizontal 300"*) plus the door's one handle finish, charged
+  on the bow as on the bar. ⚠ **`grab` and `dee` are a MIGRATION, not an
+  alias**: `n=grab` opens no bar and the bow, quietly, only while `gb=` is
+  absent — aliased onto a bar it would charge ₪500 for a ₪300 bow in silence.
+  One home per face, no ladder (`bowHome` = `gripIdeal` of `bowState`): plain
+  0.59, the trio's plate field, the Greek band, the pair's rail — under the
+  window the rail is read off `faceObstacles`. Drawn first, as
+  `<g data-hw="bow">` round the inner `data-hw="grab"`; the ONE
+  `data-hw="handle"` on a door is the bar's. **Ranking: face and window > bow
+  > bar > lever** — beside the strip the bow is greyed (`bowObstacle`,
+  `why.bowWindow`) and its tap changes nothing; the bar treats the bow's box
+  as an obstacle (`why.gripOnBow`); `repair` swaps the lever first, drops the
+  bar second, never the bow.
 - **`LOCKSETS` — the lock furniture**, always: what you turn and the keyway.
   ⚠ **`lever-taper` (the curved lever) has a placeholder id that can never be
   renamed** — Peretz's name for it becomes the label, never the id (1b in
@@ -734,7 +756,7 @@ before it picks a fill.**
 
 | gradients | owner |
 |---|---|
-| `gripHard` `gripSoft` | the pull bar, in its own finish (`hf=`) |
+| `gripHard` `gripSoft` | the pull bar and the bow, in the handle finish (`hf=`) |
 | `nickel` `nickelSoft` `plateFace` `domeKnob` | the פרזול — `domeKnob` (the כדור's ball) through `domeRamp` since 26.9, the measured dome on nickel |
 | `lockUnit` `lockUnitFace` `lockUnitSoft` `mirrorKnob` | the bought-in extra locks and the ספיר — a constant steel |
 | `euroSteel` `euroRim` | the cylinder, following the פרזול at its own stand-off (`cylinderRamp`) |
@@ -1142,7 +1164,7 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 ## 8. Things that will bite
 
 - **BigInt is required** in `url-state.js`: the code layout is **wider than 32
-  bits** (the payload is 53 bits and `TOTAL_BITS` rounds it, with the check
+  bits** (the payload is 54 bits and `TOTAL_BITS` rounds it, with the check
   nibble, to 60 on 26.9 — read the file). The build targets es2020, so
   `Object.hasOwn` is unavailable — use `Object.prototype.hasOwnProperty.call`.
 - **The short code is an ENCODING, not a hash.** It decodes without a server,
@@ -1197,6 +1219,25 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   stands beside a vertical bar there — the lever is greyed and yields to the
   cylinder (the main sweep's buildable designs 101,592 → 82,008). Both are the
   owner's son's window drawn honestly; neither was adjusted.
+- **A 2 m Nitzan does not fit beside the Greek set on `extra2`/`halfextra2`**
+  (26.9, found by the completed `homeKey`: the placement cache left out the
+  bar's length and handed the 2 m bar the short one's answer). A 2000 mm run
+  between cornice and plinth leaves a 15 mm band of centres on the 2350 leaf,
+  and the Nitzan's 44 mm fixings land on the set's mouldings at every rung
+  where the Idan's 32 fit. The owner's son asked for *"at least … idan"*, and
+  the Idan stays asserted at every length and size; the four Nitzan cases are
+  a named exemption asserted STILL refused, so the day they fit the test fails.
+- ⚠ **`homeKey` holds five fields no door binds today** — handing, bell,
+  viewer, extra lock and the bow: dropped one at a time, none makes a cached
+  placement disagree with a fresh one across 67,392 single-field variations.
+  They stay because `faceObstacles` carries their boxes; the sweep in
+  `test/units.mjs` is what catches the next missing field.
+- **The extra lock's obstacle box ignores the handing** (26.9, read, not
+  fixed): the drawing puts the keyway `KEYWAY_BACKSET` off the CLOSING edge on
+  either hand (`renderer.js` `keyX`), but `fittingBoxes` places the box 63 mm
+  off the leaf's LEFT edge always — on a hinge-left door it stands on the hinge
+  side. No bar reaches either place today (the sweep above), so nothing is
+  drawn wrong; the box is simply in the wrong place.
 - **The trio cannot stand beside a window** (26.9): the casing would stand 76
   mm into its handle plate (`panelUnderGlass`, `why.winPlate`). Refused, not
   redesigned; `ASK-PERETZ.md` asks the owner's son whether a glazed trio exists.

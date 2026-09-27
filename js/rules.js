@@ -55,7 +55,7 @@ import { T } from './copy.js';
 import { byId, DETAILS, glassRows, GRILLES, HANDLES, isGlazed, leafGlazed, LOCKSETS,
          STRIPE_MAX, WINDOWS }
   from './catalog.js';
-import { gripClashesLockset, gripFitsAnywhere,
+import { bowFits, gripFitsAnywhere,
          bellFits, panelUnderGlass,
          peepholeFits } from './renderer.js';
 
@@ -113,7 +113,12 @@ export { isGlazed, leafGlazed };
  * withdrawal note in `conflicts` — and the difference matters here more than
  * anywhere else, because this is what `repair` and the window rules read.
  */
-const locksetFits = (state, id) => !gripClashesLockset({ ...state, lockset: id });
+/* ⚠ ASKED OF THE BOW SINCE 26.9.2026. It asked `gripClashesLockset`, which
+   only ever bit on the bow as a pull handle; the bow is its own field now and
+   outranks the lever (face and window > bow > bar > lever), so a lockset fits
+   a door when the bow — if there is one — still stands beside it. The bar's
+   side of the lever question is `gripFits` below. */
+const locksetFits = (state, id) => state.grab !== 'grab' || bowFits({ ...state, lockset: id });
 
 /**
  * The lockset to fall back on when the chosen one has nowhere to go, or null
@@ -144,7 +149,29 @@ export function fallbackLockset(state) {
 /** Both questions the grip asks of a door, as one: the bow against the lock
  *  stile (`gripClashesLockset`) and the handle against everything on the face
  *  (`gripFitsAnywhere`). Two callers used to ask one each and drift. */
-const gripFits = state => !gripClashesLockset(state) && gripFitsAnywhere({ ...state, grip: null });
+/* (Since 26.9.2026 `gripClashesLockset` answers only for the bow — no pull
+   handle is `grab` — so the bar's question is `gripFitsAnywhere` alone, which
+   places it against the face, the glass, the lock furniture AND the bow's box,
+   the bow being in `faceObstacles`.) */
+const gripFits = state => gripFitsAnywhere({ ...state, grip: null });
+
+/**
+ * What stands in the BOW's way on this door — `null` when it stands at its
+ * home. The same shape as `gripObstacle`, for the same reason: `'lock'` means
+ * only the lever is in the way, and the lever yields to the bow (face and
+ * window > bow > bar > lever), so the tile is not greyed and the tap swaps the
+ * lever; `'window'` and `'face'` are reasons the tile prints and the tap does
+ * not act on, because they outrank the bow; `'door'` is more than one of them.
+ */
+export function bowObstacle(state) {
+  const s = { ...state, grab: 'grab' };
+  if (bowFits(s)) return null;
+  const k = fallbackLockset(s);
+  if (k && k !== s.lockset && bowFits({ ...s, lockset: k })) return 'lock';
+  if (leafGlazed(s) && bowFits({ ...s, window: 'none' })) return 'window';
+  if (faceWorked(s) && bowFits({ ...s, detail: 'plain', stripeDir: 'none', stripeCount: 0 })) return 'face';
+  return 'door';
+}
 
 /**
  * What stands in a pull handle's way on this door — `null` when it fits.
@@ -168,6 +195,9 @@ export function gripObstacle(state, handleId) {
   if (k && k !== s.lockset && gripFits({ ...s, lockset: k })) return 'lock';
   if (leafGlazed(s) && gripFits({ ...s, window: 'none' })) return 'window';
   if (faceWorked(s) && gripFits({ ...s, detail: 'plain', stripeDir: 'none', stripeCount: 0 })) return 'face';
+  /* 26.9.2026: the bow outranks the bar, so when it alone is in the way the
+     tile says so and the tap does not take it. */
+  if (s.grab === 'grab' && gripFits({ ...s, grab: 'nograb' })) return 'bow';
   return 'door';
 }
 
@@ -215,6 +245,8 @@ export function conflicts(state) {
                    computation as `peepholeFits`; the whole argument, and why
                    the fitting is not simply moved, is over it. */
                 peephole: {}, bell: {},
+                /* The horizontal bow, a field of its own since 26.9.2026. */
+                grab: {},
                 /* ⚠ A STRING, NOT A MAP OF IDS, because the stripes are no
                    longer options with ids. Every other key here is
                    `{ optionId: reason }`; this one is either null or the one
@@ -461,11 +493,43 @@ export function conflicts(state) {
      is neither alone, and it still exists because a leaf can simply be too
      small — the bow beside the vertical slot on a standard leaf, for one. */
   const GRIP_WHY = { window: 'why.noRoomHandleWindow', face: 'why.noRoomHandleFace',
-                     door: 'why.noRoomHandle' };
+                     bow: 'why.noRoomHandleBow', door: 'why.noRoomHandle' };
   for (const h of HANDLES) {
     if (h.style === 'none' || out.handle[h.id]) continue;
     const what = gripObstacle(state, h.id);
     if (what && what !== 'lock') out.handle[h.id] = T(GRIP_WHY[what]);
+  }
+
+  /* ⚠ THE HORIZONTAL BOW, 26.9.2026 — its own field, ranked face and window >
+     bow > bar > lever. Its tile is greyed only for what outranks it: beside
+     the vertical slot there is no home for it at all (every size), and it
+     says the window is why; `choose` makes the tap say that and change
+     nothing — a bow tap never moves the window, the face or the stripes. A
+     lever in its way is NOT a reason: the lever yields (see `repair`). */
+  {
+    const what = bowObstacle(state);
+    if (what && what !== 'lock') out.grab.grab = T(BOW_WHY[what]);
+  }
+  /* And from the lockset's side: with a bow on the door, a lever that would
+     leave it nowhere is greyed and names the bow — the same dialog the bar's
+     lever clash opens, because the bow outranks the lever exactly as the bar
+     does. */
+  if (state.grab === 'grab') {
+    for (const k of LOCKSETS) {
+      if (out.lockset[k.id]) continue;
+      if (!bowFits({ ...state, lockset: k.id })) out.lockset[k.id] = T('why.leverBow');
+    }
+  }
+  /* And from the window's side, which the bow as a pull handle already had
+     and must not lose by moving: pick the vertical slot with a bow on the door
+     and `repair` takes the bow (the window outranks it), so the slot's tile
+     says so beforehand. A greyed window still performs its repair on a tap. */
+  if (state.grab === 'grab') {
+    for (const w of WINDOWS) {
+      if (out.window[w.id] || w.id === state.window) continue;
+      const what = bowObstacle({ ...state, window: w.id });
+      if (what && what !== 'lock') out.window[w.id] = T('why.bowWithWindow');
+    }
   }
 
   /* ⚠ AND THE SAME QUESTION FROM THE WINDOW'S SIDE, because the customer may
@@ -650,11 +714,16 @@ const SAID = {
   stripesCapped: 'fix.stripesCapped',
   /* 26.9.2026: the trio refused beside a window, on a link — see repair. */
   trioPlate:    'fix.trioPlate',
+  /* 26.9.2026: the bow has no home on this door (a link, or a window tapped
+     beside it) — see repair. */
+  bowGone:      'fix.bowGone',
 };
 
 /* Which reason a face greyed for the window gives, by what `panelUnderGlass`
    found. Keys, not sentences — a top-level constant holds a key (§0c). */
 const WHY_UNDER_GLASS = { top: 'why.winTakesTop', plate: 'why.winPlate', room: 'why.noRoomBelow' };
+/* And the bow's greyed-tile reasons, by what `bowObstacle` found. */
+const BOW_WHY = { window: 'why.bowWindow', face: 'why.bowFace', door: 'why.bowDoor' };
 
 /**
  * Move a design to the nearest buildable one, and say what changed.
@@ -906,6 +975,23 @@ export function repair(state, intent = null) {
      bow is not added, which `conflicts` says on the tile and `choose`
      enforces. The old branch also called `conflicts(s)` from inside `repair`,
      which was the most expensive line in this function. */
+  /* ⚠ THE BOW BEFORE THE BAR — 26.9.2026, the ranking settled in chat: face
+     and window > bow > bar > lever. Everything above has already settled the
+     face and the window, so the bow is asked now, against them and against
+     the lock furniture: a lever in its way yields first (to the fallback the
+     bar branch below uses, whatever the intent — the bow outranks the lever;
+     on the page a lever greyed for the bow never reaches here); a window or a
+     face in its way takes the BOW. Then the bar is asked, with the bow's box
+     among its obstacles, so a tap that leaves the bar nowhere swaps the lever
+     first and drops the bar second — never the bow. */
+  if (s.grab === 'grab' && !bowFits(s)) {
+    const k = fallbackLockset(s);
+    if (k && k !== s.lockset && bowFits({ ...s, lockset: k })) {
+      s.lockset = k; change('lockset', SAID.locksetSwapped);
+    }
+    if (!bowFits(s)) { s.grab = 'nograb'; change('grab', SAID.bowGone); }
+  }
+
   if (!gripFits(s)) {
     if (intent !== 'lockset') {
       const k = fallbackLockset(s);

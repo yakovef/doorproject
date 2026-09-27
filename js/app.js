@@ -28,7 +28,7 @@
  */
 
 import {
-  BELLS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
+  BELLS, BOWS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
   GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LOCKSETS, MASHKOFS,
   mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, BUILD_A,
   PEEPHOLES, PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_A, STRIPE_MAX, WINDOWS,
@@ -37,7 +37,7 @@ import { breakdownRows, deltaLabel, formatAgorot, priceAgorot, priceLabel, price
   from './price.js';
 import {
   describe, detailGlyph, grilleGlyph, handleGlyph, locksetGlyph,
-  bellGlyph, handleFinishGlyph, copyOf, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
+  bellGlyph, bowGlyph, handleFinishGlyph, copyOf, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
   panelUnderGlass, specialLockGlyph, stripesGlyph,
   windowGlyph,
 } from './renderer.js';
@@ -146,6 +146,15 @@ const GROUPS = [
   { key: 'detail', title: 'g.detail', in: 'face', kind: 'tile',
     list: () => DETAILS,
     glyph: detailGlyph, subs: DETAIL_SUBS, hint: 'g.detail.h' },
+
+  /* ⚠ THE HORIZONTAL BOW, ON THE FACE STEP SINCE 26.9.2026 — the owner's son:
+     *"I want the horizontal pull handle to be with the panels and stripes …
+     and also the horizontal handle can be comfortable with other pull
+     handles."* A list of its own (`BOWS`, `gb=`) on the doorbell's template,
+     after the face it sits on. Its finish is chosen later, on the pull-handle
+     step, as the bell's is — the finish is the door's, not a product's. */
+  { key: 'grab', title: 'g.grab', in: 'face', kind: 'hw', list: () => BOWS,
+    glyph: bowGlyph, hint: 'g.grab.h' },
 
   { key: 'window', title: 'g.window', in: 'glass', kind: 'tile', list: () => WINDOWS,
     glyph: windowGlyph, hint: 'g.window.h' },
@@ -365,7 +374,8 @@ const SECTIONS = [
   { key: 'lock',   title: 'step.lock.t',   sub: 'step.lock.s',   lede: 'step.lock.l', exp: 'exp.lock',
     expArgs: () => [formatAgorot(byId(SPECIAL_LOCKS, 'kasefet').delta),
                     formatAgorot(byId(SPECIAL_LOCKS, 'kodan').delta)] },
-  { key: 'grip',   title: 'step.grip.t',   sub: 'step.grip.s',   lede: 'step.grip.l', exp: 'exp.grip' },
+  { key: 'grip',   title: 'step.grip.t',   sub: 'step.grip.s',   lede: 'step.grip.l', exp: 'exp.grip',
+    expArgs: () => [L(byId(BOWS, 'grab')), L(byId(HANDLES, 'channel'))] },
   { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz',
     expArgs: () => [L(byId(LOCKSETS, 'cadoor')), L(byId(LOCKSETS, 'sapir'))] },
   { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face',
@@ -1460,7 +1470,7 @@ const BREAKDOWN_KEY = {
   door: 'bd.door', cylinder: 'bd.cylinder', lock: 'bd.lock', mashkof: 'bd.mashkof',
   install: 'bd.install', measure: 'bd.measure', colour: 'bd.colour',
   detail: 'bd.detail', window: 'bd.window', grille: 'bd.grille',
-  handle: 'bd.handle', lockset: 'bd.lockset', speciallock: 'bd.speciallock',
+  handle: 'bd.handle', grab: 'bd.grab', lockset: 'bd.lockset', speciallock: 'bd.speciallock',
   pirzul: 'bd.pirzul', stripes: 'bd.stripes', round: 'bd.round',
   bell: 'bd.bell', peephole: 'bd.peephole',
 };
@@ -2428,7 +2438,10 @@ function choose(g, id) {
      ⚠ A handle whose only obstacle is the LEVER is not greyed at all, and its
      tap goes through `repair` below, which swaps the lever for the cylinder
      and says so. That is the half of his sentence about the lever going. */
-  if ((g.key === 'handle' || g.key === 'lockset') && id !== state[g.key]) {
+  /* ⚠ AND THE BOW, 26.9.2026: greyed only for what outranks it — the window
+     or the face — and its tap says so and changes nothing. A bow tap never
+     moves the window, the face or the stripes. */
+  if ((g.key === 'handle' || g.key === 'lockset' || g.key === 'grab') && id !== state[g.key]) {
     const why = conflicts(state)[g.key][id];
     if (why) {
       if (g.key === 'lockset') openClash(); else toast(why);

@@ -46,7 +46,7 @@ import { L, T, withLang } from './copy.js';
 import {
   byId, colourCode, COLOURS, DETAILS, glassRows, glazedPanels, GRILLES, grillePlacement,
   gripTakesFinish, handleLength, HANDINGS, HANDLES, HANDLE_FINISHES, isGlazed, LOCKSETS,
-  MASHKOFS, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BELLS, PEEPHOLES,
+  MASHKOFS, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BELLS, BOWS, PEEPHOLES,
 } from './catalog.js';
 
 /**
@@ -179,6 +179,15 @@ export function specRows(state) {
     ? ` · ${T('len.cm', Math.round(handleLength(state) / 10))}` : '';
   rows.push({ key: 'handle', label: T('row.handle'), id: hd.id,
               value: `${L(hd)}${fin ? ` · ${L(fin)}` : ''}${barLen}` });
+  /* ⚠ THE HORIZONTAL BOW, ITS OWN ROW SINCE 26.9.2026, directly after the pull
+     handle's — it is a separate product on a separate line of Peretz's price
+     list (*"horizontal 300"*) and a door can carry both now. Named with the
+     finish it is charged in, as the bell's row is, because the surcharge lands
+     on it per object. Only when chosen, like every optional row here. */
+  const bw = byId(BOWS, state.grab);
+  if (bw && bw.id !== 'nograb') {
+    rows.push({ key: 'grab', label: T('row.grab'), id: bw.id, value: `${L(bw)} · ${L(hf)}` });
+  }
   rows.push({ key: 'lockset', label: T('row.lockset'), id: lk.id, value: L(lk) });
   /* ⚠ NAMED ONLY WHEN THERE IS ONE, and named at all because an axis that does
      not reach this file is an axis Peretz never hears about. A customer can

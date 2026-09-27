@@ -8,7 +8,7 @@
  */
 
 import { T } from './copy.js';
-import { BELLS, BUILD_A, byId, COLOURS, DETAILS, GRILLES, gripTakesFinish, HANDLES,
+import { BELLS, BOWS, BUILD_A, byId, COLOURS, DETAILS, GRILLES, gripTakesFinish, HANDLES,
          HANDLE_BAND, HANDLE_FINISHES, isGlazed, PEEPHOLES,
          handleLength, MASHKOF_WIDER_A, MASHKOFS, paneCount,
          LOCKSETS, PIRZUL, SIZES, SPECIAL_LOCKS, stripePrice,
@@ -208,6 +208,12 @@ export function priceParts(state) {
     /* Per stripe, at his rate — ₪150 horizontal, ₪300 vertical, no base. */
     stripes: stripePrice(state),
     handle:  handlePrice(state),
+    /* The horizontal bow, 26.9.2026 — a piece of the face with its own list,
+       ₪300, and in the door's one handle finish per object like the bell: a
+       door with a bar and a bow in gold pays the gold twice, once on each
+       thing it gilds. Nothing on a door with no bow. */
+    grab:    byId(BOWS, state.grab).delta
+             + (state.grab !== 'nograb' ? finishExtra(state) : 0),
     lockset: byId(LOCKSETS, state.lockset).delta,
     speciallock: byId(SPECIAL_LOCKS, state.speciallock).delta,
     pirzul:  byId(PIRZUL, state.pirzul).delta,

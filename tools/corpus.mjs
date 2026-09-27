@@ -229,7 +229,12 @@ function grilleOf(rec) {
 function handleOf(rec) {
   const h = rec.handle;
   if (!h || h.type !== 'pull-bar') return { id: 'none', residual: 0, note: h ? h.type : 'none' };
-  if (h.orientation === 'horizontal') return { id: 'grab', residual: 0, note: 'horizontal bow' };
+  /* ⚠ THE BOW IS NOT A PULL HANDLE SINCE 26.9.2026 — it is `grab` on its own
+     field (`BOWS`, `gb=`), so a horizontal record fits NO pull handle and the
+     bow. Returning the old handle id here would have written `handle: 'grab'`
+     into js/works.js, an id `HANDLES` no longer holds, and `fromQuery` below
+     would have migrated it back — the right door by two wrongs. */
+  if (h.orientation === 'horizontal') return { id: 'none', grab: 'grab', residual: 0, note: 'horizontal bow' };
 
   /* ⚠ THE FINISH IS AN AXIS NOW, NOT A FILTER — 20.9.2026. For a round it
      was a weighted term in the distance, because two bars in the range were
@@ -456,6 +461,8 @@ for (const id of ids) {
     /* The bar's metal, off the record — see `handleOf`. A door with no bar
        carries the default, which the gallery entry then omits. */
     handleFinish: parts.handle.handleFinish || 'hf-nickel',
+    /* The bow, off the same reading — its own field since 26.9.2026. */
+    grab: parts.handle.grab || 'nograb',
     stripeDir: parts.stripes.stripeDir, stripeCount: parts.stripes.stripeCount,
     stripeTight: !!parts.stripes.stripeTight,
     size: 'standard', handing: handingOf(rec),
@@ -583,7 +590,12 @@ for (const [k, n] of [...fin].sort((a, b) => b[1] - a[1])) console.log(`  ${H(k,
      the floor, so the gallery would have drawn d072, d087 and d113 with
      NICKEL bars that their own records call black. §5.10, and caught by the
      comparison this note's last sentence promises. */
-  const FIELDS = ['colour', 'detail', 'window', 'grille', 'handle', 'handleFinish',
+  /* ⚠ `grab` JOINED ON 26.9.2026, the day the bow became a field. 20.9 is why
+     this list is checked by hand whenever the state grows: the fitter read the
+     bar's finish and this list dropped `handleFinish` on the floor, so every
+     black bar in the gallery came out nickel, and the works-vs-fitter check in
+     units.mjs is what caught it. */
+  const FIELDS = ['colour', 'detail', 'window', 'grille', 'handle', 'handleFinish', 'grab',
                   'lockset', 'size', 'handing', 'stripeDir', 'stripeCount', 'stripeTight'];
   const lit = v => typeof v === 'string' ? `'${v}'` : String(v);
   const body = rows.map(r =>

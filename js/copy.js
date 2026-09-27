@@ -363,9 +363,9 @@ export const UI = {
      finish too and a customer should not have to discover that from the
      price. */
   'g.handleFinish':   ['גימור ידית המשיכה', 'Pull handle finish', 'Отделка ручки-скобы'],
-  'g.handleFinish.h': ['הגוון של ידית המשיכה והפעמון. התוספת היא לכל פריט.',
-                       'The tone of the pull handle and the doorbell. The surcharge is per item.',
-                       'Оттенок ручки-скобы и звонка. Доплата — за каждый предмет.'],
+  'g.handleFinish.h': ['הגוון של ידית המשיכה, המאחז האופקי והפעמון. התוספת היא לכל פריט.',
+                       'The tone of the pull handle, the horizontal pull and the doorbell. The surcharge is per item.',
+                       'Оттенок ручки-скобы, горизонтальной скобы и звонка. Доплата — за каждый предмет.'],
   'g.lockset':        ['מנעול וידית', 'Lever and cylinder', 'Ручка и цилиндр'],
   'g.lockset.h':      ['הידית שמסובבים והצילינדר. יש בכל דלת.', 'The lever you turn and the cylinder. Every door has them.',
                        'Нажимная ручка и цилиндр. Есть в каждой двери.'],
@@ -402,6 +402,12 @@ export const UI = {
   'g.bell.h':         ['טבעת נוקשת במרכז הדלת, מתחת לעינית. בגימור של ידית המשיכה.',
                        'A ring knocker on the centre of the door, below the viewer. In the pull handle’s finish.',
                        'Кольцо-стучалка по центру двери, под глазком. В отделке ручки-скобы.'],
+  /* The horizontal bow, a piece of the face since 26.9.2026 — its own group
+     on the face step (`BOWS`, `gb=`). */
+  'g.grab':           ['מאחז אופקי', 'Horizontal pull', 'Горизонтальная скоба'],
+  'g.grab.h':         ['מוט אופקי שמותקן על פני הדלת — אפשר יחד עם ידית משיכה. בגימור של ידית המשיכה.',
+                       'A horizontal bar fitted across the face of the door — it can go with a pull handle too. In the pull handle’s finish.',
+                       'Горизонтальная скоба на лицевой стороне двери — можно вместе с ручкой-скобой. В отделке ручки-скобы.'],
   'g.peephole.h':     ['עינית לראות מי בחוץ. הרגילה כלולה במחיר; הדיגיטלית מצלמת.',
                        'A viewer, to see who is outside. The ordinary one is included; the digital one has a camera.',
                        'Глазок, чтобы видеть, кто снаружи. Обычный входит в цену; цифровой — с камерой.'],
@@ -552,9 +558,12 @@ export const UI = {
      and the same shape for the rectangle. The 20 cm rate this sentence used
      to explain is gone with the rule, and the finish and the bell are named
      because both arrived on the same step the same day. */
-  'exp.grip.a':           ['ידית המשיכה היא המוט שמושכים בו כדי לפתוח. יש מוט עגול ומוט מלבני, ולכל אחד שני מחירים: עד מטר, ומעל מטר. האורך מוגבל לגובה הכנף, כך שדלת נמוכה לא תקבל מוט ארוך מדי. אפשר לבחור לידית גימור שחור או זהב — התוספת היא לידית ולפעמון, לכל אחד בנפרד. אפשר גם בלי ידית משיכה בכלל. המאחז האופקי והידית השקועה מותקנים לרוחב הדלת ואין להם בחירת אורך.',
-                       'The pull handle is the bar you pull to open the door. There is a round bar and a rectangular one, and each has two prices: up to a metre, and past a metre. The length is capped by the height of the leaf, so a short door cannot take a bar that would not fit. The handle can be finished in black or gold — the surcharge is on the handle and on the doorbell, each on its own. Going without one is a choice too. The grab bar and the recessed channel are fitted across the door and have no length to choose.',
-                       'Ручка-скоба — это то, за что тянут дверь. Есть круглая и прямоугольная, и у каждой две цены: до метра и свыше метра. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Отделку можно выбрать чёрную или золотую — доплата за ручку и за звонок, за каждый отдельно. Можно обойтись и без ручки. Горизонтальная скоба и врезная ручка ставятся поперёк двери, и длина у них не выбирается.'],
+  /* ⚠ 26.9.2026: the bow left the pull handles for the face step, so its
+     sentence here went, and the finish's surcharge names it among the things
+     the finish is charged on. The two product names are {0} and {1}. */
+  'exp.grip.a':           ['ידית המשיכה היא המוט שמושכים בו כדי לפתוח. יש מוט עגול ומוט מלבני, ולכל אחד שני מחירים: עד מטר, ומעל מטר. האורך מוגבל לגובה הכנף, כך שדלת נמוכה לא תקבל מוט ארוך מדי. אפשר לבחור גימור שחור או זהב — התוספת היא לכל פריט בנפרד: לידית, ל{0} ולפעמון. אפשר גם בלי ידית משיכה בכלל. ל{1} אין בחירת אורך — היא חרוצה בדלת עצמה.',
+                       'The pull handle is the bar you pull to open the door. There is a round bar and a rectangular one, and each has two prices: up to a metre, and past a metre. The length is capped by the height of the leaf, so a short door cannot take a bar that would not fit. The finish can be black or gold — the surcharge is per item: on the handle, on the {0} and on the doorbell. Going without one is a choice too. The {1} has no length to choose — it is cut into the door itself.',
+                       'Ручка-скоба — это то, за что тянут дверь. Есть круглая и прямоугольная, и у каждой две цены: до метра и свыше метра. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Отделку можно выбрать чёрную или золотую — доплата за каждый предмет: за ручку, за «{0}» и за звонок. Можно обойтись и без ручки. У «{1}» длина не выбирается — она врезана в само полотно.'],
   'exp.lock.q':           ['כספת וקודן — במקום המנעול או בנוסף?', 'Safe lock and keypad — instead of the lock, or as well?', 'Сейфовый и кодовый замок — вместо основного или вдобавок?'],
   /* ⚠ THE TWO FIGURES WERE TYPED HERE AND THEY WENT STALE — 25.9.2026. This
      paragraph said ₪700 and ₪900 in all three languages for five days after
@@ -645,6 +654,7 @@ export const UI = {
   'bd.window':        ['חלון', 'Window', 'Окно'],
   'bd.grille':        ['עיצוב החלון', 'Inside the window', 'Наполнение окна'],
   'bd.handle':        ['ידית משיכה', 'Pull handle', 'Ручка-скоба'],
+  'bd.grab':          ['מאחז אופקי', 'Horizontal pull', 'Горизонтальная скоба'],
   'bd.lockset':       ['מנעול וידית', 'Lever and cylinder', 'Ручка и цилиндр'],
   'bd.speciallock':   ['מנעול מיוחד', 'Extra lock', 'Дополнительный замок'],
   'bd.pirzul':        ['פרזול', 'Hardware finish', 'Отделка фурнитуры'],
@@ -813,6 +823,15 @@ export const UI = {
   'why.noRoomHandleWindow': ['החלון בדרך — והוא נשאר', 'The window is in the way — it stays', 'Мешает окно — оно остаётся'],
   'why.noRoomHandleFace': ['העיצוב בדרך — והוא נשאר', 'The design is in the way — it stays', 'Мешает узор — он остаётся'],
   'why.leverBar':        ['ידית המשיכה בדרך', 'The pull handle is in the way', 'Мешает ручка-скоба'],
+  /* The horizontal bow, 26.9.2026 — ranked face and window > bow > bar >
+     lever. A greyed bow names what outranks it; a lever greyed for the bow
+     names the bow; a bar that the bow leaves nowhere names the bow. */
+  'why.bowWindow':       ['אין מקום למאחז האופקי ליד החלון הזה', 'No room for the horizontal pull beside this window', 'Рядом с этим окном нет места для горизонтальной скобы'],
+  'why.bowFace':         ['אין מקום למאחז האופקי על עיצוב החזית הזה', 'No room for the horizontal pull on this face', 'На этом оформлении нет места для горизонтальной скобы'],
+  'why.bowDoor':         ['אין מקום למאחז האופקי על הדלת', 'No room for the horizontal pull on the door', 'На двери нет места для горизонтальной скобы'],
+  'why.bowWithWindow':   ['עם החלון הזה אין מקום למאחז האופקי', 'This window leaves no room for the horizontal pull', 'С этим окном нет места для горизонтальной скобы'],
+  'why.leverBow':        ['המאחז האופקי בדרך', 'The horizontal pull is in the way', 'Мешает горизонтальная скоба'],
+  'why.noRoomHandleBow': ['המאחז האופקי לא משאיר מקום לידית הזו', 'The horizontal pull leaves no room for this handle', 'Горизонтальная скоба не оставляет места для этой ручки'],
   'fix.windowAdded':     ['הוספנו חלון — הסורג והזכוכית צריכים אותו', 'We added a window — the grille and the glass need one', 'Мы добавили окно — решётке и стеклу оно необходимо'],
   'fix.windowGone':      ['הסרנו את החלון', 'We removed the window', 'Мы убрали окно'],
   'fix.lineWorkGone':    ['הסרנו את קווי המתכת — לא משלבים אותם עם חלון', 'We removed the metal strips — they do not go with a window', 'Мы убрали металлические полосы — с окном они не сочетаются'],
@@ -829,6 +848,7 @@ export const UI = {
   'fix.faceCleared':     ['החלקנו את הדלת — ידית שקועה דורשת פנים חלקות', 'We smoothed the face — a recessed channel needs it plain', 'Мы сделали полотно гладким — врезная ручка этого требует'],
   'fix.grilleGone':      ['הסרנו את הסורג — אין חלון', 'We removed the grille — there is no window', 'Мы убрали решётку — окна нет'],
   'fix.gripGone':        ['הסרנו את ידית המשיכה — אין לה מקום כאן', 'We removed the pull handle — there is no room for it here', 'Мы убрали ручку-скобу — для неё здесь нет места'],
+  'fix.bowGone':         ['הסרנו את המאחז האופקי — אין לו מקום כאן', 'We removed the horizontal pull — there is no room for it here', 'Мы убрали горизонтальную скобу — для неё здесь нет места'],
   'fix.locksetSwapped':  ['החלפנו את המנעול — אין לו מקום ליד המאחז', 'We swapped the lockset — there is no room for it beside the grip', 'Мы заменили замок — рядом со скобой ему нет места'],
   'fix.setWindow':       ['התאמנו את החלון — הסט היווני מגיע עם חלון מלבני משלו', 'We adjusted the window — the Greek set comes with a rectangular one of its own', 'Мы изменили окно — у греческого комплекта своё прямоугольное'],
   /* ⚠ `fix.setGone` USED TO ANSWER FOR THIS TOO AND IT IS THE WRONG SENTENCE.
@@ -884,6 +904,7 @@ export const UI = {
                        'Крепления попадают на обрамление панели'],
   'why.gripTouchesLock': ['הידית נוגעת במנעול', 'The handle touches the lock', 'Ручка задевает замок'],
   'why.gripCrossesWindow': ['הידית חוצה את החלון', 'The handle crosses the window', 'Ручка пересекает окно'],
+  'why.gripOnBow':    ['הידית נוגעת במאחז האופקי', 'The handle touches the horizontal pull', 'Ручка задевает горизонтальную скобу'],
 
   /* ── the no-JS fallback and the footer ────────────────────────── */
   'down.h':           ['הדלת לא נטענת בדפדפן הזה.', 'The door will not load in this browser.',
@@ -934,6 +955,7 @@ export const UI = {
   'row.grille':       ['סורג', 'Grille', 'Решётка'],
   'row.glass':        ['זכוכית', 'Glass', 'Стекло'],
   'row.handle':       ['ידית משיכה', 'Pull handle', 'Ручка-скоба'],
+  'row.grab':         ['מאחז אופקי', 'Horizontal pull', 'Горизонтальная скоба'],
   'row.lockset':      ['מנעול וידית', 'Lever and cylinder', 'Ручка и цилиндр'],
   'row.speciallock':  ['מנעול מיוחד', 'Extra lock', 'Дополнительный замок'],
   'row.bell':         ['פעמון', 'Doorbell', 'Звонок'],

@@ -3957,7 +3957,9 @@ html.is-live.is-untouched .wa__ask { display: inline; }
 @keyframes openUp { from { opacity: 0; transform: scaleY(.94); } }
 
 #stage[data-changed="handle"] [data-hw="handle"],
-#stage[data-changed="handleLen"] [data-hw="handle"] {
+#stage[data-changed="handleLen"] [data-hw="handle"],
+/* The horizontal bow, 26.9.2026 — its own field, offered the same way. */
+#stage[data-changed="grab"] [data-hw="bow"] {
   animation: offerUp .28s var(--ease-fit) both;
 }
 @keyframes offerUp { from { opacity: 0; transform: translateX(6px); } }
@@ -3970,6 +3972,7 @@ html.is-live.is-untouched .wa__ask { display: inline; }
 /* The pull handle's finish, 20.9.2026: it repaints the bar AND the bell, and
    they change together the way the lock furniture does under the פרזול. */
 #stage[data-changed="handleFinish"] [data-hw="handle"],
+#stage[data-changed="handleFinish"] [data-hw="bow"],
 #stage[data-changed="handleFinish"] [data-hw="bell"] {
   animation: replate .30s var(--ease-fit) both;
 }

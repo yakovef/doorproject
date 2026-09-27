@@ -389,7 +389,9 @@ export const HANDLE = {
   none:    0,                              // ללא ידית משיכה
   idan:    { short: 500, long: 800 },      // עידן — מוט עגול, עד מטר / מעל מטר
   nitzan:  { short: 600, long: 900 },      // ניצן — מוט מלבני, עד מטר / מעל מטר
-  grab:    300,                            // מאחז אופקי   — Peretz, flat, no length choice
+  /* `grab` — the horizontal bow, ₪300 — is not a pull handle any more
+     (26.9.2026): it is a piece of the FACE with a list of its own. Its price
+     moved to `BOW` below, unchanged. */
   channel: 1900,                           // ידית שקועה   — Peretz, 20.9.2026 ("shkua 1900")
 };
 
@@ -492,6 +494,19 @@ export const SPECIAL_LOCK = {
 export const BELL = {
   nobell: 0,         // ללא
   bell:   300,       // פעמון — Peretz, 30.8.2026; + the handle finish
+};
+
+/* ── the horizontal bow (מאחז אופקי) ─────────────────────────────────
+   Peretz, 20.9.2026: *"horizontal 300"* — the same figure it had as a pull
+   handle. Since 26.9.2026 it is chosen on the FACE step on a list of its own
+   (the owner's son: *"I want the horizontal pull handle to be with the panels
+   and stripes … and also the horizontal handle can be comfortable with other
+   pull handles"*), so a door can carry a bow AND a bar, and each is charged.
+   Like the bell it takes the door's one handle finish, per object: ₪300 in
+   nickel, ₪400 in black, ₪500 in gold. */
+export const BOW = {
+  nograb: 0,         // ללא
+  grab:   300,       // מאחז אופקי — Peretz, 20.9.2026; + the handle finish
 };
 
 /* ⚠ A DIGITAL PEEPHOLE, +390, 20.9.2026 — Peretz: *"einit digital +390."* A

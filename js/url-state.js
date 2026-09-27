@@ -20,7 +20,7 @@
  * length was THEN; only this header was claiming a present tense.
  */
 
-import { BELLS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES,
+import { BELLS, BOWS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES,
          HANDLE_LEGACY, HANDLE_LENS, LOCKSETS,
          MASHKOFS, packStripes, PEEPHOLES, PIRZUL, SIZE_ALIAS, SIZES, SPECIAL_LOCKS,
          STRIPE_MAX, STRIPE_LEGACY, STRIPE_SLOTS, unpackStripes, WINDOWS } from './catalog.js';
@@ -271,7 +271,16 @@ import { repair } from './rules.js';
    two entries after it, moved down one. Nothing else in the layout moved.
    A link naming `rings` (or `mesh`, `lattice`, `reeded`, which it had
    inherited) opens `circles` through `aliases`. */
-export const VERSION = 24;
+/* ⚠ 25: 26.9.2026. The horizontal bow LEFT `HANDLES` — the owner's son put it
+   on the face step, on a list of its own, so a door can carry it beside a bar
+   — and `channel`, the entry after it, moved up one index. A v24 code read
+   under this layout would decode a recessed channel as nothing and a bow as a
+   channel. The bow is a new one-bit field `grab` appended at the END of the
+   pack order (`BOWS`, `gb=`), which moves nothing else; the payload goes
+   53 -> 54 and the code stays twelve characters.
+   The `?...=` query form is not indexed: `n=grab` and `n=dee` MIGRATE onto the
+   new field in `fromQuery` with no notice, never onto a bar. */
+export const VERSION = 25;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -356,6 +365,9 @@ export const DEFAULTS = {
      it". */
   bell: 'nobell',
   peephole: 'nopeep',
+  /* The horizontal bow, a piece of the face since 26.9.2026 — off, like every
+     other thing the customer adds. */
+  grab: 'nograb',
   mashkof: 'mk-std',
   pirzul:  'pz-nickel',
   /* ⚠ THE PULL HANDLE'S FINISH, 20.9.2026 — nickel until the customer picks,
@@ -434,6 +446,10 @@ export function toQuery(state) {
      and these two are their own parameters. */
   p.set('bl', state.bell);
   p.set('ey', state.peephole);
+  /* ⚠ `gb` — THE BOW, 26.9.2026, A NEW PARAMETER. It rode under `n=` as a pull
+     handle until today; checked free in `KNOWN` and `RETIRED` before it was
+     taken. */
+  p.set('gb', state.grab);
   p.set('hl', String(state.handleLen));
   /* ⚠ ONE PARAMETER FOR THREE PROPERTIES, the same ordinal the code packs.
      Three separate parameters could carry `sd=h&sc=0` or `sd=none&sc=7` — a
@@ -499,7 +515,7 @@ export function fromQuery(search) {
      language is a fact about the reader, which is also why it is not in the
      short code (see `js/copy.js`). */
   const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'hf', 'hl', 'sp',
-                           'd', 's', 'h', 'bl', 'ey',
+                           'd', 's', 'h', 'bl', 'ey', 'gb',
                            'code', 'bare', 'sheet', 'lang']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
      still. Withdrawing an option is OUR change and not the customer's mistake,
@@ -629,6 +645,23 @@ export function fromQuery(search) {
      a page that already knew the axis. */
   const legacyHandle = HANDLE_LEGACY[rawN];
   if (legacyHandle && !p.get('hf')) Object.assign(state, legacyHandle);
+  /* ⚠ AND THE BOW, THE FOURTH MIGRATION — 26.9.2026. The horizontal bow left
+     `HANDLES` for a list of its own on the face step (`BOWS`, `gb=`). A link
+     written before today names it `n=grab` or `n=dee`; `take('handle')` found
+     no such pull handle and raised `option-unknown`. It is NOT an alias onto a
+     bar — that would hand the customer a ₪500 bar for a ₪300 bow in silence —
+     it is a MIGRATION onto the new field, with NO notice, on the lockset move's
+     own pattern above: only the notice this line's own `take` raised is
+     undone, and only when the link does not already carry `gb=`, because a
+     link that does was written by a page that knew the axis. An invented
+     `n=` still raises its notice. */
+  const bowN = rawN && !p.get('gb')
+    && BOWS.find(o => o.id !== 'nograb' && (o.id === rawN || (o.aliases || []).includes(rawN)));
+  if (bowN && !HANDLES.find(o => o.id === rawN || (o.aliases || []).includes(rawN))) {
+    state.grab = bowN.id;
+    state.handle = 'none';
+    if (handleRaisedIt) notice = beforeHandle;
+  }
   /* ⚠ A RETIRED STRIPE ID IS A MIGRATION, NOT AN ALIAS, and this is the second
      one in this file (the first is `n=` for the lockset list). `strips9` was
      one id in `DETAILS`; it is now a direction, a count and a toggle across
@@ -648,6 +681,7 @@ export function fromQuery(search) {
   take('handleFinish', 'hf', HANDLE_FINISHES);
   take('bell', 'bl', BELLS);
   take('peephole', 'ey', PEEPHOLES);
+  take('grab', 'gb', BOWS);
   /* ⚠ A NUMBER, SO `take` CANNOT DO IT — `take` resolves an id against a list
      and reports an unknown one. A length is neither: it is one of eight
      values, and anything else is a link we cannot read. Refused with the same
@@ -890,7 +924,12 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
 export const BITS = { version: 5, colour: 5, size: 3, handing: 2, window: 2,
                       grille: 4, handle: 4, lockset: 4, detail: 3,
                       speciallock: 2, mashkof: 3, pirzul: 2, handleLen: 4,
-                      stripes: 5, bell: 1, peephole: 2, handleFinish: 2 };
+                      stripes: 5, bell: 1, peephole: 2, handleFinish: 2,
+                      /* The bow, 26.9.2026: one bit, APPENDED at the end of
+                         the pack order like the bell before it. Payload 54;
+                         `TOTAL_BITS` reserves the check nibble before rounding
+                         and stays at 60, so the code stays twelve characters. */
+                      grab: 1 };
 /* The payload does not divide by 5, so the code carries the next multiple up
    and the top bits are always zero. Rounding UP is the only safe direction:
    truncating would drop the low bits of the last field. Both numbers are
@@ -1007,6 +1046,7 @@ export function encodeCode(state) {
     [Math.max(0, BELLS.findIndex(x => x.id === state.bell)), BITS.bell],
     [Math.max(0, PEEPHOLES.findIndex(x => x.id === state.peephole)), BITS.peephole],
     [Math.max(0, HANDLE_FINISHES.findIndex(x => x.id === state.handleFinish)), BITS.handleFinish],
+    [Math.max(0, BOWS.findIndex(x => x.id === state.grab)), BITS.grab],
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -1075,6 +1115,7 @@ export function decodeCode(code) {
   const bell    = BELLS[read(BITS.bell)];
   const peep    = PEEPHOLES[read(BITS.peephole)];
   const hf      = HANDLE_FINISHES[read(BITS.handleFinish)];
+  const bow     = BOWS[read(BITS.grab)];
   /* ⚠ `hLen === undefined`, NOT `!hLen`. Zero is a VALID value — it is the
      "as the model comes" default and the commonest length in the range — and
      `!0` is true, so a truthiness guard refused every code for an untouched
@@ -1082,13 +1123,13 @@ export function decodeCode(code) {
      "not found"; this one is a number and needed its own test. */
   if (!colour || !size || !handing || !window || !grille || !handle || !lockset
       || !detail || !special || !mashkof || !pirzul || hLen === undefined
-      || !bell || !peep || !hf) return null;
+      || !bell || !peep || !hf || !bow) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
     speciallock: special.id, mashkof: mashkof.id, pirzul: pirzul.id,
-    bell: bell.id, peephole: peep.id, handleFinish: hf.id,
+    bell: bell.id, peephole: peep.id, handleFinish: hf.id, grab: bow.id,
     handleLen: hLen, ...unpackStripes(sp),
   };
 }
