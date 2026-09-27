@@ -26,6 +26,45 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE GATES RE-READ, AND `npm run latency` IS PARTLY AN INSTRUMENT FOR
+  MEASURING THE CONTAINER.** No instruction; this is §6 applied to a number that
+  was about to be written down.
+
+  **WHAT LOOKED LIKE A REGRESSION.** §0c carried *"183 ms worst door against a
+  600 ms gate"*, taken on `6934c0d`. The round's run read **321 ms**, then 339,
+  then 386 — with **identical element counts every time** (261 · 531 · 656), so
+  the drawing was the same weight in all three. A 75% jump is the kind of thing
+  that gets written into the table as a new figure, or worse, hunted in the code.
+
+  **WHAT WAS DONE INSTEAD.** `git worktree add /tmp/lat 6934c0d`, `node_modules`
+  symlinked, and the instrument run on the two commits **interleaved, three each**
+  — because a single A-then-B pair cannot separate an ordering from a drift, and
+  HEAD's own spread across four runs that evening was 88 ms (298–386), which is
+  twice the gap being argued about.
+
+  | | run 1 | run 2 | run 3 | median | range |
+  |---|---|---|---|---|---|
+  | `6934c0d` | 262 | 260 | 281 | **262** | 260–281 |
+  | this commit | 275 | 287 | 261 | **275** | 261–287 |
+
+  **THE CODE DID NOT GET SLOWER.** The ranges overlap almost completely and one
+  new run (261) is faster than one old run (281). 13 ms of median difference
+  inside a ±20 ms band is not a finding.
+  **THE CONTAINER DID.** The same `6934c0d` that recorded 183 ms reads a median of
+  262 here — about 1.4× — which is the whole of the change. §7 already says
+  Chromium's ceiling here falls the longer the container lives; this is the same
+  fact showing up in a timing rather than in a crash.
+
+  **SO THE RECORD CHANGED, NOT THE GATE.** §0c's row now carries the figure WITH
+  the caveat that milliseconds are not comparable across containers, the element
+  counts (which do belong to the drawing), and the measurement that established
+  it; §7's row says a jump is not a regression until the old commit has been run
+  beside the new one, and how. The gate itself stays at 600 ms: nothing here
+  argues for widening it, and at 262–275 it is nowhere near.
+  ⚠ **What this cost to learn is one worktree and six minutes.** What it would
+  have cost to skip is a hunt through `trioRows` for 44 ms that was never there,
+  or a stale 183 ms sitting in the table while a real regression hid under it.
+
 - **27.9 — THE SQUARE WINDOW DISPLACES NOTHING, AND THE TWO CLAUSES ABOUT THAT
   DISPLACEMENT ARE RESTATED.** No instruction behind this one: it is the audit
   answering the trio commit, and it is a new §5 shape (**§5.27**).
@@ -573,6 +612,19 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** The curved lever's name is permanent: ידית מתעקלת / Curved lever /
+  Изогнутая ручка (*"give the curved lever a permanent name"*); id untouched,
+  1b and A19 closed. New: nothing on sale carries a provisional name. Slow run
+  for the design pairs, the bar and this, as predicted: 11 bare sheets moved
+  and 3 new, all twins or etched (the navigator-marks commit, now in
+  `HISTORY.md`, carries the same files byte-identically); the audit's stale
+  on-door exemption was found here too and is closed by the entry below.
+  Gates: test 9,197,205 / 0 (after the rebase),
+  collide 1,488, fuzz clean, latency 183 ms, audit clean. Long form: above.
+- **27.9** The audit's four named "price card on the door" readings (1100/1152
+  px, widest doubles) were stale: "Send" shrank the card to 113–142 px and it
+  is on no door now (measured on `7b9dc43` alone). `ON_DOOR_OK` emptied, so
+  that clause fires on every reading. Long form: above.
 - **27.9** The nine navigator marks redrawn as what each step sells — *"really
   represent the actual content of the section and not some random circles and
   squares"*: ajar door, swatch fan, lever on its plate, hinge with a glint,

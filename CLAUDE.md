@@ -129,6 +129,16 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The round's gates re-read, and ⚠ **`npm run latency`'s milliseconds
+  turn out to be a reading of the CONTAINER**: the jump 183 → 321/339/386 ms was
+  investigated instead of written down, and `6934c0d` run beside this commit,
+  three each interleaved, gives medians 262 and 275 with overlapping ranges and
+  one new run faster than one old — no difference between the code. The same
+  `6934c0d` that recorded 183 ms reads 262 here, so this container is ~1.4×
+  slower and a single run's spread is ~90 ms. §0c and §7 now say to compare the
+  ELEMENT COUNTS (261 · 531 · 656) and how to run the two commits side by side.
+  Audit clean at all eight `VIEWS`; test 9,210,648 / 0; sheets 0 bare, 0 lockset.
+  Long form: `HISTORY.md`.
 - **27.9** The square window displaces NO face now, and the two audit clauses
   about that displacement are restated (§5.27 — a new shape). The trio commit
   stranded two of them, not one: the first guarded its own precondition and
@@ -172,19 +182,6 @@ lines here. Dates are the day of the change.
   by coincidence; it reads the group that DECLARES the count now. Falsified: the
   24.9 rows typed back → 30 faults. `collide -- all` 1,488 → 1,508. Long form:
   `HISTORY.md`; §3 carries the derivation and what it cost.
-- **27.9** The curved lever's name is permanent: ידית מתעקלת / Curved lever /
-  Изогнутая ручка (*"give the curved lever a permanent name"*); id untouched,
-  1b and A19 closed. New: nothing on sale carries a provisional name. Slow run
-  for the design pairs, the bar and this, as predicted: 11 bare sheets moved
-  and 3 new, all twins or etched (the navigator-marks commit, now in
-  `HISTORY.md`, carries the same files byte-identically); the audit's stale
-  on-door exemption was found here too and is closed by the entry below.
-  Gates: test 9,197,205 / 0 (after the rebase),
-  collide 1,488, fuzz clean, latency 183 ms, audit clean. Long form: `HISTORY.md`.
-- **27.9** The audit's four named "price card on the door" readings (1100/1152
-  px, widest doubles) were stale: "Send" shrank the card to 113–142 px and it
-  is on no door now (measured on `7b9dc43` alone). `ON_DOOR_OK` emptied, so
-  that clause fires on every reading. Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -289,11 +286,11 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | ~9.20 M assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything (it rose from 7.48 M on 27.9 with three more grilles; it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves); read the failure count | 27.9 |
-| `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) — about 20 minutes now; the price-breakdown check waits for its animation since 27.9 | 27.9 |
+| `npm test` | 9,210,648 assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything (it rose from 7.48 M on 27.9 with three more grilles; it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves); read the failure count | 27.9 |
+| `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) — about 20 minutes now; the price-breakdown check waits for its animation since 27.9. ⚠ It was **red for one commit** on 27.9 (8 faults, one per viewport) because the trio change stranded two of its assertions — §5.27, and the reason it is worth running the audit on a commit that changes what `repair` does | 27.9 |
 | `npm run collide` | `all` (1,508 designs — 1,338 base, 552 of them with the bow, plus 170 face-detail; the 20 over 26.9 are the glazed trio) and `boxes` clean | 27.9 |
 | `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, nothing broke | 27.9 |
-| `npm run latency` | 183 ms worst door against a 600 ms gate | 27.9 |
+| `npm run latency` | **262 ms** worst door against a 600 ms gate — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS** (261 · 531 · 656 for default · sidelight+ironwork · the heaviest). Established 27.9 by running this commit and `6934c0d` interleaved, three each: medians 275 and 262, ranges 261–287 and 260–281, one new run faster than one old — no difference between the code. `6934c0d` itself recorded 183 ms and reads 262 here, so the container is ~1.4× slower than the one that took that figure, and a single run's spread on it is ~90 ms | 27.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
 | `npm run sheets` | the 51 bare sheet files (three twins' `against` sheets added 27.9) and 6 `lockset` sheets byte-stable across commits that do not touch the drawing; the design pairs moved 11 and added 3, every one a twin or an etched design. ⚠ The trio's rows and the משקוף section moved **0 bare sheets and 0 lockset**, as predicted: no fixture carries a three-panel face (`js/works.js` is 27 `plain` + 3 `panel2`, `tools/against.mjs` sets no face at all) and a tile is not in `?bare=1`. Only `.stamps.json` and 7 of the 12 `shot` sheets — the documented noise floor | 27.9 |
@@ -1148,7 +1145,7 @@ against nothing and landed on "slightly better".
 |---|---|
 | `npm test` | the string-level suite: price, code, link, rules, drawing, copy. Its total is catalogue arithmetic; read the failures |
 | `npm run audit` | the real page, driven — see below |
-| `npm run latency` | how long a tap takes at 6× CPU throttle, against 600 ms. It requires the design code to change on every tap, or a throwing handler would pass |
+| `npm run latency` | how long a tap takes at 6× CPU throttle, against 600 ms. It requires the design code to change on every tap, or a throwing handler would pass. ⚠ **Its milliseconds are a reading of the CONTAINER as much as of the page** (identical code: 183 ms on one, 262 on another, ~90 ms of spread across runs on the same one), so a jump is not a regression until the old commit has been run beside the new one — `git worktree add /tmp/lat <old>`, symlink `node_modules`, and interleave. The **element counts** it prints beside each figure are the part that belongs to the drawing |
 | `npm run collide` | real `getBBox()` over the buildable designs, no declared number in the loop; asserts the SIZES it sweeps exist. `-- boxes` measures every fitting's footprint and keeps `handleFootprint` and `SPECIAL_BOX` honest |
 | `npm run fuzz` | random combinations of every `DEFAULTS` field (it faults on one it does not draw — the bow was missed for a run, 26.9), then click-walks in a browser |
 | `npm run profile` | the leaf's VERTICAL fall against the medians `FALLOFF` was fitted to |
