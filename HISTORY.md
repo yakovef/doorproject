@@ -50,16 +50,127 @@ oldest lines move to the top of the "moved" section.
     already rendered here by `6934c0d`, so none of that crosses over. The 17
     that did not move: 10 window-only crops and 7 orphan `recreate-` files.
   · `research/handles/curved/README.md` takes the lever's permanent name.
-  · **The audit was red on this branch before the merge, and the merge found
-    it.** Its clause "a window chosen over the trio gives the trio back when it
-    goes" tapped the SQUARE window, which `5676973` made the trio keep — so it
-    faulted "lost its subject" at all eight views (`988e948` fixed a different
-    clause of that commit). Proved not the merge's: the same taps on a clean
-    worktree of this branch's head leave `panel3` on the square window too.
-    The refusal moved to the vertical slot (`why.winPlate`), and measured on
-    the page strip takes panel3 to plain and none gives it back, so the clause
-    taps `strip` now — same subject, its fixture moved a second time, as the
-    26.9 note above it records the first.
+  · **The merge's audit found the trio clause red — 8 faults, "a square window
+    left the face at panel3 … lost its subject" — and it was this branch's own,
+    not the merge's**: the same taps on a clean worktree of this branch's head
+    leave `panel3` under the square window too. The merge first moved that
+    clause's fixture to the vertical slot (measured: strip takes panel3 to
+    plain, none gives it back); by the time it was pushed, `ab2cde4` had landed
+    here with the fuller restatement (§5.27 — the square window displaces
+    nothing, asserted; the slot swept over both faces; the silent clause moved
+    to the stripes), so the merge took `ab2cde4`'s `tools/audit.mjs` whole and
+    dropped its own one-line move.
+  · **The test total fell ~92 k (main 9,210,648 → merge 9,118,759), and a
+    fall that size is not waved through as "catalogue arithmetic".** Counted
+    per group on both trees: every big sweep lost the same 1.0%, so fewer
+    designs, not fewer checks. Buildability over size × handing × window ×
+    grille × grip × lockset is identical (3,576 refused on both); bar room for
+    the Coral, the curved lever, the cylinder and the Rotem at 0/1500/2000 mm
+    identical. The difference is one variant of `everyState`: the Coral beside
+    a **700 mm** Idan, 312 buildable per colour on main against 252 — lost on
+    `extra1` and `halfextra1` with the square window, all 15 window designs ×
+    both handings. `gripObstacle` says `lock`, `repair` swaps the lever to the
+    cylinder. With `CORAL_LOCK_R` set back to 33 all 60 fit, so it is the
+    Coral's measured 70 mm lock against the 15 mm `LOCK_CLEAR`; every other
+    bar length was already refused there on main. Recorded in §9, not fudged.
+
+- **27.9 — THE GATES RE-READ, AND `npm run latency` IS PARTLY AN INSTRUMENT FOR
+  MEASURING THE CONTAINER.** No instruction; this is §6 applied to a number that
+  was about to be written down.
+
+  **WHAT LOOKED LIKE A REGRESSION.** §0c carried *"183 ms worst door against a
+  600 ms gate"*, taken on `6934c0d`. The round's run read **321 ms**, then 339,
+  then 386 — with **identical element counts every time** (261 · 531 · 656), so
+  the drawing was the same weight in all three. A 75% jump is the kind of thing
+  that gets written into the table as a new figure, or worse, hunted in the code.
+
+  **WHAT WAS DONE INSTEAD.** `git worktree add /tmp/lat 6934c0d`, `node_modules`
+  symlinked, and the instrument run on the two commits **interleaved, three each**
+  — because a single A-then-B pair cannot separate an ordering from a drift, and
+  HEAD's own spread across four runs that evening was 88 ms (298–386), which is
+  twice the gap being argued about.
+
+  | | run 1 | run 2 | run 3 | median | range |
+  |---|---|---|---|---|---|
+  | `6934c0d` | 262 | 260 | 281 | **262** | 260–281 |
+  | this commit | 275 | 287 | 261 | **275** | 261–287 |
+
+  **THE CODE DID NOT GET SLOWER.** The ranges overlap almost completely and one
+  new run (261) is faster than one old run (281). 13 ms of median difference
+  inside a ±20 ms band is not a finding.
+  **THE CONTAINER DID.** The same `6934c0d` that recorded 183 ms reads a median of
+  262 here — about 1.4× — which is the whole of the change. §7 already says
+  Chromium's ceiling here falls the longer the container lives; this is the same
+  fact showing up in a timing rather than in a crash.
+
+  **SO THE RECORD CHANGED, NOT THE GATE.** §0c's row now carries the figure WITH
+  the caveat that milliseconds are not comparable across containers, the element
+  counts (which do belong to the drawing), and the measurement that established
+  it; §7's row says a jump is not a regression until the old commit has been run
+  beside the new one, and how. The gate itself stays at 600 ms: nothing here
+  argues for widening it, and at 262–275 it is nowhere near.
+  ⚠ **What this cost to learn is one worktree and six minutes.** What it would
+  have cost to skip is a hunt through `trioRows` for 44 ms that was never there,
+  or a stale 183 ms sitting in the table while a real regression hid under it.
+
+- **27.9 — THE SQUARE WINDOW DISPLACES NOTHING, AND THE TWO CLAUSES ABOUT THAT
+  DISPLACEMENT ARE RESTATED.** No instruction behind this one: it is the audit
+  answering the trio commit, and it is a new §5 shape (**§5.27**).
+
+  **WHAT THE AUDIT SAID.** Eight faults, one per viewport, all of them one
+  clause: *"a square window left the face at panel3 — this check has lost its
+  subject, nothing was taken away to give back"*. That clause asserts its own
+  precondition, so the day its subject vanished it failed loudly. **It is the
+  only reason any of this was found** — and it was found by running the tool,
+  after the same commit's other stranded assertion had been found by reading it.
+  Two, not one.
+
+  **WHAT WAS MEASURED.** `repair` with the square window and each of the four
+  faces returns that face unchanged and says nothing: the pair stopped being
+  displaced on 26.9 (the window replaces its upper panel), the trio on 27.9 (its
+  rows are the casing's), and the Greek set brings its own light. So **the square
+  window displaces no face at all** — this is not a fixture that can move a third
+  time. The tall SLOT still displaces both: the pair for want of room
+  (`why.noRoomBelow`, 337 mm) and the trio by the handle plate (`why.winPlate`,
+  488 mm on the standard leaf), `WHY_UNDER_GLASS` mapping each.
+
+  **SO BOTH HALVES OF THE NEW TRUTH, NOT A THIRD FIXTURE (§5.22).** *The square
+  window takes nothing* is now asserted — the thing commit `5676973` actually
+  delivered, and the thing the old clause used to contradict. The displacement
+  claim moved to the slot and sweeps **both** panelled faces, so the day the slot
+  stops taking one of them this fails instead of going quiet.
+
+  ⚠ **AND THE CLAUSE THAT WENT QUIET IS THE INTERESTING ONE.** *A deliberate
+  choice beats the memory* took the trio with the square window, chose the pair
+  on purpose beside it, removed the window, and required the pair to survive.
+  With nothing displaced it walked all three steps and **passed while testing
+  nothing**, for a whole commit. A clause about a state TRANSITION has to assert
+  the transition happened before asserting what followed it — §5.15's demand that
+  a selector prove it found something, moved from markup to behaviour.
+  ⚠ Its replacement was **measured and rejected** rather than written: taking the
+  trio with the slot and then tapping `plain` deliberately does NOT disarm the
+  memory (the trio still comes back), because the guard asks whether the field
+  still holds what the repair made it and a tap on that same value changes
+  nothing. Asserting it would have been a check demanding behaviour the page does
+  not have. It moved to the STRIPES, the one field where a deliberate different
+  value is reachable: a panelled face displaces the direction, a stripe pill's tap
+  performs its own repair, so the deliberate `v` and the remembered `h` collide in
+  one gesture and `v` must win — immediately and after the face goes back to
+  plain. Clause 4 (nothing of the memory in the address) was re-pointed to the
+  slot too, so it is about a live memory rather than a dead one.
+
+  **FALSIFIED THREE WAYS, EACH FLIPPING ONLY ITS OWN CLAUSE**, which is what
+  makes them three checks and not one: the 24.9 trio rows typed back → 1a fails
+  ("face plain" — the square window displaces again) and 1b stays green;
+  `panelUnderGlass` returning null → both 1b cases fail on the lost-subject
+  branch ("took panel3", "took panel2") and 1a stays green; the
+  `state[k] === m.became` guard dropped → 3 fails ("kept h") and the rest stay
+  green. ⚠ Done in a gitignored scratch harness (`tools/_memo.mjs`) that
+  replicates the four clauses in ~15 s — **that is why three falsifications were
+  run instead of one.** A 20-minute audit per experiment is how a round ends up
+  trusting one. The first attempt at the first falsification silently did not
+  apply (an indentation mismatch in the patch) and printed all-PASS about an
+  unchanged tree; it is only a falsification when the named clause flips.
 
 - **27.9 — THE CORAL AND THE CURVED LEVER, INTO THE APP OFF SEVEN INSTALLED DOORS.**
   The owner's son, after the Coral proposal: *"Put the coral into the app and now
@@ -667,6 +778,55 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** The Coral drawn against four installed doors — *"fix the coral
+  handle"* — **proposal only, app untouched** (`research/handles/coral/`).
+  Size was right (reach, blade, keyway spacing within 4%); shape and metal were
+  not: the root is a rounded end on the spindle, not a flared neck; the nickel
+  read 20–30% light and cold (photos warm, hue ≈40°); the escutcheon is 70 mm
+  with rings, a plug 5 mm above centre, no euro keyhole. No gates (no app change).
+- **27.9** No figures on the משקוף section — *"…it's better to not show a number
+  than show a false one."* The three figures (46/82, 62/112, 148/198) and the
+  dimension marks they sat on go from `mashkofGlyph`; the C, the three part NAMES
+  and the pills' prices stay, so the section says it RELATIVELY — a widened part
+  is a longer arm or a deeper falc, asserted off the catalogue's own `wide` list.
+  `MASHKOF_PARTS` keeps its widths (the drawing needs two parts of three). The
+  one-ruler assertion reads the three drawn PIECES, and *no `<text>` carries a
+  digit* is asked of EVERY text rather than of the deleted `glyph__dim` group
+  (§5.15); the CSS rule went with the class. Falsified: one figure back → 8, one
+  per frame; the section ignoring its frame → 32; the MARKS back → nothing, and
+  correctly — they are `<path>` and the clause reads the three `<rect>` pieces.
+  ⚠ Also carries the audit assertion `5676973` left out: it went on asserting
+  the refusal that commit reversed, so the audit was red there. Long form:
+  `HISTORY.md`.
+- **27.9** The three-panel face takes the window, and its rows are DERIVED from
+  it — *"…the window doesn't change size no matter what, and what is not right is
+  probably the proportions of the panels, change them so that the window will fit
+  there perfectly."* ⚠ Reverses the 26.9 refusal, on his word. `trioRows(leafH)`
+  replaces `PANEL_ROWS.trio`: upper = the square window's casing rectangle, the
+  plate one measured rail below it, the lower panel the second rail below that
+  (0.120–0.560 · 0.586–0.680 · 0.705–0.913 standard) — a FUNCTION, because 70 mm
+  of casing is a different fraction on every size (§5.16). The 24.9 rows are kept
+  beside it: measured, overruled, kept. ⚠ The refusal MOVED rather than going —
+  the tall slot still lands 322–488 mm in the plate, so `why.winPlate` keeps a
+  reader. Price `DETAIL_GLAZED.panel3 = DETAIL.panel3 − DETAIL.panel2`, ₪450
+  (A21) → a glazed trio is ₪7,445. ⚠ And *"a panel that is charged for is a panel
+  that is drawn"* had been reading the FIXED leaf's group on a double and agreeing
+  by coincidence; it reads the group that DECLARES the count now. Falsified: the
+  24.9 rows typed back → 30 faults. `collide -- all` 1,488 → 1,508. Long form:
+  `HISTORY.md`; §3 carries the derivation and what it cost.
+- **27.9** The curved lever's name is permanent: ידית מתעקלת / Curved lever /
+  Изогнутая ручка (*"give the curved lever a permanent name"*); id untouched,
+  1b and A19 closed. New: nothing on sale carries a provisional name. Slow run
+  for the design pairs, the bar and this, as predicted: 11 bare sheets moved
+  and 3 new, all twins or etched (the navigator-marks commit, now in
+  `HISTORY.md`, carries the same files byte-identically); the audit's stale
+  on-door exemption was found here too and is closed by the entry below.
+  Gates: test 9,197,205 / 0 (after the rebase),
+  collide 1,488, fuzz clean, latency 183 ms, audit clean. Long form: above.
+- **27.9** The audit's four named "price card on the door" readings (1100/1152
+  px, widest doubles) were stale: "Send" shrank the card to 113–142 px and it
+  is on no door now (measured on `7b9dc43` alone). `ON_DOOR_OK` emptied, so
+  that clause fires on every reading. Long form: above.
 - **27.9** The nine navigator marks redrawn as what each step sells — *"really
   represent the actual content of the section and not some random circles and
   squares"*: ajar door, swatch fan, lever on its plate, hinge with a glint,
