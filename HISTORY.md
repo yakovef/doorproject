@@ -26,6 +26,58 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE ROTEM, MEASURED OFF THREE INSTALLED DOORS: A PROPOSAL.** The
+  owner's son: *"here is 3 doors with the rotem handle."* The Rotem (`plate`) is
+  the DEFAULT lockset, on the door every visitor sees first. Per §0a the app is
+  not touched; everything is in `research/handles/rotem/` (the photographs, the
+  sheet photo | shipped | proposed, the proposal in all four finishes, the whole
+  door at a visitor's size, and `proposed-rotem.js` with what must move with it).
+  · **Method.** The leaves' width reads 7-10% under 850 on all three alike, so
+    the scale is the leaf's HEIGHT at the plate's column over 2050 mm (0.595 /
+    0.600 / 0.589 px/mm), cropped round the spindle (plate centre across, lever
+    centre line down), door 2 mirrored. Readings are edge profiles, run the same
+    way on our render with its stroke biases named.
+  · **What moved, measured:** the outline — flat head with 9 mm corners,
+    straight parallel sides, a foot that is a half-ellipse 1.16x as deep as it is
+    half-wide (fitted on the plate's width at 122-154 mm below the spindle,
+    all three doors within 3 mm; our v1 took 0.86 by eye off a grid and read
+    3-8 mm too narrow low down) where we drew a waisted plate with a domed head;
+    88.5 x 224 (was 90 x 240), spindle at 0.295; a satin face in one tone (the
+    Coral rose's centre, the same metal: plate/paint 1.63 against 1.45 / 1.66,
+    shipped 1.90) where `plateFace` banded it like chrome; the key a raised egg
+    26 x 42 narrowing downward at 101 below the spindle with the slot at 93.5,
+    where we drew a 34 x 50 oval boss with a BLACK euro keyhole none of the doors
+    shows; the lever an even strap of `LEVER_BLADE` (half-max 24.2, 23.5 without
+    the 2.8% magnification) where we drew a taper 32 -> 20 with a collar; its
+    root a rounded end on the spindle with a dark bend ~30 mm long (0.13-0.26 of
+    the plate's luminance). Two new defs beside `roseFace`, built from hwTone, so
+    it follows every finish.
+  · **Kept: the reach, 119.** The photographs read 111 / 117.5 / 114; a lever
+    ~55 mm proud, photographed from ~1.9 m in front of the door's middle (a 26 mm-
+    equivalent lens against the leaf's pixel height), is pushed toward the
+    closing edge by each point's own distance from the camera's axis: 116 / 124
+    / 119.5 corrected, and the root 12 / 7 / 9 past the spindle (read 21 / 18 /
+    19). The bar's length, 126-130, agrees either way. ⚠ A first crop reading of
+    door 2's tip (107) had caught the bright END FACE's edge instead of the
+    outline (117.5); the raw row profile settled it.
+  · ⚠ **The same model says the Coral and the curved lever, in the app since this
+    morning, are ~8% short** (Coral ~139 against 128, curved ~115 against 106,
+    each bar ~9 mm toward the edge; ~134 / ~111 if the photographs were zoomed):
+    their READMEs shrank the read reach about the spindle, which is the wrong
+    direction. Recorded in `CLAUDE.md` §9 and §0a and the Rotem's README; not
+    fixed without the owner's son's word.
+  · **Recorded, not changed:** door 1's champagne colour (a gold-family finish or
+    the lamp — the finish is the customer's choice); the pocket's straight inner
+    edge on two doors of three; a ~2 mm root-to-tip taper on two of three.
+    `ASK-PERETZ.md` §1f is answered by the owner's son's word: this fitting is the
+    Rotem. `CLAUDE.md` §9's note on the tile was re-read and corrected: the
+    tile's plate IS `PLATE` (90 x 240); the "166 x 340" is `handleFootprint`'s box.
+  · Gates: none run — nothing under `js/`, `css/` or `index.html` changed, so no
+    sheet stamp moves. The proposal was spliced into a scratch copy of the
+    renderer (`tools/_rotem/`, gitignored), drawn through Chromium on all three
+    windows and all four finishes, and its drop-in file parses and emits one
+    `data-mount="backplate"` and one `data-hw="keyway"`.
+
 - **27.9 — THE HANDLE BRANCH, MERGED INTO THE MAIN ONE.** The owner's son could
   not see the levers on the page: *"is it on the web app, because right now i
   dont see it"* — they were only on `claude/door-handle-design-catalog-votz53`,
@@ -804,6 +856,19 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** The square window displaces NO face now, and the two audit clauses
+  about that displacement are restated (§5.27 — a new shape). The trio commit
+  stranded two of them, not one: the first guarded its own precondition and
+  failed at all eight viewports (*"this check has lost its subject"*), the second
+  did not and **passed while testing nothing**. Measured: `rect` leaves all four
+  faces alone; the tall SLOT still takes the pair (`why.noRoomBelow`, 337 mm) and
+  the trio (`why.winPlate`, 488), so the displacement claims move there and sweep
+  both faces, and *the square window takes nothing* is asserted beside them
+  (§5.22). ⚠ The deliberate-choice clause moved to the STRIPES: a deliberate
+  `plain` tap was measured and does NOT disarm the memory, so asserting it would
+  have demanded behaviour the page lacks. Falsified three ways, each flipping only
+  its own clause — 24.9 rows back → 1a; the slot displacing nothing → both 1b;
+  the restore guard dropped → 3. Long form: `HISTORY.md`.
 - **27.9** Curved lever MEASURED off three installed doors (*"I trust you to put
   it into the app"*; `research/handles/curved/`), replacing the shape built from
   words 25–26.9: linear taper 21 / 15 / 9.5 (square law drew 20.6 / 11 / 8),

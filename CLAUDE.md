@@ -130,6 +130,11 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   code are committed under `research/handles/<name>/`. A new product needs
   Peretz's name and price before it can be sold. This work lives on
   `claude/door-handle-design-catalog-votz53`, their choice.
+  ⚠ **A lever stands ~55 mm proud, and a photograph taken from the door's
+  middle MOVES it toward the closing edge** — it reads short from the spindle —
+  rather than magnifying it about the spindle. Correct each point by its own
+  distance from the camera's axis (`research/handles/rotem/README.md`); the
+  Coral and the curved lever were corrected the other way (§9).
 
 ---
 
@@ -139,6 +144,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The Rotem — the DEFAULT lockset — measured off three installed doors,
+  a PROPOSAL with the app untouched (`research/handles/rotem/`): a flat head,
+  straight sides and a foot 1.16× deeper than a semicircle (we drew a waisted
+  plate), 88.5 × 224 (was 90 × 240), satin not chrome, an egg-shaped key rim with
+  no black keyhole, an even 23 mm strap with a dark bend at its root; reach 119
+  kept. ⚠ Found doing it: the Coral's and curved lever's parallax ran the WRONG way (§9).
 - **27.9** The handle branch merged into this one (*"yes you should"* — the levers
   were only on `claude/door-handle-design-catalog-votz53` and the owner's son
   looked for them on the page): the Coral and the curved lever measured off seven
@@ -170,19 +181,6 @@ lines here. Dates are the day of the change.
   ELEMENT COUNTS (261 · 531 · 656) and how to run the two commits side by side.
   Audit clean at all eight `VIEWS`; test 9,210,648 / 0; sheets 0 bare, 0 lockset.
   Long form: `HISTORY.md`.
-- **27.9** The square window displaces NO face now, and the two audit clauses
-  about that displacement are restated (§5.27 — a new shape). The trio commit
-  stranded two of them, not one: the first guarded its own precondition and
-  failed at all eight viewports (*"this check has lost its subject"*), the second
-  did not and **passed while testing nothing**. Measured: `rect` leaves all four
-  faces alone; the tall SLOT still takes the pair (`why.noRoomBelow`, 337 mm) and
-  the trio (`why.winPlate`, 488), so the displacement claims move there and sweep
-  both faces, and *the square window takes nothing* is asserted beside them
-  (§5.22). ⚠ The deliberate-choice clause moved to the STRIPES: a deliberate
-  `plain` tap was measured and does NOT disarm the memory, so asserting it would
-  have demanded behaviour the page lacks. Falsified three ways, each flipping only
-  its own clause — 24.9 rows back → 1a; the slot displacing nothing → both 1b;
-  the restore guard dropped → 3. Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -1405,11 +1403,28 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   down), rings with the plug near the centre, a dark field with the cam slot —
   at 67–71 mm against our 66. It is not the lever, it varies door to door, and
   it is every lockset's; `research/handles/curved/README.md` has it.
-- **The `plate` tile's backplate is not the door's** (19.9). The tile draws the
+- **The `plate` tile's backplate is not the door's** (19.9) — ⚠ re-read 27.9:
+  the tile's plate IS `PLATE`, 90 × 240, the spindle at 0.30 and the key at 0.74,
+  exactly the door's; the "166 × 340" below is `handleFootprint`'s box round the
+  lever and plate together, not the plate. What is wrong is the SHAPE, in both:
+  the Rotem's photographs (`research/handles/rotem/`) show no waist and a flat
+  head, and the proposal there redraws the door and names the tile's redraw.
+  The original note, kept: the tile draws the
   Rotem's plate 90 × 240; `handleFootprint` declares about 166 × 340 — not one
   scale in both axes, so it is a redraw from `plateHandle`'s outline (moving the
   keyway boss too), then re-running the pairwise raster floor. The picture is
   not wrong; the size relation `FITTING_GLYPH`'s header promises is.
+- **The Coral and the curved lever are drawn ~8% short** (27.9, found measuring
+  the Rotem; not fixed — the app waits for the owner's son's word). Their
+  READMEs shrank the photographed reach about the spindle "for parallax" (133 →
+  128, 109 → 106). A lever standing proud, photographed from the door's middle,
+  is pushed toward the closing edge, so it reads SHORT: per door, by each tip's
+  distance from the camera's axis at ~1.9 m, the Coral is ~139 and the curved
+  lever ~115, each bar ~9 mm too far toward the edge; their own lengths are
+  right. If the photographs were zoomed the error halves (~134, ~111). Fixing
+  it moves `LEVER_REACH`/`TAPER_REACH`, both footprints (re-measured by
+  `collide -- boxes`), the curved lever's photo-anchored tests and every sheet
+  with either lever.
 - **How big the lever's rose is against the leaf — three readings, three
   answers** (19.9). `LEVER_ROSETTE` 30 → 0.0765 of a 784 mm leaf; the lockset
   sweep reads 0.082, a hand flood fill 0.0726, our outline drawn over four
