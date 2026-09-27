@@ -128,18 +128,27 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
 Older and long-form: **`HISTORY.md`** (verbatim to 26.9.2026). Dates are the
 day of the change.
 
+- **27.9** No outline round the inside of the glass — *"there is a black
+  outline around the inside of the window, I want it removed"*: `aperture`'s
+  stroke of the paint ×0.6 deleted; the 8 mm rebate stays (under the opaque
+  pane, 0 px on screen). Falsified: the stroke back fails every pane (48).
+  Sheets, one run for all three 27.9 changes, as predicted: 19 bare moved, all
+  glazed, 0 solid, 0 lockset; 11 of the 19 carry the white/black change too
+  (the light twins, circles, tree, the four glazed recreates, corpus-07).
+  Gates: test 7,483,871 / 0, audit clean (its breakdown check had measured an
+  animation, 9.7 px once — it waits now), collide 1,488, fuzz clean, glass unmoved.
 - **27.9** A design is white or black, never the door's colour — *"The colors
   of the designs are only white or black, they are not based on the door
   color"* (overruling Peretz's 26.8 *"…גם בגוון הדלת"*): `-light` twins white on
   door and tile alike (`grilleTint`), etched rings white, the tree a fixed
   near-black. Falsified: `lighten(paint, 0.10)` back fails 64 light rows, 0
-  black. Labels לבן / white / белый; ids unchanged.
+  black. Labels לבן / white / белый; ids unchanged. Test 7,483,741 / 5 (sheets).
 - **27.9** The digital viewer is refused beside a window, like the optical one
   — *"The digital peephole still stays when there is a window, this can't
   happen."* `conflicts` and `repair` named `'peep'`; one `viewerOn` predicate
   now, every viewer asked at its own radius (§5.26). A `?ey=peep-digital&w=rect`
   link had kept the ₪390 viewer on the glass in silence. Falsified: the literal
-  back fails 60 digital rows, 0 optical. Sheets: none (rules only).
+  back fails 60 digital rows, 0 optical. No sheet (rules). Test 7,483,519 / 5.
 - **26.9** Flow order `fit · colour · lock · pz · face · glass · grip · mk` —
   *"the hardware finish … right after the lever … the pull handle … after the
   panels and stripes"* (after the glass, asked), overruling Peretz's 30.8
@@ -279,13 +288,13 @@ the artefact** — walking §7's T-list means grepping for each one.
 | gate | reading | when |
 |---|---|---|
 | `npm test` | ~7.48 M assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything (it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves, and rose with the bow's sweeps); read the failure count | 27.9 |
-| `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) — about 20 minutes now | 27.9 |
+| `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) — about 20 minutes now; the price-breakdown check waits for its animation since 27.9 | 27.9 |
 | `npm run collide` | `all` (1,488 designs, 552 with the bow) and `boxes` clean | 27.9 |
 | `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, nothing broke | 27.9 |
 | `npm run latency` | 185 ms worst door against a 600 ms gate | 27.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
-| `npm run sheets` | the 48 bare sheets and 6 `lockset` sheets byte-stable across commits that do not touch the drawing (the bow and the reorder moved none) | 27.9 |
+| `npm run sheets` | the 48 bare sheets and 6 `lockset` sheets byte-stable across commits that do not touch the drawing; the 27.9 glass changes moved 19, every one glazed, as predicted | 27.9 |
 
 ⚠ **When a bare sheet moves on a commit that could not have moved it, find out
 what did** — that is how chrome painted across every sheet was found once. And
@@ -686,7 +695,17 @@ fixed `#232527` with its `#000` shadow and `#8A8F94` gleam; the `-light` twins
 are `GRILLE_LIGHT` white, handed to the door and the tile by one `grilleTint`;
 the etched rings and vine are white (frosted is white on any door); the tree is
 a fixed near-black (`TREE_BLACK`, 14.9 B1 *"a black silhouette"*). The pane, its
-sky and sheen and the mullions still take the paint. `grillePaths`' `tint`
+sky and sheen and the mullions still take the paint.
+
+⚠ **No line round the inside of the glass** (27.9, the owner's son). `aperture`
+drew a two-device-pixel stroke of the paint darkened 0.6 over every pane — a
+black line on any door but a near-black one; it is deleted, and the test holds
+every pane to no stroked, unfilled rect on its box. **The 8 mm `bevel` rebate
+stays**: it is measured, and the opaque pane is drawn over it on the same box,
+so it puts no pixel on screen — read across the pane edge at 390 and 1440 on
+white and charcoal, the moulding runs straight into the glass (the rebate would
+be 1.1 and 2.2 CSS px). `npm run glass` reads the same before and after: its
+bands sit inside the pane. `grillePaths`' `tint`
 parameter stays: the corpus recreations pass photographed bar colours through
 it.
 
@@ -1063,7 +1082,7 @@ against nothing and landed on "slightly better".
 | `npm run fuzz` | random combinations of every `DEFAULTS` field (it faults on one it does not draw — the bow was missed for a run, 26.9), then click-walks in a browser |
 | `npm run profile` | the leaf's VERTICAL fall against the medians `FALLOFF` was fitted to |
 | `npm run mottle` | slow horizontal unevenness of the PAINT; strips `[data-room="lamp-wash"]` first |
-| `npm run glass` | what is inside the pane, band by band, against the corpus — a description, not a target (§3) |
+| `npm run glass` | what is inside the pane, band by band, against the corpus — a description, not a target (§3). Ours on 27.9: tone 0.75 0.65 0.56 0.53 0.52, spread 0.16 0.14 0.15 0.11 0.08, deterministic |
 | `npm run recreate` | measured photographs beside our render, leaf heights matched |
 | `npm run corpus` | the 30 measured doors rebuilt from their records; writes `js/works.js` and `screenshots/corpus-links.md` |
 | `npm run against` | each design and grip beside its own source doors, cropped |

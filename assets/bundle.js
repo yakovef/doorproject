@@ -6231,9 +6231,17 @@ ${body}
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
       <!-- occlusion under the head of the aperture -->
       <rect x="${x}" y="${y}" width="${w}" height="34" fill="url(#aoTop)"/>
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none"
-            stroke="${darken(paint2, 0.6)}" stroke-width="2"
-            vector-effect="non-scaling-stroke"/>
+      <!-- NO OUTLINE ROUND THE GLASS, 27.9.2026. A two-device-pixel stroke of
+           the paint darkened 0.6 was drawn over every pane here, on every
+           opening; on any paint but near-black it read as a black line drawn
+           round the inside of the window, and the owner's son asked for it
+           gone: "for some reason there is a black outline around the inside of
+           the window, I want it removed." The 8 mm rebate above stays: it is
+           measured, and the opaque pane is drawn over it on the same box, so
+           no pixel of it reaches the screen (read across the pane edge at 390
+           and 1440 on a white and a charcoal door, 27.9: the moulding runs
+           straight into the glass, no dip). test/units.mjs holds the pane to
+           no stroked rect. -->
       <!-- MULLIONS. Two lights side by side are one cased opening with a solid
            bar between them, not two openings that happen to be near each
            other. It is the door's own material, so it takes the door's own

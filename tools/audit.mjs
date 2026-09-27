@@ -5649,14 +5649,31 @@ try {
         const t = document.querySelector('#price-toggle');
         if (!t) return null;
         t.click();
-        await new Promise(r => setTimeout(r, 240));
+        /* ⚠ NOT A FIXED WAIT — 27.9.2026. This slept 240 ms and measured, and
+           the breakdown's `fitPart` entrance was still running then: re-read
+           five times at 1920x918 it came back 0.5-3.8 px off, 9.7 once under
+           the audit's load (a fault), and exactly 0 in every language once the
+           animation had finished. §7: an instrument that measures during an
+           animation measures the animation. So: two frames for the animations
+           to start, then every finite one must finish — and one that never
+           does inside three seconds is a fault of its own. */
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+        const finite = document.getAnimations()
+          .filter(a => a.effect && a.effect.getComputedTiming().iterations !== Infinity);
+        const settled = await Promise.race([
+          Promise.all(finite.map(a => a.finished.catch(() => {}))).then(() => true),
+          new Promise(r => setTimeout(() => r(false), 3000))]);
+        if (!settled) return { unsettled: true };
         const b = document.querySelector('#breakdown'), q = document.querySelector('.quote');
         if (!b || !q) return null;
         const rb = b.getBoundingClientRect(), rq = q.getBoundingClientRect();
         if (!rb.width) return { shut: true };
         return { off: Math.round(((rb.left + rb.right) / 2 - (rq.left + rq.right) / 2) * 10) / 10 };
       });
-      if (!bd || bd.shut) {
+      if (bd && bd.unsettled) {
+        fault('quote-wall', `${lang} ${w}x${h}: the price breakdown was still animating three `
+          + 'seconds after it was opened — its placement cannot be read');
+      } else if (!bd || bd.shut) {
         fault('quote-wall', `${lang} ${w}x${h}: the price breakdown would not open, so its `
           + 'placement is measuring nothing');
       } else {

@@ -1966,6 +1966,57 @@ group('a design is white or black, never the door\'s colour');
      'the black and the white grid draw the same tile');
 }
 
+/* ── NO LINE RUNS ROUND THE INSIDE OF THE GLASS — 27.9.2026 ─────────
+   The owner's son: *"for some reason there is a black outline around the
+   inside of the window, I want it removed."* It was the last thing `aperture`
+   drew over every pane — a two-device-pixel stroke of the paint darkened 0.6.
+   Asserted against the CLASS of thing, not the deleted string: inside every
+   `data-pane` group, no rect that is unfilled and stroked may stand on the
+   pane's own box (within 2 mm on every side). The pane's box is read off the
+   glass rect itself (`fill="url(#glass)"`), and §5.15: every door must yield
+   its panes and every pane its glass rect. Swept over the leaf's pane, the
+   fixed leaf's and the Greek set's, on a white and a charcoal door. Today's
+   two windows put one light on a row, so no door carries a mullion; the
+   check reads whatever panes the drawing emits. Falsified by putting the
+   stroke back: every pane fails. */
+group('no line runs round the inside of the glass');
+{
+  const attrs = tag => Object.fromEntries([...tag.matchAll(/([\w-]+)="([^"]*)"/g)].map(m => [m[1], m[2]]));
+  const inside = (svg, open) => {
+    let depth = 1; const tag = /<(\/?)g\b[^>]*?(\/?)>/g; tag.lastIndex = open;
+    for (let t; (t = tag.exec(svg));) {
+      if (t[1]) { if (!--depth) return svg.slice(open, t.index); } else if (!t[2]) depth++;
+    }
+    return '';
+  };
+  let doors = 0, panes = 0;
+  for (const size of ['standard', 'extra2', 'half', 'halfextra2'])
+  for (const window of ['rect', 'strip']) for (const detail of ['plain', 'panel2', 'classic'])
+  for (const colour of ['rb-9016d', 'rb-7021d']) {
+    const st = repair({ ...base, size, window, detail, colour }).state;
+    if (st.window !== window || st.detail !== detail) continue;
+    const svg = render(st);
+    const found = [...svg.matchAll(/<g data-pane="[^"]+"[^>]*>/g)];
+    ok(found.length > 0, `${size}/${window}/${detail}: no data-pane group — this check is dead`);
+    doors++;
+    for (const m of found) {
+      const g = inside(svg, m.index + m[0].length);
+      const glass = [...g.matchAll(/<rect\b[^>]*>/g)].map(t => attrs(t[0])).find(a => a.fill === 'url(#glass)');
+      ok(glass, `${size}/${window}/${detail}: a pane with no glass rect — this check is dead`);
+      if (!glass) continue;
+      panes++;
+      const [px, py, pw, ph] = [glass.x, glass.y, glass.width, glass.height].map(Number);
+      const lines = [...g.matchAll(/<rect\b[^>]*>/g)].map(t => attrs(t[0])).filter(a =>
+        a.fill === 'none' && a.stroke && a.stroke !== 'none'
+        && Math.abs(+a.x - px) <= 2 && Math.abs(+a.y - py) <= 2
+        && Math.abs(+a.width - pw) <= 4 && Math.abs(+a.height - ph) <= 4);
+      ok(!lines.length, `${size}/${window}/${detail} on ${colour}: ${lines.length} stroked, unfilled rect(s) `
+        + `round the glass (${lines.map(a => a.stroke)}) — the line the owner's son asked to be removed`);
+    }
+  }
+  ok(doors > 20 && panes > doors, `the outline sweep asked ${doors} doors and ${panes} panes — the fixed leaf's panes are missing`);
+}
+
 group('every grille names the doors it was read from');
 {
   const byIdent = new Map(GRILLES.map(g => [g.id, g]));
