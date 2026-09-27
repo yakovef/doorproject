@@ -26,6 +26,43 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE NAVIGATOR'S NINE MARKS ARE THE THINGS THEIR STEPS SELL.**
+  The owner's son: *"look at each of the icons that represent the sections
+  above … draw better versions of them that really represent the actual
+  content of the section and not some random circles and squares … find flaws
+  in your design and critique it as much as you can."*
+  · **What each is now** (`js/icons.js`, `SECTION_ICON`): fit — a door ajar in
+    its opening on the floor; colour — a fan deck of swatches on its rivet;
+    lock — the lever on its backplate with the keyway; pz — a hinge with a
+    glint; face — a door-proportioned leaf with a panel over two strips and a
+    knob; glass — a pane at a slant with glare and a vine leaf; grip — the bar
+    on two standoffs off the door's edge with its length arrow; mk — the frame
+    alone, with its thickness, open at the foot; sum — the order sheet with a
+    tick. Six of the nine had been a rectangle with something inside.
+  · **The critique, measured with the audit's own pairwise raster** (floor
+    0.50) rather than by eye. Draft one: face ~ glass 0.45, glass ~ sum 0.47 —
+    three tall rectangles at one place. A square pane: fit ~ glass 0.48. A
+    receipt outline for sum: face ~ sum 0.51. What fixed it was OUTLINE, not
+    content: the pane went to a slant (the only one on the rail; the
+    square-on rule is the door drawing's, not an icon's), face narrowed to
+    0.48 wide (at 0.6 it read as a tablet) and grew a knob. Cut by eye: a
+    second "+" glint (read as "add"), screw dots on the hinge (one pixel), an
+    open-bottomed front swatch (a tulip), a landscape framed pane (a photo
+    frame). Worst nav pair fit ~ mk 0.60 (old set 0.63), ink 23–38%.
+  · **Five spec rows share their step's mark by reference** — colour, size,
+    lockset, mashkof, pirzul — and `test/units.mjs` asserts all five pairs;
+    three had been promised by a comment and asserted nowhere. Falsified: one
+    character of drift in `pirzul` fails it. Worst spec pair colour ~ grille
+    0.54. The window row keeps its four-pane mark: it names WHICH window, and
+    the design has its own row.
+  · **Gates:** test 7,483,874 / 0 before rebasing, 9,196,966 / 0 after (the
+    total is catalogue arithmetic; the five stale-sheet failures the two
+    commits below it recorded are closed by this commit's `npm run sheets`);
+    audit clean. Sheets: before the rebase no bare or lockset sheet moved.
+    After it, only glazed-design sheets moved (against-*-light and three new
+    ones, against-vine/circles, corpus-07, four glazed recreates) — the
+    black-or-door-colour change below, whose sheets it had left stale; bare
+    mode draws no navigator.
 - **27.9 — ON A PHONE, BACK AND NEXT LIVE IN THE BOTTOM BAR, AND THE SEND SAYS
   "SEND".** The owner's son: *"On the phone I want the next and back buttons to
   be removed from the bottom of each section and moved to the bottom of the
