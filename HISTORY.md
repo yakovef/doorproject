@@ -15,7 +15,7 @@ here: search for the date. When one quotes an old `CLAUDE.md` heading that the
 rewrite condensed, the full text is in the **appendix** at the bottom — §0–§10
 as they stood on 26.9.2026 before the rewrite, verbatim.
 
-**New entries do not go here.** Every change gets one line in `CLAUDE.md` §0b;
+**New entries do not go here.** Every change gets a short entry in `CLAUDE.md` §0b;
 the long form belongs in the commit message and, if the next agent needs it, in
 the `CLAUDE.md` section it concerns. When `CLAUDE.md` §0b outgrows its limit,
 its oldest lines move to the top of the section below.
@@ -24,7 +24,36 @@ its oldest lines move to the top of the section below.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
-*(empty)*
+- **26.9** `CLAUDE.md` rewritten to what is true now; the log and the old §0–§10
+  moved verbatim to `HISTORY.md`. Fixed: code is 60 bits not 40 (§8), the
+  flow not the cabinet (§3), five August plans are in the tree (§2).
+- **25.9** Curved lever turned 8° up about its spindle (`TAPER_TILT`,
+  `taperAt`); shape unchanged, the tip now falls 7.4° instead of 15.4°.
+- **25.9** Explainers read in three languages: `exp.lock.a` quoted stale prices
+  (§5.25); all figures and names in copy now come through `expArgs`; new gates
+  refuse a typed ₪ in `UI` and a `{0}` on a live step.
+- **25.9** The audit's "options on screen" check flaked on ~half of runs by
+  measuring mid-entrance; it now waits for the step to arrive (§7).
+- **25.9** Curved lever redrawn: hangs down, starts wider, curves more.
+- **25.9** Night round, `VERSION` 24: the Idan fits beside the Greek set;
+  `rings` → `circles` (A4); a door-and-a-half carries the set on both leaves.
+- **24.9** The משקוף diagram is the square C the owner's son drew (§3).
+- **24.9** Trio re-measured off an installed door (`PANEL_ROWS.trio`); the bow
+  hangs below the lever.
+- **24.9** A pull bar never stands across a window or a panel; the lever yields
+  first (`gripObstacle`, `fallbackLockset`).
+- **23.9** Second review E–F: a tap no longer scrolls the panel; stripe pills
+  carry pictures; the colour is settled at the measure (`colour.measured`).
+- **20.9** Second review A–D: four pull handles in two bands with `hf=`
+  finishes; bell takes the handle's finish; digital viewer; ogee faces gone;
+  משקוף in three priced parts; a pull handle never costs window or face.
+- **19.9** Lock furniture measured against photographs (`npm run lockset`);
+  blade, tip and keyway distance moved; rose-to-leaf size left open (§9).
+- **18.9** The customer no longer moves the handle (drag/rotate/home, `gp=`
+  retired); it has one place, from `SPAWN` (§3).
+- **14–15.9** Owner's review A–D: the lone panel is the square window's
+  (`VERSION` 22), סט יווני, trio inset 0.23, lock before grip, `displaced`
+  offers back what a choice removed, summary rows link to their step, icons.
 
 ---
 

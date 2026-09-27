@@ -8435,6 +8435,7 @@ ${body}
   }
 
   // js/rules.js
+  var viewerOn = (st) => !!st.peephole && st.peephole !== "nopeep";
   var isLineWork = (state2) => !!(state2 && state2.stripeDir && state2.stripeDir !== "none" && state2.stripeCount);
   var faceWorked = (state2) => !!byId(DETAILS, state2.detail).panel || isLineWork(state2);
   var detailWorked = (d) => !!d.panel;
@@ -8534,7 +8535,10 @@ ${body}
         out.window[w.id] = out.window[w.id] || T("why.setOwnWindow");
       }
     }
-    if (!peepholeFits(state2)) out.peephole.peep = T("why.peepWindow");
+    for (const p of PEEPHOLES) {
+      const st = { ...state2, peephole: p.id };
+      if (viewerOn(st) && !peepholeFits(st)) out.peephole[p.id] = T("why.peepWindow");
+    }
     if (!bellFits(state2)) out.bell.bell = T("why.bellWindow");
     if (onLeaf) out.stripes = T("why.stripesWindow");
     else if (byId(DETAILS, state2.detail).panel) out.stripes = T("why.stripesPanel");
@@ -8667,7 +8671,7 @@ ${body}
       s.stripeCount = STRIPE_MAX.v;
       change("stripes", SAID.stripesCapped);
     }
-    const peepBad = s.peephole === "peep" && !peepholeFits(s);
+    const peepBad = viewerOn(s) && !peepholeFits(s);
     const bellBad = s.bell === "bell" && !bellFits(s);
     if (peepBad || bellBad) {
       if (intent === "peephole" || intent === "bell") {

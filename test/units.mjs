@@ -4433,23 +4433,37 @@ group('the doorbell and the peephole');
      centred and reach viewer height, so a peephole at its measured position
      has nowhere to be. `tools/_newhw.mjs` swept 426 designs with real getBBox
      and found the overlap on all 140 glazed ones and nothing else. */
-  for (const w of WINDOWS) {
+  /* ⚠ RESTATED 27.9.2026 OVER EVERY VIEWER, EVERY WINDOW, EVERY SIZE — the
+     owner's son: *"The digital peephole still stays when there is a window,
+     this can't happen."* These clauses bound `peephole: 'peep'` and nothing
+     else, so the ₪390 digital viewer added on 20.9 was never asked: drawn on
+     the glass, the tile never greyed, a link kept it and charged for it. The
+     rules named the same literal (§5.26). Each clause keeps its subject — the
+     rule, the link, the tap — and now walks `PEEPHOLES`. Falsified by putting
+     `'peep'` back in `rules.js`: the digital rows go red, the optical stay
+     green. */
+  const viewers = PEEPHOLES.filter(e => e.id !== 'nopeep');
+  const seen = new Set();
+  for (const e of viewers) for (const size of Object.keys(SIZES)) for (const w of WINDOWS) {
     const glazed = w.id !== 'none';
-    ok(peepholeFits({ ...base, window: w.id, detail: glazed ? 'panel' : 'plain' }) === !glazed,
-       `peepholeFits must be ${!glazed} for window "${w.id}"`);
-  }
-  {
-    const { state: fixed, changed } =
-      repair({ ...base, window: 'rect', detail: 'panel', peephole: 'peep' });
+    const st = { ...base, size, window: w.id, detail: glazed ? 'panel' : 'plain', peephole: e.id };
+    ok(peepholeFits(st) === !glazed,
+       `peepholeFits must be ${!glazed} for ${e.id} on window "${w.id}", ${size}`);
+    ok(!!conflicts({ ...st, peephole: 'nopeep' }).peephole[e.id] === glazed,
+       `the ${e.id} tile must be ${glazed ? 'greyed' : 'offered'} on window "${w.id}", ${size}`);
+    if (!glazed) continue;
+    seen.add(e.id);
+    const { state: fixed, changed } = repair(st);
     ok(fixed.peephole === 'nopeep' && changed.includes('peephole'),
-       'a link with a peephole and a window must lose the peephole, and say so');
-    /* And the other way: clicking the peephole ON a glazed door takes the
-       glass, because whichever the customer just clicked wins. */
-    const { state: chosen } =
-      repair({ ...base, window: 'rect', detail: 'panel', peephole: 'peep' }, 'peephole');
-    ok(chosen.peephole === 'peep' && chosen.window === 'none',
-       'clicking the peephole must take the window, not be refused');
+       `a link with the ${e.id} and the ${w.id} window must lose the viewer, and say so (${size})`);
+    /* And the other way: clicking the viewer ON a glazed door takes the glass,
+       because whichever the customer just clicked wins. */
+    const { state: chosen } = repair(st, 'peephole');
+    ok(chosen.peephole === e.id && chosen.window === 'none',
+       `clicking the ${e.id} must take the ${w.id} window, not be refused (${size})`);
   }
+  ok(seen.size > 1 && seen.size === viewers.length,
+     `the viewer sweep saw ${[...seen]} — one id is the fixture that hid the digital viewer`);
   /* ⚠ THIS BLOCK SAID THE BELL NEEDED NO RULE, AND IT WAS THE BLIND SPOT.
      Verbatim, for a week: *"The BELL has no such rule, and that is a finding
      rather than an omission: the same sweep found it clear of glass,
@@ -4483,31 +4497,35 @@ group('the doorbell and the peephole');
        'clicking the bell must take the window, not be refused');
     /* ⚠ AND BOTH FITTINGS MUST BE NAMED WHEN BOTH GO. They are two fields with
        two prices, and one sentence for two removals is a fault of its own. */
-    const both = repair({ ...base, window: 'rect', detail: 'panel',
-                          bell: 'bell', peephole: 'peep' });
-    ok(both.state.bell === 'nobell' && both.state.peephole === 'nopeep',
-       'a link carrying a bell AND a peephole with a window must lose both');
-    ok(both.changed.includes('bell') && both.changed.includes('peephole'),
-       'and must report both, not whichever repair ran first');
+    /* Restated 27.9.2026 over every viewer, both windows, every size: the
+       bell-and-viewer branch asks one question of both fittings, and it named
+       `'peep'` too. */
+    for (const e of viewers) for (const size of Object.keys(SIZES)) for (const w of ['rect', 'strip']) {
+      const pair = { ...base, size, window: w, detail: 'panel', bell: 'bell', peephole: e.id };
+      const both = repair(pair);
+      ok(both.state.bell === 'nobell' && both.state.peephole === 'nopeep',
+         `a link carrying a bell AND the ${e.id} with the ${w} window must lose both (${size})`);
+      ok(both.changed.includes('bell') && both.changed.includes('peephole'),
+         `and must report both, not whichever repair ran first (${e.id}, ${w}, ${size})`);
 
-    /* ⚠ AND THE CASE THAT WAS SILENTLY WRONG WHILE EACH HALF LOOKED RIGHT.
-       Written as two independent repairs, tapping the פעמון on a door already
-       carrying the עינית and a window removed the עינית (its repair ran first
-       and saw somebody else's intent) and THEN removed the window — so the
-       customer lost a fitting to make room for glass that was going anyway.
-       Both fittings must survive, because the thing they were competing with
-       is what leaves. Asserted in both directions, since the mirror is the
-       half that would go unnoticed. */
-    for (const [click, other] of [['bell', 'peephole'], ['peephole', 'bell']]) {
-      const r = repair({ ...base, window: 'rect', detail: 'panel',
-                         bell: 'bell', peephole: 'peep' }, click);
-      ok(r.state.window === 'none',
-         `clicking the ${click} on a glazed door must take the window`);
-      ok(r.state.bell === 'bell' && r.state.peephole === 'peep',
-         `clicking the ${click} must not cost the customer their ${other} — `
-       + `got bell ${r.state.bell}, peephole ${r.state.peephole}`);
-      ok(!r.changed.includes(other),
-         `and must not report removing the ${other}, which it did not remove`);
+      /* ⚠ AND THE CASE THAT WAS SILENTLY WRONG WHILE EACH HALF LOOKED RIGHT.
+         Written as two independent repairs, tapping the פעמון on a door already
+         carrying the עינית and a window removed the עינית (its repair ran first
+         and saw somebody else's intent) and THEN removed the window — so the
+         customer lost a fitting to make room for glass that was going anyway.
+         Both fittings must survive, because the thing they were competing with
+         is what leaves. Asserted in both directions, since the mirror is the
+         half that would go unnoticed. */
+      for (const [click, other] of [['bell', 'peephole'], ['peephole', 'bell']]) {
+        const r = repair(pair, click);
+        ok(r.state.window === 'none',
+           `clicking the ${click} on a glazed door must take the window (${e.id}, ${w}, ${size})`);
+        ok(r.state.bell === 'bell' && r.state.peephole === e.id,
+           `clicking the ${click} must not cost the customer their ${other} — `
+         + `got bell ${r.state.bell}, peephole ${r.state.peephole} (${e.id}, ${w}, ${size})`);
+        ok(!r.changed.includes(other),
+           `and must not report removing the ${other}, which it did not remove (${e.id}, ${w}, ${size})`);
+      }
     }
   }
 

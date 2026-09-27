@@ -16,7 +16,7 @@ through and keeping its number.
 | | |
 |---|---|
 | §0 · §0a · §0c | what this is, who you are working for, where it stands **today**. Nobody skips these |
-| §0b | the change log: one line per change, newest first. The long-form archive to 26.9.2026 is **`HISTORY.md`** |
+| §0b | the change log: a few lines per change, newest first. The long-form archive and the moved-out lines are **`HISTORY.md`** |
 | §1 · §1b | what you may never do, and the one syntax trap |
 | §2 | the codebase, file by file |
 | §3 · §4 | the drawing's model and the rules it obeys |
@@ -36,8 +36,9 @@ From the person you are working for:
 They compact the conversation often, and when they do **this file is the only
 memory that survives.** So, in the same commit as the change:
 
-- **Every change → one line in §0b** (three at most), newest first: what moved
-  and why, in words the next agent can act on. The long form goes in the commit
+- **Every change → a short entry in §0b** (six lines at most), newest first:
+  what moved and why, the quote, what was falsified, the sheets, in words the
+  next agent can act on. The long form goes in the commit
   message, which in this repo is written at length on purpose (§10).
 - **Anything in §0–§10 the change makes false → corrected in place.** This
   file has carried a stale number for months more than once (§6), and every
@@ -127,6 +128,12 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
 Older and long-form: **`HISTORY.md`** (verbatim to 26.9.2026). Dates are the
 day of the change.
 
+- **27.9** The digital viewer is refused beside a window, like the optical one
+  — *"The digital peephole still stays when there is a window, this can't
+  happen."* `conflicts` and `repair` named `'peep'`; one `viewerOn` predicate
+  now, every viewer asked at its own radius (§5.26). A `?ey=peep-digital&w=rect`
+  link had kept the ₪390 viewer on the glass in silence. Falsified: the literal
+  back fails 60 digital rows, 0 optical. Sheets: none (rules only).
 - **26.9** Flow order `fit · colour · lock · pz · face · glass · grip · mk` —
   *"the hardware finish … right after the lever … the pull handle … after the
   panels and stripes"* (after the glass, asked), overruling Peretz's 30.8
@@ -169,37 +176,6 @@ day of the change.
   lock-tile raster coral~curved 0.300 → 0.277, no audit floor exists for it.
   Falsified: 8° typed back fails 13 (the tile and 12 doors). No sheet moved (no
   fixture carries the curved lever). Test 9,086,175 / 5.
-- **26.9** `CLAUDE.md` rewritten to what is true now; the log and the old §0–§10
-  moved verbatim to `HISTORY.md`. Fixed: code is 60 bits not 40 (§8), the
-  flow not the cabinet (§3), five August plans are in the tree (§2).
-- **25.9** Curved lever turned 8° up about its spindle (`TAPER_TILT`,
-  `taperAt`); shape unchanged, the tip now falls 7.4° instead of 15.4°.
-- **25.9** Explainers read in three languages: `exp.lock.a` quoted stale prices
-  (§5.25); all figures and names in copy now come through `expArgs`; new gates
-  refuse a typed ₪ in `UI` and a `{0}` on a live step.
-- **25.9** The audit's "options on screen" check flaked on ~half of runs by
-  measuring mid-entrance; it now waits for the step to arrive (§7).
-- **25.9** Curved lever redrawn: hangs down, starts wider, curves more.
-- **25.9** Night round, `VERSION` 24: the Idan fits beside the Greek set;
-  `rings` → `circles` (A4); a door-and-a-half carries the set on both leaves.
-- **24.9** The משקוף diagram is the square C the owner's son drew (§3).
-- **24.9** Trio re-measured off an installed door (`PANEL_ROWS.trio`); the bow
-  hangs below the lever.
-- **24.9** A pull bar never stands across a window or a panel; the lever yields
-  first (`gripObstacle`, `fallbackLockset`).
-- **23.9** Second review E–F: a tap no longer scrolls the panel; stripe pills
-  carry pictures; the colour is settled at the measure (`colour.measured`).
-- **20.9** Second review A–D: four pull handles in two bands with `hf=`
-  finishes; bell takes the handle's finish; digital viewer; ogee faces gone;
-  משקוף in three priced parts; a pull handle never costs window or face.
-- **19.9** Lock furniture measured against photographs (`npm run lockset`);
-  blade, tip and keyway distance moved; rose-to-leaf size left open (§9).
-- **18.9** The customer no longer moves the handle (drag/rotate/home, `gp=`
-  retired); it has one place, from `SPAWN` (§3).
-- **14–15.9** Owner's review A–D: the lone panel is the square window's
-  (`VERSION` 22), סט יווני, trio inset 0.23, lock before grip, `displaced`
-  offers back what a choice removed, summary rows link to their step, icons.
-
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -780,7 +756,8 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
   a 132 mm **ring knocker on the centre line** (`KNOCKER_AFF` 1470), the
   peephole directly above it; the bell sits on the pull-handle step and takes
   the handle's finish. The digital viewer is drawn from published dimensions
-  (`photo: null`). Two LISTS, not a multi-select: the withdrawn add-ons were a
+  (`photo: null`). **Every viewer is refused beside a window** (`viewerOn`,
+  27.9 — the rules had named `'peep'` only). Two LISTS, not a multi-select: the withdrawn add-ons were a
   bitmask under the retired `a=`.
 
 ⚠ **Whose metal is it? — five owners, and every new drawing must answer
@@ -884,7 +861,7 @@ often wrong at drawing scale.
 
 ## 5. The failure mode that keeps recurring
 
-**Things that vanish rather than break.** Twenty-five so far. None threw. All
+**Things that vanish rather than break.** Twenty-six so far. None threw. All
 looked like a working page. **The item numbers are cited from code — never
 renumber.**
 
@@ -1019,6 +996,15 @@ door is buildable; the drawn keyhole is where the photograph puts it.
     of them read it** — every copy check was about shape. The new check is
     shape too, which is the kind that scales: **a price reaches the copy through
     an argument or not at all.**
+26. **TWO READERS CHECKING ONE ID BY NAME, AND A SECOND ID THAT NEITHER KNEW.**
+    §5.23's shape one fitting over (27.9): the digital viewer was appended to
+    `PEEPHOLES` on 20.9 and `peepholeFits` asked its own 27 mm radius from the
+    first day — but `conflicts` greyed `out.peephole.peep` and `repair` tested
+    `s.peephole === 'peep'`, so the ₪390 viewer was drawn on the glass with its
+    tile never greyed, no toast, and charged; the unit group bound `'peep'` too.
+    **A rule that names an id is a rule for that id only**: ask the question the
+    drawing asks (`viewerOn` — "is the field not its none entry"), of every
+    entry, each at its own size, and sweep the list in the test.
 
 ⚠ **And one assertion was counting PROSE.** `render(st).match(/data-pane/g)`
 counted the attribute's name inside XML comments too, and twenty-five

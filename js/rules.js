@@ -53,11 +53,20 @@
 
 import { T } from './copy.js';
 import { byId, DETAILS, glassRows, GRILLES, HANDLES, isGlazed, leafGlazed, LOCKSETS,
-         STRIPE_MAX, WINDOWS }
+         PEEPHOLES, STRIPE_MAX, WINDOWS }
   from './catalog.js';
 import { bowFits, gripFitsAnywhere,
          bellFits, panelUnderGlass,
          peepholeFits } from './renderer.js';
+
+/* ⚠ IS A VIEWER ON THE DOOR — the one question, asked of the state the way the
+   drawing asks it (`render` draws one whenever the field is not the none entry,
+   and `faceObstacles` boxes one on the same test). 27.9.2026: `conflicts` and
+   `repair` each named `'peep'`, so the ₪390 digital viewer, added on 20.9
+   beside it, walked past both — drawn on the glass, its tile never greyed, no
+   toast, charged. `peepholeFits` had been asking the digital viewer's own
+   27 mm radius all along; the rules never asked it about that id (§5.26). */
+const viewerOn = st => !!st.peephole && st.peephole !== 'nopeep';
 
 /** Does this detail put ruled line work on the face?
  *  `perimeter` counts: it is a groove like any other, and both doors that
@@ -385,7 +394,12 @@ export function conflicts(state) {
      The real reason it holds today is that the DRAWING has no measured answer
      for where a stripe goes on a panelled leaf, and inventing one would put
      geometry on screen no photograph supports (REALISM.md §6). */
-  if (!peepholeFits(state)) out.peephole.peep = T('why.peepWindow');
+  /* Every viewer, each asked at its OWN size — `peepholeFits` reads the radius
+     off the id, so the question is put once per tile, not once per door. */
+  for (const p of PEEPHOLES) {
+    const st = { ...state, peephole: p.id };
+    if (viewerOn(st) && !peepholeFits(st)) out.peephole[p.id] = T('why.peepWindow');
+  }
   if (!bellFits(state))     out.bell.bell     = T('why.bellWindow');
   if (onLeaf) out.stripes = T('why.stripesWindow');
   else if (byId(DETAILS, state.detail).panel) out.stripes = T('why.stripesPanel');
@@ -837,7 +851,7 @@ export function repair(state, intent = null) {
      glass going, or are the fittings? Found by reasoning it through rather
      than by a failing check, which is why the assertion for it is written
      beside the others rather than after the fact. */
-  const peepBad = s.peephole === 'peep' && !peepholeFits(s);
+  const peepBad = viewerOn(s) && !peepholeFits(s);
   const bellBad = s.bell === 'bell' && !bellFits(s);
   if (peepBad || bellBad) {
     if (intent === 'peephole' || intent === 'bell') {
