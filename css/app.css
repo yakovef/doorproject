@@ -1612,22 +1612,29 @@ html[dir="rtl"] .quote__back .quote__chev { transform: none; }
   .quote__send { padding: 0 11px; font-size: .8rem; }
 }
 
-/* ── ≥1100 px · THE BAR GOES BACK ON THE WALL ────────────────────────
-   Asked for from outside, with a circle drawn on a DESKTOP screenshot:
-   *"make it so that the price would be on the right side below the lamps."*
-   `--lamp-cx` and `--lamp-b` are published by `fitStage` off the SCONCE'S OWN
-   BOX — a percentage of the stage would have been the wrong instrument.
-   `left`, not `inset-inline-start`: this is pinned to a feature of the
-   DRAWING, and the drawing does not mirror when the interface does. In Hebrew
-   the interface flips and the lamp, and the price under it, stay put. */
+/* ── ≥1100 px · THE BAR GOES BACK ON THE WALL, AT THE DOOR'S CORNER ──
+   ⚠ MOVED 27.9.2026 — the owner's son: *"move the pricing to another place
+   that is better, it looks bad under the lamp, move to near the door, at the
+   up right corner."* It hung under the right-hand lamp since 28.8, when the
+   same person drew a circle there (*"on the right side below the lamps"*); he
+   is the one moving it. Chosen in chat: the top-right corner of the DOOR, on
+   the wall outside the frame's head, below the language buttons.
+   `--frame-top`, `--frame-right` and `--hud-b` are published by `fitStage`
+   off `#frame`'s own box and the chrome's — a percentage of the stage would
+   be the wrong instrument, as it was for the lamp. 8 px outside the casing,
+   the gap the lamp clamp kept; level with the head, or 8 px under the chrome
+   where the head stands higher than the chrome's foot (the tall doubles).
+   `left`, not `inset-inline-start`, and no translate: this is pinned to a
+   feature of the DRAWING, and the drawing does not mirror when the interface
+   does. `--lamp-*` is still published; nothing here reads it. */
 @media (min-width: 1100px) {
   .quote {
     position: absolute;
-    inset-block-start: calc(var(--lamp-b, 30%) + 18px);
+    inset-block-start: max(var(--frame-top, 12%), calc(var(--hud-b, 0px) + 8px));
     inset-block-end: auto;
     inset-inline: auto;
-    left: var(--lamp-cx, 76%);
-    transform: translateX(-50%);
+    left: calc(var(--frame-right, 62%) + 8px);
+    transform: none;
     flex-direction: column; align-items: center; gap: 7px;
     padding: 5px 16px 9px;
     background: var(--paper);

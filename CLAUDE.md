@@ -139,6 +139,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The price card at the door's top-right corner (2 of 8): *"it looks
+  bad under the lamp, move to near the door, at the up right corner"* — his own
+  28.8 placement, moved by him. `--frame-top`/`--frame-right`/`--hud-b` from
+  `fitStage`, read off the frame's settled geometry (its 6 px entrance put the
+  card 2 px high); physical right in every language. The audit's card sweep
+  keeps its three clauses and gains the anchor as a fourth. Breakdown at
+  1920×918 10 → 13 of 13 rows. Long form: `HISTORY.md`.
 - **27.9** Copy and small chrome, the first of the big round's eight commits
   (the owner's son's eleven notes): **עצבו** את הדלת שלכם, one line, the lede
   gone (title 99 → 34 px at 1280×720, leaf 421 → 468 px — the band of commit 4
@@ -231,9 +238,15 @@ beside the door, placed by the owner with circles on a screenshot; since 27.9
 undo/redo are 52 px and a floppy-disk save stands beside them (`#save-hud`,
 the summary's own `saveCurrent`).
 
-- **`.quote` — the price and a quiet send — moves with the viewport:** in the
-  wall under the right-hand lamp on a desktop, a bar at the foot of a phone
-  (at 390 px there are ~140 px of wall and a pill there lands on the door).
+- **`.quote` — the price and a quiet send — moves with the viewport:** on a
+  desktop at the DOOR'S top-right corner (27.9, the owner's son: *"it looks bad
+  under the lamp, move to near the door, at the up right corner"* — his own
+  28.8 circle under the lamp, moved by him): 8 px outside the casing, level
+  with its head or under the wall chrome, physically right in every language
+  (the drawing does not mirror); a bar at the foot of a phone (at 390 px there
+  are ~140 px of wall and a pill there lands on the door). `fitStage` reads the
+  frame's SETTLED geometry (`getBBox` through the screen matrix), because
+  `#frame`'s own entrance is a 6 px translate.
   **The price is stated once**; the SEND is stated twice (the quiet one and
   the summary's green one), and the audit requires both on every step with the
   identical href.
@@ -1182,8 +1195,9 @@ are not in `VIEWS`:
 - **the price** — the FIGURE's own box hit-tested against the send and the way
   on, in three languages at 320/360/375/390/834 (*"intersects the viewport"* is
   not *readable*: it read green while ₪3,195 sat under the green pill on every
-  Russian phone); the breakdown readable to its total; the card inside the
-  picture, never pulled onto `#frame`, its breakdown centred on it.
+  Russian phone); the breakdown readable to its total; the card at the door's
+  head corner (27.9), inside the picture, never on `#frame`, its breakdown
+  centred on it.
 - **repairs** — a real repair at every viewport, every sentence on screen, its
   box covering no option; an undo that moves the price names a spec row.
 - **the summary** — spec before explainer (as an ORDER, not a row count); the
@@ -1426,11 +1440,11 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 - **Two controls pinned by rules that mirror differently stand in opposite walls
   in one language and the same wall in another** — the mechanism behind a
   closed fault (the removed grip controls under the price card in Hebrew only).
-  Check it for anything put in the wall next. At 1100–1152 px the wall is
-  140–152 px: the price card fits it since 27.9 (111/113/142 px in he/en/ru,
-  from 163/184/207, when the send became one word) and stands on no door at
-  any size — the audit's four named on-door readings are gone — but nothing
-  else fits there.
+  Check it for anything put in the wall next. At 1100–1152 px the wall right
+  of the widest door is 121–147 px: the price card (111–142 px since the send
+  became one word) stands against the casing there since 27.9 — at the door's
+  head corner, never on the door by construction — and the stage's edge cuts
+  it where the wall is narrower than the card. Nothing else fits there.
 - **The phone's Back button leaves the guide** (12.9): the whole walk is one
   history entry. The obvious fix — `pushState` per step — was built and
   **thrown away**: the in-page back button then grows the stack and system Back
@@ -1446,10 +1460,13 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   140mm`, which nobody chose by printing; what it needs first is how large the
   drawing must be for Peretz to read it in a workshop. The 8 mm body padding and
   12 mm `@page` margin are not to be shaved.
-- **The desktop price breakdown is a short window on a long column**: ~5 rows at
-  1280×720 inside `.stage-wrap`'s `overflow: hidden`, total pinned. Setting the
-  rows in two columns on the desktop is the better idea and unmeasured; moving
-  the chip is the owner's placement.
+- **The desktop price breakdown is a short window on a long column** — less so
+  since the card moved to the door's head (27.9). A thirteen-row door, rows
+  whole in the column, before → after: 1280×720 10 → 10 (capped by the box's
+  46vh now, not by the room under it), 1366×768 7 → 10, 1100×800 8 → 11,
+  1440×900 12 → 12, 1920×918 10 → 13. (The "~5 rows at 1280×720" this line
+  carried was stale: it read 10 at the commit before the move.) Raising the
+  46vh cap where the room allows, or two columns, is unmeasured.
 - **A short-and-wide screen shows the question and no answer** (13.9): a phone
   on its side (844×390) and a laptop at 200% zoom (640×360) leave 75–92 px under
   the fixed furniture, and the question block alone is ~110. **The layout is
