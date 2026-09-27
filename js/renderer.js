@@ -22,6 +22,7 @@ import { byId, COLOURS, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
 import { L, T } from './copy.js';
 import { describeSentence } from './spec.js';
 import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
+import { VINE, VINE_D } from './vine.js';
 
 /* Ironmongery tones. Six stops each, because a metal's cross-section is
    light → mid → dark → a weaker second return near the far edge. That double
@@ -5972,103 +5973,48 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g', ornW = null) {
     return { veil: out, over: '' };
   }
 
-  /* ── גפן — d109 and d111 ────────────────────────────────────────────
-     A repeating film cut by the opening, not a motif placed in the middle of
-     it: one sinuous stem running off both ends with leaves and bunches tied to
-     it by thin stalks, and tendrils filling the gaps.
-     The LEAF is the dominant thing — five leaves to three bunches, each as
-     wide as a whole bunch — and ours had none at all, so the pane read as
-     fruit floating in a void. The berries were also twice life size: 0.22 W
-     against a measured 0.12-0.14 W, which put one bunch across most of the
-     opening. And three identical bunches at identical spacing is not what a
-     drawn film does. */
+  /* ── גפן — TRACED FROM THE DESIGN ITSELF, 26.9.2026 ───────────────────
+     The owner's son sent the real design — research/vine/design.webp — with
+     *"this is how the grape and vine design really looks, the black part is
+     the design, beware that the design is really white and not black like
+     its here. i want you to change our design to this."* So this branch no
+     longer composes a vine; it draws that picture, traced by
+     tools/trace-vine.py into js/vine.js (re-run the tool, never hand-edit).
+     What it replaced was drawn from d109 and d111, whose leaf boxes are
+     fallbacks and whose film is photographed through a pane; the design
+     sheet is the source those photographs were of.
+     ⚠ WHITE, on the owner's son's word: it is frosted into clear glass, so
+     it is lighter than the pane, never the paint's tone the old one used.
+     ⚠ SIZED BY THE PANE'S WIDTH, like every film in this function, and
+     repeated down a taller pane at the picture's own measured period, each
+     copy clipped to start at the seam the tool found, where the hand-drawn
+     repeat agrees best with itself. The rect light (357 x 902) is 1.11 of
+     the picture's height at that width, so it carries one short join; the
+     slot carries three. */
   if (kind === 'vine') {
-    const ink = scaleTone(paint, 1.06);
-    const STEM = w * 0.030, OUT = w * 0.021, THIN = w * 0.014;
-    const str = (d, sw) => `<path d="${d}" fill="none" stroke="${ink}"
-      stroke-width="${sw.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
-    let out = '';                                  // no ground: the pane shows through
-
-    const pitch = w * 0.26;
-    const n = Math.max(4, Math.round(h / pitch));
-    /* The stem, cut by both the top and the bottom edge, and swinging far
-       enough across the pane that the motifs hanging off it are cut by the
-       SIDE edges too. It wandered 0.11 of the width and the leaves reached
-       0.19 beyond that, which left a clear margin of bare glass down both
-       sides — and this is a repeating film cut by an opening, not a motif
-       placed in the middle of one. Both photographs run off all four edges. */
-    const stemX = t => x + w * (0.50 + 0.20 * Math.sin(t * Math.PI * 2 * (n / 3.2)));
-    let d = `M ${n2(stemX(-0.03))} ${n2(y - h * 0.03)}`;
-    for (let i = 1; i <= 48; i++) {
-      const t = -0.03 + (1.06 * i) / 48;
-      d += ` L ${n2(stemX(t))} ${n2(y + h * t)}`;
+    const k = w / VINE.w;
+    const need = h / k;
+    const n = Math.max(1, Math.ceil((need - VINE.h) / VINE.period) + 1);
+    const id = uid('vine');
+    /* Opaque inside, and the opacity on the one group round every copy: the
+       copies overlap by a pixel at each join so no hairline of bare glass is
+       left along the clip edge, and overlapping opaque white is still the
+       same white. */
+    const frost = 'fill="#FFFFFF" fill-rule="evenodd"';
+    let out = '';
+    for (let j = 0; j < n; j++) {
+      const from = j === 0 ? -1 : VINE.seam + (j - 1) * VINE.period - 1;
+      const to = j === n - 1 ? VINE.h + j * VINE.period + 1 : VINE.seam + j * VINE.period + 1;
+      const t = `translate(${n2(x + j * VINE.dx * k)} ${n2(y + j * VINE.period * k)}) scale(${k.toFixed(5)})`;
+      const shape = j === 0 ? `<path id="${id}" d="${VINE_D}" ${frost}/>`
+                            : `<use href="#${id}"/>`;
+      if (n === 1) { out += `<g transform="${t}">${shape}</g>`; continue; }
+      const cid = uid(`vc${j}`);
+      out += `<clipPath id="${cid}"><rect x="${n2(x - w)}" y="${n2(y + from * k)}"
+                width="${n2(w * 3)}" height="${n2((to - from) * k)}"/></clipPath>
+              <g clip-path="url(#${cid})"><g transform="${t}">${shape}</g></g>`;
     }
-    out += str(d, STEM);
-
-    const KIND = ['leaf', 'cluster', 'leaf', 'leaf', 'cluster', 'leaf', 'cluster', 'leaf'];
-    const LSZ = [1.00, 0.86, 1.15, 0.94, 1.08, 0.90];
-    const LROT = [-25, 15, -10, 30, -35, 20];
-    const BR = [1.00, 0.95, 0.78, 0.92, 1.18, 1.02, 0.95, 1.05, 1.00];
-    for (let i = 0; i < n; i++) {
-      const t = (i + 0.5) / n;
-      const ay = y + h * t, side = i % 2 ? 1 : -1;
-      const ax = stemX(t) + side * w * 0.26;
-      if (KIND[i % 8] === 'cluster') {
-        const r = w * 0.065;
-        let k = 0;
-        [3, 3, 2, 1].forEach((per, row) => {
-          for (let c = 0; c < per; c++) {
-            const f = BR[k % BR.length]; k++;
-            const bx = ax + (c - (per - 1) / 2) * r * 2.04 + (row % 2 ? r * 0.5 : 0);
-            const by = ay + row * r * 1.76;
-            out += `<circle cx="${n2(bx)}" cy="${n2(by)}" r="${n2(r * f)}" fill="none"
-                            stroke="${ink}" stroke-width="${OUT.toFixed(2)}"/>`;
-          }
-        });
-        out += str(`M ${n2(stemX(t))} ${n2(ay - r)} Q ${n2((stemX(t) + ax) / 2)} ${n2(ay - r * 1.8)}
-                    ${n2(ax)} ${n2(ay - r * 1.1)}`, THIN);
-      } else {
-        /* A five-lobed grape leaf: pointed centre lobe, two side lobes, two
-           basal ones, four V-notches cutting in to about a third of the half
-           width, and a heart-shaped base where the petiole enters. */
-        const L = w * 0.34 * LSZ[i % LSZ.length], H2 = L * 0.82;
-        const a = ((LROT[i % LROT.length] * side) * Math.PI) / 180;
-        const pt = (u, v) => {
-          const px = u * L * 0.5, py = v * H2 * 0.5;
-          return [n2(ax + px * Math.cos(a) - py * Math.sin(a)),
-                  n2(ay + px * Math.sin(a) + py * Math.cos(a))];
-        };
-        const lobe = [[0, -1], [0.34, -0.55], [0.30, -0.30], [0.72, -0.42], [0.60, 0.02],
-                      [0.95, 0.30], [0.42, 0.42], [0.20, 0.86], [0, 0.55]];
-        let ld = `M ${pt(0, -1).join(' ')}`;
-        for (const [u, v] of lobe.slice(1)) ld += ` Q ${pt(u * 1.12, v * 0.92).join(' ')} ${pt(u, v).join(' ')}`;
-        for (const [u, v] of [...lobe].reverse().slice(1)) {
-          ld += ` Q ${pt(-u * 1.12, v * 0.92).join(' ')} ${pt(-u, v).join(' ')}`;
-        }
-        out += str(ld + ' Z', OUT);
-        out += str(`M ${pt(0, 0.55).join(' ')} L ${n2(stemX(t))} ${n2(ay + H2 * 0.2)}`, THIN);
-        for (const [u, v] of [[0, -0.62], [0.42, -0.20], [-0.42, -0.20]]) {
-          out += str(`M ${pt(0, 0.5).join(' ')} L ${pt(u, v).join(' ')}`, THIN);
-        }
-      }
-    }
-    /* Tendrils: open spirals that never close into a ring — a closed loop
-       reads as a stray berry. */
-    const tn = Math.max(2, Math.round(h / (1.4 * w)));
-    for (let i = 0; i < tn; i++) {
-      const t = (i + 0.5) / tn, side = i % 2 ? -1 : 1;
-      const sx = stemX(t), sy = y + h * t;
-      let td = `M ${n2(sx)} ${n2(sy)}`, ex = sx, ey = sy;
-      for (let k = 1; k <= 22; k++) {
-        const a = (k / 22) * Math.PI * 2.2 * side;
-        const r = w * (0.07 - 0.045 * (k / 22));
-        ex = sx + side * w * 0.10 + Math.cos(a) * r;
-        ey = sy + Math.sin(a) * r;
-        td += ` L ${n2(ex)} ${n2(ey)}`;
-      }
-      out += str(td, THIN);
-      out += `<circle cx="${n2(ex)}" cy="${n2(ey)}" r="${n2(w * 0.012)}" fill="${ink}"/>`;
-    }
+    out = `<g opacity="0.92">${out}</g>`;
     return { veil: out, over: '' };
   }
 
