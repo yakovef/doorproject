@@ -2488,7 +2488,7 @@ group('the page\'s own marks');
   /* One idea, one mark (27.9): five rows draw their own step's picture. Three
      of these pairs were promised by a comment and asserted nowhere. */
   for (const [step, row] of [['colour', 'colour'], ['fit', 'size'], ['mk', 'mashkof'],
-                             ['pz', 'pirzul'], ['lock', 'lockset']]) {
+                             ['pz', 'pirzul'], ['lock', 'lockset'], ['grip', 'handle']]) {
     ok(SECTION_ICON[step] === SPEC_ICON[row],
       `the "${step}" step's mark and the "${row}" row's mark have come apart`);
   }

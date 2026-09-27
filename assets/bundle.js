@@ -8818,18 +8818,16 @@ ${body}
   // js/icons.js
   var SECTION_ICON = {
     fit: '<path d="M4.6 20.6V3.4h14.8v17.2"/><path d="M2.8 20.6h18.4"/><path d="M4.6 3.4 12.4 5.6v13L4.6 20.6Z"/><path d="M10.4 12.2h.01"/>',
-    /* the front swatch whole, the two behind it only where they show */
-    colour: '<path d="M9.7 17.9V5.9a2.3 2.3 0 0 1 4.6 0v12a2.3 2.3 0 0 1-4.6 0Z"/><path d="M9.7 9.6h4.6M9.7 13.4h4.6"/><path d="M12 17.9h.01"/><path d="M9.8 20.2 2.3 9.3a2.3 2.3 0 0 1 3.8-2.6l3.6 5.4"/><path d="M14.2 20.2l7.5-10.9a2.3 2.3 0 0 0-3.8-2.6l-3.6 5.4"/>',
+    colour: '<path d="M12 3.4c-4.9 0-8.6 3.7-8.6 8.4 0 4.8 3.6 8.8 8.4 8.8 1.5 0 2.4-.9 2.4-2.1 0-1.4-1.1-1.8-1.1-3 0-1.1.8-1.8 2-1.8h2.4c2.3 0 3.8-1.6 3.8-3.8 0-3.7-4-6.5-9.3-6.5Z"/><circle cx="7.8" cy="12.4" r="1.3"/><circle cx="9.4" cy="7.8" r="1.3"/><circle cx="14.4" cy="7.4" r="1.3"/>',
     lock: '<rect x="5.6" y="3.2" width="5.8" height="17.6" rx="2.9"/><path d="M11.4 6.4h7a1.7 1.7 0 0 1 0 3.4h-7"/><circle cx="8.5" cy="14.2" r="1.2"/><path d="M8.5 15.4v2.4"/>',
-    /* ⚠ the glint is ONE four-point star. A second, smaller "+" beside it read
-       as "add" at 21 px, and screw dots on the leaf were single pixels. */
-    pz: '<path d="M9.4 5.4H4.2v13.2h5.2"/><rect x="9.4" y="3.4" width="3.2" height="17.2" rx="1.6"/><path d="M9.4 9.4h3.2M9.4 14.6h3.2"/><path d="M17.8 7.4c.4 3.2 1.6 4.4 4.4 4.6-2.8.2-4 1.4-4.4 4.6-.4-3.2-1.6-4.4-4.4-4.6 2.8-.2 4-1.4 4.4-4.6Z"/>',
-    face: '<rect x="7.2" y="2.4" width="9.6" height="19.2" rx=".6"/><path d="M9.6 5h4.8v6.2H9.6Z"/><path d="M9.6 15.2h4.8M9.6 18.4h4.8"/><path d="M14.6 13.2h.01"/>',
+    /* ⚠ the glint is ONE four-point star: a second "+" beside it read as "add" */
+    pz: '<path d="M5.2 4.4h6l1.8 3-1.8 3h-6l-1.8-3Z"/><path d="M6.8 10.4v8.2a1.4 1.4 0 0 0 2.8 0v-8.2"/><path d="M6.8 13.4h2.8M6.8 16.2h2.8"/><path d="M17.2 8.6c.3 2.6 1.3 3.6 3.6 3.9-2.3.3-3.3 1.3-3.6 3.9-.3-2.6-1.3-3.6-3.6-3.9 2.3-.3 3.3-1.3 3.6-3.9Z"/>',
+    face: '<rect x="6.2" y="2.6" width="11.6" height="18.8" rx=".6"/><path d="M8.8 5.2h6.4v5.4H8.8ZM8.8 13.4h6.4v5.4H8.8Z"/><circle cx="15.8" cy="12" r=".9"/>',
     /* ⚠ A SLANT ON A SQUARE-ON PAGE, deliberately and only here: the rule in
        CLAUDE.md §4 is about the door's drawing. A glazed pane seen square-on is
        a rectangle, and the rail already had five. */
     glass: '<path d="M8.2 3.4h12.4l-4.8 17.2H3.4Z"/><path d="M16.4 6.6l-3.4 3.8M16 10.8l-1.6 1.8"/><path d="M7.4 17.4c1.2-.2 2.2-1.2 2.6-2.8-1.6-.2-2.6.9-2.6 2.8Z"/>',
-    grip: '<rect x="3.2" y="2.8" width="2.2" height="18.4"/><path d="M5.4 6.8h6.2M5.4 17.2h6.2"/><rect x="11.6" y="4.2" width="3" height="15.6" rx="1.5"/><path d="M19.6 4.2v15.6M18 5.8l1.6-1.6 1.6 1.6M18 18.2l1.6 1.6 1.6-1.6"/>',
+    grip: '<path d="M5.6 2.4v19.2"/><path d="M5.6 7h5.8M5.6 17h5.8"/><rect x="11.4" y="3.8" width="3.6" height="16.4" rx="1.8"/>',
     /* open at the foot: two nested CLOSED rectangles, which this was, are a
        picture frame or a monitor */
     mk: '<path d="M3.4 20.6V3.2h17.2v17.4"/><path d="M7.8 20.6V7.6h8.4v13"/><path d="M1.8 20.6h20.4"/>',
@@ -8842,15 +8840,17 @@ ${body}
     return `<svg class="steps__g" viewBox="0 0 24 24" aria-hidden="true">${SECTION_ICON[key]}</svg>`;
   }
   var SPEC_ICON = {
-    /* ⚠ FIVE ROWS SHARE THEIR STEP'S MARK BY REFERENCE, 27.9 — one idea, one
+    /* ⚠ SIX ROWS SHARE THEIR STEP'S MARK BY REFERENCE, 27.9 — one idea, one
        mark, and a reference cannot come apart the way two copies of a string
-       did. Worst spec pair after: colour ~ grille 0.54 at 18 px. */
+       did. `handle` joined in the second round, when the step's bar became the
+       side view `grab` below already draws lying down. Worst spec pair after:
+       colour ~ detail 0.55 at 18 px. */
     colour: SECTION_ICON.colour,
     window: '<path d="M4.6 5h14.8v11.4H4.6Z"/><path d="M12 5v11.4M4.6 10.7h14.8"/>',
     glazing: '<path d="M3.4 6.2h7.2v11.6H3.4Z"/><path d="M13.4 6.2h7.2v11.6h-7.2Z"/>',
     /* the ironwork itself, not the pane it sits in */
     grille: '<path d="M4.6 12 12 4.6M4.6 19.4 19.4 4.6M12 19.4 19.4 12"/><path d="M4.6 12 12 19.4M4.6 4.6 19.4 19.4M12 4.6 19.4 12"/>',
-    handle: '<path d="M8.4 5.6h3v12.8h-3Z"/><path d="M11.4 12h4.6"/>',
+    handle: SECTION_ICON.grip,
     /* the horizontal bow, 26.9.2026: a bar lying across two posts — the handle's
        mark turned on its side would be the handle's mark */
     grab: '<path d="M4.4 8.6h15.2v3.4H4.4Z"/><path d="M8 12v5.4M16 12v5.4"/>',

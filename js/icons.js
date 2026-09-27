@@ -64,28 +64,43 @@
             a grid at 21 px is `mk`'s nested pair with more lines in it.
    Worst pair after: 0.63. The comparison is asserted in `tools/audit.mjs`;
    it is the only instrument that can see this class of fault. */
-/* ⚠ ALL NINE REDRAWN ON 27.9.2026, on the owner's son's word: *"draw better
-   versions of them that really represent the actual content of the section
-   and not some random circles and squares."* Six of the nine were a rectangle
-   with something inside, and at 21 px a rectangle with something inside is a
-   rectangle. Each mark is now the THING the step sells, drawn the way a
-   stranger names it:
-     fit     a door standing ajar in its opening, on the floor — the door
-             itself, and which way it opens (the step's two questions)
-     colour  a fan deck of swatches on its rivet: choosing a shade off a chart,
-             which is what the step is (the drop said "paint", not "choose")
-     lock    the lever on its backplate with the keyway under it — the lock
-             furniture as it stands on the door
-     pz      a hinge with a glint: the finish reaches the hinges and the lever,
-             and the glint is what says METAL FINISH rather than "a hinge"
-     face    a door with a panel over two strips — panels or metal strips
-     glass   a pane seen at a slant, with a glare and a leaf of the vine design
-             on it — glass, and what goes on it
-     grip    the pull bar on its two standoffs off the door's edge, with the
-             arrow of its length (the step asks the length)
-     mk      the frame alone, with its thickness, standing on the floor: the
-             משקוף without the door in it
-     sum     the order sheet, folded corner and a tick: the door you built
+/* ⚠ THE BRIEF, 27.9.2026 (second round) — the owner's son kept five of the
+   first round's marks (fit, lock, glass, mk, sum) and sent four back as "too
+   complicated or not representing the right thing", asking for each section to
+   be DESCRIBED first and then drawn "so that a 5 year old will understand".
+   The descriptions are the brief; each mark is ONE object a child can name.
+     fit     The door itself: its size (standard, oversized, door-and-a-half)
+             and which side it opens. — A door standing ajar in its opening.
+     colour  The one paint colour the whole door is baked in, from the maker's
+             chart. — A painter's palette: "colours".
+     lock    What you turn and what takes the key: the lever and the cylinder,
+             and an extra lock if wanted. — The lever on its plate, the keyhole.
+     pz      The metal colour of the small fittings — lever, keyhole, hinges,
+             peephole — and which peephole. — A shiny bolt: "the metal bits",
+             and the glint is what makes it their FINISH.
+     face    What is on the front of the door: raised panels, metal strips, or
+             nothing. — A door the way a child draws one: two panels, a knob.
+     glass   A window in the door and what goes in it — a grille or a design.
+             — A pane with a glare and a leaf of the vine design.
+     grip    The long bar you pull the door with, its length and finish, and
+             the knocker. — The bar on two posts off the door, seen from the
+             side: the sign every child knows as "a handle".
+     mk      The frame the door closes into, sized to the wall. — The frame
+             alone, standing on the floor.
+     sum     The door you built, checked and sent to us. — The sheet with a
+             tick.
+   ⚠ WHAT THE SECOND ROUND TURNED DOWN. grip as a whole door with a bar on it
+   was the most literal, and measured 0.32 against face — two door outlines in
+   one row are one picture; as a close-up of the door's edge it sat at 0.50 on
+   the floor and read as a light switch. The side view with the door as a
+   single LINE (not the first round's slab, which made it a ladder) is 0.60.
+   The first side view had rounded corners and was the capital letter D.
+   pz as a bolt alone said "screws"; the hinge before it needed a hinge's
+   leaf, barrel and knuckles to be one. Worst pair after: fit ~ mk 0.60. */
+/* ⚠ THE FIRST ROUND, 27.9.2026: *"draw better versions of them that really
+   represent the actual content of the section and not some random circles and
+   squares."* Six of the nine were a rectangle with something inside, and at
+   21 px a rectangle with something inside is a rectangle.
    ⚠ HOW THE DRAFTS FAILED, measured with the audit's own pairwise raster
    (below, floor 0.50): the first draft had face ~ glass 0.45 and glass ~ sum
    0.47 — three tall rectangles in one place, whatever was inside them; a
@@ -99,30 +114,25 @@
 export const SECTION_ICON = {
   fit:    '<path d="M4.6 20.6V3.4h14.8v17.2"/><path d="M2.8 20.6h18.4"/>'
         + '<path d="M4.6 3.4 12.4 5.6v13L4.6 20.6Z"/><path d="M10.4 12.2h.01"/>',
-  /* the front swatch whole, the two behind it only where they show */
-  colour: '<path d="M9.7 17.9V5.9a2.3 2.3 0 0 1 4.6 0v12a2.3 2.3 0 0 1-4.6 0Z"/>'
-        + '<path d="M9.7 9.6h4.6M9.7 13.4h4.6"/><path d="M12 17.9h.01"/>'
-        + '<path d="M9.8 20.2 2.3 9.3a2.3 2.3 0 0 1 3.8-2.6l3.6 5.4"/>'
-        + '<path d="M14.2 20.2l7.5-10.9a2.3 2.3 0 0 0-3.8-2.6l-3.6 5.4"/>',
+  colour: '<path d="M12 3.4c-4.9 0-8.6 3.7-8.6 8.4 0 4.8 3.6 8.8 8.4 8.8 1.5 0 2.4-.9 2.4-2.1 0-1.4-1.1-1.8-1.1-3 0-1.1.8-1.8 2-1.8h2.4c2.3 0 3.8-1.6 3.8-3.8 0-3.7-4-6.5-9.3-6.5Z"/>'
+        + '<circle cx="7.8" cy="12.4" r="1.3"/><circle cx="9.4" cy="7.8" r="1.3"/><circle cx="14.4" cy="7.4" r="1.3"/>',
   lock:   '<rect x="5.6" y="3.2" width="5.8" height="17.6" rx="2.9"/>'
         + '<path d="M11.4 6.4h7a1.7 1.7 0 0 1 0 3.4h-7"/>'
         + '<circle cx="8.5" cy="14.2" r="1.2"/><path d="M8.5 15.4v2.4"/>',
-  /* ⚠ the glint is ONE four-point star. A second, smaller "+" beside it read
-     as "add" at 21 px, and screw dots on the leaf were single pixels. */
-  pz:     '<path d="M9.4 5.4H4.2v13.2h5.2"/><rect x="9.4" y="3.4" width="3.2" height="17.2" rx="1.6"/>'
-        + '<path d="M9.4 9.4h3.2M9.4 14.6h3.2"/>'
-        + '<path d="M17.8 7.4c.4 3.2 1.6 4.4 4.4 4.6-2.8.2-4 1.4-4.4 4.6-.4-3.2-1.6-4.4-4.4-4.6 2.8-.2 4-1.4 4.4-4.6Z"/>',
-  face:   '<rect x="7.2" y="2.4" width="9.6" height="19.2" rx=".6"/><path d="M9.6 5h4.8v6.2H9.6Z"/>'
-        + '<path d="M9.6 15.2h4.8M9.6 18.4h4.8"/><path d="M14.6 13.2h.01"/>',
+  /* ⚠ the glint is ONE four-point star: a second "+" beside it read as "add" */
+  pz:     '<path d="M5.2 4.4h6l1.8 3-1.8 3h-6l-1.8-3Z"/><path d="M6.8 10.4v8.2a1.4 1.4 0 0 0 2.8 0v-8.2"/>'
+        + '<path d="M6.8 13.4h2.8M6.8 16.2h2.8"/>'
+        + '<path d="M17.2 8.6c.3 2.6 1.3 3.6 3.6 3.9-2.3.3-3.3 1.3-3.6 3.9-.3-2.6-1.3-3.6-3.6-3.9 2.3-.3 3.3-1.3 3.6-3.9Z"/>',
+  face:   '<rect x="6.2" y="2.6" width="11.6" height="18.8" rx=".6"/>'
+        + '<path d="M8.8 5.2h6.4v5.4H8.8ZM8.8 13.4h6.4v5.4H8.8Z"/><circle cx="15.8" cy="12" r=".9"/>',
   /* ⚠ A SLANT ON A SQUARE-ON PAGE, deliberately and only here: the rule in
      CLAUDE.md §4 is about the door's drawing. A glazed pane seen square-on is
      a rectangle, and the rail already had five. */
   glass:  '<path d="M8.2 3.4h12.4l-4.8 17.2H3.4Z"/>'
         + '<path d="M16.4 6.6l-3.4 3.8M16 10.8l-1.6 1.8"/>'
         + '<path d="M7.4 17.4c1.2-.2 2.2-1.2 2.6-2.8-1.6-.2-2.6.9-2.6 2.8Z"/>',
-  grip:   '<rect x="3.2" y="2.8" width="2.2" height="18.4"/><path d="M5.4 6.8h6.2M5.4 17.2h6.2"/>'
-        + '<rect x="11.6" y="4.2" width="3" height="15.6" rx="1.5"/>'
-        + '<path d="M19.6 4.2v15.6M18 5.8l1.6-1.6 1.6 1.6M18 18.2l1.6 1.6 1.6-1.6"/>',
+  grip:   '<path d="M5.6 2.4v19.2"/><path d="M5.6 7h5.8M5.6 17h5.8"/>'
+        + '<rect x="11.4" y="3.8" width="3.6" height="16.4" rx="1.8"/>',
   /* open at the foot: two nested CLOSED rectangles, which this was, are a
      picture frame or a monitor */
   mk:     '<path d="M3.4 20.6V3.2h17.2v17.4"/><path d="M7.8 20.6V7.6h8.4v13"/>'
@@ -179,16 +189,18 @@ export function sectionIcon(key) {
    same thing better than half a filled disc and moved it away from `window`.
    Worst pair before 0.43, after 0.55. */
 export const SPEC_ICON = {
-  /* ⚠ FIVE ROWS SHARE THEIR STEP'S MARK BY REFERENCE, 27.9 — one idea, one
+  /* ⚠ SIX ROWS SHARE THEIR STEP'S MARK BY REFERENCE, 27.9 — one idea, one
      mark, and a reference cannot come apart the way two copies of a string
-     did. Worst spec pair after: colour ~ grille 0.54 at 18 px. */
+     did. `handle` joined in the second round, when the step's bar became the
+     side view `grab` below already draws lying down. Worst spec pair after:
+     colour ~ detail 0.55 at 18 px. */
   colour:  SECTION_ICON.colour,
   window:  '<path d="M4.6 5h14.8v11.4H4.6Z"/><path d="M12 5v11.4M4.6 10.7h14.8"/>',
   glazing: '<path d="M3.4 6.2h7.2v11.6H3.4Z"/><path d="M13.4 6.2h7.2v11.6h-7.2Z"/>',
   /* the ironwork itself, not the pane it sits in */
   grille:  '<path d="M4.6 12 12 4.6M4.6 19.4 19.4 4.6M12 19.4 19.4 12"/>'
          + '<path d="M4.6 12 12 19.4M4.6 4.6 19.4 19.4M12 4.6 19.4 12"/>',
-  handle:  '<path d="M8.4 5.6h3v12.8h-3Z"/><path d="M11.4 12h4.6"/>',
+  handle:  SECTION_ICON.grip,
   /* the horizontal bow, 26.9.2026: a bar lying across two posts — the handle's
      mark turned on its side would be the handle's mark */
   grab:    '<path d="M4.4 8.6h15.2v3.4H4.4Z"/><path d="M8 12v5.4M16 12v5.4"/>',

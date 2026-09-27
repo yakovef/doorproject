@@ -26,6 +26,32 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — FOUR NAVIGATOR MARKS A FIVE-YEAR-OLD CAN NAME.** The owner's son:
+  *"i like these icons: the first section, the third, the sixth, the eigth and
+  the final one. the other are not that great, either they are too complicated
+  or are just not representing the right thing. for each section i want you to
+  write a couple of sentences describing its insides and its role, then based
+  on that, make the most minimalistic and understandable drawing, so that a 5
+  year old will understand what the icon is."*
+  · **Kept:** fit (the door ajar), lock (lever on its plate), glass (the slanted
+    pane), mk (the frame alone), sum (the sheet with a tick).
+  · **The brief** — each section described from its own groups and lede, then
+    one object a child names — is the comment above `SECTION_ICON`.
+  · **Redrawn:** colour, the swatch fan → a painter's palette ("colours");
+    pz, a hinge with a glint → a bolt with one glint ("the shiny metal bits" —
+    the step is the metal colour of lever, keyhole, hinges, peephole; a bolt
+    alone said "screws"); face, a narrow door with a panel over strips → a
+    child's door, two panels and a round knob; grip, a slab with a bar and a
+    length arrow → the bar on two posts off a single wall line.
+  · **Turned down, measured** (the audit's pairwise raster, floor 0.50): grip as
+    a whole door with a bar on it, 0.32 against face — two door outlines are one
+    picture; as a close-up of the door's edge, 0.50 and a light switch; its first
+    side view had rounded corners and was the letter D; the square door read as
+    a switch. The single-line side view: 0.60.
+  · **Spec:** `handle` now shares `grip` by reference (it was a 3-unit slab and a
+    stub) — six rows, all asserted in `test/units.mjs`. `grab` already drew the
+    same bar lying down. Worst spec pair colour ~ detail 0.55.
+  · **Gates** in the commit message; no bare or lockset sheet moved.
 - **27.9 — THE GATES RE-READ, AND `npm run latency` IS PARTLY AN INSTRUMENT FOR
   MEASURING THE CONTAINER.** No instruction; this is §6 applied to a number that
   was about to be written down.
@@ -612,6 +638,36 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** No figures on the משקוף section — *"…it's better to not show a number
+  than show a false one."* The three figures (46/82, 62/112, 148/198) and the
+  dimension marks they sat on go from `mashkofGlyph`; the C, the three part NAMES
+  and the pills' prices stay, so the section says it RELATIVELY — a widened part
+  is a longer arm or a deeper falc, asserted off the catalogue's own `wide` list.
+  `MASHKOF_PARTS` keeps its widths (the drawing needs two parts of three). The
+  one-ruler assertion reads the three drawn PIECES, and *no `<text>` carries a
+  digit* is asked of EVERY text rather than of the deleted `glyph__dim` group
+  (§5.15); the CSS rule went with the class. Falsified: one figure back → 8, one
+  per frame; the section ignoring its frame → 32; the MARKS back → nothing, and
+  correctly — they are `<path>` and the clause reads the three `<rect>` pieces.
+  ⚠ Also carries the audit assertion `5676973` left out: it went on asserting
+  the refusal that commit reversed, so the audit was red there. Long form:
+  `HISTORY.md`.
+- **27.9** The three-panel face takes the window, and its rows are DERIVED from
+  it — *"…the window doesn't change size no matter what, and what is not right is
+  probably the proportions of the panels, change them so that the window will fit
+  there perfectly."* ⚠ Reverses the 26.9 refusal, on his word. `trioRows(leafH)`
+  replaces `PANEL_ROWS.trio`: upper = the square window's casing rectangle, the
+  plate one measured rail below it, the lower panel the second rail below that
+  (0.120–0.560 · 0.586–0.680 · 0.705–0.913 standard) — a FUNCTION, because 70 mm
+  of casing is a different fraction on every size (§5.16). The 24.9 rows are kept
+  beside it: measured, overruled, kept. ⚠ The refusal MOVED rather than going —
+  the tall slot still lands 322–488 mm in the plate, so `why.winPlate` keeps a
+  reader. Price `DETAIL_GLAZED.panel3 = DETAIL.panel3 − DETAIL.panel2`, ₪450
+  (A21) → a glazed trio is ₪7,445. ⚠ And *"a panel that is charged for is a panel
+  that is drawn"* had been reading the FIXED leaf's group on a double and agreeing
+  by coincidence; it reads the group that DECLARES the count now. Falsified: the
+  24.9 rows typed back → 30 faults. `collide -- all` 1,488 → 1,508. Long form:
+  `HISTORY.md`; §3 carries the derivation and what it cost.
 - **27.9** The curved lever's name is permanent: ידית מתעקלת / Curved lever /
   Изогнутая ручка (*"give the curved lever a permanent name"*); id untouched,
   1b and A19 closed. New: nothing on sale carries a provisional name. Slow run

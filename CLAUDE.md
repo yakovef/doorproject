@@ -129,6 +129,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** Four navigator marks redrawn "so that a 5 year old will
+  understand", after each section was described first (the brief is in
+  `js/icons.js`): colour a palette, pz a bolt with a glint, face a child's door
+  (two panels, a knob), grip the bar on two posts off a wall line. Kept on his
+  word: fit, lock, glass, mk, sum. The spec's `handle` row now shares `grip`
+  (six rows by reference, asserted). Worst nav pairs 0.60. Long form:
+  `HISTORY.md`.
 - **27.9** The round's gates re-read, and ⚠ **`npm run latency`'s milliseconds
   turn out to be a reading of the CONTAINER**: the jump 183 → 321/339/386 ms was
   investigated instead of written down, and `6934c0d` run beside this commit,
@@ -152,36 +159,7 @@ lines here. Dates are the day of the change.
   have demanded behaviour the page lacks. Falsified three ways, each flipping only
   its own clause — 24.9 rows back → 1a; the slot displacing nothing → both 1b;
   the restore guard dropped → 3. Long form: `HISTORY.md`.
-- **27.9** No figures on the משקוף section — *"…it's better to not show a number
-  than show a false one."* The three figures (46/82, 62/112, 148/198) and the
-  dimension marks they sat on go from `mashkofGlyph`; the C, the three part NAMES
-  and the pills' prices stay, so the section says it RELATIVELY — a widened part
-  is a longer arm or a deeper falc, asserted off the catalogue's own `wide` list.
-  `MASHKOF_PARTS` keeps its widths (the drawing needs two parts of three). The
-  one-ruler assertion reads the three drawn PIECES, and *no `<text>` carries a
-  digit* is asked of EVERY text rather than of the deleted `glyph__dim` group
-  (§5.15); the CSS rule went with the class. Falsified: one figure back → 8, one
-  per frame; the section ignoring its frame → 32; the MARKS back → nothing, and
-  correctly — they are `<path>` and the clause reads the three `<rect>` pieces.
-  ⚠ Also carries the audit assertion `5676973` left out: it went on asserting
-  the refusal that commit reversed, so the audit was red there. Long form:
-  `HISTORY.md`.
-- **27.9** The three-panel face takes the window, and its rows are DERIVED from
-  it — *"…the window doesn't change size no matter what, and what is not right is
-  probably the proportions of the panels, change them so that the window will fit
-  there perfectly."* ⚠ Reverses the 26.9 refusal, on his word. `trioRows(leafH)`
-  replaces `PANEL_ROWS.trio`: upper = the square window's casing rectangle, the
-  plate one measured rail below it, the lower panel the second rail below that
-  (0.120–0.560 · 0.586–0.680 · 0.705–0.913 standard) — a FUNCTION, because 70 mm
-  of casing is a different fraction on every size (§5.16). The 24.9 rows are kept
-  beside it: measured, overruled, kept. ⚠ The refusal MOVED rather than going —
-  the tall slot still lands 322–488 mm in the plate, so `why.winPlate` keeps a
-  reader. Price `DETAIL_GLAZED.panel3 = DETAIL.panel3 − DETAIL.panel2`, ₪450
-  (A21) → a glazed trio is ₪7,445. ⚠ And *"a panel that is charged for is a panel
-  that is drawn"* had been reading the FIXED leaf's group on a double and agreeing
-  by coincidence; it reads the group that DECLARES the count now. Falsified: the
-  24.9 rows typed back → 30 faults. `collide -- all` 1,488 → 1,508. Long form:
-  `HISTORY.md`; §3 carries the derivation and what it cost.
+
 ---
 
 ## 0c. Where it stands today — 26.9.2026
