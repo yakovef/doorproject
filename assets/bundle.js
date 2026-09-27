@@ -8316,26 +8316,6 @@ ${body}
       <!-- the outer kant, lapping the street side -->
       <rect x="${x0}" y="${f(yBot - T2)}" width="${f(O)}" height="${T2}"/>
     </g>
-    <g fill="none" stroke="currentColor" stroke-width="2.4" opacity=".55">
-      <!-- the outer kant, under its arm. FIRST of the two horizontal runs,
-           and the inner kant is last: that order is what the test reads. -->
-      <path d="M${x0} ${f(yBot + 12)}H${f(x0 + O)}"/>
-      <path d="M${x0} ${f(yBot + 7)}v10"/>
-      <path d="M${f(x0 + O)} ${f(yBot + 7)}v10"/>
-      <!-- the falc, beside the profile: the only vertical run -->
-      <path d="M${dimX} ${f(yTop)}V${f(yBot)}"/>
-      <path d="M${dimX - 5} ${f(yTop)}h10"/>
-      <path d="M${dimX - 5} ${f(yBot)}h10"/>
-      <!-- the inner kant, over its arm -->
-      <path d="M${x0} ${f(yTop - 12)}H${f(x0 + I)}"/>
-      <path d="M${x0} ${f(yTop - 17)}v10"/>
-      <path d="M${f(x0 + I)} ${f(yTop - 17)}v10"/>
-    </g>
-    <g class="glyph__dim" fill="currentColor" font-size="17" opacity=".85">
-      <text x="${f(x0 + O / 2)}" y="${f(yBot + 32)}" text-anchor="middle">${mk.out}</text>
-      <text x="${numX}" y="${f(cy - 2)}" text-anchor="end">${mk.in}</text>
-      <text x="${f(x0 + I / 2)}" y="${f(yTop - 21)}" text-anchor="middle">${mk.inner == null ? mk.out : mk.inner}</text>
-    </g>
     <g class="glyph__lbl" fill="currentColor" font-size="12" opacity=".7">
       <text x="${lblX}" y="${f(yBot + 16)}">${L(part("out"))}</text>
       <text x="${numX}" y="${f(cy + 15)}" text-anchor="end">${L(part("in"))}</text>

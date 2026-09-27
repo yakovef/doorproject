@@ -1031,10 +1031,23 @@ for (const v of VIEWS) {
           stage, read as boxes), the face is the pair beside the same window,
           the price AND the code move together, a lower panel is drawn below
           the glass, and the WhatsApp order names the composition in Hebrew;
-       2. tap three panels — nothing changes (code, price, pane) and the toast
-          says the plate, which is the tile's own reason (`why.winPlate`);
+       2. tap three panels — ⚠ RESTATED 27.9.2026, THE OPPOSITE ANSWER, on the
+          owner's son's *"change them so that the window will fit there
+          perfectly"*: the trio's rows are derived from the casing now, so the
+          tap BUILDS. The pane still does not move a pixel, the code and the
+          price move, TWO panels are drawn below the glass (the plate and the
+          lower), and the order names the composition. Beside it, the clause
+          that must stay true (§5.22): on the tall SLOT the trio is still
+          refused by the plate, its tap changes nothing, and the toast still
+          says `why.winPlate` — the computed check was never relaxed;
        3. `?sheet=1` of both doors builds with no page error, draws the door,
           and the pair's sheet names the composition.
+     ⚠ This block asserted the refusal for one commit AFTER the refusal was
+     reversed — a slip of that commit, found by reading the tool rather than by
+     running it, because the slow run comes at the end of a round. The unit
+     suite's own version of the claim was restated in the same commit as the
+     change; this one was not, and the difference is that `npm test` runs on
+     every commit and the audit does not.
      The fixture is asserted to arrive unrepaired (§5.15). Falsified by putting
      the `intent === 'detail'` arm back in `repair` (tap 2 loses the window)
      and by dropping the gate in `choose` (tap 2 lands on plain and says so). */
@@ -1061,6 +1074,10 @@ for (const v of VIEWS) {
         wa: wa ? decodeURIComponent(wa.getAttribute('href') || '') : '',
         panes,
         panelTop: panel ? Number(panel.getAttribute('data-top')) : null,
+        /* How many panels the face says it drew — the main leaf's group is the
+           one that declares it (the fixed leaf's does not; see `test/units.mjs`,
+           where reading the first group agreed by coincidence for rounds). */
+        panels: panel ? Number(panel.getAttribute('data-panels')) : null,
         glassFoot,
       };
     });
@@ -1108,14 +1125,53 @@ for (const v of VIEWS) {
         }
         const hit3 = await tap('panel3');
         const c3 = await read();
+        const sc = decodeCode(c3.code);
         const plate = withLang('he', () => T('why.winPlate'));
-        if (!hit3) fault(v.name, 'no three-panel tile on the face step — the refusal check is dead');
+        if (!hit3) fault(v.name, 'no three-panel tile on the face step — the trio check is dead');
         else {
-          if (c3.code !== b2.code || c3.price !== b2.price || !same(b2.panes, c3.panes)) {
-            fault(v.name, `tapping the greyed three panels changed the door: ${b2.code} ${b2.price} → ${c3.code} ${c3.price}`);
+          if (!sc || sc.detail !== 'panel3') {
+            fault(v.name, `tapping three panels beside the window landed on ${sc?.detail} — the plate `
+              + 'clears the casing by a rail since 27.9 and the tap must build');
           }
-          if (!c3.toast.includes(plate)) {
-            fault(v.name, `tapping the greyed three panels said "${c3.toast}" — it should name the plate: "${plate}"`);
+          if (!sc || sc.window !== 'rect') {
+            fault(v.name, `tapping three panels left the window at ${sc?.window} — a face tap never removes it`);
+          }
+          if (!same(b2.panes, c3.panes)) {
+            fault(v.name, `the square window moved when the pair became three panels: `
+              + `${JSON.stringify(b2.panes.map(r => r.map(Math.round)))} → ${JSON.stringify(c3.panes.map(r => r.map(Math.round)))}`);
+          }
+          if (c3.code === b2.code || c3.price === b2.price) {
+            fault(v.name, `the face changed to three panels and the ${c3.code === b2.code ? 'code' : 'price'} `
+              + `did not (${b2.code} ${b2.price} → ${c3.code} ${c3.price})`);
+          }
+          if (c3.panels !== 2) {
+            fault(v.name, `three panels beside the window draw ${c3.panels} panel(s) — the plate and the lower one`);
+          }
+          if (c3.panelTop == null || !(c3.panelTop > c3.glassFoot)) {
+            fault(v.name, `three panels beside the window draw ${c3.panelTop == null ? 'no' : 'a misplaced'} plate `
+              + `(top ${c3.panelTop}, glass to ${c3.glassFoot.toFixed(1)})`);
+          }
+          const says3 = withLang('he', () => T('row.upperGlazed', L(DETAILS.find(d => d.id === 'panel3'))));
+          if (!c3.wa.includes(says3)) {
+            fault(v.name, `the order for three panels beside a window does not say "${says3}"`);
+          }
+          /* ⚠ AND THE CLAUSE THAT MUST STAY TRUE: the tall slot still refuses
+             it, by the plate. The cheap way to make a glazed trio buildable is
+             to stop asking, and this is what catches that. */
+          await load('?w=strip&d=plain&n=none&k=cylinder&s=standard&lang=he');
+          const s0 = await read();
+          const hitS = await tap('panel3');
+          const s1 = await read();
+          if (!hitS) fault(v.name, 'no three-panel tile beside the slot — the refusal clause is dead');
+          else {
+            if (s1.code !== s0.code || s1.price !== s0.price) {
+              fault(v.name, `tapping the greyed three panels beside the SLOT changed the door: `
+                + `${s0.code} ${s0.price} → ${s1.code} ${s1.price}`);
+            }
+            if (!s1.toast.includes(plate)) {
+              fault(v.name, `tapping three panels beside the slot said "${s1.toast}" — it should still `
+                + `name the plate: "${plate}"`);
+            }
           }
         }
       }

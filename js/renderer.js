@@ -10632,10 +10632,25 @@ export function mashkofGlyph(mk) {
      Which way round: the falc faces the opening, the two kants lap the two
      faces of the wall, so the wall lies between the arms — to the RIGHT of the
      C as it is drawn, exactly as he drew it, with the inner kant on top. */
-  /* ⚠ THE UNITS ARE MILLIMETRES, `sc = 1`. Every part of this figure is drawn
-     at the length the catalogue gives it and every dimension mark is that same
-     length, so there is one scale by construction rather than by arithmetic —
-     which is what the assertion in `test/units.mjs` asks of it.
+  /* ⚠ AND IT PRINTS NO NUMBERS, SINCE 27.9.2026. The owner's son: *"Remove the
+     numbers from the mashkof section, maybe in the future I will give you
+     accurate numbers but right now I don't have them so I think it's better to
+     not show a number than show a false one."* So the three figures (46/82,
+     62/112, 148/198) and the three dimension marks they sat on are gone, and
+     what is left says the same thing RELATIVELY: the C is still drawn at the
+     catalogue's own lengths, so a widened part is visibly a longer arm or a
+     deeper falc beside the standard one, and the three part NAMES stay, because
+     a customer has to know which stroke each row is about. The pills keep their
+     prices — those are Peretz's and are not in doubt.
+     ⚠ The figures were not wrong arithmetic; they were a MEASUREMENT nobody had
+     taken. `MASHKOF_PARTS` keeps them because the DRAWING needs them for two
+     parts of three, and the day he gives real ones the marks can come back to
+     the same numbers.
+
+     ⚠ THE UNITS ARE MILLIMETRES, `sc = 1`. Every part of this figure is drawn
+     at the length the catalogue gives it, so there is one scale by construction
+     rather than by arithmetic — which is what the assertion in `test/units.mjs`
+     asks of it, off the three PIECES now that there are no marks beside them.
      ⚠ `T` IS THE ONE LENGTH HERE THAT IS NOT MEASURED. A cut profile has to
      have a thickness to read as cut rather than as a line, and steel frame
      stock is thinner than any mark drawn at this scale could show. It is a
@@ -10670,26 +10685,6 @@ export function mashkofGlyph(mk) {
       <rect x="${x0}" y="${f(yTop)}" width="${f(I)}" height="${T}"/>
       <!-- the outer kant, lapping the street side -->
       <rect x="${x0}" y="${f(yBot - T)}" width="${f(O)}" height="${T}"/>
-    </g>
-    <g fill="none" stroke="currentColor" stroke-width="2.4" opacity=".55">
-      <!-- the outer kant, under its arm. FIRST of the two horizontal runs,
-           and the inner kant is last: that order is what the test reads. -->
-      <path d="M${x0} ${f(yBot + 12)}H${f(x0 + O)}"/>
-      <path d="M${x0} ${f(yBot + 7)}v10"/>
-      <path d="M${f(x0 + O)} ${f(yBot + 7)}v10"/>
-      <!-- the falc, beside the profile: the only vertical run -->
-      <path d="M${dimX} ${f(yTop)}V${f(yBot)}"/>
-      <path d="M${dimX - 5} ${f(yTop)}h10"/>
-      <path d="M${dimX - 5} ${f(yBot)}h10"/>
-      <!-- the inner kant, over its arm -->
-      <path d="M${x0} ${f(yTop - 12)}H${f(x0 + I)}"/>
-      <path d="M${x0} ${f(yTop - 17)}v10"/>
-      <path d="M${f(x0 + I)} ${f(yTop - 17)}v10"/>
-    </g>
-    <g class="glyph__dim" fill="currentColor" font-size="17" opacity=".85">
-      <text x="${f(x0 + O / 2)}" y="${f(yBot + 32)}" text-anchor="middle">${mk.out}</text>
-      <text x="${numX}" y="${f(cy - 2)}" text-anchor="end">${mk.in}</text>
-      <text x="${f(x0 + I / 2)}" y="${f(yTop - 21)}" text-anchor="middle">${mk.inner == null ? mk.out : mk.inner}</text>
     </g>
     <g class="glyph__lbl" fill="currentColor" font-size="12" opacity=".7">
       <text x="${lblX}" y="${f(yBot + 16)}">${L(part('out'))}</text>

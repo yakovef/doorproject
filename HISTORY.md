@@ -26,6 +26,97 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — NO FIGURES ON THE משקוף SECTION.** The owner's son: *"Remove the
+  numbers from the mashkof section, maybe in the future I will give you accurate
+  numbers but right now I don't have them so I think it's better to not show a
+  number than show a false one."*
+
+  **WHAT WAS THERE.** The control's diagram printed three dimensions — the outer
+  kant 46/82, the falc 62/112, the inner kant 46/82 — each on its own mark with
+  witness ticks, in `--mono`, at the length it named. The one-ruler property was
+  real and asserted; the NUMBERS were the problem, and not because the arithmetic
+  was wrong. They were a measurement nobody had taken: A6 has said since 20.9
+  that the widened frame's 60/300 is an assumption, and a drawing that prints a
+  figure states it as a fact.
+
+  **WHAT IS LEFT, AND WHY IT IS ENOUGH.** The C is still drawn at the catalogue's
+  own lengths (`sc = 1`, millimetres), so the section keeps saying the same thing
+  **relatively**: tick the outer kant wide and its arm is visibly longer, tick the
+  falc and the piece is visibly deeper. That is what the diagram is FOR — the
+  rows underneath say which part, the pills say what it costs, and both of those
+  are Peretz's own and not in doubt. The three part NAMES stay (`glyph__lbl`,
+  `L(part)` in the customer's language): a customer has to know which stroke each
+  row is about, and a nameless C would be a worse diagram than a dimensioned one.
+
+  ⚠ **`MASHKOF_PARTS` KEEPS ITS WIDTHS.** The DRAWING needs them for two parts of
+  three — `render` reads `out` and `in` — so they are not a stranded number, and
+  the day he gives real ones the marks come back to the same table. A comment
+  there says so in his words, which is the difference between "withdrawn" and
+  "not shown".
+
+  **ASSERTED, restated rather than deleted.** The group was *"the משקוף tiles
+  print the frame's own numbers, at the length they claim"* and is now *"the
+  משקוף section draws the frame's own lengths, and prints no number"*:
+  · **no `<text>` carries a digit** — asked of EVERY text in the section, not of
+    the `glyph__dim` group, because that group is the thing that went and a check
+    scoped to a deleted selector cannot fail (§5.15). It cannot be passed by
+    drawing nothing either: the language clause still requires the three names.
+  · **the one-ruler property reads the three drawn PIECES** — the falc's rect
+    height, the inner kant's arm, the outer kant's — instead of the marks beside
+    them. Same claim, one step closer to the door, and the odd-frame clause
+    (33/155/61, a frame not in the catalogue) still separates a section that
+    reads `MASHKOFS` from one with the numbers written in.
+  · **and the relative statement is asserted, off the catalogue's own `wide`
+    list**: a widened part draws a longer piece than the standard frame's, a part
+    that is not widened draws the same one, for all eight frames × three parts.
+    This is the clause that must stay true beside "no figures" (§5.22) — printing
+    nothing and drawing nothing would pass the first and fail this.
+
+  ⚠ **AND THE STYLESHEET RULE WENT WITH THE CLASS.** `.glyph__dim { font-family:
+  var(--mono) }` in `css/app.css` set the figures' face so a number on the
+  drawing and a number under it read alike. Nothing emits that class now, and a
+  rule for a class nothing emits is dead code that reads as load-bearing. The
+  names keep `.glyph__lbl`, which takes the page's sans — they are words, and
+  `--mono` has no Hebrew in it (§9).
+
+  **FALSIFIED TWICE, and the first attempt at a second falsification was the
+  wrong experiment — recorded because it says what the check is and is not
+  about.** Printing ONE figure back fires the digit clause on **all eight
+  frames** (8 faults). Making the section ignore the frame it is drawing — every
+  piece at the standard frame's length — fires **32**: the relative clause on
+  every widened part of every frame, and *"every option tile draws its own
+  picture"* collapsing seven frames onto one.
+  ⚠ **Restoring the dimension MARKS alone fires nothing, and that is correct.**
+  I expected it to and it does not: the marks are `<path>` and the one-ruler
+  clause reads the three `<rect>` pieces, so silent marks are decoration this
+  check has no opinion about. What he asked to be removed is the false NUMBER,
+  not a tick — marks with no figures state nothing. Had I written the claim up
+  without running it, this entry would have carried a falsification that never
+  happened.
+
+  ⚠ **AND IT CARRIES THE ASSERTION THE TRIO COMMIT LEFT BEHIND, which is the
+  round's one real process failure.** `5676973` reversed the refusal of a
+  three-panel face beside the square window, restated the unit suite's version of
+  that claim in the same commit — and did not stage `tools/audit.mjs`, whose
+  face-tap block went on asserting *"tap three panels — nothing changes and the
+  toast says the plate"*. So **the audit is red at `5676973` if anybody runs it
+  there**, on a correct door, which is exactly the shape of §5's list read
+  backwards: the check describing a world the code has left. It is restated here
+  instead — the tap now BUILDS (the pane unmoved to the pixel, code and price
+  both moving, `data-panels="2"`, the plate below the glass, the order naming
+  the composition) with the clause that must stay true beside it (§5.22): on the
+  tall SLOT the trio is still refused by the plate and the toast still says
+  `why.winPlate`. The block carries a comment saying it asserted the refusal for
+  one commit after the refusal was reversed, and why that happened: `npm test`
+  runs on every commit and the audit runs once, at the end, so the tool that
+  checks least often is the one a reversal is most likely to strand. It was found
+  by READING the tool, not by running it.
+
+  **GATES.** `node --check`, `npm run build`, `npm test` 9,210,647 passed / 5
+  failed — the five sheet-staleness rows, allowed on an intermediate commit.
+  Sheets: this is a TILE and no bare sheet contains one, so none may move;
+  verified in the slow run below.
+
 - **27.9 — THE THREE-PANEL FACE TAKES THE WINDOW, AND ITS ROWS ARE DERIVED FROM
   IT.** The owner's son: *"When I try changing from the Greek set or 2 panels
   when you have a window to the 3 panel option, it doesn't let me. I remind you

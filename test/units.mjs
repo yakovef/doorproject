@@ -2280,25 +2280,22 @@ group('the stripe pictures are the door\'s own lines');
    hard-coded "46" survives every assertion that only reads the four real
    tiles. Falsified three ways — printing `mk.out * 2`, dimensioning the whole
    plate, and scaling the return by a second constant. */
-group('the משקוף tiles print the frame\'s own numbers, at the length they claim');
+group('the משקוף section draws the frame\'s own lengths, and prints no number');
 {
-  /* ⚠ THREE MARKS SINCE 20.9.2026: the inner kant is the third part Peretz
-     prices, it shows in the section and nowhere else, and it is dimensioned
-     under the drawing. The two horizontal marks are told apart by their
-     order in the markup — the face first, the inner kant last. */
-  /* ⚠ THE NUMBERS ARE READ OUT OF THE `glyph__dim` GROUP ONLY, since 20.9
-     Part B: the section is the control's own diagram now and NAMES its parts
-     in a `glyph__lbl` group beside the figures. A regex over every `<text>`
-     would count six and call the tile wrong about a number it prints right. */
+  /* ⚠ THREE PIECES, AND NO FIGURES SINCE 27.9.2026: the marks are read off the
+     three drawn RECTS of the C rather than off the dimension lines beside them,
+     because there are none. Same property — one ruler, both axes, read out of
+     `MASHKOFS` and never typed — one step closer to the drawing. The falc is
+     the tall thin rect (its HEIGHT is `in`), then the inner kant's arm, then
+     the outer kant's: that order is the drawing's and is what this reads. */
   const runs = svg => {
-    const H = [...svg.matchAll(/M([\d.-]+) ([\d.-]+)H([\d.-]+)/g)]
-      .map(([, x0, , x1]) => Number(x1) - Number(x0));
-    const dim = /<g class="glyph__dim"[\s\S]*?<\/g>/.exec(svg);
+    const R = [...svg.matchAll(/<rect x="[\d.-]+" y="[\d.-]+" width="([\d.-]+)" height="([\d.-]+)"\/>/g)]
+      .map(m => ({ w: Number(m[1]), h: Number(m[2]) }));
     const lbl = /<g class="glyph__lbl"[\s\S]*?<\/g>/.exec(svg);
     return {
-      face: H[0], inner: H[H.length - 1],
-      ret:  (([, , y0, y1]) => Number(y1) - Number(y0))(/M([\d.-]+) ([\d.-]+)V([\d.-]+)/.exec(svg)),
-      text: [...(dim ? dim[0] : '').matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map(m => m[1]),
+      ret: R[0] ? R[0].h : 0, inner: R[1] ? R[1].w : 0, face: R[2] ? R[2].w : 0,
+      pieces: R.length,
+      text: [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map(m => m[1]),
       names: [...(lbl ? lbl[0] : '').matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map(m => m[1]),
     };
   };
@@ -2316,17 +2313,42 @@ group('the משקוף tiles print the frame\'s own numbers, at the length they c
   const scales = [];
   for (const mk of MASHKOFS) {
     const r = runs(mashkofGlyph(mk));
-    ok(r.text.length === 3,
-      `the ${mk.id} tile writes ${r.text.length} numbers, not three: the outer kant, ` +
-      `the falc and the inner kant are the three parts this frame is sold by`);
-    ok(r.text[0] === String(mk.out) && r.text[1] === String(mk.in) && r.text[2] === String(mk.inner),
-      `the ${mk.id} tile writes ${r.text.join('/')} where MASHKOFS says ` +
-      `${mk.out}/${mk.in}/${mk.inner}`);
+    /* ⚠ NOT ONE DIGIT ANYWHERE IN THE SECTION, 27.9.2026 — *"it's better to not
+       show a number than show a false one."* Asked of EVERY `<text>` rather than
+       of the `glyph__dim` group, which is the group that went: a check scoped to
+       a deleted group is a check that cannot fail (§5.15), and what he asked for
+       is that the diagram print no figure at all. The three names must still be
+       there, which the language clause above asserts — so this cannot be passed
+       by drawing nothing. */
+    ok(r.text.length === 3 && !r.text.some(t => /\d/.test(t)),
+      `the ${mk.id} section prints ${JSON.stringify(r.text)} — three names and no figure`);
+    ok(r.pieces === 3,
+      `the ${mk.id} section draws ${r.pieces} pieces, not the C's three`);
     ok(r.face > 0 && r.ret > 0 && r.inner > 0,
-      `the ${mk.id} tile draws a dimension of zero length (face ${r.face}, return ${r.ret}, inner ${r.inner})`);
+      `the ${mk.id} section draws a piece of zero length (face ${r.face}, falc ${r.ret}, inner ${r.inner})`);
     scales.push({ id: `${mk.id} face`, k: r.face / mk.out },
                 { id: `${mk.id} return`, k: r.ret / mk.in },
                 { id: `${mk.id} inner`, k: r.inner / mk.inner });
+  }
+  /* ⚠ AND THE RELATIVE STATEMENT IS WHAT IS LEFT OF THE FIGURES, so it is
+     asserted rather than assumed: a widened part draws a LONGER piece than the
+     standard frame's, and a part that is not widened draws the same one. Off the
+     catalogue's own `wide` list, so a fourth part would be covered without
+     anybody coming back here. This is the whole of what the section now tells a
+     customer, and it is the clause that must stay true beside "no figures":
+     printing nothing and drawing nothing would pass the first and fail this. */
+  {
+    const std = runs(mashkofGlyph(MASHKOFS[0]));
+    const of = (r, k) => (k === 'out' ? r.face : k === 'in' ? r.ret : r.inner);
+    for (const mk of MASHKOFS) {
+      const r = runs(mashkofGlyph(mk));
+      for (const p of MASHKOF_PARTS) {
+        const wider = (mk.wide || []).includes(p.key);
+        ok(wider ? of(r, p.key) > of(std, p.key) : of(r, p.key) === of(std, p.key),
+          `${mk.id}: the ${p.key} is drawn ${of(r, p.key)} against the standard frame's `
+        + `${of(std, p.key)}, and it is ${wider ? 'widened' : 'standard'} on this frame`);
+      }
+    }
   }
   /* One ruler, both axes, four tiles — the same property the size tiles were
      given on 14.9 and for the same reason. Tolerance is the glyph's own
@@ -2342,15 +2364,16 @@ group('the משקוף tiles print the frame\'s own numbers, at the length they c
       `comparable`);
   }
 
-  /* A frame that is not in the catalogue: the only way to tell a glyph that
-     reads `MASHKOFS` from one that has the four numbers written into it. */
+  /* A frame that is not in the catalogue: the only way to tell a section that
+     reads `MASHKOFS` from one with the numbers written into it. ⚠ It used to
+     check the printed FIGURES too; with those gone the drawing is the whole
+     subject, and it is the half that mattered — a printed 46 beside a piece
+     drawn at 82 is what the one-ruler rule exists to catch. */
   const odd = runs(mashkofGlyph({ id: 'mk-test', out: 33, in: 155, inner: 61 }));
-  ok(odd.text[0] === '33' && odd.text[1] === '155' && odd.text[2] === '61',
-    `a frame of 33/155/61 draws ${odd.text.join('/')}: the numbers on this tile are typed, not read`);
   ok(Math.abs(odd.face / 33 - k0) < 0.01 && Math.abs(odd.ret / 155 - k0) < 0.01
      && Math.abs(odd.inner / 61 - k0) < 0.01,
-    `a frame of 33/155/61 draws marks ${odd.face}/${odd.ret}/${odd.inner} units long, which is not ` +
-    `${k0.toFixed(4)} per mm: the marks do not follow the numbers`);
+    `a frame of 33/155/61 draws pieces ${odd.face}/${odd.ret}/${odd.inner} units long, which is not ` +
+    `${k0.toFixed(4)} per mm: the drawing does not follow the catalogue`);
 
   /* ── 6b3. THREE ROWS OF TWO LAND ON ONE ID, AND THE DOOR MOVES FOR TWO OF
      THREE — Part B, 20.9.2026. `mashkofFor` is the control's one lookup from

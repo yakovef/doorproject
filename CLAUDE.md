@@ -129,6 +129,25 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** No figures on the משקוף section — *"Remove the numbers from the
+  mashkof section, maybe in the future I will give you accurate numbers but
+  right now I don't have them so I think it's better to not show a number than
+  show a false one."* The three figures (46/82, 62/112, 148/198) and the three
+  dimension marks they sat on go from `mashkofGlyph`; the C and the three part
+  NAMES stay, and the pills keep their prices, which are his father's. So the
+  section says it RELATIVELY — a widened part is a longer arm or a deeper falc,
+  now asserted off the catalogue's own `wide` list. `MASHKOF_PARTS` keeps its
+  widths: the drawing needs them for two parts of three. The one-ruler
+  assertion reads the three drawn PIECES instead of the marks beside them, which
+  is a step closer to the door, and *no `<text>` may carry a digit* is asked of
+  EVERY text rather than of the deleted `glyph__dim` group (§5.15). `.glyph__dim`
+  went from `css/app.css` with the class. Falsified: one figure printed back → 8
+  faults, one per frame; the section ignoring its frame → 32. ⚠ Restoring the
+  MARKS alone fires nothing and should not — they are `<path>`, the one-ruler
+  clause reads the three `<rect>` pieces, and a tick with no figure states
+  nothing. ⚠ Carries the audit assertion the trio commit LEFT OUT: `5676973`
+  reversed the glazed trio's refusal and `tools/audit.mjs` went on asserting it,
+  so the audit was red at that commit. Long form: `HISTORY.md`.
 - **27.9** The three-panel face takes the window, and its rows are DERIVED from
   it — *"When I try changing from the Greek set or 2 panels when you have a
   window to the 3 panel option, it doesn't let me. I remind you that the window
@@ -883,10 +902,25 @@ on the whole (A3). The door moves for two parts of three, and the hint says why.
 The control (`buildMashkof`) is three rows of standard/wide over **a section of
 the frame: a square C** — the falc as the upright, the two kants as the arms,
 nothing else (no wall, no leaf), exactly as the owner's son drew it. Units are
-millimetres (`sc = 1`), so each dimension mark is the length of the piece it
-names; the profile's thickness is a drawing weight, labelled in the code as the
-one unmeasured length. `mashkofGlyph` is the control's diagram only; `render()`
+millimetres (`sc = 1`), so each piece is drawn at the length the catalogue gives
+it; the profile's thickness is a drawing weight, labelled in the code as the one
+unmeasured length. `mashkofGlyph` is the control's diagram only; `render()`
 never calls it.
+
+⚠ **AND IT PRINTS NO FIGURE, SINCE 27.9.2026** — the owner's son: *"Remove the
+numbers from the mashkof section, maybe in the future I will give you accurate
+numbers but right now I don't have them so I think it's better to not show a
+number than show a false one."* The three figures and the three dimension marks
+they sat on are gone; the C and the three part NAMES (`glyph__lbl`, `L(part)`)
+stay, and the pills keep their prices, which are Peretz's and are not in doubt.
+So the section says the same thing **relatively**: a widened part is a visibly
+longer arm or a deeper falc, asserted off the catalogue's own `wide` list rather
+than by eye. ⚠ **`MASHKOF_PARTS` keeps its widths** — the DRAWING needs them for
+two parts of three, and the day he gives real ones the marks come back to the
+same numbers. The one-ruler assertion now reads the three drawn PIECES instead
+of the marks beside them, which is a step closer to the door; `.glyph__dim` went
+from `css/app.css` with the class, because a rule for a class nothing emits is
+dead code that reads as load-bearing.
 
 ### The handle has one place, from a table (18.9)
 
@@ -1303,6 +1337,18 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 ## 9. What is still open
 
 ### Measured and not fixed — each is arithmetic or a product decision
+
+- **On a near-black door a window design's two ends are almost the same option**
+  (27.9). Every design is a pair — black, or the door's colour — and the contrast
+  between the two inks is decided by the paint: **13.69:1 on לבן 9016, 2.01:1 on
+  the default חום-אפור כהה 7126, 1.53:1 on אפור פחם 7021**. So the choice is real
+  on a pale door and almost none on a dark one, and 1.53 is under the 3:1 a
+  graphic element wants. It is arithmetic about his own instruction rather than
+  anything the drawing does, so nothing is refused and no tile is adjusted;
+  `npm test` separates a pair by MARKUP, which is all a string-level check can
+  say, and it asks it on the door the page opens with — the hardest of the three.
+  What would settle whether it matters is a look at the two tiles side by side on
+  a charcoal door: a question about a picture, not about a ratio.
 
 - **The square window scales with the leaf now, and two things moved with it**
   (26.9). It is 0.422 of the leaf's width, so the lone panel under it (aligned
