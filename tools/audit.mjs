@@ -5684,11 +5684,15 @@ try {
   const SHAPES = [[1100, 800], [1152, 800], [1200, 800], [1280, 720], [1366, 768],
                   [1440, 900], [1536, 864], [1680, 950], [1920, 918]];
   const GAP = 8;                 // the same 8 px the vertical clamp keeps
-  /* The four readings where the card already stands on the door, measured on
-     the commit before the clamp and unchanged by it. Each is a wall narrower
-     than the card it has to hold; §9 has the arithmetic. */
-  const ON_DOOR_OK = new Set(['en 1100x800 halfextra2', 'ru 1100x800 halfextra1',
-                              'ru 1100x800 halfextra2', 'ru 1152x800 halfextra2']);
+  /* The readings where the card stands on the door and that is known. EMPTY
+     since 27.9.2026: there were four (en 1100x800 halfextra2, ru 1100x800
+     halfextra1 and halfextra2, ru 1152x800 halfextra2), 1-22 px onto the leaf
+     with a 184-207 px card. The phone's send became "Send" (7b9dc43) and the
+     card is 113-142 px there now, 0 px on the door on all four — measured on
+     that commit alone, before the icon commit on top of it. The clause below
+     now fires for EVERY reading; the set stays so a future known overlap has a
+     place to be named, and the stale-exemption check still walks it. */
+  const ON_DOOR_OK = new Set();
   const stillOverlapping = new Set();
   let room = 0, tight = [], measured = 0, popovers = 0;
   const p = await b.newPage();
@@ -5809,7 +5813,7 @@ try {
   if (faults === before) {
     console.log(`    ${measured} readings in three languages x nine desktop widths x all six `
       + `sizes: the price card is whole on all ${room} where the wall can hold it, it stands on `
-      + `the door on none but the ${ON_DOOR_OK.size} §9 names, and its breakdown is centred on `
+      + `the door on ${ON_DOOR_OK.size ? `none but the ${ON_DOOR_OK.size} §9 names` : 'none'}, and its breakdown is centred on `
       + `it in all ${popovers}. ${tight.length} cut where the wall cannot hold it (§9): `
       + tight.slice(0, 4).join(', ') + (tight.length > 4 ? ` +${tight.length - 4} more` : ''));
   }

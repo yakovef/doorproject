@@ -26,6 +26,18 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE PRICE CARD STANDS ON NO DOOR, SO ITS EXEMPTION GOES.** Not
+  asked for; found by the audit after rebasing the icon commit onto `7b9dc43`:
+  4 faults, all *"named as a reading where the price card stands on the door
+  and it no longer does."* Measured with a scratch copy of the check on three
+  commits, card width / px on the leaf: `fe65505` 184–207 / 1–22 on all four;
+  `7b9dc43` 113–142 / 0; the icon commit the same as `7b9dc43`. So the phone
+  send's new short label ("שלחו / Send / Отправить", which the desktop card
+  shares) is what fixed it. `ON_DOOR_OK` in `tools/audit.mjs` is now empty
+  and its comment keeps the four readings and the figures; CLAUDE.md §9's
+  "163 px price chip" is corrected. A stronger gate, not a weaker one: the
+  on-door clause now fires on all 162 readings.
+
 - **27.9 — THE NAVIGATOR'S NINE MARKS ARE THE THINGS THEIR STEPS SELL.**
   The owner's son: *"look at each of the icons that represent the sections
   above … draw better versions of them that really represent the actual

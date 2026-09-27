@@ -129,6 +129,10 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The audit's four named "price card on the door" readings (1100/1152
+  px, widest doubles) were stale: "Send" shrank the card to 113–142 px and it
+  is on no door now (measured on `7b9dc43` alone). `ON_DOOR_OK` emptied, so
+  that clause fires on every reading. Long form: `HISTORY.md`.
 - **27.9** The nine navigator marks redrawn as what each step sells — *"really
   represent the actual content of the section and not some random circles and
   squares"*: ajar door, swatch fan, lever on its plate, hinge with a glint,
@@ -1314,7 +1318,9 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   in one language and the same wall in another** — the mechanism behind a
   closed fault (the removed grip controls under the price card in Hebrew only).
   Check it for anything put in the wall next. And at 1100–1152 px the wall is
-  140–152 px against a 163 px price chip: nothing else fits there.
+  140–152 px: the price card (113–142 px since the send became "Send", 27.9)
+  fits, and stands on no door at any size — the four named on-door readings
+  are gone from the audit — but nothing else fits there.
 - **The phone's Back button leaves the guide** (12.9): the whole walk is one
   history entry. The obvious fix — `pushState` per step — was built and
   **thrown away**: the in-page back button then grows the stack and system Back
