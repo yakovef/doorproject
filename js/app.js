@@ -159,8 +159,12 @@ const GROUPS = [
   { key: 'window', title: 'g.window', in: 'glass', kind: 'tile', list: () => WINDOWS,
     glyph: windowGlyph, hint: 'g.window.h' },
 
+  /* ⚠ `tinted`: a `-light` design's tile is the design in the DOOR'S colour
+     (27.9.2026, *"black or the color of the door"*), so the art is drawn for
+     the paint on screen and re-drawn when it changes — `retintOptions`. */
   { key: 'grille', title: 'g.grille', in: 'glass', kind: 'sq', list: () => GRILLES,
-    glyph: grilleGlyph, hint: 'g.grille.h' },
+    glyph: o => grilleGlyph(o, byId(COLOURS, state.colour).hex), tinted: true,
+    hint: 'g.grille.h' },
 
   { key: 'handle', title: 'g.handle', in: 'grip', kind: 'hw', list: () => HANDLES,
     glyph: handleGlyph, hint: 'g.handle.h' },
@@ -1512,6 +1516,26 @@ function renderBreakdown(state) {
     + `<td>${formatAgorot(r.agorot)}</td></tr>`).join('')
     + `<tr class="bd__total"><th scope="row">${T('price.total')}</th>`
     + `<td>${formatAgorot(priceAgorot(state))}</td></tr>`;
+}
+
+/** Re-draw the art of every tile that is painted the door's colour, when the
+ *  colour has changed since it was drawn. The price labels are rewritten in
+ *  place by `repriceOptions` below for the same reason: a tile states what the
+ *  door would be, and the door's colour is part of that. Only the art is
+ *  touched — focus, `aria-*` and the blocked state live on the button. */
+function retintOptions(state) {
+  const hex = byId(COLOURS, state.colour).hex;
+  for (const g of GROUPS) {
+    if (!g.tinted) continue;
+    const host = document.querySelector(`.field[data-group="${g.key}"]`);
+    if (!host || host.dataset.paint === hex) continue;
+    host.dataset.paint = hex;
+    for (const b of host.querySelectorAll('[data-id]')) {
+      const o = g.list().find(x => x.id === b.dataset.id);
+      const art = b.querySelector('.tile__art');
+      if (o && o.light && art) art.innerHTML = g.glyph(o);
+    }
+  }
 }
 
 /** Repaint every option's price label against the door as it stands. */
@@ -2925,6 +2949,7 @@ function paint() {
      should be told which of the four it is looking at. */
   markSteps();
 
+  retintOptions(state);
   repriceOptions(state);
   $('#code').textContent = encodeCode(state);
 

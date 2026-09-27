@@ -1,4 +1,4 @@
-# HISTORY.md — the long-form change log, 23.8 – 26.9.2026
+# HISTORY.md — the long-form change log
 
 Every change from the start of the project to 26.9.2026, newest first, exactly
 as it was written into `CLAUDE.md` §0b at the time. It was moved here whole on
@@ -15,15 +15,130 @@ here: search for the date. When one quotes an old `CLAUDE.md` heading that the
 rewrite condensed, the full text is in the **appendix** at the bottom — §0–§10
 as they stood on 26.9.2026 before the rewrite, verbatim.
 
-**New entries do not go here.** Every change gets a short entry in `CLAUDE.md` §0b;
-the long form belongs in the commit message and, if the next agent needs it, in
-the `CLAUDE.md` section it concerns. When `CLAUDE.md` §0b outgrows its limit,
-its oldest lines move to the top of the section below.
+**Since 27.9.2026 every change also gets its long-form entry here**, newest
+first in the first section below, in the same commit as its few lines in
+`CLAUDE.md` §0b (the owner's son's instruction). The quotes, what was measured,
+what was falsified, the gates' figures and the attributed sheets go here; the
+commit message carries the same. When `CLAUDE.md` §0b outgrows its limit, its
+oldest lines move to the top of the "moved" section.
+
+---
+
+## Long-form entries since 27.9.2026 — newest first
+
+- **27.9 — EVERY WINDOW DESIGN COMES IN BLACK OR THE DOOR'S COLOUR, ALL SEVEN.**
+  The owner's son: *"Revert the change with the color of the design, it does
+  follow the color of the door, so there should be 2 options for each design,
+  black or the color of the door."* Asked whether the three etched designs get
+  a pair too: *yes, all seven.*
+  · **A reversal of his own note, recorded the way the 18.9 grip-drag reversal
+    was.** On 26.9 he wrote *"The colors of the designs are only white or
+    black, they are not based on the door color"*, executed as `8e1905d` (the
+    `-light` twins white, the rings white, labels לבן). That commit is
+    reverted whole (`git revert 8e1905d` on top of `f55fce7`; the outline
+    removal of `f55fce7` stays, and the revert's only conflicts were the §0b
+    log, the §3 paragraph and the test file). CLAUDE.md §0a: a decision is
+    settled against us re-opening it, never against him. Peretz's 26.8
+    *"וכל אחד מהם גם בגוון הדלת ולא רק בשחור"* is what the site now does, for
+    every design.
+  · **One rule for all seven.** The base id is BLACK — ironwork the fixed
+    #232527 (with its #000 shadow and #8A8F94 gleam), etched glass a fixed
+    near-black #17120F (`ETCH_BLACK`, the tree's old floor value). The
+    `-light` twin is the DOOR'S COLOUR — ironwork `lighten(paint, 0.10)`,
+    etched `scaleTone(paint, 1.06)`, each family keeping the tint it had.
+    So `circles` and `vine` are black now, the tree's base is the fixed black
+    (it was the paint x0.12 with a floor), and `circles-light`, `vine-light`,
+    `tree-light` are APPENDED to `GRILLES` (15 of `BITS.grille`'s 16; no id
+    or index moves, no `VERSION`) with `glass`, `light` and the base's ₪700.
+    Labels: "…בגוון הדלת" / "…, door colour" / "…в цвет двери" on every twin.
+  · **Every lookup resolves a twin to its base's drawing.** `glazingArt`
+    strips `-light` as `grillePaths` does (§5.1: without it a priced twin
+    draws an empty pane) and takes its ink from one `etchInk`; `data-glass`
+    names the base; one `grilleTint(grille, paint)` paints ironwork on the
+    door and the tile alike — before `8e1905d` the door drew the twin in the
+    lightened paint while the tile drew a fixed #D8D8D4.
+  · **The tile paints what the door paints.** `grilleGlyph(grille, paint)`
+    takes the door's paint; the grille group is `tinted`, and `retintOptions`
+    in app.js re-draws the twins' art when the colour changes (only when it
+    changed; the button keeps its focus and state). On the live page: 15
+    tiles, 15 distinct on לבן 9016 and on אפור פחם 7021, the seven black
+    ones unchanged across the switch, the seven twins re-tinted, no page
+    error.
+  · **Citations follow the photograph** (looked at, the four side by side):
+    d106's rings and d109/d111's vine are pale on pale doors → the twins;
+    d114's tree is black → the base. `npm run corpus` re-fitted d106 to
+    `circles-light` and its drawing is byte-identical to the reverted tree's;
+    `tools/recreate.mjs` d106 names `circles-light` for the same reason. The
+    evidence test is restated per pair: a member citing nothing inherits
+    from a twin that names doors, and a door may cite only one member (the
+    fitter takes the first entry citing it).
+  · **Tests.** The 26.9 group is RESTATED as "every window design comes in
+    black or the door's colour", same subject and fixture: a base is
+    identical on both paints and only the fixed black; a twin differs across
+    them and is exactly the tint; every design has exactly one twin at its
+    price; every id inks the pane; the tile paints what the door paints on
+    either paint; the three new ids round-trip a link and a code. Falsified:
+    the etched twins painted black fail 36 rows (only `-light` etched), the
+    ironwork twins painted black fail only ironwork twin rows, `tree-light`
+    dropped fails the pairing clause and both round-trips, the etched base on
+    the paint fails 24 base rows, d106 cited on both twins fails twice, a
+    tile that ignores the paint fails every twin.
+  · **Sheets** (rendered, not yet rasterised — the one run is after the third
+    commit): against the last run, exactly the sheets with a `-light` twin or
+    an etched design move — against grid-light, scroll-light, arch-light,
+    deco-light, circles, vine; recreate d097 d106 d113 d122; corpus d106 —
+    and three against sheets are new (circles-light, vine-light, tree-light).
+    `against-tree` does not move (its base was already #17120F at `f55fce7`).
+    Against the reverted tree, the twin work moves only the three etched base
+    sheets; every corpus and recreate door is byte-identical.
+  · **Gates:** `node --check`, `npm run build`, `npm test` 9,196,962 passed /
+    5 failed — the five sheet-staleness rows (shot, recreate, corpus, against,
+    lockset), allowed on an intermediate commit. The total rose from 7.48 M
+    because three more grilles multiply the sweeps; it is not evidence. A first
+    run failed three more: the etched-pane group asserted `data-glass` equals
+    the option id, restated to the drawing it names (the base).
+  · **Not done, on purpose:** re-reading the vine's colour off his traced
+    sheet (it was white; on the photographs it is pale on white doors, which
+    is the twin); `tools/against.mjs`' hand-kept `WINDOW_DOORS` table still
+    keys the photographs by base id, which serves both members of a pair.
 
 ---
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **26.9** The bow is its own axis on the face step, `VERSION` 25 (`BOWS`, `gb=`,
+  ₪300 + the handle finish) — *"with the panels and stripes … comfortable with
+  other pull handles"*: a bow and a bar together (336 doors, none touching;
+  54 bows refused beside the strip). `n=grab`/`n=dee` migrate quietly, never
+  onto a bar. `homeKey` completed — the stale cache had hidden a 2 m Nitzan
+  refused beside the Greek set on `extra2`/`halfextra2` (named, §9); the Greek
+  set's obstacles gain the fittings and the bow (`fittingBoxes`, 0 of 31,104
+  placements moved). Falsified: alias onto `idan` 4, no migration 6, the old
+  key both ways + 889. `collide -- all` 1,082 → 1,488. No sheet moved (run 2).
+  Gates: test 7,483,219 / 5 (the sheet rows, intermediate).
+- **26.9** The גפן window design is the owner's son's own sheet, TRACED
+  (*"this is how the grape and vine design really looks… the design is really
+  white"*): `research/vine/design.webp` → `tools/trace-vine.py` (potracer) →
+  `js/vine.js`; white, pane-width scale, repeated at its measured 1207 px period.
+- **26.9** One square window, the Greek set's (`WINDOWS.rect.frac`, `glassRows`)
+  — *"the window needs to stay on … the window size and placement then needs to
+  be the same"*: the pair keeps its lower panel under it at ₪0 (A20), the trio
+  is refused (76 mm into the plate); a face tap never removes the window
+  (`panelUnderGlass`). Falsified: the intent arm back fails 18 of 192 taps.
+  Sheets run 1, predicted: 15 bare moved, all square-window sheets (corpus-06–09,
+  recreate d097 d106 d122, against grid/scroll/arch ±light, circles, vine).
+  Gates: test 7,374,750 / 0 (the Coral greyed on the widest glazed leaves took
+  the sweeps down from 9.09 M); collide 1,082.
+- **26.9** The כדור follows the פרזול (*"a bug"*, overruling 31.8): ball via
+  `domeRamp` (measured literal on nickel, `scaleTone` elsewhere), shank on
+  `nickelSoft`; the ספיר stays constant. `exp.pz.a` names both via `expArgs`.
+  Falsified: a constant `domeKnob` fails the three ball clauses, every ספיר
+  clause green. No sheet moved (d030, d031 carry nickel). Test 9,086,180 / 5.
+- **26.9** Curved lever's tip level with its spindle (*"the end of the handle
+  needs to be the same height as the start"*): `TAPER_TILT` derived, 15.39°;
+  lock-tile raster coral~curved 0.300 → 0.277, no audit floor exists for it.
+  Falsified: 8° typed back fails 13 (the tile and 12 doors). No sheet moved (no
+  fixture carries the curved lever). Test 9,086,175 / 5.
 - **26.9** `CLAUDE.md` rewritten to what is true now; the log and the old §0–§10
   moved verbatim to `HISTORY.md`. Fixed: code is 60 bits not 40 (§8), the
   flow not the cabinet (§3), five August plans are in the tree (§2).

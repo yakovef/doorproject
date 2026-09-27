@@ -36,9 +36,9 @@ From the person you are working for:
 They compact the conversation often, and when they do **this file is the only
 memory that survives.** So, in the same commit as the change:
 
-- **Every change → a short entry in §0b** (six lines at most), newest first:
-  what moved and why, the quote, what was falsified, the sheets, in words the
-  next agent can act on. The long form goes in the commit
+- **Every change → a short entry in §0b** (six lines at most), newest first,
+  and **its long-form entry at the top of `HISTORY.md`** (since 27.9): what
+  moved and why, the quote, what was falsified, the sheets. The long form goes in the commit
   message, which in this repo is written at length on purpose (§10).
 - **Anything in §0–§10 the change makes false → corrected in place.** This
   file has carried a stale number for months more than once (§6), and every
@@ -125,9 +125,16 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
 
 ## 0b. Change log — newest first, a few lines each
 
-Older and long-form: **`HISTORY.md`** (verbatim to 26.9.2026). Dates are the
-day of the change.
+Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
+since 27.9 each change's long-form entry, written in the same commit as its
+lines here. Dates are the day of the change.
 
+- **27.9** Every window design in black OR the door's colour, all seven — the
+  owner's son reversing his own 26.9 note (`8e1905d` reverted whole, the outline
+  removal kept): base black, `-light` twin the paint; `circles-light`,
+  `vine-light`, `tree-light` appended (15/16). Tiles re-tint (`retintOptions`).
+  Falsified: twins black, `tree-light` dropped. Test 9,196,962 / 5 (sheets).
+  Long form: `HISTORY.md`.
 - **27.9** No outline round the inside of the glass — *"there is a black
   outline around the inside of the window, I want it removed"*: `aperture`'s
   stroke of the paint ×0.6 deleted; the 8 mm rebate stays (under the opaque
@@ -158,39 +165,6 @@ day of the change.
   viewports; old walk one sentence. Sheets run 2 as predicted: 0/48 bare, 0/6
   lockset. Gates: test 7,483,220 / 0 failed, audit clean, collide 1,488,
   fuzz clean, latency 185 ms.
-- **26.9** The bow is its own axis on the face step, `VERSION` 25 (`BOWS`, `gb=`,
-  ₪300 + the handle finish) — *"with the panels and stripes … comfortable with
-  other pull handles"*: a bow and a bar together (336 doors, none touching;
-  54 bows refused beside the strip). `n=grab`/`n=dee` migrate quietly, never
-  onto a bar. `homeKey` completed — the stale cache had hidden a 2 m Nitzan
-  refused beside the Greek set on `extra2`/`halfextra2` (named, §9); the Greek
-  set's obstacles gain the fittings and the bow (`fittingBoxes`, 0 of 31,104
-  placements moved). Falsified: alias onto `idan` 4, no migration 6, the old
-  key both ways + 889. `collide -- all` 1,082 → 1,488. No sheet moved (run 2).
-  Gates: test 7,483,219 / 5 (the sheet rows, intermediate).
-- **26.9** The גפן window design is the owner's son's own sheet, TRACED
-  (*"this is how the grape and vine design really looks… the design is really
-  white"*): `research/vine/design.webp` → `tools/trace-vine.py` (potracer) →
-  `js/vine.js`; white, pane-width scale, repeated at its measured 1207 px period.
-- **26.9** One square window, the Greek set's (`WINDOWS.rect.frac`, `glassRows`)
-  — *"the window needs to stay on … the window size and placement then needs to
-  be the same"*: the pair keeps its lower panel under it at ₪0 (A20), the trio
-  is refused (76 mm into the plate); a face tap never removes the window
-  (`panelUnderGlass`). Falsified: the intent arm back fails 18 of 192 taps.
-  Sheets run 1, predicted: 15 bare moved, all square-window sheets (corpus-06–09,
-  recreate d097 d106 d122, against grid/scroll/arch ±light, circles, vine).
-  Gates: test 7,374,750 / 0 (the Coral greyed on the widest glazed leaves took
-  the sweeps down from 9.09 M); collide 1,082.
-- **26.9** The כדור follows the פרזול (*"a bug"*, overruling 31.8): ball via
-  `domeRamp` (measured literal on nickel, `scaleTone` elsewhere), shank on
-  `nickelSoft`; the ספיר stays constant. `exp.pz.a` names both via `expArgs`.
-  Falsified: a constant `domeKnob` fails the three ball clauses, every ספיר
-  clause green. No sheet moved (d030, d031 carry nickel). Test 9,086,180 / 5.
-- **26.9** Curved lever's tip level with its spindle (*"the end of the handle
-  needs to be the same height as the start"*): `TAPER_TILT` derived, 15.39°;
-  lock-tile raster coral~curved 0.300 → 0.277, no audit floor exists for it.
-  Falsified: 8° typed back fails 13 (the tile and 12 doors). No sheet moved (no
-  fixture carries the curved lever). Test 9,086,175 / 5.
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -689,13 +663,17 @@ drawing, and was **reverted on the owner's word**: a configurator is not a
 photograph. Obscured and reeded glass stay patterned and measure DARKER than the
 paint — behind them is an unlit hall.
 
-⚠ **A design is white or black, never the paint** (27.9, the owner's son,
-overruling Peretz's 26.8 *"וכל אחד מהם גם בגוון הדלת"*). Black ironwork is the
-fixed `#232527` with its `#000` shadow and `#8A8F94` gleam; the `-light` twins
-are `GRILLE_LIGHT` white, handed to the door and the tile by one `grilleTint`;
-the etched rings and vine are white (frosted is white on any door); the tree is
-a fixed near-black (`TREE_BLACK`, 14.9 B1 *"a black silhouette"*). The pane, its
-sky and sheen and the mullions still take the paint.
+⚠ **Every window design comes in a pair: black, or the door's colour** (27.9,
+the owner's son — *"there should be 2 options for each design, black or the
+color of the door"*, all seven — reversing his own 26.9 *"only white or
+black"*). The base id is black: ironwork the fixed `#232527` with its `#000`
+shadow and `#8A8F94` gleam, etched glass `ETCH_BLACK` `#17120F`. The `-light`
+twin is the paint: ironwork `grilleTint` (lightened 0.10), etched `etchInk`
+(×1.06). `glazingArt` and `grillePaths` strip `-light` to dispatch; the tile
+takes the door's paint and the page re-tints it (`retintOptions`). A door's
+`doors` citation is on the twin its photograph shows (d106, d109, d111 pale;
+d114 black). `grillePaths`' `tint` parameter stays: the corpus recreations pass
+photographed bar colours through it.
 
 ⚠ **No line round the inside of the glass** (27.9, the owner's son). `aperture`
 drew a two-device-pixel stroke of the paint darkened 0.6 over every pane — a
@@ -705,9 +683,7 @@ stays**: it is measured, and the opaque pane is drawn over it on the same box,
 so it puts no pixel on screen — read across the pane edge at 390 and 1440 on
 white and charcoal, the moulding runs straight into the glass (the rebate would
 be 1.1 and 2.2 CSS px). `npm run glass` reads the same before and after: its
-bands sit inside the pane. `grillePaths`' `tint`
-parameter stays: the corpus recreations pass photographed bar colours through
-it.
+bands sit inside the pane.
 
 ### The flow — `SECTIONS` and `GROUPS` in `js/app.js`
 

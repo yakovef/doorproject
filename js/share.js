@@ -264,8 +264,8 @@ export function gripAddendum(state) {
  * ⚠ ALWAYS HEBREW, WHATEVER LANGUAGE THE CUSTOMER BUILT THE DOOR IN, and this
  * is the one place in the project where the interface language is deliberately
  * ignored. `PLAN.md` §0: the product is an order Peretz can act on without a
- * clarifying question. An order that reaches him reading "Кованая решётка,
- * белая · Полуторная" is a question — he has to translate it before he
+ * clarifying question. An order that reaches him reading "Кованая решётка в
+ * цвет двери · Полуторная" is a question — he has to translate it before he
  * can price it, and that phone call is the thing this whole project exists to
  * remove. Every other reader on the page follows the customer.
  *

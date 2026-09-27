@@ -198,18 +198,22 @@ export const WINDOW = {
 export const GRILLE = {
   none:         0,   // ללא סורג
   grid:         0,   // סורג רשת
-  'grid-light': 0,   // סורג רשת לבן
+  'grid-light': 0,   // סורג רשת בגוון הדלת
   scroll:       0,   // סורג מעוצב
-  'scroll-light': 0, // סורג מעוצב לבן
+  'scroll-light': 0, // סורג מעוצב בגוון הדלת
   arch:         0,   // קשת
-  'arch-light': 0,   // קשת לבנה
+  'arch-light': 0,   // קשת בגוון הדלת
   deco:         0,   // קווים גיאומטריים
-  'deco-light': 0,   // קווים גיאומטריים לבנים
+  'deco-light': 0,   // קווים גיאומטריים בגוון הדלת
   /* The three laser-cut ones. "laser hard ones" — more machine time, and the
      only three in the range that are cut rather than bent. */
   circles:      700, // עיגולים שזורים
   vine:         700, // גפן
   tree:         700, // עץ
+  /* Each in the door's colour, 27.9.2026: the same cut, the same price. */
+  'circles-light': 700, // עיגולים שזורים בגוון הדלת
+  'vine-light':    700, // גפן בגוון הדלת
+  'tree-light':    700, // עץ בגוון הדלת
   /* Worked GLASS rather than ironwork — etched into the pane, bought from a
      different supplier. Priced together here only because they are the same
      row on the customer's screen. */

@@ -1157,11 +1157,25 @@ export const PEEPHOLES = [
  * ⚠ AND NO DIAGONAL LATTICE ANYWHERE. `lattice` was ours. It resolves to the
  * fine etched mesh, which is the closest thing that exists.
  *
- * `light` means the ironwork is WHITE rather than black (27.9.2026 — it was
- * the door's own colour, lightened; see the overrule on the twins below).
- * Pale ironwork is roughly as common as black across the gallery, so it is an
- * axis and not a variant. `glass` means the pattern is IN the pane: no shadow, no relief, and
+ * `light` means the design is the door's own colour rather than black —
+ * roughly as common as black across the gallery, so it is an axis and not a
+ * variant. `glass` means the pattern is IN the pane: no shadow, no relief, and
  * a grille's rules about ironwork do not apply to it.
+ *
+ * ⚠ EVERY DESIGN COMES IN A PAIR, BLACK AND THE DOOR'S COLOUR — 27.9.2026, the
+ * owner's son: *"Revert the change with the color of the design, it does follow
+ * the color of the door, so there should be 2 options for each design, black or
+ * the color of the door."* — and, asked, all seven, the etched glass too. That
+ * REVERSES his own note of the day before, *"The colors of the designs are only
+ * white or black, they are not based on the door color"*, which had made the
+ * twins white (reverted whole); CLAUDE.md §0a: a decision is settled against us
+ * re-opening it, never against him. One rule: the base id is BLACK, the
+ * `-light` twin the door's colour — ironwork at the paint lightened 0.10,
+ * etched glass at the paint x1.06, each family keeping the tint it had.
+ * `doors` follow the PHOTOGRAPH: a door cites the twin its picture matches
+ * (d106's rings and d109/d111's vine are pale on a pale door, d114's tree is
+ * black), because `npm run corpus` fits a record to the first entry citing it;
+ * the member of a pair citing nothing inherits the other's evidence.
  *
  * ⚠ ONE THING THE MERGE COSTS, recorded rather than hidden: d102, d116 and
  * d122 carry a grille AND worked glass. One list means one choice, so those
@@ -1196,12 +1210,12 @@ export const GRILLES = [
     doors: ['d094', 'd115'] },
   { id: 'grid',    he: 'סורג רשת',       en: 'Square grid', ru: 'Решётка-сетка',     aliases: ['bars', 'iron'],
     doors: ['d091', 'd100', 'd107', 'd110', 'd113', 'd117', 'd122'] },
-  { id: 'grid-light',   he: 'סורג רשת לבן',   en: 'Square grid, white', ru: 'Решётка-сетка, белая', light: true,
+  { id: 'grid-light',   he: 'סורג רשת בגוון הדלת',   en: 'Square grid, door colour', ru: 'Решётка-сетка в цвет двери', light: true,
     aliases: ['bars-light', 'iron-light'] },
   { id: 'scroll',  he: 'סורג מעוצב',     en: 'Grid with scrolls', ru: 'Кованая решётка',
     aliases: ['quatrefoil'],
     doors: ['d089', 'd093', 'd095', 'd097', 'd099', 'd102', 'd116'] },
-  { id: 'scroll-light', he: 'סורג מעוצב לבן', en: 'Grid with scrolls, white', ru: 'Кованая решётка, белая', light: true,
+  { id: 'scroll-light', he: 'סורג מעוצב בגוון הדלת', en: 'Grid with scrolls, door colour', ru: 'Кованая решётка в цвет двери', light: true,
     aliases: ['quatrefoil-light'] },
   /* ⚠ `iron` AND `iron-light` ARE WITHDRAWN — Peretz, 26.8.2026: "there is no
      זכוכית מחורצת, ברזל מחושל, מדליוני פרח". They were the heavy ornamental
@@ -1224,16 +1238,7 @@ export const GRILLES = [
      ONE door `quatrefoil` is read from and its column is painted white. We
      were drawing the only evidence door for that pattern in the wrong colour,
      with no option to correct it.
-     Appended to the end of the list, so no `VERSION` bump.
-     ⚠ AND THE TWINS ARE WHITE NOW, NOT THE DOOR'S COLOUR — 27.9.2026, the
-     owner's son, overruling the sentence above: *"For some reason the color
-     of some designs colors change when I change the color of the door. The
-     colors of the designs are only white or black, they are not based on the
-     door color."* Peretz's 26.8 *"וכל אחד מהם גם בגוון הדלת ולא רק בשחור"* is
-     kept here beside the overrule. The drawing had painted a twin in the
-     door's paint lightened 0.10 while its tile painted a fixed #D8D8D4, so the
-     tile and the door already disagreed; both hand `GRILLE_LIGHT` now. Ids
-     unchanged — `-light` is a wire format; the labels say לבן / white / белый. */
+     Appended to the end of the list, so no `VERSION` bump. */
   /* ⚠ `quatrefoil` AND `quatrefoil-light` ARE WITHDRAWN — Peretz named
      מדליוני פרח among the three he does not sell. One measured door (d104)
      carried it. Both ids resolve to `scroll`, the nearest surviving pattern. */
@@ -1241,10 +1246,10 @@ export const GRILLES = [
   { id: 'deco',    he: 'קווים גיאומטריים', en: 'Art-deco lines', ru: 'Геометрические линии', doors: ['d123'] },
   /* Worked GLASS. In the pane, not on it. */
   { id: 'circles', he: 'עיגולים שזורים', en: 'Interlocking rings', ru: 'Переплетённые кольца', glass: true,
+    /* Black since 27.9.2026; d106's pale rings cite `circles-light`. */
     /* `rings` and the three ids it had inherited land here since 25.9.2026 —
        see the withdrawal note where it stood, below. */
-    aliases: ['rings', 'mesh', 'lattice', 'reeded'],
-    doors: ['d106'] },
+    aliases: ['rings', 'mesh', 'lattice', 'reeded'] },
   /* ⚠ THESE THREE DOORS HAVE NO HAND-MEASURED LEAF BOX AND CANNOT BE GIVEN
      ONE — examined 14.9.2026, when the patterns were re-opened to be redrawn
      from the photographs and it turned out they already had been.
@@ -1276,8 +1281,9 @@ export const GRILLES = [
      ⚠ THE VINE HALF IS CLOSED, 26.9.2026: the owner's son sent the design
      sheet itself (research/vine/design.webp) and `glazingArt` draws it traced
      (js/vine.js), in white. d109 and d111 stay cited as the doors it is on. */
-  { id: 'vine',    he: 'גפן',            en: 'Grape and vine', ru: 'Виноградная лоза',  glass: true,
-    doors: ['d109', 'd111'] },
+  /* Black since 27.9.2026; d109 and d111 carry it pale on white doors and
+     cite `vine-light`. */
+  { id: 'vine',    he: 'גפן',            en: 'Grape and vine', ru: 'Виноградная лоза',  glass: true },
   { id: 'tree',    he: 'עץ',             en: 'Tree', ru: 'Дерево',            glass: true,
     doors: ['d114'] },
   /* ⚠ d125 was in TWO of the prose lists — under `reeded` and under "nothing
@@ -1316,9 +1322,20 @@ export const GRILLES = [
   /* The three missing `-light` twins, appended so the ids already in the wild
      keep their indices. `light` is the same one switch it has always been: the
      same ironwork, painted the door's colour instead of black. */
-  { id: 'arch-light', he: 'קשת לבנה', en: 'Arch, white', ru: 'Арка, белая', light: true },
-  { id: 'deco-light', he: 'קווים גיאומטריים לבנים',
-    en: 'Art-deco lines, white', ru: 'Геометрические линии, белые', light: true },
+  { id: 'arch-light', he: 'קשת בגוון הדלת', en: 'Arch, door colour', ru: 'Арка в цвет двери', light: true },
+  { id: 'deco-light', he: 'קווים גיאומטריים בגוון הדלת',
+    en: 'Art-deco lines, door colour', ru: 'Геометрические линии в цвет двери', light: true },
+  /* ⚠ AND THE THREE ETCHED TWINS, 27.9.2026 — appended at the END, so no id
+     already in a link or a code moves (`BITS.grille` is four bits; fifteen of
+     sixteen are used after these). Each is its base's pattern in the door's
+     colour (`glazingArt` strips the suffix and takes the tint), at its base's
+     price. The photographs that show the design pale cite the twin. */
+  { id: 'circles-light', he: 'עיגולים שזורים בגוון הדלת', en: 'Interlocking rings, door colour',
+    ru: 'Переплетённые кольца в цвет двери', glass: true, light: true, doors: ['d106'] },
+  { id: 'vine-light', he: 'גפן בגוון הדלת', en: 'Grape and vine, door colour',
+    ru: 'Виноградная лоза в цвет двери', glass: true, light: true, doors: ['d109', 'd111'] },
+  { id: 'tree-light', he: 'עץ בגוון הדלת', en: 'Tree, door colour',
+    ru: 'Дерево в цвет двери', glass: true, light: true },
   /* ⚠ `reeded` IS WITHDRAWN — זכוכית מחורצת, the third of the three. It
      resolves to `mesh`, the other worked glass. */
 ];

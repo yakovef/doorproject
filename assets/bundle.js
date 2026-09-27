@@ -990,27 +990,34 @@
     grid: 0,
     // סורג רשת
     "grid-light": 0,
-    // סורג רשת לבן
+    // סורג רשת בגוון הדלת
     scroll: 0,
     // סורג מעוצב
     "scroll-light": 0,
-    // סורג מעוצב לבן
+    // סורג מעוצב בגוון הדלת
     arch: 0,
     // קשת
     "arch-light": 0,
-    // קשת לבנה
+    // קשת בגוון הדלת
     deco: 0,
     // קווים גיאומטריים
     "deco-light": 0,
-    // קווים גיאומטריים לבנים
+    // קווים גיאומטריים בגוון הדלת
     /* The three laser-cut ones. "laser hard ones" — more machine time, and the
        only three in the range that are cut rather than bent. */
     circles: 700,
     // עיגולים שזורים
     vine: 700,
     // גפן
-    tree: 700
+    tree: 700,
     // עץ
+    /* Each in the door's colour, 27.9.2026: the same cut, the same price. */
+    "circles-light": 700,
+    // עיגולים שזורים בגוון הדלת
+    "vine-light": 700,
+    // גפן בגוון הדלת
+    "tree-light": 700
+    // עץ בגוון הדלת
     /* Worked GLASS rather than ironwork — etched into the pane, bought from a
        different supplier. Priced together here only because they are the same
        row on the customer's screen. */
@@ -1909,9 +1916,9 @@
     },
     {
       id: "grid-light",
-      he: "סורג רשת לבן",
-      en: "Square grid, white",
-      ru: "Решётка-сетка, белая",
+      he: "סורג רשת בגוון הדלת",
+      en: "Square grid, door colour",
+      ru: "Решётка-сетка в цвет двери",
       light: true,
       aliases: ["bars-light", "iron-light"]
     },
@@ -1925,9 +1932,9 @@
     },
     {
       id: "scroll-light",
-      he: "סורג מעוצב לבן",
-      en: "Grid with scrolls, white",
-      ru: "Кованая решётка, белая",
+      he: "סורג מעוצב בגוון הדלת",
+      en: "Grid with scrolls, door colour",
+      ru: "Кованая решётка в цвет двери",
       light: true,
       aliases: ["quatrefoil-light"]
     },
@@ -1952,16 +1959,7 @@
        ONE door `quatrefoil` is read from and its column is painted white. We
        were drawing the only evidence door for that pattern in the wrong colour,
        with no option to correct it.
-       Appended to the end of the list, so no `VERSION` bump.
-       ⚠ AND THE TWINS ARE WHITE NOW, NOT THE DOOR'S COLOUR — 27.9.2026, the
-       owner's son, overruling the sentence above: *"For some reason the color
-       of some designs colors change when I change the color of the door. The
-       colors of the designs are only white or black, they are not based on the
-       door color."* Peretz's 26.8 *"וכל אחד מהם גם בגוון הדלת ולא רק בשחור"* is
-       kept here beside the overrule. The drawing had painted a twin in the
-       door's paint lightened 0.10 while its tile painted a fixed #D8D8D4, so the
-       tile and the door already disagreed; both hand `GRILLE_LIGHT` now. Ids
-       unchanged — `-light` is a wire format; the labels say לבן / white / белый. */
+       Appended to the end of the list, so no `VERSION` bump. */
     /* ⚠ `quatrefoil` AND `quatrefoil-light` ARE WITHDRAWN — Peretz named
        מדליוני פרח among the three he does not sell. One measured door (d104)
        carried it. Both ids resolve to `scroll`, the nearest surviving pattern. */
@@ -1974,10 +1972,10 @@
       en: "Interlocking rings",
       ru: "Переплетённые кольца",
       glass: true,
+      /* Black since 27.9.2026; d106's pale rings cite `circles-light`. */
       /* `rings` and the three ids it had inherited land here since 25.9.2026 —
          see the withdrawal note where it stood, below. */
-      aliases: ["rings", "mesh", "lattice", "reeded"],
-      doors: ["d106"]
+      aliases: ["rings", "mesh", "lattice", "reeded"]
     },
     /* ⚠ THESE THREE DOORS HAVE NO HAND-MEASURED LEAF BOX AND CANNOT BE GIVEN
        ONE — examined 14.9.2026, when the patterns were re-opened to be redrawn
@@ -2010,14 +2008,9 @@
        ⚠ THE VINE HALF IS CLOSED, 26.9.2026: the owner's son sent the design
        sheet itself (research/vine/design.webp) and `glazingArt` draws it traced
        (js/vine.js), in white. d109 and d111 stay cited as the doors it is on. */
-    {
-      id: "vine",
-      he: "גפן",
-      en: "Grape and vine",
-      ru: "Виноградная лоза",
-      glass: true,
-      doors: ["d109", "d111"]
-    },
+    /* Black since 27.9.2026; d109 and d111 carry it pale on white doors and
+       cite `vine-light`. */
+    { id: "vine", he: "גפן", en: "Grape and vine", ru: "Виноградная лоза", glass: true },
     {
       id: "tree",
       he: "עץ",
@@ -2062,12 +2055,43 @@
     /* The three missing `-light` twins, appended so the ids already in the wild
        keep their indices. `light` is the same one switch it has always been: the
        same ironwork, painted the door's colour instead of black. */
-    { id: "arch-light", he: "קשת לבנה", en: "Arch, white", ru: "Арка, белая", light: true },
+    { id: "arch-light", he: "קשת בגוון הדלת", en: "Arch, door colour", ru: "Арка в цвет двери", light: true },
     {
       id: "deco-light",
-      he: "קווים גיאומטריים לבנים",
-      en: "Art-deco lines, white",
-      ru: "Геометрические линии, белые",
+      he: "קווים גיאומטריים בגוון הדלת",
+      en: "Art-deco lines, door colour",
+      ru: "Геометрические линии в цвет двери",
+      light: true
+    },
+    /* ⚠ AND THE THREE ETCHED TWINS, 27.9.2026 — appended at the END, so no id
+       already in a link or a code moves (`BITS.grille` is four bits; fifteen of
+       sixteen are used after these). Each is its base's pattern in the door's
+       colour (`glazingArt` strips the suffix and takes the tint), at its base's
+       price. The photographs that show the design pale cite the twin. */
+    {
+      id: "circles-light",
+      he: "עיגולים שזורים בגוון הדלת",
+      en: "Interlocking rings, door colour",
+      ru: "Переплетённые кольца в цвет двери",
+      glass: true,
+      light: true,
+      doors: ["d106"]
+    },
+    {
+      id: "vine-light",
+      he: "גפן בגוון הדלת",
+      en: "Grape and vine, door colour",
+      ru: "Виноградная лоза в цвет двери",
+      glass: true,
+      light: true,
+      doors: ["d109", "d111"]
+    },
+    {
+      id: "tree-light",
+      he: "עץ בגוון הדלת",
+      en: "Tree, door colour",
+      ru: "Дерево в цвет двери",
+      glass: true,
       light: true
     }
     /* ⚠ `reeded` IS WITHDRAWN — זכוכית מחורצת, the third of the three. It
@@ -5913,6 +5937,8 @@ ${body}
             fill="${darken(paint2, 0.34)}"/>
     </g>`;
   }
+  var ETCH_BLACK = "#17120F";
+  var etchInk = (light, paint2) => light ? scaleTone(paint2, 1.06) : ETCH_BLACK;
   function glazingArt(kind, x, y, w, h, paint2, key = "g", ornW = null) {
     if (ornW && ornW > w) {
       x -= (ornW - w) / 2;
@@ -5920,6 +5946,8 @@ ${body}
     }
     const n2 = (v) => v.toFixed(1);
     const uid = (s) => `gz-${key}-${s}`;
+    const light = /-light$/.test(String(kind));
+    kind = String(kind).replace(/-light$/, "");
     if (kind === "reeded") {
       const g = toRgb(paint2);
       const av = (g.r + g.g + g.b) / 3;
@@ -5966,7 +5994,7 @@ ${body}
       const cols = Math.max(4, Math.round(w / STEP));
       const s = w / cols, r = s;
       const sw = Math.max(1, r * 0.11);
-      const ink = ETCH_WHITE;
+      const ink = etchInk(light, paint2);
       let out = "";
       const rows = Math.ceil(h / s) + 1;
       let d = "";
@@ -5986,7 +6014,7 @@ ${body}
       const need = h / k;
       const n = Math.max(1, Math.ceil((need - VINE.h) / VINE.period) + 1);
       const id = uid("vine");
-      const frost = `fill="${ETCH_WHITE}" fill-rule="evenodd"`;
+      const frost = `fill="${etchInk(light, paint2)}" fill-rule="evenodd"`;
       let out = "";
       for (let j = 0; j < n; j++) {
         const from = j === 0 ? -1 : VINE.seam + (j - 1) * VINE.period - 1;
@@ -6006,7 +6034,7 @@ ${body}
       return { veil: out, over: "" };
     }
     if (kind === "tree") {
-      const ink = TREE_BLACK;
+      const ink = etchInk(light, paint2);
       let out = "";
       const fill = (d) => `<path d="${d}" fill="${ink}"/>`;
       const ribbon = (spine, hw) => {
@@ -6175,7 +6203,7 @@ ${body}
     const M = band, MF = band;
     const id = `cl-${key}`;
     return `
-    <g data-pane="${key}" data-glass="${grille.glass ? grille.id : "clear"}">
+    <g data-pane="${key}" data-glass="${grille.glass ? grille.id.replace(/-light$/, "") : "clear"}">
       ${moulding(
       x - M,
       y - M,
@@ -6227,7 +6255,7 @@ ${body}
            half a ring's worth of scallops appeared on the door beside the
            opening. A pattern is in the glass; the glass stops at the frame. -->
       <g clip-path="url(#${id})">${glass ? glass.veil : ""}</g>
-      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grilleTint(grille), ornW)}</g>
+      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grilleTint(grille, paint2), ornW)}</g>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
       <!-- occlusion under the head of the aperture -->
       <rect x="${x}" y="${y}" width="${w}" height="34" fill="url(#aoTop)"/>
@@ -6263,10 +6291,6 @@ ${body}
     }).join("")}
     </g>`;
   }
-  var GRILLE_LIGHT = "#FFFFFF";
-  var ETCH_WHITE = "#FFFFFF";
-  var TREE_BLACK = "#17120F";
-  var grilleTint = (grille) => grille.light ? GRILLE_LIGHT : null;
   function grillePaths(kind, x, y, w, h, tint, ornW = null) {
     const idKind = String(kind);
     kind = idKind.replace(/-light$/, "");
@@ -7930,12 +7954,14 @@ ${body}
     <circle cx="${W - 120}" cy="${H * 0.52}" r="34" fill="currentColor"/>
   </svg>`;
   }
-  function grilleGlyph(grille) {
+  var grilleTint = (grille, paint2) => grille.light ? lighten(paint2, 0.1) : null;
+  var TILE_PAINT = "#8E979D";
+  function grilleGlyph(grille, paint2 = TILE_PAINT) {
     const S = 300;
-    const glass = grille.glass ? glazingArt(grille.id, 0, 0, S, S, "#8E979D", "t" + grille.id) : null;
+    const glass = grille.glass ? glazingArt(grille.id, 0, 0, S, S, paint2, "t" + grille.id) : null;
     return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
     <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
-    ${glass ? glass.veil : `<g>${grillePaths(grille.id, 0, 0, S, S, grilleTint(grille))}</g>`}
+    ${glass ? glass.veil : `<g>${grillePaths(grille.id, 0, 0, S, S, grilleTint(grille, paint2))}</g>`}
     <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
   </svg>`;
   }
@@ -9360,7 +9386,7 @@ ${body}
     { id: "d092", state: { colour: "rb-6219d", detail: "plain", window: "rect", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "knobplate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d097", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d099", state: { colour: "rb-7126d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d106", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "circles", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d106", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "circles-light", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d108", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "idan", handleFinish: "hf-black", grab: "nograb", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d116", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
@@ -9468,13 +9494,17 @@ ${body}
       glyph: windowGlyph,
       hint: "g.window.h"
     },
+    /* ⚠ `tinted`: a `-light` design's tile is the design in the DOOR'S colour
+       (27.9.2026, *"black or the color of the door"*), so the art is drawn for
+       the paint on screen and re-drawn when it changes — `retintOptions`. */
     {
       key: "grille",
       title: "g.grille",
       in: "glass",
       kind: "sq",
       list: () => GRILLES,
-      glyph: grilleGlyph,
+      glyph: (o) => grilleGlyph(o, byId(COLOURS, state.colour).hex),
+      tinted: true,
       hint: "g.grille.h"
     },
     {
@@ -10161,6 +10191,20 @@ ${body}
     const rows = breakdownRows(state2);
     body.innerHTML = rows.map((r) => `<tr><th scope="row">${BREAKDOWN_KEY[r.key] ? T(BREAKDOWN_KEY[r.key]) : r.key}</th><td>${formatAgorot(r.agorot)}</td></tr>`).join("") + `<tr class="bd__total"><th scope="row">${T("price.total")}</th><td>${formatAgorot(priceAgorot(state2))}</td></tr>`;
   }
+  function retintOptions(state2) {
+    const hex = byId(COLOURS, state2.colour).hex;
+    for (const g of GROUPS) {
+      if (!g.tinted) continue;
+      const host = document.querySelector(`.field[data-group="${g.key}"]`);
+      if (!host || host.dataset.paint === hex) continue;
+      host.dataset.paint = hex;
+      for (const b of host.querySelectorAll("[data-id]")) {
+        const o = g.list().find((x) => x.id === b.dataset.id);
+        const art = b.querySelector(".tile__art");
+        if (o && o.light && art) art.innerHTML = g.glyph(o);
+      }
+    }
+  }
   function repriceOptions(state2) {
     for (const g of GROUPS) {
       const host = document.querySelector(`.field[data-group="${g.key}"]`);
@@ -10733,6 +10777,7 @@ ${body}
       el.textContent = hw;
     });
     markSteps();
+    retintOptions(state);
     repriceOptions(state);
     $("#code").textContent = encodeCode(state);
     const win = byId(WINDOWS, state.window);

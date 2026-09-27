@@ -138,8 +138,10 @@ const CASES = [
        + 'real ornament is denser scrollwork where ours is a single opposed pair; '
        + RECT_LOWER },
   { id: 'd106', label: 'luxury 8500 - interlocking rings',
-    /* `d=plain` since 14.9.2026 — see the note on d097 above. */
-    q: 'c=rb-7080d&w=broad&g=circles&n=none&k=plate&d=plain&s=standard',
+    /* `d=plain` since 14.9.2026 — see the note on d097 above. `circles-light`
+       since 27.9.2026: the rings on d106 are pale on a pale door, and the base
+       `circles` is black now. */
+    q: 'c=rb-7080d&w=broad&g=circles-light&n=none&k=plate&d=plain&s=standard',
     /* ⚠ This note claimed the ring cell was "capped at 96 mm", and there has
        been no such cap since the glass patterns were redrawn — a tool
        describing a drawing that no longer exists, which is CLAUDE.md §5 in its

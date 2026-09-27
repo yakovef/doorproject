@@ -292,7 +292,7 @@ export function handingWords(state) {
  * into the WhatsApp message, and the person who opens that message is Peretz.
  * `PLAN.md` §0 asks for an order he can act on without a clarifying question,
  * and an order in Russian is a question — he would have to translate
- * "Кованая решётка, белая" before he could price it, and the whole
+ * "Кованая решётка в цвет двери" before he could price it, and the whole
  * project exists to remove that phone call.
  *
  * The customer's language is not lost, it is REPORTED: `js/share.js` adds one

@@ -3,13 +3,13 @@
  * Run: npm test
  */
 import { BELLS, BOWS, glassRows, PEEPHOLES, STRIPE_SLOTS, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
-import { contrast, lighten, silhouette } from '../js/colour.js';
+import { contrast, lighten, scaleTone, silhouette } from '../js/colour.js';
 import { SECTION_ICON, sectionIcon, SPEC_ICON, specIcon } from '../js/icons.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
   bellGlyph, bowGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
-  gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, GRILLE_LIGHT, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
+  gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
   bellFits, bowFeet, bowFits, bowHome, bowPlacement, locksetGlyph, mashkofGlyph, panelUnderGlass, spawnIndexOf, spawnSpots, peepholeFits,
   peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph, stripesGlyph,
   windowGlyph,
@@ -1903,22 +1903,31 @@ group('every grille draws something, and no two draw the same thing');
    the colour of the same ironwork, not the pattern, and the photographs were
    read for pattern. So it is asked for a parent that exists rather than for
    doors of its own. */
-/* ── A DESIGN IS WHITE OR BLACK, NEVER THE DOOR'S COLOUR — 27.9.2026 ──
-   The owner's son: *"For some reason the color of some designs colors change
-   when I change the color of the door. The colors of the designs are only
-   white or black, they are not based on the door color."* The `-light` twins
-   were the paint lightened 0.10, the etched rings the paint x1.06, the tree
-   the paint x0.12. Asked of the DRAWING: every design, on the two paints he
-   named (לבן 9016 and אפור פחם 7021), both windows, a single leaf and the
-   door-and-a-half, the colours inside the design's own clip groups (the
-   `cl-` clip `aperture` cuts to the hole — never the pane's rects, which do
-   take the paint) must be the same set on both doors and drawn only from the
-   fixed constants. §5.15: every door must have yielded a design group with
-   colours in it. Falsified by restoring `lighten(paint, 0.10)`: the light
-   rows go red and the black rows stay green. */
-group('a design is white or black, never the door\'s colour');
+/* ── EVERY DESIGN COMES IN BLACK OR THE DOOR'S COLOUR — 27.9.2026 ─────
+   RESTATED, not deleted: this group was "a design is white or black, never
+   the door's colour" (26.9, the owner's son: *"The colors of the designs are
+   only white or black, they are not based on the door color"*), and he
+   reversed it the next day — *"it does follow the color of the door, so there
+   should be 2 options for each design, black or the color of the door"* — for
+   all seven designs. The subject is the same — what colour the DESIGN is
+   drawn, asked of the drawing on his two paints (לבן 9016 and אפור פחם 7021),
+   both windows, a single leaf and the door-and-a-half, inside the design's own
+   clip groups (the `cl-` clip `aperture` cuts to the hole, never the pane's
+   rects) — and so is the tile clause. The rule it now holds:
+     · a base design is identical on both paints and drawn only from the fixed
+       black (#232527 with its #000 shadow and #8A8F94 gleam; #17120F etched);
+     · its `-light` twin DIFFERS across the paints and is exactly the tint —
+       ironwork the paint lightened 0.10 (with the #000 shadow and #fff
+       gleam), etched glass the paint x1.06;
+     · every design has exactly one twin, at its price, and every id inks the
+       pane (§5.1: a priced option that draws nothing);
+     · the tile paints what the door paints, on either paint.
+   Falsified: a twin painted black (the differs clause), `tree-light` dropped
+   (the pairing clause). */
+group('every window design comes in black or the door\'s colour');
 {
-  const FIXED = new Set(['#fff', '#ffffff', '#000', '#000000', '#232527', '#8a8f94', '#17120f']);
+  const IRON_BLACK = new Set(['#232527', '#000', '#8a8f94']);
+  const ETCH_BLACK = new Set(['#17120f']);
   const inside = (svg, open) => {                   // balanced <g>…</g> after `open`
     let depth = 1; const tag = /<(\/?)g\b[^>]*?(\/?)>/g; tag.lastIndex = open;
     for (let t; (t = tag.exec(svg));) {
@@ -1936,8 +1945,13 @@ group('a design is white or black, never the door\'s colour');
     }
     return { groups, all };
   };
+  const eq = (a, b) => a.size === b.size && [...a].every(c => b.has(c));
   const PAINTS = ['rb-9016d', 'rb-7021d'];
-  let rows = 0, lightRows = 0;
+  const hexOf = id => byId(COLOURS, id).hex;
+  const tintOf = (g, id) => g.glass
+    ? new Set([scaleTone(hexOf(id), 1.06).toLowerCase()])
+    : new Set([lighten(hexOf(id), 0.10).toLowerCase(), '#000', '#fff']);
+  let bases = 0, twins = 0;
   for (const g of GRILLES) if (g.id !== 'none') for (const window of ['rect', 'strip'])
   for (const size of ['standard', 'half']) {
     const read = PAINTS.map(colour => {
@@ -1945,25 +1959,55 @@ group('a design is white or black, never the door\'s colour');
       return st.grille === g.id ? designOf(render(st)) : null;
     });
     if (!read[0] || !read[1]) continue;                // the rules refused this window for it
-    rows++; if (g.light) lightRows++;
     const [a, b] = read;
-    ok(a.groups > 0 && a.all.size > 0, `${g.id} on ${window}/${size}: no design group with colours in it was found — this check is dead`);
-    const same = a.all.size === b.all.size && [...a.all].every(c => b.all.has(c));
-    ok(same, `${g.id} on ${window}/${size}: the design is ${[...a.all]} on white and ${[...b.all]} on charcoal — it follows the door's paint`);
-    const stray = [...a.all, ...b.all].filter(c => !FIXED.has(c));
-    ok(!stray.length, `${g.id} on ${window}/${size}: the design paints ${stray} — only white and the fixed blacks are allowed`);
-    ok(g.light ? a.all.has(GRILLE_LIGHT.toLowerCase()) && !a.all.has('#232527')
-               : g.glass ? true : a.all.has('#232527'),
-       `${g.id}: a ${g.light ? 'white' : 'black'} design must be drawn ${g.light ? 'white' : 'in the fixed ironwork black'}`);
-    /* And the tile paints what the door paints (the 10.9 rule): the door drew
-       the twins in the paint lightened while the tile drew #D8D8D4. */
-    const tile = hexes(grilleGlyph(g)); tile.delete('#7c8891');
-    ok(tile.size === a.all.size && [...tile].every(c => a.all.has(c)),
-       `${g.id}: the tile paints ${[...tile]} and the door ${[...a.all]}`);
+    const where = `${g.id} on ${window}/${size}`;
+    ok(a.groups > 0 && a.all.size > 0 && b.all.size > 0,
+       `${where}: no ink inside the pane — a priced design that draws nothing (§5.1), or this check is dead`);
+    if (g.light) {
+      twins++;
+      ok(!eq(a.all, b.all), `${where}: the twin paints ${[...a.all]} on white and on charcoal alike — it must follow the door`);
+      PAINTS.forEach((id, i) => ok(eq(read[i].all, tintOf(g, id)),
+        `${where} on ${id}: the twin paints ${[...read[i].all]}, the door's colour is ${[...tintOf(g, id)]}`));
+    } else {
+      bases++;
+      ok(eq(a.all, b.all), `${where}: the black design is ${[...a.all]} on white and ${[...b.all]} on charcoal — it follows the paint`);
+      const allowed = g.glass ? ETCH_BLACK : IRON_BLACK;
+      const stray = [...a.all].filter(c => !allowed.has(c));
+      ok(!stray.length, `${where}: the black design paints ${stray} — only the fixed black is allowed`);
+    }
+    /* The tile paints what the door paints (10.9), on either paint. */
+    PAINTS.forEach((id, i) => {
+      const tile = hexes(grilleGlyph(g, hexOf(id))); tile.delete('#7c8891');
+      ok(eq(tile, read[i].all), `${where}: on ${id} the tile paints ${[...tile]} and the door ${[...read[i].all]}`);
+    });
   }
-  ok(rows > 20 && lightRows >= 4, `the design sweep asked ${rows} doors, ${lightRows} of them light — too few to mean anything`);
-  ok(grilleGlyph(byId(GRILLES, 'grid')) !== grilleGlyph(byId(GRILLES, 'grid-light')),
-     'the black and the white grid draw the same tile');
+  ok(bases >= 20 && twins >= 20, `the design sweep asked ${bases} black and ${twins} door-colour doors — too few to mean anything`);
+
+  /* ── the pairs ── every design has exactly one twin, the twin is the base's
+     pattern (same `glass`), and it costs what the base costs. */
+  const baseIds = GRILLES.filter(g => g.id !== 'none' && !g.light).map(g => g.id);
+  for (const id of baseIds) {
+    const tw = GRILLES.filter(g => g.id === `${id}-light`);
+    ok(tw.length === 1, `${id} has ${tw.length} door-colour twins — every design comes in black OR the door's colour`);
+    if (tw.length !== 1) continue;
+    const b0 = byId(GRILLES, id);
+    ok(tw[0].light && !!tw[0].glass === !!b0.glass, `${id}-light is not the same kind of design as ${id}`);
+    ok(tw[0].delta === b0.delta, `${id}-light costs ${tw[0].delta} and ${id} ${b0.delta} — a colour is not a price`);
+  }
+  for (const g of GRILLES) if (g.light) {
+    ok(!g.id.endsWith('-light') || baseIds.includes(g.id.slice(0, -6)),
+       `${g.id} is a twin of nothing`);
+  }
+  ok(baseIds.length === 7, `${baseIds.length} designs; the owner's son named seven`);
+  ok(GRILLES.length <= 2 ** BITS.grille,
+     `${GRILLES.length} grilles in ${BITS.grille} bits — the next entry would encode as index 0`);
+  /* The appended twins travel in a link and a code like every other id. */
+  for (const id of ['circles-light', 'vine-light', 'tree-light']) {
+    const st = repair({ ...base, window: 'rect', detail: 'plain', grille: id }).state;
+    ok(fromQuery(toQuery(st)).state.grille === id, `a link lost ${id}`);
+    const c = decodeCode(encodeCode(st));
+    ok(c && c.grille === id, `a code lost ${id}`);
+  }
 }
 
 /* ── NO LINE RUNS ROUND THE INSIDE OF THE GLASS — 27.9.2026 ─────────
@@ -2022,16 +2066,26 @@ group('every grille names the doors it was read from');
   const byIdent = new Map(GRILLES.map(g => [g.id, g]));
   for (const g of GRILLES) {
     if (g.id === 'none') continue;
-    const parentId = g.id.endsWith('-light') ? g.id.slice(0, -6) : null;
-    if (parentId) {
-      const parent = byIdent.get(parentId);
-      ok(parent, `grille ${g.id} inherits evidence from ${parentId}, which is not in the list`);
-      ok(parent && Array.isArray(parent.doors) && parent.doors.length,
-         `grille ${g.id} inherits from ${parentId}, which itself names no doors`);
+    /* RESTATED 27.9.2026 for pairs: the evidence is the PATTERN's, and a
+       door cites the twin its photograph matches (d106's pale rings cite
+       `circles-light`, so `npm run corpus` fits it to the drawing it shows).
+       So the claim is per pair — the pair names doors, and a member citing
+       nothing inherits from a twin that exists and does — and it is asked of
+       the black member too, which before could never inherit. And a door
+       cites ONE member: the fitter takes the first entry citing it, so a
+       door on both would be fitted by list order in silence. */
+    const twinId = g.id.endsWith('-light') ? g.id.slice(0, -6) : `${g.id}-light`;
+    const twin = byIdent.get(twinId);
+    if (!(Array.isArray(g.doors) && g.doors.length)) {
+      ok(twin, `grille ${g.id} names no door and has no twin to inherit from: a priced option with no evidence`);
+      ok(twin && Array.isArray(twin.doors) && twin.doors.length,
+         `grille ${g.id} inherits from ${twinId}, which itself names no doors`);
       continue;
     }
-    ok(Array.isArray(g.doors) && g.doors.length > 0,
-       `grille ${g.id} names no door it was read from: it is a priced option with no evidence`);
+    for (const d of g.doors) {
+      ok(!(twin && (twin.doors || []).includes(d)),
+         `${d} is cited by both ${g.id} and ${twinId} — the fitter would pick one by list order`);
+    }
     for (const d of g.doors || []) {
       ok(evidenceFile(d),
          `grille ${g.id} cites "${d}", which names no evidence root`);
@@ -2967,7 +3021,12 @@ group('an etched design is drawn over the pane, not instead of it');
     const pane = /<g data-pane="[^"]*" data-glass="([^"]*)">([\s\S]*?)<rect x="[\d.]+" y="[\d.]+" width="[\d.]+" height="[\d.]+" fill="url\(#sheen\)"/.exec(svg);
     ok(pane, `${g.id}: no pane group in the markup — this check is dead`);
     if (!pane) continue;
-    ok(pane[1] === g.id, `${g.id}: the pane is tagged data-glass="${pane[1]}"`);
+    /* Restated 27.9.2026: the tag names the DRAWING, and a `-light` twin is
+       its base's drawing in the door's colour — so `circles-light` is tagged
+       `circles`, exactly as `glazingArt` dispatches it. Still asked of every
+       etched id; for the three black ones the value is unchanged. */
+    const drawn = g.id.replace(/-light$/, '');
+    ok(pane[1] === drawn, `${g.id}: the pane is tagged data-glass="${pane[1]}", the drawing is "${drawn}"`);
     ok(/fill="url\(#glass\)"/.test(pane[2]), `${g.id}: the pane has lost its clear glazing`);
     ok(/fill="url\(#skyRefl\)"/.test(pane[2]), `${g.id}: the pane has lost its sky — the design replaced the window`);
     const veil = /<g clip-path="url\(#cl-[^"]*\)">([\s\S]*?)<\/g>/.exec(pane[2]);
