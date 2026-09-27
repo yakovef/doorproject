@@ -1758,25 +1758,27 @@
          shorter blade is drawn by `leverTaper()` and is this.
     
          ⚠ THE ID IS A PLACEHOLDER AND IT IS PERMANENT. `lever-taper` is our word,
-         not his — he has not said what this handle is called and ASK-PERETZ asks.
-         An id is a WIRE FORMAT: it is packed into every short code by index and
-         written into every link by name, so whatever it says today it will still
-         say in five years. When his name arrives it becomes the LABEL below, in
-         three languages, and this id stays exactly as it is. Renaming it would
-         break every code and link already written, which is the one thing an
-         alias cannot rescue (see `VERSION` in url-state.js).
-    
-         ⚠ AND IT PRICES AS THE CORAL UNTIL HE SAYS OTHERWISE — ₪0, included.
-         That is an assumption, not a quotation: `CLAUDE.md` §9, A19. It is the
-         safe direction to be wrong in only if he checks it, so it is asked. */
+         not his. An id is a WIRE FORMAT: it is packed into every short code by
+         index and written into every link by name, so whatever it says today it
+         will still say in five years. Renaming it would break every code and link
+         already written, which is the one thing an alias cannot rescue (see
+         `VERSION` in url-state.js).
+         ⚠ AND ITS NAME IS SETTLED, 27.9.2026 — the owner's son: *"Give the curved
+         lever a permanent name"*, and he chose ידית מתעקלת / Curved lever /
+         Изогнутая ручка: the label it carried with "(שם זמני)" / "(provisional)"
+         dropped. The name went into the LABEL, as this note always said it
+         would; the id above did not move.
+         (This note also said it priced as the Coral at ₪0 "until he says
+         otherwise". He said otherwise on 20.9 — ₪200, `LOCKSET` in prices.js,
+         A19 closed — and the sentence stayed here a week.) */
     /* `photo: null` — it is the drawing the Coral used to be, asked for by the
        owner from the screen rather than from a product. If a cut-out turns out
        to match it, that is A0's question and not an assumption to make here. */
     {
       id: "lever-taper",
-      he: "ידית מתעקלת (שם זמני)",
-      en: "Curved lever (provisional)",
-      ru: "Изогнутая ручка (временное название)",
+      he: "ידית מתעקלת",
+      en: "Curved lever",
+      ru: "Изогнутая ручка",
       style: "levertaper",
       lever: true,
       photo: null

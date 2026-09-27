@@ -129,6 +129,14 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The curved lever's name is permanent: ידית מתעקלת / Curved lever /
+  Изогнутая ручка (*"give the curved lever a permanent name"*); id untouched,
+  1b and A19 closed. New: nothing on sale carries a provisional name. Slow run
+  for the design pairs, the bar and this, as predicted: 11 bare sheets moved
+  and 3 new, all twins or etched (the icon commit below carries the same files,
+  byte-identical); the audit's stale on-door exemption was found here too and
+  is closed by the entry below. Gates: test 9,197,205 / 0 (after the rebase),
+  collide 1,488, fuzz clean, latency 183 ms, audit clean. Long form: `HISTORY.md`.
 - **27.9** The audit's four named "price card on the door" readings (1100/1152
   px, widest doubles) were stale: "Send" shrank the card to 113–142 px and it
   is on no door now (measured on `7b9dc43` alone). `ON_DOOR_OK` emptied, so
@@ -163,18 +171,6 @@ lines here. Dates are the day of the change.
   (the light twins, circles, tree, the four glazed recreates, corpus-07).
   Gates: test 7,483,871 / 0, audit clean (its breakdown check had measured an
   animation, 9.7 px once — it waits now), collide 1,488, fuzz clean, glass unmoved.
-- **27.9** A design is white or black, never the door's colour — *"The colors
-  of the designs are only white or black, they are not based on the door
-  color"* (overruling Peretz's 26.8 *"…גם בגוון הדלת"*): `-light` twins white on
-  door and tile alike (`grilleTint`), etched rings white, the tree a fixed
-  near-black. Falsified: `lighten(paint, 0.10)` back fails 64 light rows, 0
-  black. Labels לבן / white / белый; ids unchanged. Test 7,483,741 / 5 (sheets).
-- **27.9** The digital viewer is refused beside a window, like the optical one
-  — *"The digital peephole still stays when there is a window, this can't
-  happen."* `conflicts` and `repair` named `'peep'`; one `viewerOn` predicate
-  now, every viewer asked at its own radius (§5.26). A `?ey=peep-digital&w=rect`
-  link had kept the ₪390 viewer on the glass in silence. Falsified: the literal
-  back fails 60 digital rows, 0 optical. No sheet (rules). Test 7,483,519 / 5.
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -279,14 +275,14 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | ~7.48 M assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything (it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves, and rose with the bow's sweeps); read the failure count | 27.9 |
+| `npm test` | ~9.20 M assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything (it rose from 7.48 M on 27.9 with three more grilles; it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves); read the failure count | 27.9 |
 | `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) — about 20 minutes now; the price-breakdown check waits for its animation since 27.9 | 27.9 |
 | `npm run collide` | `all` (1,488 designs, 552 with the bow) and `boxes` clean | 27.9 |
 | `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, nothing broke | 27.9 |
-| `npm run latency` | 185 ms worst door against a 600 ms gate | 27.9 |
+| `npm run latency` | 183 ms worst door against a 600 ms gate | 27.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
-| `npm run sheets` | the 48 bare sheets and 6 `lockset` sheets byte-stable across commits that do not touch the drawing; the 27.9 glass changes moved 19, every one glazed, as predicted | 27.9 |
+| `npm run sheets` | the 51 bare sheet files (three twins' `against` sheets added 27.9) and 6 `lockset` sheets byte-stable across commits that do not touch the drawing; the design pairs moved 11 and added 3, every one a twin or an etched design, as predicted | 27.9 |
 
 ⚠ **When a bare sheet moves on a commit that could not have moved it, find out
 what did** — that is how chrome painted across every sheet was found once. And
@@ -772,8 +768,8 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
   bar second, never the bow.
 - **`LOCKSETS` — the lock furniture**, always: what you turn and the keyway.
   ⚠ **`lever-taper` (the curved lever) has a placeholder id that can never be
-  renamed** — Peretz's name for it becomes the label, never the id (1b in
-  `ASK-PERETZ.md`). It is drawn by `leverTaper`, turned up about the spindle
+  renamed** — its name went into the LABEL: ידית מתעקלת / Curved lever /
+  Изогнутая ручка, permanent since 27.9 on the owner's son's word. It is drawn by `leverTaper`, turned up about the spindle
   by `taperAt` until its tip's centre is level with the spindle — `TAPER_TILT`
   is **derived**, `atan2(TAPER_DROP, taperReach())`, never typed (26.9). The
   tile uses the same function and sizes its box off `taperExtent`. Point
@@ -1082,7 +1078,7 @@ against nothing and landed on "slightly better".
 | `npm run against` | each design and grip beside its own source doors, cropped |
 | `npm run lockset` | our lock furniture beside photographs of it, each photograph beside our door in **that door's own paint**, both scaled by the LEAF. One `fitting()` measures photo and render alike, and it prints its own calibration |
 | `npm run shot` | the whole page at twelve sizes and designs — ⚠ **not byte-stable** (two runs of identical code differ on ~7 of 12, up to 9/255 in one small box), so it proves nothing either way |
-| `npm run sheets` | regenerates every family. **The 48 bare sheets (`corpus-`, `recreate-`, `against-`) and the 6 `lockset-` sheets are the proof**: `?bare=1` rasterises flat vector with no webfont, photograph or animation, so they are stable |
+| `npm run sheets` | regenerates every family. **The 51 bare sheet files (`corpus-`, `recreate-`, `against-`; a few are withdrawn designs' and no longer rewritten) and the 6 `lockset-` sheets are the proof**: `?bare=1` rasterises flat vector with no webfont, photograph or animation, so they are stable |
 | `npm run backdrop` | rebuilds both rooms in `assets/` from the owner's originals; the asset is a pure function of an original plus one number |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and de-skews it bilinearly from four measured corners (§3) |
 
@@ -1317,10 +1313,11 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 - **Two controls pinned by rules that mirror differently stand in opposite walls
   in one language and the same wall in another** — the mechanism behind a
   closed fault (the removed grip controls under the price card in Hebrew only).
-  Check it for anything put in the wall next. And at 1100–1152 px the wall is
-  140–152 px: the price card (113–142 px since the send became "Send", 27.9)
-  fits, and stands on no door at any size — the four named on-door readings
-  are gone from the audit — but nothing else fits there.
+  Check it for anything put in the wall next. At 1100–1152 px the wall is
+  140–152 px: the price card fits it since 27.9 (111/113/142 px in he/en/ru,
+  from 163/184/207, when the send became one word) and stands on no door at
+  any size — the audit's four named on-door readings are gone — but nothing
+  else fits there.
 - **The phone's Back button leaves the guide** (12.9): the whole walk is one
   history entry. The obvious fix — `pushState` per step — was built and
   **thrown away**: the in-page back button then grows the stack and system Back
@@ -1371,8 +1368,8 @@ and a fixed half — the drawing on three sizes, A18); **1g** (the rose's size);
 **0j** (26.9: whether a glazed trio exists — to the owner's son; whether a glazed
 pair is the ₪3,800 alone, A20; that the square window moved 131 mm down);
 **0a2** (the ₪300 bell: ring, electric push, or both); **0a5** (a gold פרזול's
-keyhole); **1b** (the curved lever's name, the Idan's stock length, a picture of
-the digital viewer); **1c** (the wide-margin three-panel doors); **2** (ברזל
+keyhole); **1b** (a picture of the curved lever, the Idan's stock length, a
+picture of the digital viewer); **1c** (the wide-margin three-panel doors); **2** (ברזל
 מחושל on ten doors he says do not carry it); **3** (warranty term, permission to
 use the photographs).
 
@@ -1401,7 +1398,7 @@ edit if Peretz says otherwise. `ASK-PERETZ.md` carries the open ones in Hebrew.
 | A16 | The חריגה is drawn at 1025 × 2250, the midpoint of the two sizes it replaced (leaf aspect 0.4205 against the corpus median 0.415) | two numbers in `SIZES` |
 | A17 | A דו כנפי's fixed leaf is 400 mm on all three bands; the extra width goes into the leaf that opens | two numbers in `SIZES` |
 | A18 | His דו כנפי is our דלת וחצי — a main leaf and a narrow FIXED leaf, not two equal leaves | **the drawing**, on three of six sizes |
-| A19 | ~~The curved lever priced as the Coral~~ — closed 20.9: ₪200. Its NAME is open and its id can never be renamed | one label, three languages |
+| A19 | ~~The curved lever priced as the Coral~~ — closed 20.9: ₪200; its name closed 27.9 (ידית מתעקלת, the owner's son). The id `lever-taper` can never be renamed | — |
 | A20 | Two panels beside the square window cost the window's ₪3,800 and nothing for the face (`DETAIL_GLAZED.panel2 = 0`): the window replaced the upper panel and the one panel drawn is the one the window already pays for (26.9) | one number in `prices.js` |
 
 ⚠ **A2, A7 and A13 are the three worth asking first**; A13 is ₪500 on most glazed

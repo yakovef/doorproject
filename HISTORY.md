@@ -26,6 +26,64 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE CURVED LEVER'S NAME IS PERMANENT, AND THE ONE SLOW RUN FOR THE
+  THREE CHANGES.** The owner's son: *"Give the curved lever a permanent name."*
+  He chose ידית מתעקלת / Curved lever / Изогнутая ручка — the label it had
+  carried with "(שם זמני)" / "(provisional)" / "(временное название)" dropped.
+  · **The id `lever-taper` is untouched** — it is a wire format, and the note
+    over it always said his name would go into the LABEL. That note also said
+    the lever "prices as the Coral, ₪0, until he says otherwise"; he said
+    otherwise on 20.9 (₪200, A19 closed) and the sentence stayed for a week —
+    corrected. `ASK-PERETZ.md`: the ✅ row and §1b close the name on his son's
+    word (the photograph is still asked); `CLAUDE.md` §9 A19 and the blocked
+    list follow.
+  · **Test, new:** "nothing on sale carries a provisional name" — every label
+    in every option list the page offers, in three languages (237 labels),
+    against a provisional pattern in all three, and the curved lever's Hebrew
+    name read through `L()`. Falsified by putting "(שם זמני)" back: 3 faults
+    (he, en, and the name clause). No test read the label before.
+  · **Sheets**, predicted before the run and written into the working notes,
+    against the last run (`f55fce7`). Held exactly — and the icon commit below
+    (`ef89797`, another session, sheets run on top of `7b9dc43`) carries the
+    same eleven moved and three new files byte-identically, so after the
+    rebase this commit adds none of them. Moved (the design pairs,
+    `fe65505`): against grid-light, scroll-light, arch-light, deco-light
+    (their twins white → the door's colour), against circles and vine (door
+    colour / white → black), recreate d097 d106 d113 d122, corpus-07 (d106,
+    re-fitted to `circles-light` — the drawing it had before `8e1905d`). New:
+    against circles-light, vine-light, tree-light (looked at: the twin is
+    d106's pale rings; the base vine is black). Not moved: against-tree (its
+    base was already #17120F), the black ironwork, the four grip sheets, every
+    solid door, the six lockset sheets, `corpus-links.md` (its row went in
+    with `7b9dc43`). Neither the bar commit (page only) nor this one (a label)
+    moved a bare sheet. The 12 shot sheets moved, as on every run (§7).
+  · **The rest of the slow run:** `collide -- all` 1,488 designs, nothing
+    overlaps, `faceObstacles` agrees with the drawing; `fuzz` 30,000 designs
+    over every field (the three new grilles in the draw), 10,000 drawn, 60
+    click walks and 1,800 clicks, nothing broke; `latency` worst 183 ms
+    against 600. The audit's first full run had FOUR faults, and they were
+    good news: its named exemption of four desktop readings where the price
+    card stood on the door (en 1100 halfextra2; ru 1100 halfextra1 and
+    halfextra2; ru 1152 halfextra2) is asserted still needed, and it was not —
+    the one-word send (`7b9dc43`) took the wall card from 163/184/207 px wide
+    (he/en/ru) to 111/113/142, and at 1100 in Russian it now ends at the
+    frame's edge instead of 23 px into it. By the time this was pushed,
+    another session on the branch had found and closed the same exemption
+    (the entry below, `c90afcd` — the same four readings, the same card
+    widths); its version of the audit and of §9's price-chip line is the one
+    kept, and this commit's copy was dropped in the rebase. The block re-ran
+    clean (162 readings, on the door on
+    none; the Russian card's 3 px edge cut at 1100 on the widest door is the
+    §9 case the block reports rather than faults). The full audit, re-run with
+    the exemption emptied: no faults, at every viewport.
+  · **Gates:** `node --check`, `npm run build`, `npm test` 9,197,202 passed / 0
+    failed (the sheets fresh) on this tree before the rebase; after rebasing
+    onto the icon commits: rebuilt, `npm run sheets` re-stamped (only the
+    stamps and eight of the twelve shot sheets moved — no bare sheet, no
+    lockset sheet), `npm test` 9,197,205 passed / 0 failed.
+  · **Not done, on purpose:** renaming the id (never — §1); asking Peretz the
+    name again (his son answered it, and the decision is his to reverse).
+
 - **27.9 — THE PRICE CARD STANDS ON NO DOOR, SO ITS EXEMPTION GOES.** Not
   asked for; found by the audit after rebasing the icon commit onto `7b9dc43`:
   4 faults, all *"named as a reading where the price card stands on the door
@@ -225,6 +283,18 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** A design is white or black, never the door's colour — *"The colors
+  of the designs are only white or black, they are not based on the door
+  color"* (overruling Peretz's 26.8 *"…גם בגוון הדלת"*): `-light` twins white on
+  door and tile alike (`grilleTint`), etched rings white, the tree a fixed
+  near-black. Falsified: `lighten(paint, 0.10)` back fails 64 light rows, 0
+  black. Labels לבן / white / белый; ids unchanged. Test 7,483,741 / 5 (sheets).
+- **27.9** The digital viewer is refused beside a window, like the optical one
+  — *"The digital peephole still stays when there is a window, this can't
+  happen."* `conflicts` and `repair` named `'peep'`; one `viewerOn` predicate
+  now, every viewer asked at its own radius (§5.26). A `?ey=peep-digital&w=rect`
+  link had kept the ₪390 viewer on the glass in silence. Falsified: the literal
+  back fails 60 digital rows, 0 optical. No sheet (rules). Test 7,483,519 / 5.
 - **26.9** Flow order `fit · colour · lock · pz · face · glass · grip · mk` —
   *"the hardware finish … right after the lever … the pull handle … after the
   panels and stripes"* (after the glass, asked), overruling Peretz's 30.8

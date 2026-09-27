@@ -2061,6 +2061,30 @@ group('no line runs round the inside of the glass');
   ok(doors > 20 && panes > doors, `the outline sweep asked ${doors} doors and ${panes} panes — the fixed leaf's panes are missing`);
 }
 
+/* ── NOTHING ON SALE CARRIES A PROVISIONAL NAME — 27.9.2026 ────────────
+   The owner's son: *"Give the curved lever a permanent name."* It had shipped
+   for twelve days as "ידית מתעקלת (שם זמני)" — "(provisional)" in the order
+   Peretz reads, which is a clarifying question typed into the product. Asked
+   of every option list the page offers and every language, so the next
+   placeholder label is caught wherever it is written; its id may stay a
+   placeholder for ever (§1), its label may not. Falsified by putting
+   "(שם זמני)" back on `lever-taper`. */
+group('nothing on sale carries a provisional name');
+{
+  const LISTS = { COLOURS, WINDOWS, GRILLES, HANDLES, LOCKSETS, DETAILS, SPECIAL_LOCKS, MASHKOFS, PIRZUL,
+                  BELLS, PEEPHOLES, HANDLE_FINISHES, BOWS, HANDINGS };
+  const PROVISIONAL = /זמני|provisional|placeholder|temporary|tbd|временн|условн/i;
+  let labels = 0;
+  for (const [name, list] of Object.entries(LISTS)) for (const o of list) for (const k of ['he', 'en', 'ru']) {
+    if (typeof o[k] !== 'string') continue;
+    labels++;
+    ok(!PROVISIONAL.test(o[k]), `${name}.${o.id} is sold as "${o[k]}" (${k}) — a provisional name in the order`);
+  }
+  ok(labels > 200, `only ${labels} labels read (237 on 27.9) — the lists this check walks have gone missing`);
+  ok(withLang('he', () => L(byId(LOCKSETS, 'lever-taper'))) === 'ידית מתעקלת',
+     'the curved lever is sold under the name the owner\'s son gave it');
+}
+
 group('every grille names the doors it was read from');
 {
   const byIdent = new Map(GRILLES.map(g => [g.id, g]));
