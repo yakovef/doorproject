@@ -4055,7 +4055,8 @@ const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real o
  * `ASK-PERETZ.md` asks which.
  *
  * ⚠ THE ROWS DO NOT MOVE WITH IT. The inset is horizontal and the rows are
- * vertical, so `PANEL_ROWS.trio` is untouched by this. The sentence below
+ * vertical, so the trio's ROWS are untouched by this (they are `trioRows` and
+ * no longer a table at all since 27.9.2026). The sentence below
  * about the trio landing within 0.02 of the pair is about the ROWS, and it now
  * has an assertion behind it in `test/units.mjs` — it did not before, and it
  * was wrong: the foot of the trio's lower panel is 0.944 against the pair's
@@ -4087,11 +4088,89 @@ const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real o
  * bow is centred on the plate by `gripIdeal`, so it moves down with it and
  * ends up below the lever, as it is on the photograph. The three-photograph
  * mean of 14.9 is kept above; it was read off doors partly shot from below. */
+/* ⚠ AND THE TRIO'S ROWS ARE DERIVED FROM THE WINDOW SINCE 27.9.2026 — see
+   `trioRows` below. The 24.9 reading is kept in full above: measured,
+   overruled, kept. */
 const PANEL_ROWS = {
   pair: [[0.07, 0.58], [0.66, 0.92]],
-  trio: [[0.064, 0.497], [0.523, 0.617], [0.642, 0.913]],
   top:  [[0.07, 0.58]],
   lone: [0.68, 0.90],
+};
+
+/**
+ * ── THE THREE-PANEL FACE, BUILT ROUND THE WINDOW ─────────────────────────
+ *
+ * ⚠ 27.9.2026, THE OWNER'S SON, REVERSING THE 26.9 REFUSAL: *"When I try
+ * changing from the Greek set or 2 panels when you have a window to the 3 panel
+ * option, it doesn't let me. I remind you that the window doesn't change size no
+ * matter what, and what is not right is probably the proportions of the panels,
+ * change them so that the window will fit there perfectly."*
+ *
+ * Both halves of that are instructions. The window does not move — it is his
+ * own light, `WINDOWS.rect.frac`, and the 26.9 round made it the ONE statement
+ * of where glass goes on every face. So the PANELS move, and they move by being
+ * computed from the window rather than measured off a door:
+ *
+ *   upper   the square window's CASING RECTANGLE — its own fractions grown by
+ *           `MOULD_BAND` on each side, which is the stock the drawing cases a
+ *           light in. 0.120-0.560 on the standard leaf. So "the window fits
+ *           there perfectly" is true BY CONSTRUCTION, on every size, and it
+ *           stays true the day the window or the casing is re-measured.
+ *   plate   one rail below it, at the trio's own measured rail and plate
+ *           height. 0.586-0.680.
+ *   lower   the second rail below the plate, down to the measured foot.
+ *           0.705-0.913.
+ *
+ * ⚠ SO THE ROWS ARE A FUNCTION OF `leafH`, WHICH IS WHY THIS IS NOT A TABLE.
+ * `MOULD_BAND` is 70 mm of timber whatever the door, so as a FRACTION it
+ * shrinks on a taller leaf: the upper row is 0.120-0.560 on the standard 2050
+ * leaf and 0.124-0.556 on a 2350 one. A constant table could only be right on
+ * one size, which is §5.16's own lesson — one opening written twice, in two
+ * units, agreeing on the default case.
+ *
+ * ⚠ WHAT IT COSTS, MEASURED, AND IT IS THE HEAD MARGIN. The 24.9 reading put
+ * the upper panel at 0.064 and this puts it at 0.120, so the rail above it goes
+ * from 131 mm to 246 on the standard leaf and the trio stops having the equal
+ * margins all round that made the 14.9 reading credible. The plate drops 0.063
+ * — 129 mm — and the lower panel is 426 mm where it was 556. That is his
+ * instruction carried out, not a reading: the alternative he ruled out is
+ * refusing the face beside the window.
+ * ⚠ AND THE PLATE IS NO LONGER AT THE HEIGHT THE PHOTOGRAPHS PUT IT. Its
+ * centre goes from 0.570 of the leaf to 0.633, about 285 mm below hand height,
+ * and the bow is centred on it by `gripIdeal` so it follows — still inside
+ * `HOME_REACH`, checked rather than assumed.
+ *
+ * ⚠ AND THE WINDOW IT IS BUILT ROUND IS THE SQUARE ONE, ALWAYS, SOLID OR
+ * GLAZED. A solid trio draws the same upper rectangle the glass would take, so
+ * switching the window on and off moves nothing — which is what makes his
+ * sentence answerable at all. The tall slot runs to 0.79 of the leaf and the
+ * computed clearance in `panelUnderGlass` still refuses the trio beside it, by
+ * the plate, off the same geometry: this changes which doors are buildable by
+ * moving the DRAWING, never by relaxing the check.
+ */
+/* The two rails and the plate, from the 24.9 de-keystoned reading of the
+   installed door: 0.523-0.617 is a plate 0.094 tall, with rails of 0.026 above
+   and 0.025 below it. ⚠ The two coming out equal is what made that reading
+   credible — a real door's joinery is symmetric and a bad reading is not — so
+   they are kept as the two figures rather than averaged into one. */
+export const TRIO_RAIL = [0.026, 0.025];
+const TRIO_PLATE_H = 0.094;
+const TRIO_FOOT = 0.913;
+/* ⚠ NAMED, AND GUARDED, BECAUSE `byId` RESCUES A STALE ID IN SILENCE (§5.24).
+   Its fallback exists so a customer's old link opens something; handed a
+   programmer's typo it would return `WINDOWS[0]` — `none`, which has no
+   `frac` — and the trio would be laid out against `undefined`. */
+const squareWindow = () => {
+  const win = byId(WINDOWS, 'rect');
+  if (!win || !win.frac) throw new Error('the square window has no frac: the trio is laid out against it');
+  return win;
+};
+const trioRows = leafH => {
+  const band = MOULD_BAND / leafH;
+  const { top, bot } = squareWindow().frac;
+  const upper = [top - band, bot + band];
+  const plate = [upper[1] + TRIO_RAIL[0], upper[1] + TRIO_RAIL[0] + TRIO_PLATE_H];
+  return [upper, plate, [plate[1] + TRIO_RAIL[1], TRIO_FOOT]];
 };
 /* How far a panelled face keeps its rectangles from the leaf's edges, where it
    differs from `PANEL_INSET`.
@@ -4112,8 +4191,13 @@ const PANEL_INSETS = {};
  * catalog.js taught the same lesson from the other side; it is gone since
  * 26.9.2026, replaced by `keeps` and `faceRowsOn` below.)
  */
-const panelRows = detail =>
-  detail.panels >= 3 ? PANEL_ROWS.trio
+/* ⚠ AND IT TAKES `leafH` SINCE 27.9.2026, because the trio's rows are derived
+   from the window and the casing round a light is 70 mm of stock rather than a
+   fraction — see `trioRows`. Every caller has the leaf's height to hand; the
+   catalogue glyph passes the standard leaf's, which is the door its tile is a
+   picture of. */
+const panelRows = (detail, leafH) =>
+  detail.panels >= 3 ? trioRows(leafH)
   : detail.panels === 2 ? PANEL_ROWS.pair
   : detail.top ? PANEL_ROWS.top
   : [PANEL_ROWS.lone];
@@ -4145,9 +4229,9 @@ export function faceRowsOn(detail, win, openings, leafW, leafH) {
   if (detail.classic) return none;
   if (!openings.length) {
     return detail.panel
-      ? { rows: panelRows(detail), inset: leafW * panelInset(detail), lone: false } : none;
+      ? { rows: panelRows(detail, leafH), inset: leafW * panelInset(detail), lone: false } : none;
   }
-  const kept = (detail.keeps || []).map(i => panelRows(detail)[i]).filter(Boolean);
+  const kept = (detail.keeps || []).map(i => panelRows(detail, leafH)[i]).filter(Boolean);
   if (kept.length) return { rows: kept, inset: leafW * panelInset(detail), lone: false };
   if (!detail.panel && !win.panel) return none;
   const winBottom = Math.max(...openings.map(o => o.top + o.h));
@@ -4682,7 +4766,7 @@ export function panelUnderGlass(state) {
   }
   /* A kept row must stand clear of the casing round the glass — the same
      MOULD_BAND the drawing cases a light in on every face but the set. */
-  const rows = panelRows(detail);
+  const rows = panelRows(detail, leafH);
   for (const i of detail.keeps) {
     const [t, b] = rows[i];
     const r = { x: f.inset, y: leafH * t, w: leafW - f.inset * 2, h: leafH * (b - t) };
@@ -4802,7 +4886,7 @@ function gripIdeal(state) {
   const grabY = () => {
     if (detail.classic) return leafH * (CLASSIC_ROWS.band[0] + CLASSIC_ROWS.band[1]) / 2;
     if (panelled) {
-      const rows = panelRows(detail);
+      const rows = panelRows(detail, leafH);
       if (rows.length >= 3) return leafH * (rows[1][0] + rows[1][1]) / 2;
       if (rows.length === 2) return leafH * (rows[0][1] + rows[1][0]) / 2;
     }
@@ -10814,7 +10898,13 @@ export function detailGlyph(detail) {
                        stroke-width="36"/>`;
        })].join('')
     : !detail.panel ? ''
-    : panelRows(detail).map(([t, b]) => panelAt(t, b)).join('');
+    /* ⚠ THE STANDARD LEAF'S HEIGHT, NOT `H`. `H` here is the OPENING (950 x
+       2100) and the rows are fractions of the LEAF, which is the same figure
+       the trio's derivation needs — so the tile is a picture of the standard
+       door rather than of a leaf 50 mm taller than any we sell. A tile that
+       drew the trio against the opening would put its panels a rail off the
+       ones the door draws (§5.10, a quantity in two units). */
+    : panelRows(detail, SIZES.standard.h - REBATE).map(([t, b]) => panelAt(t, b)).join('');
 
   /* GONE, 23.9.2026: the stripe branches that stood here — a count off
      detail.strips, the ragged RHYTHM table, the even rows off STRIP_ROWS, the

@@ -129,6 +129,29 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The three-panel face takes the window, and its rows are DERIVED from
+  it — *"When I try changing from the Greek set or 2 panels when you have a
+  window to the 3 panel option, it doesn't let me. I remind you that the window
+  doesn't change size no matter what, and what is not right is probably the
+  proportions of the panels, change them so that the window will fit there
+  perfectly."* ⚠ Reverses the 26.9 refusal, on his word. `trioRows(leafH)`
+  replaces `PANEL_ROWS.trio`: upper = the square window's casing rectangle
+  (`frac` grown by `MOULD_BAND`), the plate one measured rail below it, the lower
+  panel the second rail below that — 0.120–0.560 · 0.586–0.680 · 0.705–0.913 on
+  the standard leaf, and a FUNCTION because 70 mm of casing is a different
+  fraction on every size (§5.16). The 24.9 rows are kept beside it — measured,
+  overruled, kept; what survives is the plate's 0.094 and the two rails. Cost,
+  measured: the head rail 131 → 246 mm, the plate down 129, the lower panel
+  556 → 426; the bow follows the plate to 0.633 of the leaf, inside `HOME_REACH`.
+  ⚠ The refusal MOVED rather than going — the tall slot still lands 322–488 mm in
+  the plate, so `why.winPlate` keeps a reader; measured before deleting it.
+  Price `DETAIL_GLAZED.panel3 = DETAIL.panel3 − DETAIL.panel2` as the expression,
+  ₪450 (A21) → a glazed trio is ₪7,445. ⚠ And *"a panel that is charged for is a
+  panel that is drawn"* had been reading the FIXED leaf's group on a double and
+  agreeing by coincidence; it reads the group that declares the count now.
+  Falsified: the 24.9 rows typed back → 30 faults. `collide -- all` 1,488 →
+  1,508, `faceObstacles` agreeing with the drawing everywhere. Test
+  9,210,382 / 5 (sheets). Long form: `HISTORY.md`.
 - **27.9** The curved lever's name is permanent: ידית מתעקלת / Curved lever /
   Изогнутая ручка (*"give the curved lever a permanent name"*); id untouched,
   1b and A19 closed. New: nothing on sale carries a provisional name. Slow run
@@ -596,23 +619,50 @@ people consult.
 
 **Every family is a MEASURED composition with its own doors named** — the
 recurring mistake here has been deriving one from another (`trio` from `pair`,
-a stripe count from a span formula). `PANEL_ROWS` holds `pair`, `trio`, `top`
-and `lone` (the square window's own panel).
+a stripe count from a span formula). `PANEL_ROWS` holds `pair`, `top` and
+`lone` (the square window's own panel); the trio is the one exception and it is
+derived from the WINDOW rather than from another face.
 
 - `PANEL_ROWS.pair` 0.07–0.58 and 0.66–0.92.
-- `PANEL_ROWS.trio` **0.064–0.497 · 0.523–0.617 · 0.642–0.913** (24.9, off an
-  installed door, de-keystoned). The middle rectangle is a **handle plate**:
-  d067/d068/d077 carry a turned pull through it; d065/d070/d087 are the same
-  door without the plate. No face brings its own pull (14.9); a bow chosen on
-  this face is homed in the plate's field (`gripIdeal`).
+- ⚠ **THE TRIO'S ROWS ARE DERIVED FROM THE WINDOW SINCE 27.9.2026**, the
+  owner's son: *"…I remind you that the window doesn't change size no matter
+  what, and what is not right is probably the proportions of the panels, change
+  them so that the window will fit there perfectly."* `trioRows(leafH)`:
+  the **upper row IS the square window's casing rectangle** (`WINDOWS.rect.frac`
+  grown by `MOULD_BAND` each side) — 0.120–0.560 on the standard leaf — then the
+  **plate** one measured rail below it (0.586–0.680) and the **lower panel** the
+  second rail below that to the measured foot (0.705–0.913). So "the window fits
+  there perfectly" is true by construction on every size, and it stays true when
+  the window or the casing is re-measured.
+  ⚠ **A function and not a table, because `MOULD_BAND` is 70 mm of stock**: as a
+  fraction it shrinks on a taller leaf (0.120–0.560 at 2050, 0.124–0.556 at
+  2350), so a constant could only be right on one of the six sizes — §5.16.
+  ⚠ **Solid or glazed, it is the SQUARE window it is built round**, so switching
+  the window on and off moves nothing. The tall slot runs to 0.79 of the leaf
+  and the computed clearance still refuses the trio beside it (488 mm into the
+  plate on the standard leaf) — the check was never relaxed, the drawing moved.
+  ⚠ **What it cost, measured:** the head rail goes 131 → 246 mm, so the trio
+  loses the equal margins all round that made the 14.9 reading credible; the
+  plate drops 129 mm (its centre 0.570 → 0.633 of the leaf, still inside
+  `HOME_REACH`) and the lower panel is 426 mm where it was 556.
+  **The 24.9 reading — 0.064–0.497 · 0.523–0.617 · 0.642–0.913, off an installed
+  door, de-keystoned — is kept in full beside `trioRows`: measured, overruled,
+  kept.** What survives of it unchanged is the plate's own height (0.094) and
+  the two rails (0.026, 0.025), which is what the derivation is built from.
+  The middle rectangle is still a **handle plate**: d067/d068/d077 carry a
+  turned pull through it; d065/d070/d087 are the same door without it. No face
+  brings its own pull (14.9); a bow chosen on this face is homed in the plate's
+  field (`gripIdeal`) and follows it down.
 - ⚠ **Under the square window a face draws the rows it `keeps`** (26.9, on the
   catalogue entry — `panel2` keeps its lower panel, `panel3` its plate and
   lower); `faceRowsOn` is the one statement, read by the drawing,
   `faceObstacles` and `panelUnderGlass`. Whether kept rows clear the casing is
   computed: on the standard leaf the casing reaches 1148 mm, the pair's lower
-  panel starts at 1353 (205 clear), the trio's plate at 1072 (**76 into it — the
-  trio is refused beside a window, the window stays**). The pair's kept panel is
-  its own 0.23 inset (459 mm), 20 mm inside the casing each side — not aligned.
+  panel starts at 1353 (205 clear) and **the trio's plate at 1201, one 53 mm
+  rail below it** — so both stand beside the square window, and a glazed trio
+  costs the plate (A21). The kept panels are at their own 0.23 inset (459 mm),
+  20 mm inside the casing each side — not aligned, because the inset is Peretz's
+  14.9 overrule and the window's own x fractions are the owner's son's light.
   A face that keeps nothing falls back to the window's own lone panel, aligned
   to the casing (d097); plain behind the square window draws that.
 
@@ -1281,9 +1331,13 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   off the leaf's LEFT edge always — on a hinge-left door it stands on the hinge
   side. No bar reaches either place today (the sweep above), so nothing is
   drawn wrong; the box is simply in the wrong place.
-- **The trio cannot stand beside a window** (26.9): the casing would stand 76
-  mm into its handle plate (`panelUnderGlass`, `why.winPlate`). Refused, not
-  redesigned; `ASK-PERETZ.md` asks the owner's son whether a glazed trio exists.
+- ✅ ~~**The trio cannot stand beside a window** (26.9): the casing would stand
+  76 mm into its handle plate.~~ **CLOSED 27.9** — the owner's son answered by
+  asking for the opposite: the window does not move, the PANELS do. The trio's
+  rows are derived from the casing now (§3, `trioRows`) and it stands beside the
+  square window on all six sizes. ⚠ **The refusal did not go, it moved to the
+  window it is about**: the tall slot still lands 322–488 mm into the plate, off
+  the same computed check, so `why.winPlate` still has a reader.
 
 - **The `plate` tile's backplate is not the door's** (19.9). The tile draws the
   Rotem's plate 90 × 240; `handleFootprint` declares about 166 × 340 — not one
@@ -1400,6 +1454,7 @@ edit if Peretz says otherwise. `ASK-PERETZ.md` carries the open ones in Hebrew.
 | A18 | His דו כנפי is our דלת וחצי — a main leaf and a narrow FIXED leaf, not two equal leaves | **the drawing**, on three of six sizes |
 | A19 | ~~The curved lever priced as the Coral~~ — closed 20.9: ₪200; its name closed 27.9 (ידית מתעקלת, the owner's son). The id `lever-taper` can never be renamed | — |
 | A20 | Two panels beside the square window cost the window's ₪3,800 and nothing for the face (`DETAIL_GLAZED.panel2 = 0`): the window replaced the upper panel and the one panel drawn is the one the window already pays for (26.9) | one number in `prices.js` |
+| A21 | Three panels beside the square window cost the HANDLE PLATE and nothing else — `DETAIL_GLAZED.panel3 = DETAIL.panel3 − DETAIL.panel2`, ₪450 (27.9). A glazed trio draws one panel more than a glazed pair, and the only figure in the range that says what that plate is worth is the difference between Peretz's own two solid faces. He has priced two solid faces and never a glazed trio | one expression in `prices.js` |
 
 ⚠ **A2, A7 and A13 are the three worth asking first**; A13 is ₪500 on most glazed
 orders and rests on the shape of two Hebrew names.

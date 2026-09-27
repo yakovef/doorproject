@@ -11,7 +11,7 @@ import {
   bellGlyph, bowGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
   bellFits, bowFeet, bowFits, bowHome, bowPlacement, locksetGlyph, mashkofGlyph, panelUnderGlass, spawnIndexOf, spawnSpots, peepholeFits,
-  peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph, stripesGlyph,
+  peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph, stripesGlyph, TRIO_RAIL,
   windowGlyph,
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
@@ -2694,8 +2694,8 @@ for (const [key, list, ctx] of [
    and the figure is 0.03, which is stated in the comment now and asserted
    here.
 
-   ⚠ ASKED OF `faceObstacles`, NOT OF THE TABLE. Comparing `PANEL_ROWS.trio` to
-   `PANEL_ROWS.pair` would be the table agreeing with itself. `faceObstacles`
+   ⚠ ASKED OF `faceObstacles`, NOT OF THE TABLES. Comparing the trio's own rows
+   to `PANEL_ROWS.pair` would be the renderer agreeing with itself. `faceObstacles`
    is what the placement rules believe is on the face, and `npm run collide`
    checks it against the geometry the drawing actually emits — so going through
    it means this asserts the DRAWN envelope, one step closer to the door.
@@ -2706,7 +2706,16 @@ for (const [key, list, ctx] of [
    makes that separation visible: if somebody ever "finishes the job" by
    pulling the rows onto the pair's as well, the plate loses its row and this
    fails rather than the drawing quietly changing. */
-group('the three-panel face is the two-panel face with a plate let in');
+/* ⚠ AND THE HEAD CLAUSE IS THE WINDOW'S NOW, NOT THE PAIR'S — 27.9.2026.
+   The trio's upper rectangle stopped being a measurement that round: it IS the
+   square window's casing rectangle, so that the window can replace it (see
+   `trioRows`). So the claim "the trio's head lands within 0.03 of the pair's"
+   is DEAD — measured, it is 0.050 — and what replaces it is the claim that is
+   now load-bearing, and it is strictly stronger: an EQUALITY to a millimetre,
+   on every size, read off the drawing's own boxes on both sides. The foot and
+   the plate clauses are untouched and still hold, which is what is left of the
+   family resemblance. */
+group('the three-panel face is built round the window, with a plate let in');
 {
   const solid = d => ({ ...base, detail: d, window: 'none', size: 'standard',
                         handle: 'none' });
@@ -2716,13 +2725,31 @@ group('the three-panel face is the two-panel face with a plate let in');
   const pair = rowsOf('panel2'), trio = rowsOf('panel3');
   ok(pair.length === 2, `the pair draws ${pair.length} panels, so this check is dead`);
   ok(trio.length === 3, `the trio draws ${trio.length} panels, so this check is dead`);
+
+  /* THE UPPER RECTANGLE IS WHERE THE GLASS GOES — both boxes off
+     `faceObstacles`, which is what the placement rules believe is on the face
+     and what `npm run collide` checks against the drawing. Every size, because
+     the casing is 70 mm of stock and its FRACTION of the leaf moves with the
+     door: a constant table could only have been right on one of the six. */
+  let sizes = 0;
+  for (const size of sizeKeys) {
+    const up = faceObstacles({ ...base, detail: 'panel3', window: 'none', size, handle: 'none' })
+      .filter(o => o.kind === 'panel').sort((a, b) => a.y - b.y)[0];
+    const [win] = faceObstacles({ ...base, detail: 'plain', window: 'rect', size, handle: 'none' })
+      .filter(o => o.kind === 'window');
+    ok(up && win, `${size}: the trio's upper rectangle or the window's casing was not found — this check is dead`);
+    if (!up || !win) continue;
+    sizes++;
+    ok(Math.abs(up.y - win.y) < 1 && Math.abs(up.h - win.h) < 1,
+       `${size}: the trio's upper rectangle is ${up.y.toFixed(0)}+${up.h.toFixed(0)} and the window's casing `
+     + `${win.y.toFixed(0)}+${win.h.toFixed(0)} — the glass must land exactly where that panel was`);
+  }
+  ok(sizes === 6, `the upper rectangle was compared on ${sizes} of 6 sizes`);
+
   if (pair.length === 2 && trio.length === 3) {
     const leafH = SIZES.standard.h - REBATE;
     const TOL = 0.03;
-    const head = Math.abs(trio[0].y - pair[0].y) / leafH;
     const foot = Math.abs((trio[2].y + trio[2].h) - (pair[1].y + pair[1].h)) / leafH;
-    ok(head <= TOL,
-       `the trio's head is ${head.toFixed(3)} of the leaf from the pair's, past ${TOL}`);
     ok(foot <= TOL,
        `the trio's foot is ${foot.toFixed(3)} of the leaf from the pair's, past ${TOL}`);
     /* And the middle one is the PLATE: shorter than either rectangle it sits
@@ -2803,13 +2830,32 @@ group('a panel that is charged for is a panel that is drawn');
     if (!buildable(st)) continue;
     n++;
     const svg = render(st);
-    const g = /<g data-detail="panel"([^>]*)>/.exec(svg);
     /* ⚠ THE COUNT, NOT "TWO OR NOT TWO". This read `/data-panels="2"/` and
        scored anything else as one — so the three-panel face was compared as
        1 against a `paid` of 1 and the check passed on both sides being wrong.
-       It reads the number the drawing wrote. */
-    const drawnAttr = g && /data-panels="(\d+)"/.exec(g[1]);
-    const drawn = g ? (drawnAttr ? Number(drawnAttr[1]) : 1) : 0;
+       It reads the number the drawing wrote.
+       ⚠ AND IT READ THE WRONG LEAF ON A DOUBLE UNTIL 27.9.2026, AND AGREED BY
+       COINCIDENCE. It took the FIRST `data-detail="panel"` group in the
+       document; on a דו כנפי that is the FIXED leaf's, which draws the window's
+       own lone panel and carries no `data-panels` at all, so the reader's
+       fallback scored it 1 — which happened to be the right answer for every
+       face that had ever reached a double under glass. The trio becoming
+       buildable beside the window made `paid` 2 and the check reported the
+       fixed leaf's 1: a true failure about a correct door, from a check that
+       had been looking at the wrong object. It reads the group that CARRIES
+       the count — which is the main leaf's, by construction — with a §5.15
+       clause that every group declaring one AGREES — the Greek set draws itself
+       on both leaves of a double and each declares its 1, which is fine; two
+       leaves declaring DIFFERENT counts is the fault this clause is for, and it
+       is exactly the shape the fixed leaf's silence was hiding. */
+    const groups = [...svg.matchAll(/<g data-detail="panel"([^>]*)>/g)].map(m => m[1]);
+    const counts = new Set(groups.flatMap(a => {
+      const m = /data-panels="(\d+)"/.exec(a);
+      return m ? [Number(m[1])] : [];
+    }));
+    ok(counts.size <= 1,
+       `${d.id}/${w.id}/${size}: the leaves declare ${[...counts]} panels — two different counts on one door`);
+    const drawn = groups.length ? (counts.size ? [...counts][0] : 1) : 0;
     /* ⚠ AND TWO THINGS CAN BE PAID FOR SINCE 14.9.2026. The face is one, at
        its own `DETAIL` price. The square window is the other: `WINDOWS.rect`
        carries `panel: true` and `WINDOW.rect`'s ₪3,800 includes that panel —
@@ -3761,29 +3807,56 @@ group('one square window, and the pair keeps it — 26.9.2026');
   }
   ok(sizesChecked === 6, `the pane was compared on ${sizesChecked} of 6 sizes`);
 
-  /* 2 · THE PAIR STANDS BESIDE IT AND THE TRIO DOES NOT — every size, and the
-     trio's overlap COMPUTED off the drawing, not matched as a string: the raw
-     render of the trio beside the window draws its kept rows (plate first,
-     `data-top`), the pane's foot plus the casing band (`data-band`, the same
-     stock round a pane and round a panel) is where the casing ends, and the
-     difference must be what the rule says it is, and positive. */
+  /* 2 · AND THE TRIO STANDS BESIDE IT TOO, SINCE 27.9.2026 — RESTATED, SAME
+     SUBJECT, OPPOSITE ANSWER. The owner's son: *"When I try changing from the
+     Greek set or 2 panels when you have a window to the 3 panel option, it
+     doesn't let me. I remind you that the window doesn't change size no matter
+     what, and what is not right is probably the proportions of the panels,
+     change them so that the window will fit there perfectly."* So the refusal
+     this block used to assert is gone and what replaces it is the geometry that
+     makes it unnecessary: **the plate stands exactly one rail BELOW the casing**,
+     computed off the drawing rather than matched as a string, on every size.
+     Same three readings as before — the kept rows' `data-top`, the casing band
+     `data-band`, the pane — with the sign the other way round and the rail from
+     the renderer's own constant.
+     ⚠ AND THE REFUSAL DID NOT DISAPPEAR, IT MOVED TO THE WINDOW IT IS ABOUT.
+     The tall slot runs to 0.79 of the leaf, so its casing still lands in the
+     plate: measured, 488 mm on the standard leaf, 323 on `extra2`. That is the
+     same computed check, unrelaxed, and it is what keeps `why.winPlate` a
+     string with a reader — deleting it on the strength of the square window
+     would have printed a raw key the first time somebody tried the slot. */
   for (const size of sizeKeys) {
     const pair = onRect(size, 'panel2'), trio = onRect(size, 'panel3');
     ok(buildable(pair), `${size}: two panels beside the square window are refused — the window replaces the upper panel`);
-    ok(!buildable(trio), `${size}: three panels beside the square window are buildable — the casing stands in the handle plate`);
-    const u = panelUnderGlass(trio);
+    ok(buildable(trio), `${size}: three panels beside the square window are refused — the plate should clear the casing by a rail`);
+    ok(!panelUnderGlass(trio), `${size}: the rule says ${JSON.stringify(panelUnderGlass(trio))} about a glazed trio`);
     const svg = render(trio);
     const g = /<g data-detail="panel" data-panels="(\d+)"\s+data-top="([\d.]+)"\s+data-band="([\d.]+)">/.exec(svg);
     const [pane] = paneOf(svg);
-    ok(g && pane, `${size}: the trio's kept rows or the pane were not found on the raw render — the overlap check is dead`);
+    ok(g && pane, `${size}: the trio's kept rows or the pane were not found on the raw render — the clearance check is dead`);
     if (!g || !pane) continue;
-    const overlap = pane[1] + pane[3] + Number(g[3]) - Number(g[2]);
-    ok(u && u.why === 'plate' && overlap > 0 && Math.abs(u.by - overlap) < 0.5,
-       `${size}: the rule says ${JSON.stringify(u)} and the drawing puts the casing ${overlap.toFixed(1)} mm into the plate`);
-    ok(conflicts(pair).detail.panel3 === T('why.winPlate'),
-       `${size}: the greyed trio beside the window gives "${conflicts(pair).detail.panel3}" — it should name the plate`);
+    /* The drawn gap between the casing's foot and the plate's top, against the
+       rail the renderer derives the rows with. Read off the door, so a change
+       to either the window or the band moves both sides together. */
+    const leafH = SIZES[size].h - REBATE;
+    const gap = Number(g[2]) - (pane[1] + pane[3] + Number(g[3]));
+    ok(Math.abs(gap - leafH * TRIO_RAIL[0]) < 0.5,
+       `${size}: the drawing leaves ${gap.toFixed(1)} mm between the casing and the plate, `
+     + `and the rail is ${(leafH * TRIO_RAIL[0]).toFixed(1)}`);
+    /* The clause that must stay true beside it (§5.22): the SLOT still refuses
+       the trio, by the plate, and the tile still says so. The cheap way to make
+       a glazed trio buildable is to stop asking, and this is what catches it. */
+    const slot = { ...onRect(size, 'panel3'), window: 'strip' };
+    const u = panelUnderGlass(slot);
+    ok(u && u.why === 'plate' && u.by > 0,
+       `${size}: the tall slot says ${JSON.stringify(u)} about the trio — its casing runs to 0.79 of the leaf and must still land in the plate`);
+    ok(conflicts({ ...onRect(size, 'plain'), window: 'strip' }).detail.panel3 === T('why.winPlate'),
+       `${size}: the greyed trio beside the slot gives `
+     + `"${conflicts({ ...onRect(size, 'plain'), window: 'strip' }).detail.panel3}" — it should name the plate`);
     ok(!conflicts(onRect(size, 'plain')).detail.panel2,
        `${size}: the pair's tile is greyed beside the square window`);
+    ok(!conflicts(onRect(size, 'plain')).detail.panel3,
+       `${size}: the trio's tile is greyed beside the square window`);
   }
 
   /* 3 · A FACE TAP NEVER TAKES THE WINDOW. Every face, from every face, on
@@ -3808,16 +3881,56 @@ group('one square window, and the pair keeps it — 26.9.2026');
      the composition on the face row, and the window row stops claiming a
      lower panel of its own beside it. */
   for (const lang of LANG_IDS) withLang(lang, () => {
-    const rows = specRows(onRect('standard', 'panel2'));
-    const face = rows.find(r => r.key === 'detail'), win = rows.find(r => r.key === 'window');
-    ok(face && face.value === T('row.upperGlazed', L(DETAILS.find(d => d.id === 'panel2'))),
-       `${lang}: the glazed pair's face row reads "${face && face.value}"`);
-    ok(win && !win.value.includes(T('row.withPanel')),
-       `${lang}: the glazed pair's window row still claims "${T('row.withPanel')}" — a second lower panel in the order`);
+    /* ⚠ BOTH PANELLED FACES SINCE 27.9.2026, and `row.upperGlazed` needed no
+       new string for the trio: `keptUnderGlass` in `js/spec.js` is derived from
+       `keeps` rather than from an id, so the sentence — "שלושה פאנלים — העליון
+       הוחלף בחלון" — came with the face becoming buildable. Which is the point
+       of it being derived; a map of ids to phrases would have printed
+       "three panels" on a door drawing two. */
+    for (const face0 of ['panel2', 'panel3']) {
+      const rows = specRows(onRect('standard', face0));
+      const face = rows.find(r => r.key === 'detail'), win = rows.find(r => r.key === 'window');
+      ok(face && face.value === T('row.upperGlazed', L(DETAILS.find(d => d.id === face0))),
+         `${lang}: the glazed ${face0}'s face row reads "${face && face.value}"`);
+      ok(win && !win.value.includes(T('row.withPanel')),
+         `${lang}: the glazed ${face0}'s window row still claims "${T('row.withPanel')}" — a second lower panel in the order`);
+    }
     const plainWin = specRows(onRect('standard', 'plain')).find(r => r.key === 'window');
     ok(plainWin && plainWin.value.includes(T('row.withPanel')),
        `${lang}: the plain door's square window no longer says it brings its panel`);
   });
+
+  /* 5 · AND THE GLAZED TRIO IS PRICED AT THE PLATE — ASSUMPTION A21, 27.9.2026.
+     The window takes its upper panel and the plate and the lower panel stay, so
+     it draws exactly ONE panel more than a glazed pair draws, and the only
+     figure in the range that says what that plate is worth is the difference
+     between Peretz's own two solid faces. Asserted as the ARITHMETIC and not as
+     ₪450, for the reason `DETAIL_GLAZED` gives: both figures are his, and the
+     day he moves either one, a typed number would go on charging the old
+     difference in silence (§5.10 with money in it). */
+  {
+    const { DETAIL: SOLID, DETAIL_GLAZED } = await import('../js/prices.js');
+    ok(DETAIL_GLAZED.panel3 === SOLID.panel3 - SOLID.panel2,
+       `the glazed trio is priced at ₪${DETAIL_GLAZED.panel3} and the plate is `
+     + `₪${SOLID.panel3 - SOLID.panel2} — the difference between his own two faces`);
+    for (const size of sizeKeys) {
+      const plate = (SOLID.panel3 - SOLID.panel2) * 100;
+      ok(priceAgorot(onRect(size, 'panel3')) - priceAgorot(onRect(size, 'panel2')) === plate,
+         `${size}: a glazed trio costs ₪${(priceAgorot(onRect(size, 'panel3')) - priceAgorot(onRect(size, 'panel2'))) / 100} `
+       + `more than a glazed pair, and the plate is ₪${plate / 100}`);
+    }
+    /* The clause that must stay true: a panel that is charged for is a panel
+       that is DRAWN. A glazed trio pays for two panels over the plain door's
+       window and must draw exactly two. */
+    for (const size of sizeKeys) {
+      const drawn = (render(onRect(size, 'panel3')).match(/\sdata-detail="panel"/g) || []).length;
+      const want = SIZES[size].side ? 2 : 1;   // one group per leaf that carries the face
+      ok(drawn === want, `${size}: a glazed trio draws ${drawn} panel groups, expected ${want}`);
+      const g = /<g data-detail="panel" data-panels="(\d+)"/.exec(render(onRect(size, 'panel3')));
+      ok(g && Number(g[1]) === 2,
+         `${size}: a glazed trio says data-panels="${g && g[1]}" — it is charged for the plate and the lower panel`);
+    }
+  }
 }
 
 group('`gp` is a retired parameter, and a link still carrying it is not an error');

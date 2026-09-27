@@ -26,6 +26,146 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE THREE-PANEL FACE TAKES THE WINDOW, AND ITS ROWS ARE DERIVED FROM
+  IT.** The owner's son: *"When I try changing from the Greek set or 2 panels
+  when you have a window to the 3 panel option, it doesn't let me. I remind you
+  that the window doesn't change size no matter what, and what is not right is
+  probably the proportions of the panels, change them so that the window will
+  fit there perfectly."*
+
+  ⚠ **IT REVERSES THE 26.9 DECISION, AND BOTH HALVES OF HIS SENTENCE ARE
+  INSTRUCTIONS.** On 26.9 he made a panelled face and the window compatible —
+  the window replaces the upper panel — and refused the trio beside it, because
+  the casing would stand 76 mm into the handle plate. That refusal was computed
+  off the drawing rather than listed, which is why reversing it needed no new
+  rule: the window does not move, so the PANELS move. §0a — a settled decision
+  is settled against us re-opening it, never against him.
+
+  **WHAT IS DERIVED, AND FROM WHAT.** `trioRows(leafH)` replaces
+  `PANEL_ROWS.trio`:
+  · **upper** — the square window's CASING RECTANGLE: `WINDOWS.rect.frac` grown
+    by `MOULD_BAND` on each side, which is the stock the drawing cases every
+    light in. 0.120–0.560 on the standard leaf. So *"the window fits there
+    perfectly"* is true **by construction**, on every size, and it stays true the
+    day the window or the casing is re-measured — which is the difference between
+    this and picking three numbers that happen to clear the glass today.
+  · **plate** — one measured rail below it, at the trio's own measured plate
+    height: 0.586–0.680.
+  · **lower** — the second rail below the plate, down to the measured foot:
+    0.705–0.913.
+
+  ⚠ **A FUNCTION AND NOT A TABLE, AND THAT IS §5.16.** `MOULD_BAND` is 70 mm of
+  timber whatever the door, so as a FRACTION of the leaf it shrinks on a taller
+  one: the upper row is 0.120–0.560 on the 2050 leaf and 0.124–0.556 on the 2350.
+  A constant table could only have been right on one of the six sizes, which is
+  exactly the shape of "one opening written twice, in two units, agreeing on the
+  default case". The assertion is asked on all six for the same reason.
+
+  ⚠ **AND IT IS THE SQUARE WINDOW IT IS BUILT ROUND, SOLID OR GLAZED.** A solid
+  trio draws the same upper rectangle the glass would take, so switching the
+  window on and off moves nothing — which is what makes his sentence answerable
+  at all. `squareWindow()` looks the id up with a guard rather than bare `byId`,
+  because `byId`'s fallback exists to rescue a customer's stale LINK and would
+  have rescued a programmer's typo here in silence, handing the trio `WINDOWS[0]`
+  — `none`, which has no `frac` (§5.24).
+
+  ⚠ **THE MEASUREMENT IS OVERRULED, NOT WITHDRAWN.** The 24.9 reading —
+  0.064–0.497 · 0.523–0.617 · 0.642–0.913, taken off an installed door and put
+  through the one-dimensional homography its taper implies, checked against the
+  peephole's and the lever's own known heights — is kept in full beside
+  `trioRows`. What SURVIVES of it is what the derivation is built from: the
+  plate's height (0.094) and the two rails (0.026 and 0.025). Their coming out
+  equal is what made that reading credible, so they are kept as two figures
+  rather than averaged.
+
+  ⚠ **WHAT IT COSTS, MEASURED AND RECORDED RATHER THAN DISCOVERED LATER.** The
+  head rail goes from 131 mm to 246, so the trio loses the equal margins all
+  round that made the 14.9 reading credible; the plate drops 0.063 of the leaf —
+  129 mm, its centre from 0.570 to 0.633 — and the lower panel is 426 mm where it
+  was 556. The bow is centred on the plate by `gripIdeal` and follows it down,
+  still inside `HOME_REACH`, checked rather than assumed. That is his instruction
+  carried out; the alternative he ruled out is refusing the face.
+
+  ⚠ **THE REFUSAL DID NOT DISAPPEAR, IT MOVED TO THE WINDOW IT IS ABOUT — AND
+  THAT WAS MEASURED BEFORE ANYTHING WAS DELETED.** The brief said the reason
+  string could go with the rule. It cannot: the tall slot runs to 0.79 of the
+  leaf and its casing still lands in the plate — 488 mm on the standard leaf, 406
+  on `extra1`, 323 on `extra2` — so `panelUnderGlass` still answers `'plate'` and
+  `why.winPlate` still has a reader. Deleting it would have printed a raw key at
+  the first customer who tried the trio beside the slot. **The check was never
+  relaxed; the drawing moved.**
+
+  **PRICE — ASSUMPTION A21.** `DETAIL_GLAZED.panel3 = DETAIL.panel3 −
+  DETAIL.panel2`, ₪450, so a glazed trio is **₪7,445**: the glazed pair's ₪6,995
+  plus the handle plate. The window takes the upper panel and the plate and the
+  lower panel stay, so the trio draws exactly ONE panel more than a glazed pair
+  draws — and the pair is ₪0 on top of the window by A20, because its one panel
+  is the one `WINDOW.rect` already pays for. The only figure in the range that
+  says what the plate is worth is the difference between Peretz's own two solid
+  faces. ⚠ **Written as the expression and not as ₪450**: both are HIS numbers,
+  and a typed 450 would go on charging the old difference the day he moves
+  either one — §5.10 with money in it. `ASK-PERETZ.md` §0j asks him in one line;
+  he has priced two solid faces and never a glazed trio.
+
+  **THE ORDER SAYS WHAT IS DRAWN, AND IT NEEDED NO NEW STRING.**
+  `row.upperGlazed` — *"{0} — העליון הוחלף בחלון"* — arrived with the face,
+  because `keptUnderGlass` in `js/spec.js` is derived from `keeps` rather than
+  from an id. A map of ids to phrases would have printed "three panels" on a door
+  drawing two.
+
+  **ASSERTED, and two restatements rather than two deletions.**
+  · The group that said *"the three-panel face is the two-panel face with a plate
+    let in"* is renamed and its HEAD clause replaced. That clause — the trio's
+    head within 0.03 of the pair's — is now false by 0.050 and the claim it stood
+    for has moved: the upper rectangle IS the window's casing rectangle. The
+    replacement is strictly stronger, an EQUALITY to the millimetre on all six
+    sizes, read off `faceObstacles` on both sides (the trio's box and the
+    window's), which is what the placement rules believe is on the face and what
+    `npm run collide` checks against the drawing. The foot and the plate clauses
+    are untouched and still hold.
+  · The window group's *"the trio does not stand beside it"* becomes *"the plate
+    stands exactly one rail BELOW the casing"* — the same three readings off the
+    markup (`data-top`, `data-band`, the pane) with the sign the other way round
+    and the rail from the renderer's own constant, on every size. Beside it, the
+    clause that must stay true (§5.22): the SLOT still refuses the trio by the
+    plate and the tile still says so. The cheap way to make a glazed trio
+    buildable is to stop asking, and that is what catches it.
+  · Plus: the tile is not greyed beside the square window; the spec row on both
+    panelled faces in all three languages; and the price asserted as the
+    arithmetic on all six sizes with *"a panel that is charged for is a panel
+    that is drawn"* beside it.
+
+  ⚠ **AND THAT LAST CHECK HAD BEEN READING THE WRONG LEAF ON A DOUBLE, AGREEING
+  BY COINCIDENCE.** It took the FIRST `data-detail="panel"` group in the
+  document; on a דו כנפי that is the FIXED leaf's, which draws the window's own
+  lone panel and carries no `data-panels` at all — so the reader's fallback
+  scored it 1, which happened to be the right answer for every face that had ever
+  reached a double under glass. The trio becoming buildable made `paid` 2 and the
+  check reported the fixed leaf's 1: a true failure about a correct door, from a
+  check looking at the wrong object. It reads the group that DECLARES the count
+  now, with a clause that every declaring group agrees — the Greek set draws
+  itself on both leaves of a double and each declares its 1, which is fine; two
+  leaves declaring different counts is the fault the clause is for.
+
+  **FALSIFIED** by typing the 24.9 rows back: **30 faults beyond the sheet rows**
+  — six sizes × (the upper rectangle against the casing, the trio refused, the
+  rule saying `plate` by 76 mm, the drawing leaving −76 mm where the rail is 53,
+  the tile greyed).
+
+  **GATES.** `node --check js/renderer.js`, `npm run build`, `npm test`
+  **9,210,382 passed / 5 failed** — the five sheet-staleness rows, allowed on an
+  intermediate commit. `npm run collide -- all` **1,508 designs** (1,488 before —
+  the 20 are the glazed trio), `faceObstacles` agreeing with the drawing
+  everywhere, nothing overlapping. Measured against HEAD: the bow is placed on
+  **48** face × window × size states where it was placed on 42, and the 6 new ones
+  are exactly the glazed trio on the six sizes; **0** other placements moved.
+
+  **SHEETS: none may move, and one that moves is a finding.** No corpus door and
+  no recreate fixture carries `panel3` — the corpus's three-panel doors (d067,
+  d068, d077) are not among the thirty the gallery draws — so the drawing changed
+  on a face no committed sheet contains. Verified in the one run after the third
+  commit.
+
 - **27.9 — THE CURVED LEVER'S NAME IS PERMANENT, AND THE ONE SLOW RUN FOR THE
   THREE CHANGES.** The owner's son: *"Give the curved lever a permanent name."*
   He chose ידית מתעקלת / Curved lever / Изогнутая ручка — the label it had

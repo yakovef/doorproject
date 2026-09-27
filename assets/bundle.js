@@ -1110,8 +1110,26 @@
        refused the pair at ₪0 to avoid saying; the spec row names the
        composition instead. Whether a glazed two-panel door is really ₪3,800
        alone is Peretz's to say, and `ASK-PERETZ.md` asks it in one line. */
-    panel2: 0
+    panel2: 0,
     // 3195 + 3800 + 0 = 6995, the same as plain behind the same window
+    /* ⚠ AND THE TRIO IS THE PAIR'S DIFFERENCE, 27.9.2026 — ASSUMPTION A21, and
+       the one figure in this file that is written as arithmetic rather than as a
+       number. The owner's son made the trio buildable beside the square window
+       (the window takes its upper panel, the plate and the lower panel stay), so
+       a glazed trio draws exactly ONE panel more than a glazed pair draws: the
+       handle plate. The pair beside that window is ₪0 on top of it by A20,
+       because the one panel it draws is the panel `WINDOW.rect` already pays for.
+       So what the trio may charge is what the plate is worth, and the only figure
+       in the range that says so is the difference between Peretz's own two
+       solid faces — ₪1,900 for three, ₪1,450 for two.
+       It is the expression and not ₪450 deliberately: both of those are HIS
+       numbers, and the day he moves either one this row has to move with it or it
+       starts charging for something he did not say. A typed 450 would keep the
+       old difference in silence, which is §5.10 with money in it.
+       ⚠ It is still an ASSUMPTION — he priced two solid faces and has never
+       priced a glazed trio. `ASK-PERETZ.md` asks it in one line. */
+    panel3: DETAIL.panel3 - DETAIL.panel2
+    // ₪450 — the handle plate, and nothing else
   };
   var HANDLE = {
     none: 0,
@@ -5316,20 +5334,34 @@ ${body}
   var PANEL_INSET_MAX = 0.39;
   var PANEL_ROWS = {
     pair: [[0.07, 0.58], [0.66, 0.92]],
-    trio: [[0.064, 0.497], [0.523, 0.617], [0.642, 0.913]],
     top: [[0.07, 0.58]],
     lone: [0.68, 0.9]
   };
+  var TRIO_RAIL = [0.026, 0.025];
+  var TRIO_PLATE_H = 0.094;
+  var TRIO_FOOT = 0.913;
+  var squareWindow = () => {
+    const win = byId(WINDOWS, "rect");
+    if (!win || !win.frac) throw new Error("the square window has no frac: the trio is laid out against it");
+    return win;
+  };
+  var trioRows = (leafH) => {
+    const band = MOULD_BAND / leafH;
+    const { top, bot } = squareWindow().frac;
+    const upper = [top - band, bot + band];
+    const plate = [upper[1] + TRIO_RAIL[0], upper[1] + TRIO_RAIL[0] + TRIO_PLATE_H];
+    return [upper, plate, [plate[1] + TRIO_RAIL[1], TRIO_FOOT]];
+  };
   var PANEL_INSETS = {};
-  var panelRows = (detail) => detail.panels >= 3 ? PANEL_ROWS.trio : detail.panels === 2 ? PANEL_ROWS.pair : detail.top ? PANEL_ROWS.top : [PANEL_ROWS.lone];
+  var panelRows = (detail, leafH) => detail.panels >= 3 ? trioRows(leafH) : detail.panels === 2 ? PANEL_ROWS.pair : detail.top ? PANEL_ROWS.top : [PANEL_ROWS.lone];
   var panelInset = (detail) => (detail.panels >= 3 ? PANEL_INSETS.trio : null) ?? PANEL_INSET;
   function faceRowsOn(detail, win, openings, leafW, leafH) {
     const none = { rows: [], inset: 0, lone: false };
     if (detail.classic) return none;
     if (!openings.length) {
-      return detail.panel ? { rows: panelRows(detail), inset: leafW * panelInset(detail), lone: false } : none;
+      return detail.panel ? { rows: panelRows(detail, leafH), inset: leafW * panelInset(detail), lone: false } : none;
     }
-    const kept = (detail.keeps || []).map((i) => panelRows(detail)[i]).filter(Boolean);
+    const kept = (detail.keeps || []).map((i) => panelRows(detail, leafH)[i]).filter(Boolean);
     if (kept.length) return { rows: kept, inset: leafW * panelInset(detail), lone: false };
     if (!detail.panel && !win.panel) return none;
     const winBottom = Math.max(...openings.map((o) => o.top + o.h));
@@ -5530,7 +5562,7 @@ ${body}
       const fits = leafW - f.inset * 2 > MOULD_BAND * 2.2 && leafH * (b - t) > MOULD_BAND * 2.2;
       return fits ? null : { why: "room", by: 0 };
     }
-    const rows = panelRows(detail);
+    const rows = panelRows(detail, leafH);
     for (const i of detail.keeps) {
       const [t, b] = rows[i];
       const r = { x: f.inset, y: leafH * t, w: leafW - f.inset * 2, h: leafH * (b - t) };
@@ -5574,7 +5606,7 @@ ${body}
     const grabY = () => {
       if (detail.classic) return leafH * (CLASSIC_ROWS.band[0] + CLASSIC_ROWS.band[1]) / 2;
       if (panelled) {
-        const rows = panelRows(detail);
+        const rows = panelRows(detail, leafH);
         if (rows.length >= 3) return leafH * (rows[1][0] + rows[1][1]) / 2;
         if (rows.length === 2) return leafH * (rows[0][1] + rows[1][0]) / 2;
       }
@@ -8434,7 +8466,7 @@ ${body}
                        height="${H * (b - t)}" fill="none" stroke="currentColor"
                        stroke-width="36"/>`;
       })
-    ].join("") : !detail.panel ? "" : panelRows(detail).map(([t, b]) => panelAt(t, b)).join("");
+    ].join("") : !detail.panel ? "" : panelRows(detail, SIZES.standard.h - REBATE).map(([t, b]) => panelAt(t, b)).join("");
     return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
     <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
     ${panels}

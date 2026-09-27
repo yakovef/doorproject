@@ -360,6 +360,23 @@ export const DETAIL_GLAZED = {
      composition instead. Whether a glazed two-panel door is really ₪3,800
      alone is Peretz's to say, and `ASK-PERETZ.md` asks it in one line. */
   panel2: 0,         // 3195 + 3800 + 0 = 6995, the same as plain behind the same window
+  /* ⚠ AND THE TRIO IS THE PAIR'S DIFFERENCE, 27.9.2026 — ASSUMPTION A21, and
+     the one figure in this file that is written as arithmetic rather than as a
+     number. The owner's son made the trio buildable beside the square window
+     (the window takes its upper panel, the plate and the lower panel stay), so
+     a glazed trio draws exactly ONE panel more than a glazed pair draws: the
+     handle plate. The pair beside that window is ₪0 on top of it by A20,
+     because the one panel it draws is the panel `WINDOW.rect` already pays for.
+     So what the trio may charge is what the plate is worth, and the only figure
+     in the range that says so is the difference between Peretz's own two
+     solid faces — ₪1,900 for three, ₪1,450 for two.
+     It is the expression and not ₪450 deliberately: both of those are HIS
+     numbers, and the day he moves either one this row has to move with it or it
+     starts charging for something he did not say. A typed 450 would keep the
+     old difference in silence, which is §5.10 with money in it.
+     ⚠ It is still an ASSUMPTION — he priced two solid faces and has never
+     priced a glazed trio. `ASK-PERETZ.md` asks it in one line. */
+  panel3: DETAIL.panel3 - DETAIL.panel2,   // ₪450 — the handle plate, and nothing else
 };
 
 /* ── the pull handle ───────────────────────────────────────────────────
