@@ -127,3 +127,17 @@ windows). Three things were narrowed on the way in:
 - Every sheet carrying a Coral moves, as it should: name them.
 - §9's open question — the rose against the leaf — gets four readings from this
   set: 0.074–0.078 of an assumed 850 mm leaf.
+
+## 27.9, later: the reach, 128 → 133
+
+The table above shrank the photographed reach 4% about the spindle "for
+parallax" (133 → 128). That runs the wrong way: a lever standing proud,
+photographed from the door's middle, reads SHORT from its spindle. Measuring the
+Rotem showed it (`../rotem/README.md`, *The camera, and why the levers are drawn
+as photographed*). How big the camera's effect is in these photographs is not
+settled — the full 1x-lens correction would make the reach ~138 and stop the
+round root at the spindle, which a root sitting on its neck cannot do — so the
+reach is now the photographs' own **133**, the root still 11.5 past the spindle
+where the doors read 12 / 10 / 9. `handleFootprint`'s `in` 135 → 140 (drawn 133
+plus the 7 mm margin), the square plate's likewise. `sheet-reach-before-after.webp`
+is the four windows: photograph, 128, 133.

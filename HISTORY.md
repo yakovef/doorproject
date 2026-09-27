@@ -26,6 +26,58 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE ROTEM INTO THE APP, THE CORAL AND CURVED LEVER TO THEIR
+  PHOTOGRAPHED REACH, AND A STANDING PERMISSION.** The owner's son, on the
+  Rotem sheet: *"yes put it in and fix the coral and curved. and form now on i
+  want you to put in the app things without my permission, it just wastes time
+  for me."* Recorded in `CLAUDE.md` §0a; *"Don't deploy"* is untouched.
+  · **The Rotem, as proposed, with one change: the lever's position.** Plate
+    88.5 x 224, flat head, straight sides, a foot 1.16x deeper than a
+    semicircle, spindle at 0.295; `rotemFace` (hwTone[2], one satin tone) and
+    `rotemLever` beside `roseFace`, so it follows every finish; the key an egg
+    26 x 42 at 101 with the slot at 93.5; an even `LEVER_BLADE` strap, no
+    collar. The proposal had taken a parallax correction out of the lever
+    (reach 119, root 11.5 past the spindle); the app draws it as photographed —
+    reach 114, root 19, the dark bend from the root end to 9 on the tip side.
+  · **Why as photographed.** Checking the size of the correction before
+    changing two levers by it: each photograph's camera, recovered from its
+    leaf's four corners with a 1x phone lens, stood 1.8-1.95 m in front of the
+    door's middle at 0.9-1.2 m, which moves a 55-60 mm-proud lever ~9 mm. Two
+    independent checks did not support that much. (1) The Coral's round root
+    would end 0-2 mm past its spindle, unable to cover the neck it sits on; as
+    photographed it ends 9-12 past, concentric with a neck. (2) The model
+    predicts each blade's vertical offset from its rose door by door: +0.8 /
+    +5.3 / +1.7 / -2.4 on the four Coral doors, measured +0.7 / +4.3 / +4.9 /
+    +1.4 — two of four; a half-strength model fits better (RMS 1.4 against 2.1
+    mm), and the curved doors' one difference matched (3.5 against 3.6). The
+    DIRECTION is physics — a lever pointing back toward the camera's axis reads
+    short, never long — the size is between nothing and ~10 mm. So all three
+    levers are drawn with no camera term, which is the one reading that
+    assumes nothing, and a ruler on one real lever settles the rest (§9).
+    ⚠ This walked back the Rotem commit's own claim that the Coral and curved
+    lever were "~8% short": they were 3-4% short, shrunk the wrong way.
+  · **The Coral 128 -> 133 and the curved lever's tip 106 -> 109**
+    (`LEVER_REACH`; `TAPER_REACH` 102 -> 104.5): their READMEs had shrunk the
+    photographed 133 and 109 about the spindle "for parallax", which is the
+    wrong direction. The curved lever's depths were always read at the
+    photographs' 30 / 70 / 100 mm and did not move (drawn 21.1 / 14.6 / 9.7).
+  · **Footprints re-measured by `npm run collide -- boxes`:** coral `in` 135 ->
+    140 and square 135 -> 140 (drawn 133 + the 7 mm margin); levertaper 114 ->
+    116 (drawn 109 + 7); plate 47 / 119 / 170 -> 47 / 114 / 161 (drawn 45 /
+    114 / 159, the margins it always carried).
+  · **The tile** is drawn from `PLATE`, the door's own numbers — flat head,
+    straight sides, the deep foot, the egg; it had drawn a 90 x 240 stadium
+    and a 152 mm blade. `CLAUDE.md` §9's tile item is closed.
+  · **Citations:** `plate` cites `research/handles/rotem/door-1.jpg` (its name
+    question, `ASK-PERETZ` §1f, answered by the owner's son's photographs),
+    `lever-taper` cites `research/handles/curved/door-1.jpg`. So no fitting is
+    drawn from nothing any more, and `test/units.mjs`'s blind-fitting gate is
+    TIGHTENED from `<= 2` to `=== 0`, as its own comment requires (a gate with
+    margin in it passes the next mistake).
+  · New sheets: `research/handles/rotem/sheet-photo-before-app.webp`,
+    `…/coral/sheet-reach-before-after.webp`, `…/curved/sheet-reach-before-after.webp`.
+  · Gates at this commit: `collide -- all` 1,508 designs clean and `-- boxes` clean (the four footprints above re-declared); `npm test` 9,118,784 passed with only the five stale-sheet failures, then `npm run sheets` — 33 sheets moved, every one only in a lever-sized patch at lock height (10 `against-` by 231 px at their edge, 8 `corpus-`, 6 `recreate-`, `lockset-coral` and `lockset-plate`, and 7 `shot`); the rerun of `npm test` and `npm run audit` are recorded in the next commit.
+
 - **27.9 — THE ROTEM, MEASURED OFF THREE INSTALLED DOORS: A PROPOSAL.** The
   owner's son: *"here is 3 doors with the rotem handle."* The Rotem (`plate`) is
   the DEFAULT lockset, on the door every visitor sees first. Per §0a the app is
@@ -856,6 +908,16 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** The round's gates re-read, and ⚠ **`npm run latency`'s milliseconds
+  turn out to be a reading of the CONTAINER**: the jump 183 → 321/339/386 ms was
+  investigated instead of written down, and `6934c0d` run beside this commit,
+  three each interleaved, gives medians 262 and 275 with overlapping ranges and
+  one new run faster than one old — no difference between the code. The same
+  `6934c0d` that recorded 183 ms reads 262 here, so this container is ~1.4×
+  slower and a single run's spread is ~90 ms. §0c and §7 now say to compare the
+  ELEMENT COUNTS (261 · 531 · 656) and how to run the two commits side by side.
+  Audit clean at all eight `VIEWS`; test 9,210,648 / 0; sheets 0 bare, 0 lockset.
+  Long form: `HISTORY.md`.
 - **27.9** The square window displaces NO face now, and the two audit clauses
   about that displacement are restated (§5.27 — a new shape). The trio commit
   stranded two of them, not one: the first guarded its own precondition and

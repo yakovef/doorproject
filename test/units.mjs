@@ -1764,9 +1764,14 @@ group('every handle and lockset says what it was drawn from');
      drawn from nothing has to stop somebody, because "we already had two" is
      how a list becomes ten. ⚠ Exact rather than slack on purpose — a gate
      with margin in it is a gate that passes the next mistake. */
-  ok(blind.length <= 2,
+  /* ⚠ 2 -> 0 ON 27.9.2026, TIGHTENED BECAUSE THE TWO GOT THEIR EVIDENCE: the
+     owner's son sent three installed doors of each (research/handles/rotem/,
+     research/handles/curved/), both were redrawn off them, and both cite them.
+     The gate follows the known count down, as its comment says it must: a
+     gate with margin in it passes the next mistake. */
+  ok(blind.length === 0,
      `${blind.length} fittings are drawn from no photograph and no named door `
-     + `(${blind.join(', ')}) — two are known and recorded; a new one needs `
+     + `(${blind.join(', ')}) — none is known; a new one needs `
      + `evidence, or a question in ASK-PERETZ, not a row on its own`);
   console.log(`  (${withPhoto} product cut-outs, ${withDoors} with corpus doors, `
     + `${blind.length} drawn from neither: ${blind.join(', ') || 'none'})`);

@@ -1651,7 +1651,12 @@
        black inlay stripe, not a backplate. Either RB sells two products under
        the name or this label is on the wrong row. `photo: null` rather than a
        citation of those files, because citing them would assert the very thing
-       that is in doubt. `ASK-PERETZ.md` §1f asks. */
+       that is in doubt. `ASK-PERETZ.md` §1f asks.
+       ✅ ANSWERED 27.9.2026 by the owner's son, with three photographs of
+       installed doors: *"here is 3 doors with the rotem handle"* — this row, the
+       lever on its backplate. What RB calls its striped bar is RB's business;
+       the label is on the right row. The plate was redrawn off those doors
+       (research/handles/rotem/), and they are its citation. */
     {
       id: "plate",
       he: "רותם",
@@ -1661,7 +1666,7 @@
       lock: true,
       lever: true,
       aliases: ["longplate"],
-      photo: null
+      photo: "research/handles/rotem/door-1.jpg"
     },
     {
       id: "cadoor",
@@ -1793,9 +1798,10 @@
          (This note also said it priced as the Coral at ₪0 "until he says
          otherwise". He said otherwise on 20.9 — ₪200, `LOCKSET` in prices.js,
          A19 closed — and the sentence stayed here a week.) */
-    /* `photo: null` — it is the drawing the Coral used to be, asked for by the
-       owner from the screen rather than from a product. If a cut-out turns out
-       to match it, that is A0's question and not an assumption to make here. */
+    /* It was `photo: null` — "the drawing the Coral used to be, asked for by the
+       owner from the screen rather than from a product". Since 27.9.2026 it is
+       measured off three installed doors (research/handles/curved/), and the
+       first of them is its citation. */
     {
       id: "lever-taper",
       he: "ידית מתעקלת",
@@ -1803,7 +1809,7 @@
       ru: "Изогнутая ручка",
       style: "levertaper",
       lever: true,
-      photo: null
+      photo: "research/handles/curved/door-1.jpg"
     }
   ];
   var PIRZUL2 = [
@@ -3284,9 +3290,9 @@ ${stops}
   var LEVER_ROSETTE = 31.5;
   var CORAL_LOCK_R = 35;
   var escutcheonR = (lockset) => lockset && lockset.escutcheon === "covered" ? CORAL_LOCK_R : LOCK_R;
-  var LEVER_REACH = 128;
+  var LEVER_REACH = 133;
   var LEVER_BLADE = 23;
-  var TAPER_REACH = 102;
+  var TAPER_REACH = 104.5;
   var TAPER_ROSE = LEVER_ROSETTE;
   var TAPER_RISE = [4.5, 30, 0.5];
   var TAPER_HALF = [13, 4.5];
@@ -3321,20 +3327,31 @@ ${stops}
   var GRAB = { fromTop: 0.59, len: 280, ratio: 1 / 15, post: [0.175, 0.825] };
   var GRAB_D = GRAB.len * GRAB.ratio;
   var PLATE = {
-    w: 90,
-    // 0.095 W
-    h: 240,
-    // 0.114 H, aspect 2.67
-    waist: 0.91,
-    // of the end width — a pinch, not an hourglass
-    lever: 0.3,
-    // spindle, as a fraction down the plate
-    key: 0.74,
-    // cylinder, same
-    reach: 1.32,
-    // lever tip from the spindle, in plate widths
-    bar: 0.36
-    // lever thickness at the root, in plate widths
+    w: 88.5,
+    // 87.3 / 91.7 / 86.5 by edge profile (87 / 93 / 90 off a ruled grid); was 90
+    h: 224,
+    // head -65.6 to foot 158.5 off the spindle, by edge profile; was 240
+    head: 9,
+    // the head is FLAT, its two corners 8-13 / 7-8 / 8.5-10 in radius
+    foot: 1.16,
+    // the foot: a half-ellipse DEEPER than a semicircle, ry of rx —
+    // fitted to the plate's width 122-154 mm below the spindle,
+    // all three doors within 3 mm (a first reading by eye, 0.86,
+    // read 3-8 mm too narrow low down)
+    lever: 0.295,
+    // spindle, as a fraction down the plate (0.302 0.299 0.282)
+    plug: 93.5,
+    // spindle -> the cylinder's key slot, mm (92.5 / 93 / 95)
+    bezel: [26, 42, 101],
+    // the euro opening's raised rim: width (26 / 27 / 25),
+    // height (44 / 42 / 40), centre below the spindle — an EGG
+    // narrowing downward, where a black keyhole was drawn
+    reach: 114,
+    // spindle -> lever tip, mm, AS PHOTOGRAPHED: 111 / 117.5 / 114
+    root: 19,
+    // the lever's round root ends this far PAST the spindle: 21 / 18 / 19
+    bend: 9
+    // its dark bend runs from the root end to this far on the tip side: 9 / 6 / 12
   };
   var PAD = { x: 70, top: 110, bottom: 300 };
   var SCENE = 8e3;
@@ -3994,6 +4011,20 @@ ${stops}
       <stop offset="0.98" stop-color="${hwTone[0]}"/>
       <stop offset="1"    stop-color="${hwTone[3]}"/>
     </radialGradient>
+    <!-- THE ROTEM'S PLATE AND LEVER, on hwTone so they follow the פרזול (27.9).
+         The plate is ONE satin tone, the rose's own centre; the lever is lit
+         along its top arris and rolls away underneath. The banded chrome
+         plateFace stays the ספיר's square plate's. -->
+    <linearGradient id="rotemFace" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${hwTone[2]}"/>
+      <stop offset="1" stop-color="${hwTone[2]}"/>
+    </linearGradient>
+    <linearGradient id="rotemLever" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="${hwTone[0]}"/>
+      <stop offset="0.45" stop-color="${hwTone[1]}"/>
+      <stop offset="0.80" stop-color="${hwTone[2]}"/>
+      <stop offset="1"    stop-color="${hwTone[3]}"/>
+    </linearGradient>
 
     <!-- WARNING: THE GRIP'S OWN PAIR, AND WHY THERE HAS TO BE A SECOND SET.
          One gradient cannot serve two masters: grabHandle is a PULL HANDLE
@@ -7137,8 +7168,10 @@ ${body}
          fine. Re-measured by `npm run collide -- boxes`, which used to report
          half the height and now reports the reach, for the same reason `out` and
          `in` stopped being one symmetric `hx`. */
+      /* `in` 135 -> 140 ON 27.9.2026 with the reach 128 -> 133 (as photographed):
+         drawn 133 by `npm run collide -- boxes`, plus the Coral's own 7 mm. */
       case "lever":
-        return { out: 40, in: 135, vy: 51 };
+        return { out: 40, in: 140, vy: 51 };
       /* The curved lever: shorter than the Coral (0.85 of the reach) and no
          wider anywhere, so it sits inside the Coral's declaration on every axis.
          Declared on its own anyway rather than shared, because it is a different
@@ -7147,10 +7180,14 @@ ${body}
       /* ⚠ `in` 118 → 114 ON 27.9.2026: re-measured off three installed doors the
          blade reaches 107 (106 to its tip), so 118 kept bars 11 mm away from
          metal that is not there. 114 is the Coral's own 7 mm margin (128 → 135). */
+      /* 114 -> 116 on 27.9 with the tip 106 -> 109: drawn 109, plus 7. */
       case "levertaper":
-        return { out: 40, in: 114, vy: 51 };
+        return { out: 40, in: 116, vy: 51 };
+      /* The Rotem, re-measured 27.9 off its redrawn plate (88.5 x 224, the
+         lever 114 as photographed): drawn out 45 / in 114 / vy 159, declared
+         with the margins it always carried (+2, 0, +2). Was 47 / 119 / 170. */
       case "plate":
-        return { out: 47, in: 119, vy: 170 };
+        return { out: 47, in: 114, vy: 161 };
       case "almog":
         return { out: 42, in: 220, vy: 42 };
       /* ⚠ `out` WAS 78 AND THE DRAWING REACHES 41. Reported from outside as
@@ -7176,7 +7213,8 @@ ${body}
       case "digital":
         return { out: 28, in: 33, vy: 145 };
       case "square":
-        return { out: 41, in: 135, vy: 149 };
+        return { out: 41, in: 140, vy: 149 };
+      // the Coral's lever: 135 -> 140 on 27.9
       case "shiran":
         return { out: 43, in: 43, vy: 240 };
       default: {
@@ -7421,65 +7459,109 @@ ${body}
   function plateHandle(cx, cy, dir) {
     const w = PLATE.w, h = PLATE.h, r = w / 2;
     const top = cy - h * PLATE.lever, bot = top + h;
-    const wh = w * PLATE.waist / 2;
-    const keyY = top + h * PLATE.key;
+    const k = PLATE.head, fy = r * PLATE.foot;
+    const yF = bot - fy;
+    const f = (n) => n.toFixed(2);
     const at = (t) => cx + dir * t;
-    const reach = w * PLATE.reach, bar = w * PLATE.bar / 2;
-    const rT = w * 0.3, rB = w * 0.4;
-    const rb = r * 0.9;
-    const yA = top + rT, yB = bot - rB, mid = (yA + yB) / 2;
-    const kA = (mid - yA) * 0.62, kB = (yB - mid) * 0.62;
-    const outline = `M ${cx - r} ${yA}
-    C ${cx - r} ${top + rT * 0.45} ${cx - r * 0.55} ${top} ${cx} ${top}
-    C ${cx + r * 0.55} ${top} ${cx + r} ${top + rT * 0.45} ${cx + r} ${yA}
-    C ${cx + r} ${yA + kA} ${cx + wh} ${mid - kA * 0.6} ${cx + wh} ${mid}
-    C ${cx + wh} ${mid + kB * 0.6} ${cx + rb} ${yB - kB} ${cx + rb} ${yB}
-    C ${cx + rb} ${bot - rB * 0.35} ${cx + rb * 0.62} ${bot} ${cx} ${bot}
-    C ${cx - rb * 0.62} ${bot} ${cx - rb} ${bot - rB * 0.35} ${cx - rb} ${yB}
-    C ${cx - rb} ${yB - kB} ${cx - wh} ${mid + kB * 0.6} ${cx - wh} ${mid}
-    C ${cx - wh} ${mid - kA * 0.6} ${cx - r} ${yA + kA} ${cx - r} ${yA} Z`;
-    const lever2 = `
-      <path d="M ${at(6)} ${cy - bar + 3} L ${at(reach - 14)} ${cy - bar + 6}
-               Q ${at(reach)} ${cy - bar + 6} ${at(reach)} ${cy + 2}
-               Q ${at(reach)} ${cy + bar + 4} ${at(reach - 14)} ${cy + bar + 4}
-               L ${at(6)} ${cy + bar + 6} Z"
-            fill="#000" opacity="0.26" filter="url(#hwShadow)"/>
-      <!-- the collar first: the lever swells out of it -->
-      <ellipse cx="${at(1)}" cy="${cy}" rx="16" ry="${bar * 1.25}" fill="url(#nickel)"/>
-      <path d="${arcPath(at(1), cy, bar * 1.1, 150, 320)}" fill="none"
-            stroke="#fff" stroke-opacity="0.5" stroke-width="2"/>
-      <path d="M ${at(0)} ${cy - bar} L ${at(reach - 18)} ${cy - bar * 0.62}
-               Q ${at(reach)} ${cy - bar * 0.62} ${at(reach)} ${cy + bar * 0.1}
-               Q ${at(reach)} ${cy + bar * 0.8} ${at(reach - 18)} ${cy + bar * 0.8}
-               L ${at(0)} ${cy + bar} Z"
-            fill="url(#nickel)"/>
-      <path d="M ${at(3)} ${cy - bar + 2} L ${at(reach - 14)} ${cy - bar * 0.62 + 2}
-               L ${at(reach - 14)} ${cy - bar * 0.62 + 5} L ${at(3)} ${cy - bar + 6} Z"
-            fill="#fff" opacity="0.95"/>
-      <path d="M ${at(3)} ${cy + bar - 7} L ${at(reach - 16)} ${cy + bar * 0.8 - 5}
-               L ${at(reach - 16)} ${cy + bar * 0.8} L ${at(3)} ${cy + bar} Z"
-            fill="#000" opacity="0.46"/>`;
+    const u = Math.round(cx) + "-" + Math.round(cy);
+    const outline = `M ${f(cx - r)} ${f(top + k)}
+    A ${k} ${k} 0 0 1 ${f(cx - r + k)} ${f(top)} L ${f(cx + r - k)} ${f(top)}
+    A ${k} ${k} 0 0 1 ${f(cx + r)} ${f(top + k)} L ${f(cx + r)} ${f(yF)}
+    A ${f(r)} ${f(fy)} 0 0 1 ${f(cx - r)} ${f(yF)} Z`;
+    const D = LEVER_BLADE, hd = D / 2;
+    const L2 = PLATE.reach;
+    const T2 = cy - hd, B = cy + hd;
+    const rc = hd * 0.7;
+    const t0 = -PLATE.root + hd;
+    const sw = dir > 0 ? 1 : 0;
+    const blade = (a, b, yT, yB, tipR = rc) => {
+      const rr = (yB - yT) / 2;
+      return `M ${f(at(a))} ${f(yT)} L ${f(at(b - tipR))} ${f(yT)}
+      A ${f(tipR)} ${f(tipR)} 0 0 ${sw} ${f(at(b))} ${f(yT + tipR)} L ${f(at(b))} ${f(yB - tipR)}
+      A ${f(tipR)} ${f(tipR)} 0 0 ${sw} ${f(at(b - tipR))} ${f(yB)} L ${f(at(a))} ${f(yB)}
+      A ${f(rr)} ${f(rr)} 0 0 ${sw} ${f(at(a))} ${f(yT)} Z`;
+    };
+    const body = blade(t0, L2, T2, B);
+    const band = (fr, bw2, a) => {
+      const x = at(L2 * fr) - bw2 / 2;
+      return `<rect x="${f(x)}" y="${f(T2 + D * 0.1)}" width="${bw2}" height="${f(D * 0.8)}"
+                  fill="url(#rotemBand-${u})" opacity="${a}"/>`;
+    };
+    const [bw, bh, bc] = PLATE.bezel;
+    const eR = bw / 2, eTop = cy + bc - bh / 2, eBot = cy + bc + bh / 2;
+    const eR2 = eR * 0.59;
+    const egg = (s, dy = 0) => {
+      const R1 = eR * s, R2 = eR2 * s;
+      const c1 = eTop + eR + dy, c2 = eBot - eR2 + dy;
+      const yT = c1 - R1, yB = c2 + R2;
+      return `M ${f(cx - R1)} ${f(c1)} A ${f(R1)} ${f(R1)} 0 0 1 ${f(cx + R1)} ${f(c1)}
+      L ${f(cx + R2)} ${f(c2)} A ${f(R2)} ${f(R2)} 0 0 1 ${f(cx - R2)} ${f(c2)} Z`;
+    };
+    const ky = cy + PLATE.plug;
     return `
     <g>
-      <path d="${outline}" transform="translate(${dir * 13} 16)"
-            fill="#000" opacity="0.40" filter="url(#hwShadow)"/>
+      <linearGradient id="rotemBand-${u}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"   stop-color="#fff" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#fff" stop-opacity="1"/>
+        <stop offset="1"   stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="rotemFace-${u}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="#fff" stop-opacity="0.10"/>
+        <stop offset="0.45" stop-color="#fff" stop-opacity="0"/>
+        <stop offset="1"    stop-color="#000" stop-opacity="0.10"/>
+      </linearGradient>
+      <!-- the rounded edge catches the key light on its left and fades out
+           across the plate: no hard start anywhere on the outline -->
+      <linearGradient id="rotemRim-${u}" x1="0" y1="0" x2="1" y2="0.25">
+        <stop offset="0"    stop-color="#fff" stop-opacity="0.42"/>
+        <stop offset="0.35" stop-color="#fff" stop-opacity="0.26"/>
+        <stop offset="0.70" stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="rotemShadow-${u}" x="-20%" y="-150%" width="140%" height="400%">
+        <feGaussianBlur stdDeviation="7"/>
+      </filter>
 
-      <!-- the plate: mid-dark face, bright rim, one lit band off centre -->
-      <path data-mount="backplate" d="${outline}" fill="url(#plateFace)"/>
-      <path d="${outline}" fill="none" stroke="#fff" stroke-opacity="0.62" stroke-width="3.4"
-            transform="translate(${dir * 1.2} -1.6)"/>
-      <path d="${outline}" fill="none" stroke="#000" stroke-opacity="0.46" stroke-width="2.4"
-            transform="translate(${dir * -1.8} 2.4)"/>
-      <path d="${outline}" fill="none" stroke="#000" stroke-opacity="0.30" stroke-width="1"/>
+      <!-- the plate stands ~8 mm proud: a short, soft shadow -->
+      <path d="${outline}" transform="translate(2 5)"
+            fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
 
-      <!-- raised oval boss carrying the euro keyway -->
-      <ellipse cx="${cx}" cy="${keyY}" rx="17" ry="25" fill="url(#nickelSoft)"/>
-      <ellipse cx="${cx - 1}" cy="${keyY - 1}" rx="15" ry="23" fill="none"
-               stroke="#fff" stroke-opacity="0.42" stroke-width="1.6"/>
-      <ellipse cx="${cx}" cy="${keyY}" rx="11" ry="18" fill="#000" opacity="0.20"/>
-      ${keyway(cx, keyY - 1, 0.85)}
+      <!-- the plate: one satin face, a lit rounded edge on the key's side and
+           along the foot, a darker one opposite -->
+      <path data-mount="backplate" d="${outline}" fill="url(#rotemFace)"/>
+      <path d="${outline}" fill="#000" opacity="0.14"/>
+      <path d="${outline}" fill="url(#rotemFace-${u})"/>
+      <path d="${outline}" fill="none" stroke="#000" stroke-opacity="0.34" stroke-width="1.4"
+            transform="translate(0.9 0.7)"/>
+      <path d="${outline}" fill="none" stroke="url(#rotemRim-${u})" stroke-width="1.3"
+            transform="translate(-0.5 -0.4)"/>
 
-      ${lever2}
+      <!-- the euro opening: a raised rim lit along its top, a thin dark gap,
+           the cylinder's face, and its key slot -->
+      <path d="${egg(1)}" fill="none" stroke="#000" stroke-opacity="0.26" stroke-width="1.2"
+            transform="translate(0.5 0.8)"/>
+      <path d="${egg(0.86)}" fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="2.4"/>
+      <path d="${egg(0.7, 0.5)}" fill="#000" opacity="0.26"/>
+      <g data-hw="keyway">
+        <path d="${egg(0.62, 0.7)}" fill="url(#euroSteel)"/>
+        <rect x="${f(cx - 5)}" y="${f(ky - 1.1)}" width="10" height="2.2" rx="1" fill="#121417" opacity="0.85"/>
+      </g>
+
+      <!-- the lever's shadow: it stands ~55 mm proud -->
+      <path d="${blade(t0 + 6, L2, T2, B)}" transform="translate(4 15)"
+            fill="#000" opacity="0.30" filter="url(#rotemShadow-${u})"/>
+
+      <!-- the lever: a satin strap -->
+      <path d="${body}" fill="url(#rotemLever)"/>
+      <path d="${blade(t0 + 2, L2 - rc * 0.8, T2 + D * 0.05, T2 + D * 0.16, 1.2)}" fill="#fff" opacity="0.40"/>
+      <path d="${blade(t0 + 2, L2 - rc * 0.8, T2 + D * 0.8, T2 + D * 0.97, 1.6)}" fill="#000" opacity="0.22"/>
+      ${band(0.58, 24, 0.42)}
+      ${band(0.82, 12, 0.34)}
+
+      <!-- the bend back into the plate: dark from the root end to PLATE.bend
+           on the tip side of the spindle -->
+      <path d="${blade(t0, PLATE.bend, T2 + 1.2, B - 1.2, hd * 0.8)}" fill="#000" opacity="0.72"/>
+      <path d="${arcPath(at(t0), cy, hd - 1.2, dir > 0 ? 110 : 290, dir > 0 ? 250 : 70)}" fill="none"
+            stroke="#fff" stroke-opacity="0.22" stroke-width="1.2"/>
     </g>`;
   }
   function almogLever(cx, cy, dir) {
@@ -8225,19 +8307,25 @@ ${body}
     almog: () => ({ box: [-244, -62, LOCK_R + 13, 46], art: `
     <circle cx="0" cy="0" r="${LOCK_R}"/>
     <path d="M 0 13 L -218 -47 L -218 -26 L 0 29 Z"/>` }),
-    // Rotem: lever and cylinder on one waisted backplate.
-    /* ⚠ ITS LEVER FOLLOWS `LEVER_BLADE`; ITS PLATE IS STILL ITS OWN AND IS A
-       KNOWN DRIFT, recorded in §9 rather than guessed at. The plate here is
-       90 x 240 where the door's is about 166 x 340 — not one scale in both axes,
-       so it cannot be closed by multiplying, and closing it properly means
-       deriving this glyph from the same outline the door draws and then
-       re-running the pairwise raster check, which is a redraw rather than a
-       constant swap. */
-    plate: () => ({ box: [-172, -88, 56, 184], art: `
-    <rect x="-45" y="-72" width="90" height="240" rx="45"/>
-    <rect x="-152" y="${-LEVER_BLADE / 2}" width="152" height="${LEVER_BLADE}"
-          rx="${LEVER_BLADE / 2}"/>
-    <circle cx="0" cy="106" r="13" fill="var(--paper, #EFEDE8)"/>` }),
+    // Rotem: lever and cylinder on one backplate — flat head, straight sides,
+    // the deep foot, the egg the key sits in. Every number is PLATE's, the
+    // door's own, so the tile cannot drift from the door (27.9; until then the
+    // tile drew a 90 x 240 stadium and a 152 mm blade against the door's 119).
+    plate: () => {
+      const r = PLATE.w / 2, top = -PLATE.h * PLATE.lever, bot = top + PLATE.h;
+      const k = PLATE.head, fy = r * PLATE.foot, yF = bot - fy;
+      const hd = LEVER_BLADE / 2, L2 = PLATE.reach;
+      const [bw, bh, bc] = PLATE.bezel, e1 = bw / 2 * 0.8, e2 = e1 * 0.59;
+      const c1 = bc - bh / 2 + bw / 2, c2 = bc + bh / 2 - bw / 2 * 0.59;
+      return { box: [-(L2 + 18), top - 16, r + 16, bot + 16], art: `
+    <path d="M ${-r} ${top + k} A ${k} ${k} 0 0 1 ${-r + k} ${top} L ${r - k} ${top}
+             A ${k} ${k} 0 0 1 ${r} ${top + k} L ${r} ${yF.toFixed(2)}
+             A ${r} ${fy.toFixed(2)} 0 0 1 ${-r} ${yF.toFixed(2)} Z"/>
+    <rect x="${-L2}" y="${-hd}" width="${L2 + PLATE.root}" height="${LEVER_BLADE}" rx="${hd}"/>
+    <path d="M ${-e1} ${c1} A ${e1} ${e1} 0 0 1 ${e1} ${c1} L ${e2.toFixed(2)} ${c2.toFixed(2)}
+             A ${e2.toFixed(2)} ${e2.toFixed(2)} 0 0 1 ${-e2.toFixed(2)} ${c2.toFixed(2)} Z"
+          fill="var(--paper, #EFEDE8)"/>` };
+    },
     // Knob on a long backplate — the plate carries the keyway too.
     knobplate: () => ({ box: [-58, -118, 58, 214], art: `
     <rect x="-48" y="-102" width="96" height="300" rx="30"/>

@@ -125,16 +125,22 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   it against the catalogue (never add one we have or Peretz withdrew), rectify
   each leaf through its four corners onto 850 × 2050 mm, measure, draw it in a
   scratch copy of the renderer (`tools/_<name>/`, gitignored), compare photo |
-  shipped | proposed at one scale, correct, and **send the sheet — the app is
-  not touched until they say.** Photographs, sheets, readings and the proposed
-  code are committed under `research/handles/<name>/`. A new product needs
+  shipped | proposed at one scale, correct, **put it in the app, run the gates,
+  and send the sheet.** Photographs, sheets, readings and the proposed code
+  are committed under `research/handles/<name>/`. A new product needs
   Peretz's name and price before it can be sold. This work lives on
   `claude/door-handle-design-catalog-votz53`, their choice.
   ⚠ **A lever stands ~55 mm proud, and a photograph taken from the door's
-  middle MOVES it toward the closing edge** — it reads short from the spindle —
-  rather than magnifying it about the spindle. Correct each point by its own
-  distance from the camera's axis (`research/handles/rotem/README.md`); the
-  Coral and the curved lever were corrected the other way (§9).
+  middle MOVES it toward the closing edge** — it reads short from the spindle,
+  never long. How far is NOT settled by a door photograph (0 to ~10 mm here),
+  so levers are drawn **as photographed**; the Coral and curved lever had been
+  shrunk the wrong way and were fixed 27.9 (§9, `research/handles/rotem/README.md`).
+- ⚠ **PUT IT IN THE APP WITHOUT ASKING — a standing instruction since 27.9.2026:**
+  *"from now on i want you to put in the app things without my permission, it
+  just wastes time for me."* Do the work, run the gates, commit, merge the
+  handle branch into `claude/door-builder-website-plan-rgg7gu` and push both,
+  then report what changed with a picture. It does not touch **"Don't deploy"**,
+  which still stands, nor the rules in §1.
 
 ---
 
@@ -144,6 +150,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The Rotem INTO THE APP (*"yes put it in and fix the coral and curved"*),
+  with its lever as photographed (reach 114, root 19 past), and the Coral 128 →
+  133 and curved lever 106 → 109 — their "parallax" shrink ran the wrong way; the
+  full correction's size did not hold up, so all three are drawn as photographed.
+  Tile redrawn from `PLATE`; footprints re-measured; the blind-fitting gate 2 → 0.
+  ⚠ Standing instruction: put things in the app without asking (§0a).
 - **27.9** The Rotem — the DEFAULT lockset — measured off three installed doors,
   a PROPOSAL with the app untouched (`research/handles/rotem/`): a flat head,
   straight sides and a foot 1.16× deeper than a semicircle (we drew a waisted
@@ -171,16 +183,6 @@ lines here. Dates are the day of the change.
   word: fit, lock, glass, mk, sum. The spec's `handle` row now shares `grip`
   (six rows by reference, asserted). Worst nav pairs 0.60. Long form:
   `HISTORY.md`.
-- **27.9** The round's gates re-read, and ⚠ **`npm run latency`'s milliseconds
-  turn out to be a reading of the CONTAINER**: the jump 183 → 321/339/386 ms was
-  investigated instead of written down, and `6934c0d` run beside this commit,
-  three each interleaved, gives medians 262 and 275 with overlapping ranges and
-  one new run faster than one old — no difference between the code. The same
-  `6934c0d` that recorded 183 ms reads 262 here, so this container is ~1.4×
-  slower and a single run's spread is ~90 ms. §0c and §7 now say to compare the
-  ELEMENT COUNTS (261 · 531 · 656) and how to run the two commits side by side.
-  Audit clean at all eight `VIEWS`; test 9,210,648 / 0; sheets 0 bare, 0 lockset.
-  Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -819,6 +821,16 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
   The Coral brings its own **covered** escutcheon (`escutcheon: 'covered'`, 70
   mm, plug 5 mm above centre, no euro keyhole; `escutcheonR` is what the rules
   clear); every other lever keeps the open-euro one (66).
+  **The Rotem (`plate`, the DEFAULT) is measured too since 27.9**
+  (`research/handles/rotem/`): a flat-headed plate 88.5 × 224 with straight
+  sides and a foot 1.16× deeper than a semicircle (it was a waisted 90 × 240),
+  one satin tone (`rotemFace`, the rose's centre) rather than banded chrome, a
+  raised egg round the key instead of a black keyhole, and an even
+  `LEVER_BLADE` strap with a dark bend at its root. `PLATE` is read by the door
+  and the tile alike.
+  ⚠ **Every lever is drawn AS PHOTOGRAPHED** — Coral 133, curved 109, Rotem 114
+  from spindle to tip — because the camera's parallax on a proud lever could
+  not be sized from these photographs (§9).
 - **`SPECIAL_LOCKS`** — a second lock beside the first, at eye level
   (`SPECIAL_AFF` 1430). Bought-in units.
 - **`BELLS` and `PEEPHOLES`** — fittings on the face (`bl=`, `ey=`). The bell is
@@ -835,7 +847,7 @@ before it picks a fill.**
 | gradients | owner |
 |---|---|
 | `gripHard` `gripSoft` | the pull bar and the bow, in the handle finish (`hf=`) |
-| `nickel` `nickelSoft` `plateFace` `domeKnob` | the פרזול — nickel is its **own** warm ramp, `FINISH_TONES.nickel` (27.9, measured off the Coral doors: 20% darker than `steel`, hue ≈40°); `steel` stays the pull bar's nickel, the extra locks' and the derivation reference. `domeKnob` (the כדור's ball) through `domeRamp` since 26.9, the measured dome kept literal on nickel |
+| `nickel` `nickelSoft` `plateFace` `domeKnob` `rotemFace` `rotemLever` | the פרזול — nickel is its **own** warm ramp, `FINISH_TONES.nickel` (27.9, measured off the Coral doors: 20% darker than `steel`, hue ≈40°); `steel` stays the pull bar's nickel, the extra locks' and the derivation reference. `domeKnob` (the כדור's ball) through `domeRamp` since 26.9, the measured dome kept literal on nickel |
 | `lockUnit` `lockUnitFace` `lockUnitSoft` `mirrorKnob` | the bought-in extra locks and the ספיר — a constant steel |
 | `euroSteel` `euroRim` | the cylinder, following the פרזול at its own stand-off (`cylinderRamp`) — derived on nickel too since 27.9, so every finish's plug stands 2–16% off its plate |
 | `bellMetal` | the פעמון, following the pull handle's finish (`bellRamp` keeps Peretz's older *"nickel and gold only"* beside the instruction that overruled it) |
@@ -857,6 +869,7 @@ at least once, always silently.
 | blade depth | **23 mm**, a measurement since 27.9 (was 0.377 of the rose) | four installed Coral doors: 23 / 23 / 22 on a 63 rose; RB's 0.377 was an angled shot |
 | the tip | **a semicircle** | RB, and the four doors |
 | the root | **a semicircle on the spindle**, ~10 mm past it | the four doors; RB 0.38 of the rose radius |
+| reach, spindle → tip | Coral **133**, curved **109**, Rotem **114** — as photographed (27.9) | the four / three / three installed doors; the camera's parallax is left in (§9) |
 | lever → keyway | **105 mm** | the ten lever-rose corpus records (the four Coral doors read 102); RB's 88.8 is a catalogue LAYOUT |
 | rose | **63 mm**, both levers | 62.5–66 on seven installed doors (27.9) |
 | escutcheon | the Coral's **70** (covered); every other **66** | the four doors 66.5–72.5; the curved doors 67–71 |
@@ -1403,28 +1416,32 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   down), rings with the plug near the centre, a dark field with the cam slot —
   at 67–71 mm against our 66. It is not the lever, it varies door to door, and
   it is every lockset's; `research/handles/curved/README.md` has it.
-- **The `plate` tile's backplate is not the door's** (19.9) — ⚠ re-read 27.9:
-  the tile's plate IS `PLATE`, 90 × 240, the spindle at 0.30 and the key at 0.74,
-  exactly the door's; the "166 × 340" below is `handleFootprint`'s box round the
-  lever and plate together, not the plate. What is wrong is the SHAPE, in both:
-  the Rotem's photographs (`research/handles/rotem/`) show no waist and a flat
-  head, and the proposal there redraws the door and names the tile's redraw.
-  The original note, kept: the tile draws the
-  Rotem's plate 90 × 240; `handleFootprint` declares about 166 × 340 — not one
-  scale in both axes, so it is a redraw from `plateHandle`'s outline (moving the
-  keyway boss too), then re-running the pairwise raster floor. The picture is
-  not wrong; the size relation `FITTING_GLYPH`'s header promises is.
-- **The Coral and the curved lever are drawn ~8% short** (27.9, found measuring
-  the Rotem; not fixed — the app waits for the owner's son's word). Their
-  READMEs shrank the photographed reach about the spindle "for parallax" (133 →
-  128, 109 → 106). A lever standing proud, photographed from the door's middle,
-  is pushed toward the closing edge, so it reads SHORT: per door, by each tip's
-  distance from the camera's axis at ~1.9 m, the Coral is ~139 and the curved
-  lever ~115, each bar ~9 mm too far toward the edge; their own lengths are
-  right. If the photographs were zoomed the error halves (~134, ~111). Fixing
-  it moves `LEVER_REACH`/`TAPER_REACH`, both footprints (re-measured by
-  `collide -- boxes`), the curved lever's photo-anchored tests and every sheet
-  with either lever.
+- ✅ ~~**The `plate` tile's backplate is not the door's** (19.9).~~ **CLOSED
+  27.9**: the tile is drawn from `PLATE`, the door's own numbers, since the
+  Rotem was redrawn off three installed doors. (Re-read that day: the tile's
+  plate had been `PLATE` all along, 90 × 240; the "166 × 340" it was measured
+  against was `handleFootprint`'s box round lever and plate together.)
+- **Five gallery doors carry a backplate that is not the Rotem** (27.9, seen on
+  `screenshots/lockset-plate.png` once the Rotem was redrawn): d004, d022, d029,
+  d106 and d108 have a WAISTED plate with a domed head and a curved lever — the
+  shape `plateHandle` drew until 27.9, which is where the old drawing came from.
+  Only d003 is the Rotem the owner's son photographed (flat head, straight
+  sides, straight strap). `tools/corpus.mjs` files every backplate under `plate`
+  because the catalogue has one; those five now show the Rotem. Whether the
+  waisted one is a product Peretz sells — a new lockset, with its name and
+  price — is a question for the owner's son, not a shape to invent.
+- **How far a photograph moves a lever is not settled — so all three are drawn
+  as photographed** (27.9). A lever stands 55–60 mm proud; photographed from the
+  door's middle it lands farther from the camera's axis, so it reads SHORT from
+  its spindle. The Coral's and curved lever's READMEs had shrunk their reach
+  the other way (133 → 128, 109 → 106); fixed to the photographs' 133 and 109.
+  The full correction for a 1x lens at ~1.9 m (each camera recovered from its
+  leaf's corners) would add ~5–6 mm more and move each root ~9 mm; it did not
+  hold up — the Coral's round root would stop at its spindle instead of
+  covering its neck, and the blades' predicted vertical offsets matched two
+  Coral doors of four (a half-strength model fits better). **A ruler on one
+  real lever, rose centre to tip, settles it**; the Rotem's own plate is not
+  affected (8 mm proud).
 - **How big the lever's rose is against the leaf — three readings, three
   answers** (19.9). `LEVER_ROSETTE` 30 → 0.0765 of a 784 mm leaf; the lockset
   sweep reads 0.082, a hand flood fill 0.0726, our outline drawn over four

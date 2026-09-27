@@ -1,8 +1,18 @@
 # The Rotem (רותם, id `plate`), against three installed doors — 27.9.2026
 
-**Status: a proposal. The app is not touched.** The owner's son sent three
-photographs: *"here is 3 doors with the rotem handle."* The Rotem is the
-**default lockset**, so it is on the door every visitor sees first.
+**Status: in the app since 27.9.2026** — *"yes put it in and fix the coral and
+curved."* The owner's son sent three photographs: *"here is 3 doors with the
+rotem handle."* The Rotem is the **default lockset**, so it is on the door every
+visitor sees first.
+
+⚠ **What went in differs from the proposal in one place: the lever's position.**
+The proposal (`proposed-rotem.js`, `sheet-photo-now-proposed.webp`) took a
+parallax correction out of the lever (reach 119, root 11.5 past the spindle).
+Checked before it went in, the size of that correction did not hold (below,
+*The camera, and why the levers are drawn as photographed*), so the app draws
+the lever **as photographed**: reach 114, root 19 past the spindle, the dark bend
+from the root end to 9 mm on the tip side. `sheet-photo-before-app.webp` is the
+photographs beside the Rotem before 27.9 and as it is now in the app.
 
 | file | what it is |
 |---|---|
@@ -11,6 +21,7 @@ photographs: *"here is 3 doors with the rotem handle."* The Rotem is the
 | `proposed-finishes.webp` | the proposal in all four פרזול finishes, on anthracite and on white |
 | `doors-now-proposed.webp` | the whole door shipped and proposed, 700 px tall, on three paints |
 | `proposed-rotem.js` | the proposed `PLATE` and `plateHandle`, a drop-in for `js/renderer.js`. Its header lists what else has to move with it |
+| `sheet-photo-before-app.webp` | the same windows: photograph, before 27.9, **in the app** |
 
 ## Method
 
@@ -25,14 +36,8 @@ photographs: *"here is 3 doors with the rotem handle."* The Rotem is the
 - **Readings** are edge profiles (the strongest step, or half-maximum for the
   lever's depth) on the crops, run the same way on our render. Where the render
   carries a stroke that shifts an edge, that bias is named.
-- **The lever stands about 55 mm proud, and that MOVES it in a photograph, it
-  does not scale it about the spindle.** A proud point lands farther from the
-  camera's axis than a point on the door. Each photograph was taken from about
-  1.9 m in front of the door's middle (a phone's 26 mm-equivalent lens against
-  the leaf's height in pixels), so the lever, which points back toward the
-  middle, is pushed toward the closing edge by 5–10 mm. It reads **shorter**
-  from the spindle than it is, and its root reads farther past the spindle.
-  The bar's own length is only magnified 2.8%. See *The same mistake, twice*.
+- **The lever stands about 55 mm proud, and that MOVES it in a photograph** —
+  see *The camera, and why the levers are drawn as photographed*, at the end.
 
 ## Readings (mm from the spindle, y positive DOWN)
 
@@ -44,12 +49,12 @@ photographs: *"here is 3 doors with the rotem handle."* The Rotem is the
 | the head | flat, corners 8–13 | 7–8 | 8.5–10 | **flat, 9 mm corners** | a shallow dome | flat, 9 |
 | the sides | straight | straight | straight | **straight, parallel** | waisted to 0.91 | straight |
 | the foot | | | | **a half-ellipse 1.16 × as deep as it is half-wide**, fitted on the width at 122–154 mm (all three doors within 3 mm) | a shallow dome, the foot narrowed to 0.9 | 1.16 |
-| lever depth, half-max | 24.8 | 23.0 | 24.9 | **24.2**, 23.5 once the 2.8% is out | 32 at the root → 20 at the tip | 23 (`LEVER_BLADE`), even |
+| lever depth, half-max | 24.8 | 23.0 | 24.9 | **24.2** | 32 at the root → 20 at the tip | 23 (`LEVER_BLADE`, the Coral's), even — within a photo pixel (1.7 mm) |
 | spindle → tip, as read | 111 | 117.5 | 114 | 114 | | |
-| … the stand-off taken out | 116 | 124 | 119.5 | **120** | 119 | 119 (unchanged) |
+| … if the full 1x correction held | 116 | 124 | 119.5 | 120 | 119 | **114, as photographed** (proposed 119) |
 | root end past the spindle, as read | 21 | 18 | 19 | 19 | | |
-| … the stand-off taken out | 12 | 7 | 9 | **9.5** | none: a 32 mm collar | 11.5, a semicircle on the spindle |
-| the dark bend at the root | | | | **dark from the root end ~30 mm toward the tip**, 0.13–0.26 of the plate's luminance | none | to 18 on the tip side |
+| … if the full 1x correction held | 12 | 7 | 9 | 9.5 | none: a 32 mm collar | **19, as photographed** (proposed 11.5) |
+| the dark bend at the root, tip-side edge | −9 | −6 | −12 | **dark from the root end ~28 mm toward the tip**, 0.13–0.26 of the plate's luminance | none | **to 9 on the tip side** (proposed 18) |
 | key opening | 26 × 44 | 27 × 42 | 25 × 40 | **an egg narrowing downward, 26 × 42, centred 101 below** | an oval boss 34 × 50 carrying a BLACK euro keyhole at 105 | 26 × 42 at 101 |
 | the key slot | 92.5 | 93 | 95 | **93.5**, across the plug at the top of the egg | | 93.5 |
 | plate ÷ paint | 1.45 | 3.60 | 1.66 | | 1.90 / 2.54 / 1.90 | 1.63 / 2.18 / 1.63 |
@@ -77,13 +82,11 @@ the photograph reads 34), so its ratios cannot be matched. Compare doors 1 and 3
    to 20, and it has **no collar**. Its root is a rounded end on the spindle
    that turns back into the plate, and from the front that turn is a dark
    pocket.
-5. **Its size was right.** Reach 119 against a corrected 120. The plate was
-   2% too wide and 7% too tall.
+5. **Its size was nearly right.** The plate was 2% too wide and 7% too tall;
+   the lever reached 119 where the photographs read 114.
 
 ## Not changed, on purpose
 
-- **The reach** (119). It is inside the corrected readings. The photographs'
-  own 111–118 is the lever's stand-off, not its length.
 - **The pocket's straight inner edge.** Doors 1 and 3 show one; door 2 shows
   a rounded one. It is drawn rounded, which is one door out of three.
 - **A slight taper.** Doors 1 and 3 read the lever about 2 mm deeper at the
@@ -101,22 +104,41 @@ The proposed plate reads a little matte at door size, a painted tag rather
 than brushed metal. The photographs' faint vertical brushing is below a pixel
 at any size a visitor sees it, and a texture for it would be invention.
 
-## The same mistake, twice — the Coral and the curved lever
+## The camera, and why the levers are drawn as photographed
 
-This round found an error in the two levers that went into the app earlier
-today. Their READMEs "corrected for parallax" by shrinking the reach about the
-spindle (Coral 133 → 128, curved 109 → 106). The lever stands proud, and the
-camera was in front of the door's middle, so the photographs make the reach
-read **short**. The correction runs the other way. The same model as above,
-per door (tip distance from the camera's axis, camera ~1.9 m away):
+A lever stands 55–60 mm proud of the door, the rose or plate ~10 mm. Seen from
+a camera a distance `d` in front of the door, a proud point lands farther from
+the camera's axis than it is, by its own distance from that axis × stand-off ÷
+`d`. The door photographs here were taken from in front of the door's middle,
+so a lever, which points back toward the middle, reads **short** from its
+spindle and its root reads farther past it. The direction is physics.
 
-| | read | corrected | in the app |
-|---|---|---|---|
-| Coral | 131 / 130 / 135 / 135 | 137 / 135 / 143 / 141 → **~139** | 128 |
-| curved | 110.5 / 106.5 / 110 | 118 / 112 / 115 → **~115** | 106 |
+**The size is not settled, and the app does not guess it.** A phone's 1x lens,
+with the door filling ~80% of the frame, puts the camera ~1.9 m away (each
+photograph's camera recovered from its leaf's four corners: 1.8–1.95 m, at the
+door's middle, 0.9–1.2 m above the floor), and that moves each lever ~9 mm. Two
+independent checks do not support that much:
 
-Both are about **8% short, with each bar pushed ~9 mm toward the closing
-edge**. The bars' own lengths are right. If the photographs were taken zoomed,
-the camera stood farther back and the error halves (Coral ~134, curved ~111).
-Either way it is the wrong direction. Not fixed here: the app is not touched
-without the owner's son's word.
+- **The Coral's own root.** Under the full 1x correction its round root would
+  end 0–2 mm past the spindle, so it could not cover the neck it sits on. As
+  photographed it ends 9–12 past, which is where a root concentric with its
+  neck belongs. The curved lever's hook likewise sits on its rose as
+  photographed, and would sit ~9 mm off it corrected.
+- **The blades' vertical offsets.** The same model predicts how far each blade
+  should appear below or above its rose, door by door, from where each camera
+  stood: +0.8 / +5.3 / +1.7 / −2.4 mm on the four Coral doors, measured +0.7 /
+  +4.3 / +4.9 / +1.4. Two of four agree, and a model at half strength fits the
+  four better than the full one (RMS 1.4 against 2.1 mm).
+
+So the shift in these photographs is somewhere between nothing and ~10 mm, and
+**all three levers are drawn as photographed**, with no camera term:
+
+| | as photographed | full 1x correction | was drawn | now |
+|---|---|---|---|---|
+| Rotem, spindle → tip | 114 | 120 | 119 | **114** |
+| Coral, spindle → tip | 133 | ~138 | 128 | **133** |
+| curved, spindle → tip | 109 | ~115 | 106 | **109** |
+
+The Coral and curved lever had been "corrected" the WRONG way (shrunk about the
+spindle); that is what was fixed. A ruler on one real lever, rose centre to tip,
+settles the rest.

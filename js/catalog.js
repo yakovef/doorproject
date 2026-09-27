@@ -704,9 +704,14 @@ export const LOCKSETS = [
      black inlay stripe, not a backplate. Either RB sells two products under
      the name or this label is on the wrong row. `photo: null` rather than a
      citation of those files, because citing them would assert the very thing
-     that is in doubt. `ASK-PERETZ.md` §1f asks. */
+     that is in doubt. `ASK-PERETZ.md` §1f asks.
+     ✅ ANSWERED 27.9.2026 by the owner's son, with three photographs of
+     installed doors: *"here is 3 doors with the rotem handle"* — this row, the
+     lever on its backplate. What RB calls its striped bar is RB's business;
+     the label is on the right row. The plate was redrawn off those doors
+     (research/handles/rotem/), and they are its citation. */
   { id: 'plate',   he: 'רותם',  en: 'Rotem', ru: 'Ротем',   style: 'plate', lock: true, lever: true,
-    aliases: ['longplate'], photo: null },
+    aliases: ['longplate'], photo: 'research/handles/rotem/door-1.jpg' },
   { id: 'cadoor',  he: 'כדור',   en: 'Cadoor', ru: 'Шаровая',  style: 'cadoor',
     photo: 'research/handles/rb/enterance-handle-product-cadoor-1.png' },
   /* ⚠ `escutcheon: 'square'` — THE KEYWAY PLATE UNDER THIS KNOB IS SQUARE, and
@@ -806,12 +811,13 @@ export const LOCKSETS = [
      (This note also said it priced as the Coral at ₪0 "until he says
      otherwise". He said otherwise on 20.9 — ₪200, `LOCKSET` in prices.js,
      A19 closed — and the sentence stayed here a week.) */
-  /* `photo: null` — it is the drawing the Coral used to be, asked for by the
-     owner from the screen rather than from a product. If a cut-out turns out
-     to match it, that is A0's question and not an assumption to make here. */
+  /* It was `photo: null` — "the drawing the Coral used to be, asked for by the
+     owner from the screen rather than from a product". Since 27.9.2026 it is
+     measured off three installed doors (research/handles/curved/), and the
+     first of them is its citation. */
   { id: 'lever-taper', he: 'ידית מתעקלת', en: 'Curved lever',
     ru: 'Изогнутая ручка',
-    style: 'levertaper', lever: true, photo: null },
+    style: 'levertaper', lever: true, photo: 'research/handles/curved/door-1.jpg' },
 ];
 
 /**

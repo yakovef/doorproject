@@ -71,3 +71,13 @@ start"*. The photographs keep every one of those and give them their size:
 - The footprint declared for the rules (`handleFootprint`, `levertaper`) went
   `in` 118 → 114: the drawn blade reaches 107, and 114 is the Coral's own 7 mm
   margin.
+
+## 27.9, later: the reach, 106 → 109
+
+"≈106 after parallax" above shrank the photographed 110.5 / 106.5 / 110 the
+wrong way (see `../coral/README.md`, *27.9, later*, and `../rotem/README.md`).
+The tip is now the photographs' own **109** (`TAPER_REACH` 102 → 104.5, the round
+tip half a depth past it). The depths were always read at the photographs' 30 /
+70 / 100 mm and did not move: 21.1 / 14.6 / 9.7 drawn. `handleFootprint`'s `in`
+114 → 116. `sheet-reach-before-after.webp` is the three windows: photograph,
+106, 109.
