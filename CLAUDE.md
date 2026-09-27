@@ -141,7 +141,9 @@ lines here. Dates are the day of the change.
 
 - **27.9** The handle branch merged into this one (*"yes you should"* — the levers
   were only on `claude/door-handle-design-catalog-votz53` and the owner's son
-  looked for them on the page). Code merged clean; `CLAUDE.md`, `HISTORY.md`
+  looked for them on the page): the Coral and the curved lever measured off seven
+  installed doors (§3 LOCKSETS and the lock-furniture table; their two lines are
+  in `HISTORY.md`). Code merged clean; `CLAUDE.md`, `HISTORY.md`
   merged by hand. On the merge: test 9,118,759 / 0, collide 1,508 + boxes,
   fuzz clean, latency 190 ms; against this branch 40 of 57 sheets moved, every
   one only by its nickel lock furniture (14 `against-` by one lever-sized patch).
@@ -151,6 +153,13 @@ lines here. Dates are the day of the change.
   9.12 M), traced per group: 60 designs per colour stopped being buildable —
   the Coral beside a 700 mm Idan on `extra1`/`halfextra1` with the square
   window; the Coral's measured 70 mm lock (66 → all 60 fit again). §9.
+- **27.9** Four navigator marks redrawn "so that a 5 year old will
+  understand", after each section was described first (the brief is in
+  `js/icons.js`): colour a palette, pz a bolt with a glint, face a child's door
+  (two panels, a knob), grip the bar on two posts off a wall line. Kept on his
+  word: fit, lock, glass, mk, sum. The spec's `handle` row now shares `grip`
+  (six rows by reference, asserted). Worst nav pairs 0.60. Long form:
+  `HISTORY.md`.
 - **27.9** The round's gates re-read, and ⚠ **`npm run latency`'s milliseconds
   turn out to be a reading of the CONTAINER**: the jump 183 → 321/339/386 ms was
   investigated instead of written down, and `6934c0d` run beside this commit,
@@ -174,21 +183,6 @@ lines here. Dates are the day of the change.
   have demanded behaviour the page lacks. Falsified three ways, each flipping only
   its own clause — 24.9 rows back → 1a; the slot displacing nothing → both 1b;
   the restore guard dropped → 3. Long form: `HISTORY.md`.
-- **27.9** Curved lever MEASURED off three installed doors (*"I trust you to put
-  it into the app"*; `research/handles/curved/`), replacing the shape built from
-  words 25–26.9: linear taper 21 / 15 / 9.5 (square law drew 20.6 / 11 / 8),
-  runs level 4.5 above the spindle, the curve is the ROOT diving into the rose
-  (`TAPER_TILT` gone), the Coral's 63 rose. Its tests restated from words to the
-  photographs: 50/0 now, 17 fail on the old shape, 2 on no dive.
-- **27.9** The Coral into the app — *"Put the coral into the app"* — the approved
-  proposal pixel for pixel, narrowed three ways: the warm nickel is the פרזול's
-  own ramp (`FINISH_TONES.nickel`; `steel` stays the bar's, the extra locks' and
-  the derivation's); the covered 70 mm escutcheon is the Coral's only
-  (`escutcheon: 'covered'`, `escutcheonR`); the plug is derived (test caught the
-  literal: 2 fails). Gates: test 9,105,074 / 0, audit clean, collide 1,488 +
-  boxes, fuzz clean, latency 218 ms. Sheets on the handle branch: 39 of 54
-  moved — 30 for the nickel furniture alone, the rest the design pairs of
-  `fe65505`, which the main branch's slow run (`6934c0d`) rendered too.
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -293,7 +287,7 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | 9,118,759 assertions, **0 failed** (9,210,648 before the levers' merge; the 92 k are 60 Coral + 700 mm bar designs per colour, §9) — the total is the product of catalogue list lengths and is not evidence of anything (it rose from 7.48 M on 27.9 with three more grilles; it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves); read the failure count | 27.9 |
+| `npm test` | 9,118,760 assertions, **0 failed** (9,210,648 before the levers' merge; the 92 k are 60 Coral + 700 mm bar designs per colour, §9) — the total is the product of catalogue list lengths and is not evidence of anything (it rose from 7.48 M on 27.9 with three more grilles; it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves); read the failure count | 27.9 |
 | `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) — about 20 minutes now; the price-breakdown check waits for its animation since 27.9. ⚠ It was **red for one commit** on 27.9 (8 faults, one per viewport) because the trio change stranded two of its assertions — §5.27, and the reason it is worth running the audit on a commit that changes what `repair` does | 27.9 |
 | `npm run collide` | `all` (1,508 designs — 1,338 base, 552 of them with the bow, plus 170 face-detail; the 20 over 26.9 are the glazed trio) and `boxes` clean | 27.9 |
 | `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, nothing broke | 27.9 |

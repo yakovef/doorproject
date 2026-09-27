@@ -74,6 +74,32 @@ oldest lines move to the top of the "moved" section.
     Coral's measured 70 mm lock against the 15 mm `LOCK_CLEAR`; every other
     bar length was already refused there on main. Recorded in §9, not fudged.
 
+- **27.9 — FOUR NAVIGATOR MARKS A FIVE-YEAR-OLD CAN NAME.** The owner's son:
+  *"i like these icons: the first section, the third, the sixth, the eigth and
+  the final one. the other are not that great, either they are too complicated
+  or are just not representing the right thing. for each section i want you to
+  write a couple of sentences describing its insides and its role, then based
+  on that, make the most minimalistic and understandable drawing, so that a 5
+  year old will understand what the icon is."*
+  · **Kept:** fit (the door ajar), lock (lever on its plate), glass (the slanted
+    pane), mk (the frame alone), sum (the sheet with a tick).
+  · **The brief** — each section described from its own groups and lede, then
+    one object a child names — is the comment above `SECTION_ICON`.
+  · **Redrawn:** colour, the swatch fan → a painter's palette ("colours");
+    pz, a hinge with a glint → a bolt with one glint ("the shiny metal bits" —
+    the step is the metal colour of lever, keyhole, hinges, peephole; a bolt
+    alone said "screws"); face, a narrow door with a panel over strips → a
+    child's door, two panels and a round knob; grip, a slab with a bar and a
+    length arrow → the bar on two posts off a single wall line.
+  · **Turned down, measured** (the audit's pairwise raster, floor 0.50): grip as
+    a whole door with a bar on it, 0.32 against face — two door outlines are one
+    picture; as a close-up of the door's edge, 0.50 and a light switch; its first
+    side view had rounded corners and was the letter D; the square door read as
+    a switch. The single-line side view: 0.60.
+  · **Spec:** `handle` now shares `grip` by reference (it was a 3-unit slab and a
+    stub) — six rows, all asserted in `test/units.mjs`. `grab` already drew the
+    same bar lying down. Worst spec pair colour ~ detail 0.55.
+  · **Gates** in the commit message; no bare or lockset sheet moved.
 - **27.9 — THE GATES RE-READ, AND `npm run latency` IS PARTLY AN INSTRUMENT FOR
   MEASURING THE CONTAINER.** No instruction; this is §6 applied to a number that
   was about to be written down.
@@ -778,6 +804,21 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** Curved lever MEASURED off three installed doors (*"I trust you to put
+  it into the app"*; `research/handles/curved/`), replacing the shape built from
+  words 25–26.9: linear taper 21 / 15 / 9.5 (square law drew 20.6 / 11 / 8),
+  runs level 4.5 above the spindle, the curve is the ROOT diving into the rose
+  (`TAPER_TILT` gone), the Coral's 63 rose. Its tests restated from words to the
+  photographs: 50/0 now, 17 fail on the old shape, 2 on no dive.
+- **27.9** The Coral into the app — *"Put the coral into the app"* — the approved
+  proposal pixel for pixel, narrowed three ways: the warm nickel is the פרזול's
+  own ramp (`FINISH_TONES.nickel`; `steel` stays the bar's, the extra locks' and
+  the derivation's); the covered 70 mm escutcheon is the Coral's only
+  (`escutcheon: 'covered'`, `escutcheonR`); the plug is derived (test caught the
+  literal: 2 fails). Gates: test 9,105,074 / 0, audit clean, collide 1,488 +
+  boxes, fuzz clean, latency 218 ms. Sheets on the handle branch: 39 of 54
+  moved — 30 for the nickel furniture alone, the rest the design pairs of
+  `fe65505`, which the main branch's slow run (`6934c0d`) rendered too.
 - **27.9** The Coral drawn against four installed doors — *"fix the coral
   handle"* — **proposal only, app untouched** (`research/handles/coral/`).
   Size was right (reach, blade, keyway spacing within 4%); shape and metal were
