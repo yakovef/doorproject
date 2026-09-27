@@ -150,6 +150,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The navigator as a dark column (3 of 8): *"vertical and on the left
+  of the place where you choose options … a black rectangle … the section that
+  i am in will turn white and be square … a checkmark"* on steps chosen or
+  skipped. 56 px ink column on the panel's inline-end edge above 1100, the
+  phone row dressed the same; live = light square; checks = `visited` (steps
+  left by a gesture, session only). `--rail-band` no longer counts a column.
+  Long form: `HISTORY.md`.
 - **27.9** The price card at the door's top-right corner (2 of 8): *"it looks
   bad under the lamp, move to near the door, at the up right corner"* — his own
   28.8 placement, moved by him. `--frame-top`/`--frame-right`/`--hud-b` from
@@ -756,7 +763,17 @@ for the same half of the leaf and `repair` trades between them.
   `WANT_ORDER` in `tools/audit.mjs`.
 - **The navigator is a table of contents, never a progress bar**: every step
   carries a value on first paint, so a state-derived indicator would read
-  complete before anything was touched.
+  complete before anything was touched. Since 27.9 (the owner's son: *"…a
+  black rectangle, and then the section that i am in will turn white and be
+  square"*) it is a 56 px ink COLUMN on the panel's door-facing edge
+  (inline-end) above 1100 — the panel stays the scroller, the ink is its own
+  background stripe, nine 44 px targets never scroll — and the same look on
+  the phone's fixed 62 px row (the ink a fixed strip under it, so the row's
+  fade cue still works). The live step is a light square. ⚠ **The checks are
+  `visited`**, a Set in `app.js` beside `liveStep`: a step LEFT by a gesture
+  (its button, the bar's arrows, the rail, the skip, a summary row) — never
+  derived from the door, never in the state, the URL or the code; a reload
+  empties it. The connector, the fill and `is-done` went with the ink.
 - A bare load opens step 01; a shared link or a code opens the summary (T11).
 - Every step has a `<details>` explainer (`exp.<step>.q/.a`) and every group a
   `hint` (T15).
@@ -1198,7 +1215,10 @@ two pixels), plus sweeps with their own viewport lists where the worst widths
 are not in `VIEWS`:
 
 - **arrival and order** — one step live at every width; a bare load on step 01
-  and a link on the summary; the whole question sequence off the navigator.
+  and a link on the summary; the whole question sequence off the navigator;
+  the navigator a dark column on the door-facing edge above 1100 (a dark row
+  below), the live mark whole on both axes, and its checks on exactly the
+  steps walked — none on arrival or after a reload, the address unmoved.
 - **every step** — reachable from the rail; a visible send and a readable price;
   every `[data-wa]` the same href; at least one answer on screen with the
   question (after the step has **finished arriving**); nothing prints `{0}`.

@@ -1978,7 +1978,10 @@ button.spec__row:focus-visible {
   position: sticky;
   inset-block-start: 0;
   z-index: 3;
-  background: var(--surface);
+  /* ⚠ TRANSPARENT SINCE 27.9.2026: its dark ground is drawn by the panel
+     (the column's stripe above 1100, a fixed strip below it) — see "THE
+     NAVIGATOR IS A DARK COLUMN" further down. */
+  background: none;
 }
 
 /* ⚠ ON A PHONE IT IS FIXED, NOT STICKY, AND THAT IS THE WHOLE POINT.
@@ -2013,7 +2016,23 @@ button.spec__row:focus-visible {
     z-index: 6;
     padding-inline: 14px;
     margin-block-end: 0;
-    box-shadow: 0 1px 0 var(--rule);
+    border-block-end: 0;
+  }
+  /* ⚠ THE ROW'S DARK GROUND IS A STRIP OF ITS OWN, AND THAT IS FOR THE FADE —
+     27.9.2026. The row keeps its geometry (62 px, `--steps-h`, nine scrolling
+     44 px targets) and takes the column's look: ink, the live step a white
+     square. Painted on the row itself, the ink would be faded out at both ends
+     by the row's own `mask` (the "there is more this way" cue, which nine 44 px
+     targets in 390 px still need) and the page would show through at the
+     corners. So the ground is a fixed strip under it, owned by the panel so it
+     goes wherever the panel goes (hidden with it in bare mode, removed with it
+     on the order sheet, hidden with `#choices` on a page that cannot start),
+     and only the icons fade into it. */
+  .panel--choose::before {
+    content: ''; position: fixed; z-index: 5;
+    inset-block-start: 0; inset-inline: 0; block-size: var(--steps-h);
+    background: var(--ink);
+    pointer-events: none;
   }
   /* ⚠ THE PADDING MOVED TO `body` BECAUSE THE BAR IT WAS ON IS DELETED.
      Something has to reserve the fixed strip's height or the first thing in
@@ -2085,36 +2104,11 @@ button.spec__row:focus-visible {
     clip-path: inset(50%); white-space: nowrap;
   }
 }
-/* The connector, drawn once behind the row rather than as a border on each
-   circle — four separate half-lines would leave a seam wherever the flex
-   gap fell. It stops short of the outer circles so it does not run off the
-   ends of the card. */
-.steps::before {
-  content: '';
-  position: absolute; z-index: 0;
-  inset-inline: 12%;
-  inset-block-start: calc(8px + 22px);       /* the circles' own centre line */
-  block-size: 1px; background: var(--rule);
-}
-/* ⚠ AND THE SAME LINE AGAIN IN ACCENT, SCALED TO WHERE YOU ARE. `--fill` is
-   set by `markSteps` — 0 on step 01, 1 at the summary — and it is an ORDINAL
-   fraction, not a completion one: this row has refused to claim progress since
-   it was four circles, because every step carries a value from the first paint
-   and anything derived from `state` reads 9/9 on arrival.
-   `transform-origin: left` in a logical world would be wrong, so the origin is
-   set per direction below — a `scaleX` is a physical transform and the row
-   reads right-to-left in Hebrew. */
-.steps::after {
-  content: '';
-  position: absolute; z-index: 0;
-  inset-inline: 12%;
-  inset-block-start: calc(8px + 22px);
-  block-size: 1px; background: var(--accent);
-  transform: scaleX(var(--fill, 0));
-  transform-origin: left center;
-  transition: transform .26s linear;
-}
-[dir="rtl"] .steps::after { transform-origin: right center; }
+/* `.steps::before` (the connector behind the circles) and `.steps::after` (the
+   same line in accent, scaled to where you are) stood here until 27.9.2026.
+   The owner's son asked for the navigator to be *"all … a black rectangle, and
+   then the section that i am in will turn white and be square"*, and a
+   hairline on ink says nothing; what is behind you is the checks now. */
 .steps__step {
   position: relative; z-index: 1;
   flex: 1 1 0; min-inline-size: var(--tap);
@@ -2132,14 +2126,14 @@ button.spec__row:focus-visible {
      shortfall: 44 x 23 on every desktop viewport. */
   flex: 0 0 auto;
   display: grid; place-items: center;
-  border: 1px solid var(--rule); border-radius: 50%;
-  /* ⚠ `--surface`, so the circle punches a hole in the connector behind it on
-     WHATEVER it is sitting on. It is `--paper` below 1100 and `#fff` inside
-     the desktop card, and a hard-coded fill would show as a ring of the wrong
-     beige on one of the two. */
-  background: var(--surface);
-  color: var(--ink-2);
-  transition: border-color .12s var(--ease), color .12s var(--ease);
+  /* ⚠ A SQUARE ON INK, NOT A RING ON PAPER — 27.9.2026 (see the note on the
+     dark column below). The mark is `--paper` on the column's `--ink`, 14.84:1;
+     the live step's square is `--surface` with the mark in ink. The 44 px
+     target is the square's own box, unchanged. */
+  border: 0; border-radius: var(--r-tile);
+  background: none;
+  color: var(--paper);
+  transition: background .12s var(--ease), color .12s var(--ease);
 }
 .steps__g { inline-size: 21px; block-size: 21px; }
 
@@ -2226,26 +2220,40 @@ button.spec__row:focus-visible {
    (measured `scrollWidth` 429), so a desktop customer read nine truncated
    words. The button's accessible name is set in `app.js` and is now its only
    text — see the note there. */
-.steps__step:hover .steps__c { border-color: var(--ink-2); color: var(--ink); }
-/* Behind you: the circle picks up the accent hairline the fill is drawing
-   through it, so the row reads as a path rather than as nine equal buttons. */
-/* ⚠ AND QUIETLY. The first version gave every circle behind you the full
-   accent ring, so on step 05 there were four tan rings and one tan ring with a
-   halo, and the row read as five equal marks — the loudest thing on a phone
-   screen whose point is the door. A path is legible when the CURRENT position
-   is the only strong mark on it; behind you needs to be visible, not
-   competing. Half-strength, and the ink stays secondary. */
-.steps__step.is-done .steps__c {
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--rule));
-  color: var(--ink-2);
-}
-@supports not (color: color-mix(in srgb, red 50%, blue)) {
-  .steps__step.is-done .steps__c { border-color: var(--accent); }
-}
+.steps__step:hover .steps__c { background: rgb(255 255 255 / .12); color: #fff; }
+/* ⚠ THE LIVE STEP IS A WHITE SQUARE — 27.9.2026, the owner's son: *"the section
+   that i am in will turn white and be square."* `--surface` (the card's
+   #FDFBF7 above 1100, the page's paper below) with the mark in `--ink`. It was
+   an accent ring on a paper disc, and the ring behind you (`is-done`) went with
+   the fill it belonged to; the accent is not spent on the navigator any more
+   (`npm test`'s allow-list says so). */
 .steps__step.is-on .steps__c {
-  border-color: var(--accent); color: var(--accent-ink);
-  background: var(--paper-up);
-  box-shadow: 0 0 0 3px rgb(176 141 87 / .18);
+  background: var(--surface); color: var(--ink);
+}
+/* ⚠ AND ON INK THE PAGE'S FOCUS RING IS INVISIBLE — `:focus-visible` is a 2 px
+   `--ink` outline, the colour of the ground. The paper ring, 2 px off the
+   square, is what a keyboard user sees here. */
+.steps__step:focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; }
+
+/* ── THE CHECK ON A STEP YOU HAVE LEFT — 27.9.2026 ────────────────────
+   The owner's son: *"the icons of sections that the user has chosen or skipped
+   need a checkmark."* `markSteps` puts `is-visited` on a step the customer has
+   LEFT by a gesture (`visited` in app.js — never derived from the door, which
+   carries a value on every step from the first paint). An 18 px disc at the
+   square's top corner on the inline-end side: paper with an ink rim and tick,
+   so it reads on the ink ground and on the live white square alike. */
+.steps__v {
+  position: absolute; z-index: 2;
+  inset-block-start: -4px; inset-inline-end: -4px;
+  inline-size: 18px; block-size: 18px;
+  display: none; pointer-events: none;
+}
+.steps__step.is-visited .steps__v { display: block; }
+.steps__vg { inline-size: 18px; block-size: 18px; display: block; }
+.steps__vg circle { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
+.steps__vg path {
+  fill: none; stroke: var(--ink); stroke-width: 2.6;
+  stroke-linecap: round; stroke-linejoin: round;
 }
 
 .panel--choose { counter-reset: sect; }
@@ -3553,6 +3561,55 @@ html.is-live.is-untouched .wa__ask { display: inline; }
     inset-block-end: 100%; block-size: 26px;
     background: linear-gradient(to top, var(--surface), transparent);
     pointer-events: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   THE NAVIGATOR IS A DARK COLUMN ON THE DOOR-FACING EDGE — 27.9.2026
+   ══════════════════════════════════════════════════════════════════════
+   The owner's son: *"the icons would look better if they were [vertical] and
+   on the left of the place where you choose options … i want it all to be a
+   black rectangle, and then the section that i am in will turn white and be
+   square."* On the Hebrew page the choices are on the right and the door on
+   the left, so "the left of the place where you choose" is the panel's
+   door-facing edge — `inline-end`, which is the right-hand edge in English and
+   Russian, where the panel is on the left. One rule, mirroring with the
+   interface (the panel is chrome, not drawing).
+   ⚠ ABOVE 1100 ONLY. A phone keeps its fixed row of nine (62 px, `--steps-h`)
+   dressed the same way, ink with a white square: a 56 px column down a 320 px
+   screen leaves no room for two tiles side by side — a decision recorded as
+   ours in CLAUDE.md §0a, for him to reverse in a line.
+   HOW. `.panel--choose` stays the scroller — everything that measures or
+   scrolls it (the sticky foot, `markMore`, `goStep`, the audit's tap sweep)
+   keeps its box — and becomes a two-column grid: the step in the first, the
+   navigator in a 56 px second column spanning every row, sticky at the top,
+   its nine 44 px targets stacked 6 px apart (9 × 44 + 8 × 6 = 444 px, inside
+   the 690+ px panel of every desktop VIEW, so the column never scrolls and
+   `markSteps`' self-scroll has nothing to do up here — it stays for the phone
+   row). The ink ground is the PANEL's background, a 56 px stripe at the
+   inline-end edge: a scroll container's own background does not scroll with
+   its content, so the column is ink from the card's top to its foot whatever
+   the step's length, and the nav itself is transparent. The card's inline-end
+   padding moves into the column's gap. */
+@media (min-width: 1100px) {
+  .panel--choose {
+    grid-template-columns: minmax(0, 1fr) 56px;
+    column-gap: 18px;
+    padding-inline-end: 0;
+    background: linear-gradient(to left, var(--ink) 0 56px, var(--surface) 56px);
+  }
+  [dir="rtl"] .panel--choose {
+    background: linear-gradient(to right, var(--ink) 0 56px, var(--surface) 56px);
+  }
+  .panel--choose > * { grid-column: 1; }
+  .panel--choose > .steps {
+    grid-column: 2; grid-row: 1 / span 40;
+    align-self: start;
+    flex-direction: column; align-items: center; gap: 6px;
+    margin: 0; padding: 0 0 12px;
+    border: 0; box-shadow: none;
+    min-block-size: 0; overflow: visible;
+    -webkit-mask-image: none; mask-image: none;
   }
 }
 

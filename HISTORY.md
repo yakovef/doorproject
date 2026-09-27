@@ -26,6 +26,69 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE BIG ROUND, 3 OF 8: THE NAVIGATOR AS A DARK COLUMN.** The
+  owner's son: *"the icons would look better if they were [vertical] and on the
+  left of the place where you choose options … i want it all to be a black
+  rectangle, and then the section that i am in will turn white and be square …
+  the icons of sections that the user has chosen or skipped need a checkmark."*
+  · **Above 1100.** On the Hebrew page the choices are on the right and the
+    door on the left, so "the left of the place where you choose" is the
+    panel's DOOR-facing edge — `inline-end`, which is the right-hand edge in
+    English and Russian, where the panel is on the left; one rule, mirroring
+    with the interface (the panel is chrome). `.panel--choose` stays the
+    scroller — the sticky foot, `markMore`, `goStep` and the audit's tap sweep
+    keep their box — and becomes a two-column grid: the step, then a 56 px
+    column spanning every row with the nine targets stacked 6 px apart, sticky
+    at the top (9 × 44 + 8 × 6 = 444 px inside every desktop panel, so it never
+    scrolls and `markSteps`' self-scroll has nothing to do there). The ink is
+    the PANEL's own background — a 56 px stripe at the inline-end edge; a
+    scroll container's background does not scroll with its content, so the
+    column is ink from the card's top to its foot whatever the step's length.
+    `--rail-band` no longer adds a column's height to the scroll padding (it
+    would have scrolled every focused option 460 px off).
+  · **Below 1100** (ours to have decided, recorded in §0a to be reversed in a
+    line): a 56 px column down a 320 px screen leaves no room for two tiles, so
+    the fixed row keeps its 62 px and its nine scrolling targets and takes the
+    look — ink, the live step a light square. The ink is a fixed strip owned by
+    the panel (`.panel--choose::before`), because painted on the row itself the
+    row's own fade (the "more this way" cue) would have faded the ground out at
+    both ends; the strip goes wherever the panel goes (hidden in bare mode,
+    gone on the sheet, hidden with `#choices` on a page that cannot start).
+  · **The marks.** A square on ink, `--paper` marks (14.84:1); the live one a
+    `--surface` square with an ink mark. `:focus-visible`'s ink outline is the
+    ground's colour, so the navigator's is paper. The connector, the tan fill
+    behind you and `is-done` are gone; `npm test`'s accent allow-list loses its
+    three navigator entries — the accent is not spent there any more, and the
+    gate still fails on any new place it appears.
+  · **The checks — `visited`.** A `Set` in `app.js` beside `liveStep`: a step
+    goes in when the customer LEAVES it by a gesture — its own button, the
+    phone bar's arrows, the rail, the skip, a summary row (`leaveTo`) — never
+    at boot, on a language switch or from a link; never in the state, the URL,
+    the code or `spec.js`; a reload empties it. It is the one honest progress
+    fact: every step carries a value from the first paint, so a check derived
+    from the door would read nine of nine on arrival. The badge is
+    `CHECK_BADGE` in `js/icons.js`, an 18 px disc with a tick on the 24 grid
+    (arms 5.6 units apart, 4.4 inside the rim), paper with an ink rim so it
+    reads on the ink and on the light square. The accessible names are
+    unchanged (the audit asserts title = `aria-label`).
+  · **Audit.** Restated: the tap sweep's live-circle clause, "the live mark
+    whole in its navigator", is asked on BOTH axes and inside what the panel
+    shows — in a column the mark can be cut by the column's foot or scrolled
+    out of the panel. New block: a column on the door-facing edge above 1100
+    (≤ 60 px, ≤ 4 px from the edge, ink stripe, not scrolling, nine whole
+    targets ≥ 44), the row below (58–64 px, ink strip); the live square light
+    (luminance ≥ 0.8), the others groundless; no check on arrival, fit and
+    colour after two presses of the way on (the step's own on a desktop, the
+    bar's arrow on a phone), lock added by a rail tap to mk, the address
+    unmoved, none after a reload — at 1100 he, 1280 en, 1440 ru, 1920 he, 390
+    he, 320 ru. Unchanged and re-run: WANT_ORDER (DOM order is the column's
+    order), the marks' pairwise raster (the glyph is still 21 px), title =
+    `aria-label`, the keyboard walk (the column is before the options in the
+    DOM), the tap floors.
+  · **Falsified**: the checks derived from position (the old `is-done`) —
+    6 faults, one per viewport, at the rail-tap clause; the column on the wrong
+    edge with no stripe — 8 faults, both clauses at all four desktop widths.
+
 - **27.9 — THE BIG ROUND, 2 OF 8: THE PRICE CARD AT THE DOOR'S TOP-RIGHT
   CORNER.** The owner's son: *"move the pricing to another place that is
   better, it looks bad under the lamp, move to near the door, at the up right

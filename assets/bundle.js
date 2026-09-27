@@ -9079,6 +9079,8 @@ ${body}
     }
     return `<svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">${HUD_ICON[key]}</svg>`;
   };
+  var CHECK_BADGE = '<circle cx="12" cy="12" r="10"/><path d="m7 12.4 3.2 3.2 6.6-7.2"/>';
+  var checkBadge = () => `<svg class="steps__vg" viewBox="0 0 24 24" aria-hidden="true">${CHECK_BADGE}</svg>`;
 
   // js/url-state.js
   var VERSION = 25;
@@ -10286,12 +10288,12 @@ ${body}
       b.type = "button";
       b.className = "steps__step";
       b.dataset.step = sec.key;
-      b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span>`;
+      b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span><span class="steps__v" aria-hidden="true">${checkBadge()}</span>`;
       b.setAttribute("aria-label", T(sec.title));
       b.title = T(sec.title);
       b.addEventListener("click", () => {
         noteEngaged();
-        goStep(sec.key);
+        leaveTo(sec.key);
       });
       nav.appendChild(b);
     }
@@ -10336,7 +10338,7 @@ ${body}
       <button type="button" class="btn btn--ghost sect__skip">${T("nav.skip")}</button>
       <button type="button" class="btn sect__next">${T("nav.next")}</button>`;
       foot.querySelector(".sect__back").addEventListener("click", () => stepBy(-1));
-      foot.querySelector(".sect__skip").addEventListener("click", () => goStep(SUMMARY.key));
+      foot.querySelector(".sect__skip").addEventListener("click", () => leaveTo(SUMMARY.key));
       foot.querySelector(".sect__next").addEventListener("click", () => stepBy(1));
       box.appendChild(foot);
     }
@@ -10660,6 +10662,7 @@ ${body}
     if (tel && tel.previousElementSibling !== wa) wa.after(tel);
   }
   var liveStep = SECTIONS[0].key;
+  var visited = /* @__PURE__ */ new Set();
   var revealed = false;
   var displaced = /* @__PURE__ */ new Map();
   var STEP_KEYS = () => [...SECTIONS.map((x) => x.key), SUMMARY.key];
@@ -10708,7 +10711,11 @@ ${body}
     const keys = STEP_KEYS();
     const i = keys.indexOf(liveStep) + d;
     if (i < 0 || i >= keys.length) return;
-    goStep(keys[i]);
+    leaveTo(keys[i]);
+  }
+  function leaveTo(key) {
+    if (key !== liveStep && STEP_KEYS().includes(key)) visited.add(liveStep);
+    goStep(key);
   }
   var SAVED_KEY = "dm.saved.v1";
   var SAVED_MAX = 6;
@@ -10802,13 +10809,12 @@ ${body}
   }
   function markSteps() {
     const keys = STEP_KEYS();
-    const at = keys.indexOf(liveStep);
     for (const [i2, k] of keys.entries()) {
       const b = document.querySelector(`.steps__step[data-step="${k}"]`);
       if (b) {
         const on = k === liveStep;
         b.classList.toggle("is-on", on);
-        b.classList.toggle("is-done", at >= 0 && i2 < at);
+        b.classList.toggle("is-visited", visited.has(k));
         if (on) b.setAttribute("aria-current", "step");
         else b.removeAttribute("aria-current");
       }
@@ -10817,8 +10823,6 @@ ${body}
         where.textContent = k === SUMMARY.key ? T(SUMMARY.sub) : T("nav.stepOf", i2 + 1, SECTIONS.length);
       }
     }
-    const nav = document.querySelector(".steps");
-    if (nav) nav.style.setProperty("--fill", keys.length > 1 ? at / (keys.length - 1) : 0);
     const panel = document.querySelector(".panel--choose");
     if (panel) panel.dataset.live = liveStep;
     const live = document.querySelector(".steps__step.is-on");
@@ -11014,7 +11018,7 @@ ${body}
           row.type = "button";
           row.dataset.step = step2;
           row.setAttribute("aria-label", `${r.label}: ${r.value}`);
-          row.addEventListener("click", () => goStep(step2));
+          row.addEventListener("click", () => leaveTo(step2));
         }
         row.innerHTML = specIcon(r.key) + `<span class="spec__label">${r.label}</span><span class="spec__value">${r.value}</span>` + (r.hex ? `<span class="spec__chip" style="--chip:${r.hex}"></span>` : "");
         return row;
@@ -11266,7 +11270,8 @@ ${body}
     const footEl = document.querySelector(".sect:not([hidden]) .sect__foot");
     if (choose2 && railEl && getComputedStyle(railEl).position === "sticky") {
       const pad = parseFloat(getComputedStyle(choose2).paddingBlockStart) || 0;
-      const band = pad + railEl.getBoundingClientRect().height;
+      const column = getComputedStyle(railEl).flexDirection === "column";
+      const band = pad + (column ? 0 : railEl.getBoundingClientRect().height);
       if (band > 0) style.setProperty("--rail-band", `${Math.round(band)}px`);
     }
     if (footEl && getComputedStyle(footEl).position === "sticky") {

@@ -46,7 +46,7 @@ import { conflicts, repair } from './rules.js';
    file because a `const` in here can only be read by the browser, and two
    pictures that share a shape can only be found by rasterising them — see the
    header of `js/icons.js`, and the pairwise check in `tools/audit.mjs`. */
-import { hudIcon, sectionIcon, specIcon } from './icons.js';
+import { checkBadge, hudIcon, sectionIcon, specIcon } from './icons.js';
 import { handingWords, specRows, summaryLine } from './spec.js';
 import { canSharePicture, copyMessage, drawingCaveat, fallbackWhatsappUrl,
          gripAddendum, PHONE_DISPLAY, PHONE_TEL, priceCaveat,
@@ -1215,7 +1215,10 @@ function buildPanel() {
 
        What is left is nine 44 px icon circles that mean "which question", and
        the row is legible at every width for the first time. */
-    b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span>`;
+    b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span>`
+      /* the check on a step the customer has left (27.9) — shown by
+         `markSteps` from `visited`, never from the door's values */
+      + `<span class="steps__v" aria-hidden="true">${checkBadge()}</span>`;
     /* ⚠ THE NAME, EXPLICITLY, AND NOW IT IS THE ONLY ONE. There is no text
        inside this button at all, so without this line it measures
        `{role: "button", name: ""}` at every width rather than only below
@@ -1240,7 +1243,7 @@ function buildPanel() {
        `npm test` asserts they are equal so a future rename cannot leave a
        tooltip saying one thing and a screen reader another. */
     b.title = T(sec.title);
-    b.addEventListener('click', () => { noteEngaged(); goStep(sec.key); });
+    b.addEventListener('click', () => { noteEngaged(); leaveTo(sec.key); });
     nav.appendChild(b);
   }
   wrap.appendChild(nav);
@@ -1364,7 +1367,7 @@ function buildPanel() {
       <button type="button" class="btn btn--ghost sect__skip">${T('nav.skip')}</button>
       <button type="button" class="btn sect__next">${T('nav.next')}</button>`;
     foot.querySelector('.sect__back').addEventListener('click', () => stepBy(-1));
-    foot.querySelector('.sect__skip').addEventListener('click', () => goStep(SUMMARY.key));
+    foot.querySelector('.sect__skip').addEventListener('click', () => leaveTo(SUMMARY.key));
     foot.querySelector('.sect__next').addEventListener('click', () => stepBy(1));
     box.appendChild(foot);
   }
@@ -2010,6 +2013,20 @@ function placeSend() {
  * door is what gets sent to Peretz.
  */
 let liveStep = SECTIONS[0].key;
+/**
+ * ⚠ THE STEPS THE CUSTOMER HAS LEFT — 27.9.2026, the owner's son: *"the icons
+ * of sections that the user has chosen or skipped need a checkmark."*
+ * A step goes in when the customer LEAVES it by a gesture — the step's own
+ * button, the phone bar's arrows, the rail, the skip, a summary row — and
+ * never at boot, on a language switch or by a link. It is the one honest
+ * progress fact the navigator can show: every step carries a value from the
+ * first paint (`nowLabel` falls back to `list[0]`), so a check derived from
+ * the DOOR would read nine of nine on arrival.
+ * Presentation, exactly like `liveStep`: not in `state`, the URL, the code or
+ * `js/spec.js`, and a reload empties it. Which questions somebody walked past
+ * is a fact about their afternoon, not about the door Peretz builds.
+ */
+const visited = new Set();
 /** Has the customer already watched the door settle? See the note in `goStep`.
  *  Presentation, like `liveStep`: not in `state`, not in the URL, not in the
  *  code, and reset by nothing but a reload. */
@@ -2203,7 +2220,15 @@ function stepBy(d) {
   const keys = STEP_KEYS();
   const i = keys.indexOf(liveStep) + d;
   if (i < 0 || i >= keys.length) return;
-  goStep(keys[i]);
+  leaveTo(keys[i]);
+}
+
+/** Leave the live step for another by a gesture: the step left is `visited`
+ *  (its navigator mark takes the check), then the flow moves. Boot, the
+ *  language switch and a link call `goStep` directly and mark nothing. */
+function leaveTo(key) {
+  if (key !== liveStep && STEP_KEYS().includes(key)) visited.add(liveStep);
+  goStep(key);
 }
 
 /* ── SAVED DESIGNS ───────────────────────────────────────────────────
@@ -2341,20 +2366,16 @@ function paintSaved() {
 /** Which sections are open, on the navigator. */
 function markSteps() {
   const keys = STEP_KEYS();
-  const at = keys.indexOf(liveStep);
   for (const [i, k] of keys.entries()) {
     const b = document.querySelector(`.steps__step[data-step="${k}"]`);
     if (b) {
       const on = k === liveStep;
       b.classList.toggle('is-on', on);
-      /* ⚠ `is-done` MEANS "BEHIND YOU", NOT "FINISHED", and the distinction is
-         the whole reason this row is allowed to have a fill at all. Every step
-         carries a valid value from the first paint — `nowLabel` falls back to
-         `list[0]` — so a mark meaning COMPLETE would read 9/9 on arrival, which
-         is the dishonesty this navigator has refused since it was four circles.
-         Ordinal position is a fact about the page, like `NN ⁄ 08`, and it is
-         safe to draw. It fills only behind; it never runs ahead. */
-      b.classList.toggle('is-done', at >= 0 && i < at);
+      /* ⚠ `is-done` ("behind you", an ordinal fill) WENT ON 27.9.2026 with the
+         connector it was drawn on: the owner's son asked for a CHECK on the
+         steps a customer has chosen or skipped, which is `visited` — what
+         they walked, not where the page is. Neither derives from the door. */
+      b.classList.toggle('is-visited', visited.has(k));
       if (on) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
     }
     /* ⚠ `NN ⁄ 08` IS A PAGE NUMBER, NOT A PROGRESS BAR, and the wording is
@@ -2378,15 +2399,10 @@ function markSteps() {
         : T('nav.stepOf', i + 1, SECTIONS.length);
     }
   }
-  /* ⚠ THE HAIRLINE FILLS BEHIND YOU, AS A FRACTION, AND IT IS SET HERE RATHER
-     THAN COUNTED IN CSS. `.steps::after` is one rule scaled on the inline axis,
-     so it mirrors correctly in LTR for free — a fill drawn per-circle would
-     leave a seam at every flex gap, which is why the connector under it is one
-     rule and not nine borders.
-     Zero on step 01 and 1 at the summary. A `scaleX` on a hairline is a
-     compositor transform, so this costs no layout. */
-  const nav = document.querySelector('.steps');
-  if (nav) nav.style.setProperty('--fill', keys.length > 1 ? at / (keys.length - 1) : 0);
+  /* The hairline that filled behind you (`--fill` on `.steps::after`) went on
+     27.9.2026 with the connector under it: the navigator is a dark column on
+     a desktop and a dark row on a phone, the live step a white square, and
+     what is behind you is said by the checks above. */
 
   /* ⚠ WHICH STEP IS LIVE, ON THE PANEL, FOR THE STYLESHEET. The gallery opener
      sits above the navigator, so on a phone — where the navigator is fixed at
@@ -3010,7 +3026,7 @@ function paint() {
         row.type = 'button';
         row.dataset.step = step;
         row.setAttribute('aria-label', `${r.label}: ${r.value}`);
-        row.addEventListener('click', () => goStep(step));
+        row.addEventListener('click', () => leaveTo(step));
       }
       row.innerHTML = specIcon(r.key)
         + `<span class="spec__label">${r.label}</span>`
@@ -3768,7 +3784,14 @@ function fitStage() {
        height. Measured: with `foot height + 12` the sweep is clean at every
        desktop width. */
     const pad = parseFloat(getComputedStyle(choose).paddingBlockStart) || 0;
-    const band = pad + railEl.getBoundingClientRect().height;
+    /* ⚠ AND SINCE 27.9.2026 THE RAIL IS A COLUMN BESIDE THE STEP, NOT A ROW
+       OVER IT (the owner's son: the icons *"vertical and on the left of the
+       place where you choose options"*), so it covers none of the step and its
+       height is no longer part of the band — adding 460 px of column to the
+       scroll padding would scroll every focused option half a panel away from
+       where it is. Asked of the layout, not of the breakpoint. */
+    const column = getComputedStyle(railEl).flexDirection === 'column';
+    const band = pad + (column ? 0 : railEl.getBoundingClientRect().height);
     if (band > 0) style.setProperty('--rail-band', `${Math.round(band)}px`);
   }
   if (footEl && getComputedStyle(footEl).position === 'sticky') {

@@ -255,3 +255,18 @@ export const hudIcon = key => {
   }
   return `<svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">${HUD_ICON[key]}</svg>`;
 };
+
+/**
+ * ⚠ THE CHECK ON A STEP THE CUSTOMER HAS LEFT — 27.9.2026. The owner's son:
+ * *"the icons of sections that the user has chosen or skipped need a
+ * checkmark."* It marks `visited` in `app.js` — a step left by the button, an
+ * arrow or the rail — which is the one honest progress fact: every step
+ * carries a value from the first paint, so a mark derived from the DOOR would
+ * read nine of nine on arrival (the reason the navigator has refused a
+ * progress bar since it was four circles). Drawn at 18 px on the 24 grid: a
+ * disc with a tick, the tick's two arms 5.6 units apart at their open ends and
+ * 4.4 units inside the disc's edge — over 3 px at 18 px, well past the 2.
+ */
+export const CHECK_BADGE = '<circle cx="12" cy="12" r="10"/><path d="m7 12.4 3.2 3.2 6.6-7.2"/>';
+export const checkBadge = () =>
+  `<svg class="steps__vg" viewBox="0 0 24 24" aria-hidden="true">${CHECK_BADGE}</svg>`;

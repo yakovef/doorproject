@@ -5314,14 +5314,28 @@ for (const v of VIEWS) {
       for (let s = 0; s < 8; s++) {
         const live = await p.evaluate(() => document.querySelector('.sect.is-live')?.dataset.section || null);
         if (!live) { fault(where, 'no live step — this check has no subject'); break; }
+        /* ⚠ RESTATED 27.9.2026 ON BOTH AXES, SAME SUBJECT (the live mark is
+           whole in its navigator). Above 1100 the navigator is a COLUMN now,
+           and a circle cut by the row's inline edges is no longer the only way
+           to lose it: it can be cut by the column's foot or scrolled out of
+           the panel it sticks in. So the live mark must be inside the
+           navigator's box on both axes AND inside what the panel shows (the
+           viewport below 1100, where the row is fixed and the panel is the
+           page). */
         const inRow = await p.evaluate(() => {
           const row = document.querySelector('.steps'), c = document.querySelector('.steps__step.is-on');
-          if (!row || !c) return null;
+          const pn = document.querySelector('.panel--choose');
+          if (!row || !c || !pn) return null;
           const r = row.getBoundingClientRect(), k = c.getBoundingClientRect();
-          return k.left >= r.left - 1 && k.right <= r.right + 1;
+          const wide = innerWidth >= 1100, v = pn.getBoundingClientRect();
+          const box = wide ? v : { left: 0, right: innerWidth, top: 0, bottom: innerHeight };
+          return k.left >= r.left - 1 && k.right <= r.right + 1
+            && k.top >= r.top - 1 && k.bottom <= r.bottom + 1
+            && k.top >= box.top - 1 && k.bottom <= box.bottom + 1
+            && k.left >= box.left - 1 && k.right <= box.right + 1;
         });
         if (inRow === null) fault(where, `step "${live}": no navigator row or no live circle — the circle clause has no subject`);
-        else if (!inRow) fault(where, `step "${live}": the live circle is cut by the edge of the navigator row — a navigator whose current position is off its own edge is not a navigator`);
+        else if (!inRow) fault(where, `step "${live}": the live mark is cut by the edge of the navigator or of the panel it stands in — a navigator whose current position is off its own edge is not a navigator`);
         else circles++;
         if (taps) {
           for (const at of ['mid', 'bottom']) {
@@ -5596,6 +5610,110 @@ for (const v of VIEWS) {
      that found fewer than one priced step per language is not reading prices. */
   if (priced < 3) fault('explainers', `only ${priced} priced steps were found across three languages — the price reader is not reading the page`);
   if (faults === before0) console.log(`    ${priced} priced steps across three languages, no explainer says the prices are the same; the colour sentence is on the colour step and the summary in all three`);
+}
+
+/* ── THE NAVIGATOR IS A DARK COLUMN, AND ITS CHECKS ARE WHAT YOU WALKED ───
+   27.9.2026, the owner's son: the icons *"vertical and on the left of the
+   place where you choose options … all … a black rectangle, and then the
+   section that i am in will turn white and be square … the icons of sections
+   that the user has chosen or skipped need a checkmark."*
+   Above 1100: a column on the panel's DOOR-facing edge (inline-end — left in
+   Hebrew, right in English), on ink, nine targets whole in the panel and ≥ 44,
+   never scrolling; the live one a light square, the rest on the ground. Below
+   1100: the fixed row keeps its 62 px and takes the same look.
+   And the checks: exactly the steps LEFT by a gesture, never derived from the
+   door — so on arrival there are none, after two presses of the way on there
+   are two, a rail tap adds the one it leaves, the URL does not move, and a
+   reload (a new afternoon) has none. §5.15: every clause first proves it found
+   its subject. */
+{
+  console.log('\nthe navigator is a dark column, and its checks are what you walked');
+  const before = faults;
+  const INK = 'rgb(28, 26, 23)';
+  const lum = c => { const m = (c.match(/\d+(\.\d+)?/g) || []).map(Number);
+    if (m.length < 3 || (m.length > 3 && m[3] === 0)) return null;
+    return (0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]) / 255; };
+  let readings = 0;
+  for (const [w, h, lang] of [[1100, 800, 'he'], [1280, 720, 'en'], [1920, 918, 'he'], [1440, 900, 'ru'],
+                              [390, 844, 'he'], [320, 568, 'ru']]) {
+    const tag = `${lang} ${w}x${h}`;
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
+      await pg.waitForTimeout(600);
+      const look = () => pg.evaluate(([INK]) => {
+        const nav = document.querySelector('.steps'), pn = document.querySelector('.panel--choose');
+        if (!nav || !pn) return null;
+        const r = nav.getBoundingClientRect(), P = pn.getBoundingClientRect();
+        const rtl = document.documentElement.dir === 'rtl';
+        const steps = [...nav.querySelectorAll('.steps__step')];
+        const vis = innerWidth >= 1100 ? P : { top: 0, bottom: innerHeight, left: 0, right: innerWidth };
+        const circ = s => getComputedStyle(s.querySelector('.steps__c')).backgroundColor;
+        return {
+          n: steps.length,
+          column: getComputedStyle(nav).flexDirection === 'column',
+          width: Math.round(r.width), height: Math.round(r.height),
+          /* the door-facing edge: inline-end of the panel */
+          edge: Math.round(rtl ? r.left - P.left : P.right - r.right),
+          groundDesk: getComputedStyle(pn).backgroundImage.includes(INK),
+          groundPhone: getComputedStyle(pn, '::before').backgroundColor,
+          scrolls: nav.scrollHeight > nav.clientHeight + 1,
+          whole: steps.every(s => { const b = s.getBoundingClientRect();
+            return b.top >= vis.top - 1 && b.bottom <= vis.bottom + 1 && b.top >= r.top - 1 && b.bottom <= r.bottom + 1; }),
+          tap: Math.round(Math.min(...steps.map(s => { const b = s.getBoundingClientRect(); return Math.min(b.width, b.height); }))),
+          live: circ(nav.querySelector('.steps__step.is-on') || steps[0]),
+          other: circ(steps.find(s => !s.classList.contains('is-on')) || steps[0]),
+          visited: steps.filter(s => s.querySelector('.steps__v')?.checkVisibility()).map(s => s.dataset.step),
+          search: location.search,
+        };
+      }, [INK]);
+      const a = await look();
+      if (!a || a.n !== 9) { fault('nav-column', `${tag}: ${a ? a.n : 'no'} navigator marks — this check has no subject`); continue; }
+      readings++;
+      const wide = w >= 1100;
+      if (wide) {
+        if (!a.column || a.width > 60) fault('nav-column', `${tag}: the navigator is ${a.column ? '' : 'not '}a column, ${a.width} px wide — it should be a column of at most 60 px`);
+        if (a.edge > 4) fault('nav-column', `${tag}: the column stands ${a.edge} px in from the panel's door-facing edge — it belongs on that edge`);
+        if (!a.groundDesk) fault('nav-column', `${tag}: the panel paints no ink stripe behind the column`);
+        if (a.scrolls) fault('nav-column', `${tag}: the column scrolls — nine 44 px targets fit every desktop panel`);
+      } else {
+        if (a.column || a.height < 58 || a.height > 64) fault('nav-column', `${tag}: the phone navigator is ${a.column ? 'a column' : 'a row'} ${a.height} px tall — it keeps its 62 px row`);
+        if (a.groundPhone !== INK) fault('nav-column', `${tag}: the phone row's ground is ${a.groundPhone}, not the ink`);
+      }
+      if (wide && !a.whole) fault('nav-column', `${tag}: a navigator mark is cut by the column or the panel`);
+      if (a.tap < 44) fault('nav-column', `${tag}: a navigator mark is ${a.tap} px on its short side`);
+      const L = lum(a.live), O = lum(a.other);
+      if (L === null || L < 0.8) fault('nav-column', `${tag}: the live step is ${a.live} — it should be a light square`);
+      if (O !== null) fault('nav-column', `${tag}: a step that is not live has a ground (${a.other}) — only the live one is a square`);
+      /* the checks: none on arrival */
+      if (a.visited.length) fault('nav-column', `${tag}: ${a.visited.join(', ')} carry a check before anything was walked — a check derived from the door reads 9/9 on arrival`);
+      /* two presses of the way on — the step's own on a desktop, the bar's arrow on a phone */
+      for (let i = 0; i < 2; i++) {
+        await pg.evaluate(() => [...document.querySelectorAll('.sect__next, .quote__next')]
+          .find(x => x.offsetParent !== null && !x.disabled)?.click());
+        await pg.waitForTimeout(300);
+      }
+      const b2 = await look();
+      if (b2.visited.join(',') !== 'fit,colour') {
+        fault('nav-column', `${tag}: after two presses of the way on the checks are on "${b2.visited.join(', ')}" — they should be on fit and colour`);
+      }
+      if (b2.search !== a.search) fault('nav-column', `${tag}: walking the steps changed the address (${a.search} → ${b2.search}) — which steps were walked is not the door`);
+      /* a rail tap leaves the live step */
+      await pg.evaluate(() => document.querySelector('.steps__step[data-step="mk"]')?.click());
+      await pg.waitForTimeout(300);
+      const c2 = await look();
+      if (c2.visited.join(',') !== 'fit,colour,lock') {
+        fault('nav-column', `${tag}: a rail tap from lock to mk left the checks on "${c2.visited.join(', ')}" — the step it left should take one`);
+      }
+      /* and a reload is a new afternoon */
+      await pg.reload();
+      await pg.waitForTimeout(500);
+      const d2 = await look();
+      if (d2 && d2.visited.length) fault('nav-column', `${tag}: after a reload ${d2.visited.join(', ')} still carry a check — it rode in something that outlives the session`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (readings < 6) fault('nav-column', `only ${readings} of 6 viewports were read — this check is measuring almost nothing`);
+  if (faults === before) console.log(`    ${readings} viewports: a dark column on the door-facing edge above 1100 (a dark row below), nine whole ≥44 px targets, the live one a light square; checks on exactly the steps walked, none on arrival or after a reload, the address unmoved`);
 }
 
 /* ── THE HANDLE FINISH IS ON THE PAGE ONLY WHERE IT PAINTS SOMETHING ──────

@@ -5344,11 +5344,16 @@ group('the accent is spent only where it means "this one is chosen"');
 {
   const css = readFileSync('css/app.css', 'utf8');
   /* selector → why this one is allowed to carry the accent.
-     Seven places, and every one of them means the same thing: THIS ONE. */
+     Every one of them means the same thing: THIS ONE.
+     ⚠ THREE CAME OFF ON 27.9.2026 BECAUSE THE ACCENT LEFT THE NAVIGATOR —
+     `.steps::after` (the ordinal line), `.steps__step.is-on` (the tan ring on
+     the live step) and `.steps__step.is-done` (the half ring behind you). The
+     owner's son asked for the navigator *"all … a black rectangle, and then
+     the section that i am in will turn white and be square"*, with checks on
+     the steps walked: ink, a white square, a paper check — no tan. The list
+     shrinking is this gate working; the test below it still fails on any NEW
+     place the accent appears. */
   const ALLOWED = [
-    ['.steps::after',        'the ordinal line under the navigator, scaled to where you are'],
-    ['.steps__step.is-on',   'the ring on the step you are looking at'],
-    ['.steps__step.is-done', 'the ring on a step you have already answered'],
     ['[data-chrome="focus"]','the focus ring on the draggable grip'],
     /* ⚠ RESTATED 27.9.2026: it was "on hover only". The owner's son asked for
        the opener to be *"more apparent, still in the palette"*, and the
