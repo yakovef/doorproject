@@ -1957,6 +1957,24 @@ export function gripFinish(state) {
  *  painted with the door and does not. Read by the price and the order. */
 export const gripTakesFinish = state => !!byId(HANDLES, state.handle).finishes;
 
+/**
+ * Is there anything on this door the pull handle's finish paints?
+ *
+ * ⚠ ASKED BY THE PAGE, 27.9.2026 — the owner's son: *"in the section with the
+ * pull handles make the color options only appear if there is a pull handle,
+ * either vertical or horizontal."* The three objects are the three `price.js`
+ * charges `finishExtra` on: the bar (when it takes a finish at all — the
+ * channel is painted with the door), the horizontal bow, and the פעמון. The
+ * bell is the one his sentence does not name; it takes this finish on
+ * Peretz's 20.9 word, and hiding the choice while a bell is on the door would
+ * strand its metal — a decision recorded as ours in CLAUDE.md §0a, for him to
+ * reverse in a line. `npm test` holds this to the price: the group is shown
+ * exactly when a finish changes what the door costs.
+ */
+export const finishHasSubject = state => gripTakesFinish(state)
+  || (state.grab || 'nograb') !== 'nograb'
+  || (state.bell || 'nobell') !== 'nobell';
+
 /* Aliases count: a superseded id must resolve to its replacement rather than
    silently falling through to the first entry, which is how a stale link
    quietly becomes a different door at a different price. */

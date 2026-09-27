@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { BELLS, BOWS, glassRows, PEEPHOLES, STRIPE_SLOTS, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
+import { BELLS, BOWS, glassRows, PEEPHOLES, STRIPE_SLOTS, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, finishHasSubject, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
 import { contrast, lighten, scaleTone, silhouette } from '../js/colour.js';
 import { SECTION_ICON, sectionIcon, SPEC_ICON, specIcon } from '../js/icons.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
@@ -5350,7 +5350,12 @@ group('the accent is spent only where it means "this one is chosen"');
     ['.steps__step.is-on',   'the ring on the step you are looking at'],
     ['.steps__step.is-done', 'the ring on a step you have already answered'],
     ['[data-chrome="focus"]','the focus ring on the draggable grip'],
-    ['.works-open',          'the gallery opener, on hover only'],
+    /* ⚠ RESTATED 27.9.2026: it was "on hover only". The owner's son asked for
+       the opener to be *"more apparent, still in the palette"*, and the
+       palette's one colour is this tan — so it is the opener's GROUND now,
+       with ink on it (asserted ≥ 4.5:1 below). It still means one thing: the
+       one offer on the page to start from a door he built. */
+    ['.works-open',          'the gallery opener\'s ground — the one offer to start from a door he built'],
     ['.work',                'one gallery door, on hover only'],
     ['.proof a',             'the underline on the proof link'],
   ];
@@ -5393,6 +5398,29 @@ group('the accent is spent only where it means "this one is chosen"');
   ok(contrast('#7E6134', '#FFFFFF') >= 4.5,
      'var(--accent-ink) no longer measures 4.5:1 on white, and it is the token '
    + 'every readable accent uses');
+  /* ⚠ AND WHERE THE ACCENT IS A GROUND, WHAT STANDS ON IT IS READ — 27.9.2026.
+     The gallery opener is tan now, and its two lines of text are the only text
+     on the page set on the accent. Read out of the stylesheet — the rule's own
+     `background` and `color`, each token resolved from `:root` — so a later
+     "tan text on tan" edit (`--accent-ink` there is 1.86:1) fails here rather
+     than on a customer. §5.15: both rules must be found and both must resolve. */
+  const root = /:root\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] || '';
+  const token = name => (new RegExp(`--${name}:\\s*(#[0-9A-Fa-f]{6})`).exec(root) || [])[1];
+  const rule = sel => (new RegExp(`\\n${sel.replace(/[.]/g, '\\.')}\\s*\\{([^}]*)\\}`).exec(css) || [])[1];
+  const prop = (body, name) => (new RegExp(`(?:^|[;\\s])${name}:\\s*var\\(--([a-z-]+)\\)`).exec(body || '') || [])[1];
+  const opener = rule('.works-open'), count = rule('.works-open__n');
+  const ground = token(prop(opener, 'background'));
+  ok(opener && ground, 'the gallery opener\'s ground could not be read out of css/app.css — '
+   + 'this contrast check has no subject');
+  for (const [what, body] of [['name', opener], ['count', count]]) {
+    const ink = token(prop(body, 'color'));
+    ok(ink, `the gallery opener's ${what} has no colour token this check can resolve`);
+    if (ground && ink) {
+      ok(contrast(ink, ground) >= 4.5,
+         `the gallery opener's ${what} is ${ink} on ${ground}: ${contrast(ink, ground).toFixed(2)}:1, `
+       + 'under the 4.5:1 text needs — on the accent ground the text is --ink');
+    }
+  }
 }
 
 /* ── 12. THE MESSAGE ──────────────────────────────────────────────────
@@ -6397,6 +6425,35 @@ group('ironwork is counted, and the drawing agrees with the bill');
      'a door with no glass should say nothing about where a grille goes');
 
   console.log(`  (${checked} designs, ${two} of them carrying two panels)`);
+}
+
+/* ── THE FINISH IS OFFERED EXACTLY WHERE IT COSTS SOMETHING — 27.9.2026 ──
+   The owner's son: *"make the color options only appear if there is a pull
+   handle, either vertical or horizontal."* The page hides the group off
+   `finishHasSubject`; this holds that predicate to the one thing that cannot
+   be argued with, the PRICE: over every pull handle × bow × bell, as repaired,
+   the group is shown if and only if choosing a non-nickel finish moves the
+   door's price. A predicate that forgot the bell (his sentence does not name
+   it, Peretz's 20.9 does) would hide a choice the order charges for; one that
+   counted the channel (painted with the door) would offer one that does
+   nothing. §5.15: both halves must be seen, or the sweep has no subject. */
+group('the handle finish is offered exactly where it costs something');
+{
+  const paid = HANDLE_FINISHES.filter(f => f.delta > 0);
+  ok(paid.length > 0, 'no handle finish costs anything — this sweep cannot tell shown from hidden');
+  let shown = 0, hidden = 0;
+  for (const hn of HANDLES) for (const bw of BOWS) for (const bl of BELLS) {
+    const st = repair({ ...DEFAULTS, handle: hn.id, grab: bw.id, bell: bl.id }).state;
+    const moves = paid.some(f => priceAgorot({ ...st, handleFinish: f.id })
+                              !== priceAgorot({ ...st, handleFinish: HANDLE_FINISHES[0].id }));
+    const on = finishHasSubject(st);
+    if (on) shown++; else hidden++;
+    ok(on === moves,
+       `${hn.id} / ${bw.id} / ${bl.id}: the finish group is ${on ? 'shown' : 'hidden'} and a paid `
+     + `finish ${moves ? 'moves' : 'does not move'} the price — the page and the bill disagree`);
+  }
+  ok(shown > 0 && hidden > 0,
+     `the sweep saw ${shown} shown and ${hidden} hidden — one half is missing, so it tested nothing`);
 }
 
 group('a finish is named on the fitting that has one, and nowhere else');

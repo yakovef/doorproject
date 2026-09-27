@@ -150,6 +150,15 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** Copy and small chrome, the first of the big round's eight commits
+  (the owner's son's eleven notes): **עצבו** את הדלת שלכם, one line, the lede
+  gone (title 99 → 34 px at 1280×720, leaf 421 → 468 px — the band of commit 4
+  spends it); the gallery opener on `--accent` with ink (5.62:1, asserted);
+  the summary's send full-width 56 px "הזמינו את הדלת דרך נציג" with the
+  telephone under it from `PHONE_DISPLAY`; the handing card gone (the order
+  keeps `handingWords()`); undo/redo 52 px and a floppy save (`HUD_ICON`);
+  the handle finish shown only with a bar, bow or bell (`finishHasSubject`,
+  held to the price). Long form: `HISTORY.md`.
 - **27.9** The Rotem INTO THE APP (*"yes put it in and fix the coral and curved"*),
   with its lever as photographed (reach 114, root 19 past), and the Coral 128 →
   133 and curved lever 106 → 109 — their "parallax" shrink ran the wrong way; the
@@ -176,13 +185,6 @@ lines here. Dates are the day of the change.
   9.12 M), traced per group: 60 designs per colour stopped being buildable —
   the Coral beside a 700 mm Idan on `extra1`/`halfextra1` with the square
   window; the Coral's measured 70 mm lock (66 → all 60 fit again). §9.
-- **27.9** Four navigator marks redrawn "so that a 5 year old will
-  understand", after each section was described first (the brief is in
-  `js/icons.js`): colour a palette, pz a bolt with a glint, face a child's door
-  (two panels, a knob), grip the bar on two posts off a wall line. Kept on his
-  word: fit, lock, glass, mk, sum. The spec's `handle` row now shares `grip`
-  (six rows by reference, asserted). Worst nav pairs 0.60. Long form:
-  `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -241,7 +243,9 @@ by Hebrew readers.
 ### The chrome stands on the wall
 
 The page has no header. The language picker and undo/redo stand in the wall
-beside the door, placed by the owner with circles on a screenshot.
+beside the door, placed by the owner with circles on a screenshot; since 27.9
+undo/redo are 52 px and a floppy-disk save stands beside them (`#save-hud`,
+the summary's own `saveCurrent`).
 
 - **`.quote` — the price and a quiet send — moves with the viewport:** in the
   wall under the right-hand lamp on a desktop, a bar at the foot of a phone
@@ -288,10 +292,10 @@ the artefact** — walking §7's T-list means grepping for each one.
 | gate | reading | when |
 |---|---|---|
 | `npm test` | 9,118,760 assertions, **0 failed** (9,210,648 before the levers' merge; the 92 k are 60 Coral + 700 mm bar designs per colour, §9) — the total is the product of catalogue list lengths and is not evidence of anything (it rose from 7.48 M on 27.9 with three more grilles; it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves); read the failure count | 27.9 |
-| `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) — about 20 minutes now; the price-breakdown check waits for its animation since 27.9. ⚠ It was **red for one commit** on 27.9 (8 faults, one per viewport) because the trio change stranded two of its assertions — §5.27, and the reason it is worth running the audit on a commit that changes what `repair` does | 27.9 |
-| `npm run collide` | `all` (1,508 designs — 1,338 base, 552 of them with the bow, plus 170 face-detail; the 20 over 26.9 are the glazed trio) and `boxes` clean | 27.9 |
-| `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, nothing broke | 27.9 |
-| `npm run latency` | **262 ms** worst door against a 600 ms gate — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS** (261 · 531 · 656 for default · sidelight+ironwork · the heaviest). Established 27.9 by running this commit and `6934c0d` interleaved, three each: medians 275 and 262, ranges 261–287 and 260–281, one new run faster than one old — no difference between the code. `6934c0d` itself recorded 183 ms and reads 262 here, so the container is ~1.4× slower than the one that took that figure, and a single run's spread on it is ~90 ms | 27.9 |
+| `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) — about 20 minutes; the price-breakdown check waits for its animation. Last full run on the Rotem commit `a74ec6b` (27.9), before the big round's first commit was merged in; that commit ran its per-view audit at 1280×720 and 320×568. ⚠ It was **red for one commit** on 27.9 (8 faults) because the trio change stranded two of its assertions — §5.27 | 27.9 |
+| `npm run collide` | `all` (1,508 designs — 1,338 base, 552 of them with the bow, plus 170 face-detail) and `boxes` clean on the Rotem (27.9: coral/square `in` 140, levertaper 116, plate 47/114/161, each re-measured) | 27.9 |
+| `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, nothing broke (the Rotem commit) | 27.9 |
+| `npm run latency` | **227 ms** worst door against a 600 ms gate — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · 531 · 656 for default · sidelight+ironwork · the heaviest (27.9: the default door carries the Rotem, and its redrawn plate is 7 elements more than the waisted one's 261). Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 27.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
 | `npm run sheets` | the 51 bare sheet files (three twins' `against` sheets added 27.9) and 6 `lockset` sheets byte-stable across commits that do not touch the drawing; the design pairs moved 11 and added 3, every one a twin or an etched design. ⚠ The trio's rows and the משקוף section moved **0 bare sheets and 0 lockset**, as predicted: no fixture carries a three-panel face (`js/works.js` is 27 `plain` + 3 `panel2`, `tools/against.mjs` sets no face at all) and a tile is not in `?bare=1`. Only `.stamps.json` and 7 of the 12 `shot` sheets — the documented noise floor ⚠ The levers' merge (27.9) moved 40 of the 57: every one by its nickel lock furniture only — the 10 recreates and 10 corpus the tools write, all 6 lockset, 14 `against-` crops by one lever-sized patch at their edge; the 17 still are window-only crops and 7 `recreate-` files no tool writes any more | 27.9 |
@@ -1210,8 +1214,9 @@ are not in `VIEWS`:
 - **repairs** — a real repair at every viewport, every sentence on screen, its
   box covering no option; an undo that moves the price names a spec row.
 - **the summary** — spec before explainer (as an ORDER, not a row count); the
-  table above 700 px and the line below, exactly one drawn; the handing
-  confirmation whole, with `handingWords()`'s exact sentence.
+  table above 700 px and the line below, exactly one drawn; no handing card
+  (removed 27.9 — the order keeps `handingWords()`) and, under the green send,
+  the telephone reading exactly `PHONE_DISPLAY`.
 - **routes** — `prefers-reduced-motion` (nothing left running), bare mode,
   no-photo (drawn room still painting), a wrong code says the code was not
   recognised, the language switch leaves no Hebrew behind, the order sheet
@@ -1507,10 +1512,10 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   (the boot call does not do `goStep`'s ~50 px scroll), and **568×320 is short by
   five pixels** on every step. Named exemptions.
 - **The summary cannot show its whole spec at 1280×720**: the table starts at
-  523 behind the heading and the 122 px handing confirmation (`UX-FINDINGS` §2,
-  asserted whole everywhere). Denser rows, folding the confirmation into the
-  פתיחה row (a product decision — it is the order's sentence), or a wider summary
-  column.
+  385 now (the handing card went on 27.9; it was 523) and 3 of the default
+  door's 8 rows are whole above the pinned foot — which grew 93 → 151 px with
+  the full-width send and the telephone under it. 1100×800 5 of 8, 1440 7,
+  1680 8, 1920×918 7. Denser rows or a wider summary column.
 - **At 320×568 step 01 arrives with its answers 78 px below the fold.** What
   would close it: the illustration note (45 px) not standing between door and
   question on a phone — an honesty commitment, ask before moving it — or shorter
