@@ -514,6 +514,36 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** The nine navigator marks redrawn as what each step sells — *"really
+  represent the actual content of the section and not some random circles and
+  squares"*: ajar door, swatch fan, lever on its plate, hinge with a glint,
+  panel-and-strips door, slanted pane, bar with its length, the frame alone,
+  the sheet with a tick (`js/icons.js`). Drafts failed the audit's pairwise
+  raster (face~glass 0.45, glass~sum 0.47) until the OUTLINES differed; worst
+  pair now fit~mk 0.60. Five spec rows share their step's mark by reference,
+  asserted. No bare sheet moved. Long form: above.
+- **27.9** Phone back/next in the bottom bar as two 44 px icon arrows, the step's
+  foot not shown below 1100, the send "שלחו / Send / Отправить" — *"moved to the
+  bottom of the page and be seen at all times … just send"*. Bar height as
+  before; the price box has a real floor at the figure now and the caption
+  yields (it had set the box: 152 px in Russian). Falsified: worded back —
+  320 he and ru 320–390 overflow; the foot shown — every step. Test 9,196,962 /
+  5 (sheets). Long form: above.
+- **27.9** Every window design in black OR the door's colour, all seven — the
+  owner's son reversing his own 26.9 note (`8e1905d` reverted whole, the outline
+  removal kept): base black, `-light` twin the paint; `circles-light`,
+  `vine-light`, `tree-light` appended (15/16). Tiles re-tint (`retintOptions`).
+  Falsified: twins black, `tree-light` dropped. Test 9,196,962 / 5 (sheets).
+  Long form: above.
+- **27.9** No outline round the inside of the glass — *"there is a black
+  outline around the inside of the window, I want it removed"*: `aperture`'s
+  stroke of the paint ×0.6 deleted; the 8 mm rebate stays (under the opaque
+  pane, 0 px on screen). Falsified: the stroke back fails every pane (48).
+  Sheets, one run for all three 27.9 changes, as predicted: 19 bare moved, all
+  glazed, 0 solid, 0 lockset; 11 of the 19 carry the white/black change too
+  (the light twins, circles, tree, the four glazed recreates, corpus-07).
+  Gates: test 7,483,871 / 0, audit clean (its breakdown check had measured an
+  animation, 9.7 px once — it waits now), collide 1,488, fuzz clean, glass unmoved.
 - **27.9** A design is white or black, never the door's colour — *"The colors
   of the designs are only white or black, they are not based on the door
   color"* (overruling Peretz's 26.8 *"…גם בגוון הדלת"*): `-light` twins white on

@@ -129,90 +129,49 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
-- **27.9** No figures on the משקוף section — *"Remove the numbers from the
-  mashkof section, maybe in the future I will give you accurate numbers but
-  right now I don't have them so I think it's better to not show a number than
-  show a false one."* The three figures (46/82, 62/112, 148/198) and the three
-  dimension marks they sat on go from `mashkofGlyph`; the C and the three part
-  NAMES stay, and the pills keep their prices, which are his father's. So the
-  section says it RELATIVELY — a widened part is a longer arm or a deeper falc,
-  now asserted off the catalogue's own `wide` list. `MASHKOF_PARTS` keeps its
-  widths: the drawing needs them for two parts of three. The one-ruler
-  assertion reads the three drawn PIECES instead of the marks beside them, which
-  is a step closer to the door, and *no `<text>` may carry a digit* is asked of
-  EVERY text rather than of the deleted `glyph__dim` group (§5.15). `.glyph__dim`
-  went from `css/app.css` with the class. Falsified: one figure printed back → 8
-  faults, one per frame; the section ignoring its frame → 32. ⚠ Restoring the
-  MARKS alone fires nothing and should not — they are `<path>`, the one-ruler
-  clause reads the three `<rect>` pieces, and a tick with no figure states
-  nothing. ⚠ Carries the audit assertion the trio commit LEFT OUT: `5676973`
-  reversed the glazed trio's refusal and `tools/audit.mjs` went on asserting it,
-  so the audit was red at that commit. Long form: `HISTORY.md`.
+- **27.9** No figures on the משקוף section — *"…it's better to not show a number
+  than show a false one."* The three figures (46/82, 62/112, 148/198) and the
+  dimension marks they sat on go from `mashkofGlyph`; the C, the three part NAMES
+  and the pills' prices stay, so the section says it RELATIVELY — a widened part
+  is a longer arm or a deeper falc, asserted off the catalogue's own `wide` list.
+  `MASHKOF_PARTS` keeps its widths (the drawing needs two parts of three). The
+  one-ruler assertion reads the three drawn PIECES, and *no `<text>` carries a
+  digit* is asked of EVERY text rather than of the deleted `glyph__dim` group
+  (§5.15); the CSS rule went with the class. Falsified: one figure back → 8, one
+  per frame; the section ignoring its frame → 32; the MARKS back → nothing, and
+  correctly — they are `<path>` and the clause reads the three `<rect>` pieces.
+  ⚠ Also carries the audit assertion `5676973` left out: it went on asserting
+  the refusal that commit reversed, so the audit was red there. Long form:
+  `HISTORY.md`.
 - **27.9** The three-panel face takes the window, and its rows are DERIVED from
-  it — *"When I try changing from the Greek set or 2 panels when you have a
-  window to the 3 panel option, it doesn't let me. I remind you that the window
-  doesn't change size no matter what, and what is not right is probably the
-  proportions of the panels, change them so that the window will fit there
-  perfectly."* ⚠ Reverses the 26.9 refusal, on his word. `trioRows(leafH)`
-  replaces `PANEL_ROWS.trio`: upper = the square window's casing rectangle
-  (`frac` grown by `MOULD_BAND`), the plate one measured rail below it, the lower
-  panel the second rail below that — 0.120–0.560 · 0.586–0.680 · 0.705–0.913 on
-  the standard leaf, and a FUNCTION because 70 mm of casing is a different
-  fraction on every size (§5.16). The 24.9 rows are kept beside it — measured,
-  overruled, kept; what survives is the plate's 0.094 and the two rails. Cost,
-  measured: the head rail 131 → 246 mm, the plate down 129, the lower panel
-  556 → 426; the bow follows the plate to 0.633 of the leaf, inside `HOME_REACH`.
-  ⚠ The refusal MOVED rather than going — the tall slot still lands 322–488 mm in
-  the plate, so `why.winPlate` keeps a reader; measured before deleting it.
-  Price `DETAIL_GLAZED.panel3 = DETAIL.panel3 − DETAIL.panel2` as the expression,
-  ₪450 (A21) → a glazed trio is ₪7,445. ⚠ And *"a panel that is charged for is a
-  panel that is drawn"* had been reading the FIXED leaf's group on a double and
-  agreeing by coincidence; it reads the group that declares the count now.
-  Falsified: the 24.9 rows typed back → 30 faults. `collide -- all` 1,488 →
-  1,508, `faceObstacles` agreeing with the drawing everywhere. Test
-  9,210,382 / 5 (sheets). Long form: `HISTORY.md`.
+  it — *"…the window doesn't change size no matter what, and what is not right is
+  probably the proportions of the panels, change them so that the window will fit
+  there perfectly."* ⚠ Reverses the 26.9 refusal, on his word. `trioRows(leafH)`
+  replaces `PANEL_ROWS.trio`: upper = the square window's casing rectangle, the
+  plate one measured rail below it, the lower panel the second rail below that
+  (0.120–0.560 · 0.586–0.680 · 0.705–0.913 standard) — a FUNCTION, because 70 mm
+  of casing is a different fraction on every size (§5.16). The 24.9 rows are kept
+  beside it: measured, overruled, kept. ⚠ The refusal MOVED rather than going —
+  the tall slot still lands 322–488 mm in the plate, so `why.winPlate` keeps a
+  reader. Price `DETAIL_GLAZED.panel3 = DETAIL.panel3 − DETAIL.panel2`, ₪450
+  (A21) → a glazed trio is ₪7,445. ⚠ And *"a panel that is charged for is a panel
+  that is drawn"* had been reading the FIXED leaf's group on a double and agreeing
+  by coincidence; it reads the group that DECLARES the count now. Falsified: the
+  24.9 rows typed back → 30 faults. `collide -- all` 1,488 → 1,508. Long form:
+  `HISTORY.md`; §3 carries the derivation and what it cost.
 - **27.9** The curved lever's name is permanent: ידית מתעקלת / Curved lever /
   Изогнутая ручка (*"give the curved lever a permanent name"*); id untouched,
   1b and A19 closed. New: nothing on sale carries a provisional name. Slow run
   for the design pairs, the bar and this, as predicted: 11 bare sheets moved
-  and 3 new, all twins or etched (the icon commit below carries the same files,
-  byte-identical); the audit's stale on-door exemption was found here too and
-  is closed by the entry below. Gates: test 9,197,205 / 0 (after the rebase),
+  and 3 new, all twins or etched (the navigator-marks commit, now in
+  `HISTORY.md`, carries the same files byte-identically); the audit's stale
+  on-door exemption was found here too and is closed by the entry below.
+  Gates: test 9,197,205 / 0 (after the rebase),
   collide 1,488, fuzz clean, latency 183 ms, audit clean. Long form: `HISTORY.md`.
 - **27.9** The audit's four named "price card on the door" readings (1100/1152
   px, widest doubles) were stale: "Send" shrank the card to 113–142 px and it
   is on no door now (measured on `7b9dc43` alone). `ON_DOOR_OK` emptied, so
   that clause fires on every reading. Long form: `HISTORY.md`.
-- **27.9** The nine navigator marks redrawn as what each step sells — *"really
-  represent the actual content of the section and not some random circles and
-  squares"*: ajar door, swatch fan, lever on its plate, hinge with a glint,
-  panel-and-strips door, slanted pane, bar with its length, the frame alone,
-  the sheet with a tick (`js/icons.js`). Drafts failed the audit's pairwise
-  raster (face~glass 0.45, glass~sum 0.47) until the OUTLINES differed; worst
-  pair now fit~mk 0.60. Five spec rows share their step's mark by reference,
-  asserted. No bare sheet moved. Long form: `HISTORY.md`.
-- **27.9** Phone back/next in the bottom bar as two 44 px icon arrows, the step's
-  foot not shown below 1100, the send "שלחו / Send / Отправить" — *"moved to the
-  bottom of the page and be seen at all times … just send"*. Bar height as
-  before; the price box has a real floor at the figure now and the caption
-  yields (it had set the box: 152 px in Russian). Falsified: worded back —
-  320 he and ru 320–390 overflow; the foot shown — every step. Test 9,196,962 /
-  5 (sheets). Long form: `HISTORY.md`.
-- **27.9** Every window design in black OR the door's colour, all seven — the
-  owner's son reversing his own 26.9 note (`8e1905d` reverted whole, the outline
-  removal kept): base black, `-light` twin the paint; `circles-light`,
-  `vine-light`, `tree-light` appended (15/16). Tiles re-tint (`retintOptions`).
-  Falsified: twins black, `tree-light` dropped. Test 9,196,962 / 5 (sheets).
-  Long form: `HISTORY.md`.
-- **27.9** No outline round the inside of the glass — *"there is a black
-  outline around the inside of the window, I want it removed"*: `aperture`'s
-  stroke of the paint ×0.6 deleted; the 8 mm rebate stays (under the opaque
-  pane, 0 px on screen). Falsified: the stroke back fails every pane (48).
-  Sheets, one run for all three 27.9 changes, as predicted: 19 bare moved, all
-  glazed, 0 solid, 0 lockset; 11 of the 19 carry the white/black change too
-  (the light twins, circles, tree, the four glazed recreates, corpus-07).
-  Gates: test 7,483,871 / 0, audit clean (its breakdown check had measured an
-  animation, 9.7 px once — it waits now), collide 1,488, fuzz clean, glass unmoved.
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -319,12 +278,12 @@ the artefact** — walking §7's T-list means grepping for each one.
 |---|---|---|
 | `npm test` | ~9.20 M assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything (it rose from 7.48 M on 27.9 with three more grilles; it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves); read the failure count | 27.9 |
 | `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) — about 20 minutes now; the price-breakdown check waits for its animation since 27.9 | 27.9 |
-| `npm run collide` | `all` (1,488 designs, 552 with the bow) and `boxes` clean | 27.9 |
+| `npm run collide` | `all` (1,508 designs — 1,338 base, 552 of them with the bow, plus 170 face-detail; the 20 over 26.9 are the glazed trio) and `boxes` clean | 27.9 |
 | `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, nothing broke | 27.9 |
 | `npm run latency` | 183 ms worst door against a 600 ms gate | 27.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
-| `npm run sheets` | the 51 bare sheet files (three twins' `against` sheets added 27.9) and 6 `lockset` sheets byte-stable across commits that do not touch the drawing; the design pairs moved 11 and added 3, every one a twin or an etched design, as predicted | 27.9 |
+| `npm run sheets` | the 51 bare sheet files (three twins' `against` sheets added 27.9) and 6 `lockset` sheets byte-stable across commits that do not touch the drawing; the design pairs moved 11 and added 3, every one a twin or an etched design. ⚠ The trio's rows and the משקוף section moved **0 bare sheets and 0 lockset**, as predicted: no fixture carries a three-panel face (`js/works.js` is 27 `plain` + 3 `panel2`, `tools/against.mjs` sets no face at all) and a tile is not in `?bare=1`. Only `.stamps.json` and 7 of the 12 `shot` sheets — the documented noise floor | 27.9 |
 
 ⚠ **When a bare sheet moves on a commit that could not have moved it, find out
 what did** — that is how chrome painted across every sheet was found once. And
