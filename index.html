@@ -13,7 +13,7 @@
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=56e4b5ff">
+<link rel="stylesheet" href="css/app.css?v=7ff0880a">
 
 <!-- ⚠ THE PHOTOGRAPHED ROOM, IN TWO CROPS, AND ONLY ONE IS EVER FETCHED.
      The owner supplied the same entrance framed 3:4 and 16:9 and both ship:
@@ -237,7 +237,7 @@
 <noscript id="down-css"><style>
   #down[hidden] { display: block !important; }
   #choices, .stage, .stage__bar, .stage__hud,
-  .send__spec, .send__lead, .send__alt { display: none; }
+  .send__spec, .send__lead, .send__alt, .send__tel { display: none; }
   /* ⚠ THE QUOTE BAR'S PRICE GOES AND ITS SEND STAYS, and the second half of
      that is not tidiness — it is the only send button guaranteed to survive.
      `#choices` is hidden above, and `goStep` MOVES `.panel--send` inside it;
@@ -305,9 +305,14 @@
       </svg>
       <span class="brand__name">דלתות מגן</span>
     </p>
-    <h1 class="stage__h1" id="stage-h"><span data-t="stage.h1">בנו את הדלת שלכם</span>
-      <span class="stage__lede" data-t="stage.lede">בחרו את הפרטים ותראו את השינוי בזמן אמת</span>
-    </h1>
+    <!-- ⚠ SMALLER, AND THE LEDE UNDER IT IS GONE — 27.9.2026, the owner's son:
+         "the white strip with the main text smaller and less tall, remove
+         'בחרו את הפרטים ותראו את השינוי בזמן אמת'", and "rename to '**עצבו** את
+         הדלת שלכם'". The verb is a <strong> of its own key in every language.
+         The height it gives back is the budget of the band above the door
+         (the live step's name), measured on the leaf at 1280, 1440 and 1920. -->
+    <h1 class="stage__h1" id="stage-h"><strong data-t="stage.h1.verb">עצבו</strong>
+      <span data-t="stage.h1.rest">את הדלת שלכם</span></h1>
     <div class="stage" id="stage"></div>
 
     <!-- ⚠ THE WALL IS THE CHROME NOW. Asked for from outside with three
@@ -348,6 +353,14 @@
             </svg>
           </button>
         </div>
+        <!-- ⚠ AND A SAVE BESIDE THEM, 27.9.2026 — the owner's son: "put a save
+             button near them, with the icon of an old hard drive." The same
+             `saveCurrent` the summary's "שמירת העיצוב" calls; its floppy disk
+             is `HUD_ICON.save` in js/icons.js, written in by app.js. Never
+             disabled: there is always a door to save. -->
+        <button type="button" class="iconbtn" id="save-hud"
+                aria-label="שמירת העיצוב" title="שמירת העיצוב"
+                data-ta="aria-label=saved.hud,title=saved.hud"></button>
       </div>
     </div>
 
@@ -526,10 +539,24 @@
         <svg viewBox="0 0 24 24" aria-hidden="true" width="22" height="22">
           <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.04-.98.22-3.3-.69-2.78-1.1-4.55-3.94-4.69-4.12-.14-.18-1.12-1.49-1.12-2.85s.71-2.02.97-2.3c.25-.27.55-.34.73-.34l.53.01c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.31.02.49-.09.18-.14.29-.28.45l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.28.14.44.12.6-.07.18-.2.7-.81.88-1.09.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.2.53.32.07.11.07.66-.17 1.34Z"/>
         </svg>
-        <span class="wa__on" data-t="send.waOn">שלחו את הדלת בוואטסאפ</span>
+        <span class="wa__on" data-t="send.waOn">הזמינו את הדלת דרך נציג</span>
         <span class="wa__off" data-t="send.waOff">שלחו לנו הודעה בוואטסאפ</span>
         <!-- The third state: a door nobody has touched. See `is-untouched`. -->
         <span class="wa__ask" data-t="send.waAsk">יש לי שאלה — דברו איתי בוואטסאפ</span>
+      </a>
+      <!-- ⚠ THE TELEPHONE, BIG, UNDER THE SEND — 27.9.2026, the owner's son:
+           "the WhatsApp button big, saying 'הזמינו את הדלת דרך נציג'; and show
+           053-219-7466." The digits are NOT typed here: `app.js` writes
+           `PHONE_DISPLAY` into the span, as it does for every
+           `[data-phone-text]` (the number drifted once between two copies).
+           The href is the one `npm test` holds to `PHONE_TEL`. `placeSend`
+           keeps this line directly after `#wa-btn` wherever that goes, so the
+           two read as one offer: write, or ring. A page whose script never ran
+           hides it (`down-css`) — the strip above carries the number then. -->
+      <a class="send__tel" id="send-tel" href="tel:+972532197466">
+        <svg class="send__tel-ico" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6.6 3.6h2.9l1.4 4.1-2 1.4a12 12 0 0 0 5.9 5.9l1.4-2 4.1 1.4v2.9a2 2 0 0 1-2.2 2A16.6 16.6 0 0 1 4.6 5.8a2 2 0 0 1 2-2.2Z"/>
+        </svg><span data-phone-text></span>
       </a>
 
       <div class="send__alt">
@@ -675,7 +702,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=b40cdfb3"></script>
+<script src="assets/bundle.js?v=1713fa25"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

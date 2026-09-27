@@ -139,6 +139,15 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** Copy and small chrome, the first of the big round's eight commits
+  (the owner's son's eleven notes): **עצבו** את הדלת שלכם, one line, the lede
+  gone (title 99 → 34 px at 1280×720, leaf 421 → 468 px — the band of commit 4
+  spends it); the gallery opener on `--accent` with ink (5.62:1, asserted);
+  the summary's send full-width 56 px "הזמינו את הדלת דרך נציג" with the
+  telephone under it from `PHONE_DISPLAY`; the handing card gone (the order
+  keeps `handingWords()`); undo/redo 52 px and a floppy save (`HUD_ICON`);
+  the handle finish shown only with a bar, bow or bell (`finishHasSubject`,
+  held to the price). Long form: `HISTORY.md`.
 - **27.9** The handle branch merged into this one (*"yes you should"* — the levers
   were only on `claude/door-handle-design-catalog-votz53` and the owner's son
   looked for them on the page): the Coral and the curved lever measured off seven
@@ -160,29 +169,6 @@ lines here. Dates are the day of the change.
   word: fit, lock, glass, mk, sum. The spec's `handle` row now shares `grip`
   (six rows by reference, asserted). Worst nav pairs 0.60. Long form:
   `HISTORY.md`.
-- **27.9** The round's gates re-read, and ⚠ **`npm run latency`'s milliseconds
-  turn out to be a reading of the CONTAINER**: the jump 183 → 321/339/386 ms was
-  investigated instead of written down, and `6934c0d` run beside this commit,
-  three each interleaved, gives medians 262 and 275 with overlapping ranges and
-  one new run faster than one old — no difference between the code. The same
-  `6934c0d` that recorded 183 ms reads 262 here, so this container is ~1.4×
-  slower and a single run's spread is ~90 ms. §0c and §7 now say to compare the
-  ELEMENT COUNTS (261 · 531 · 656) and how to run the two commits side by side.
-  Audit clean at all eight `VIEWS`; test 9,210,648 / 0; sheets 0 bare, 0 lockset.
-  Long form: `HISTORY.md`.
-- **27.9** The square window displaces NO face now, and the two audit clauses
-  about that displacement are restated (§5.27 — a new shape). The trio commit
-  stranded two of them, not one: the first guarded its own precondition and
-  failed at all eight viewports (*"this check has lost its subject"*), the second
-  did not and **passed while testing nothing**. Measured: `rect` leaves all four
-  faces alone; the tall SLOT still takes the pair (`why.noRoomBelow`, 337 mm) and
-  the trio (`why.winPlate`, 488), so the displacement claims move there and sweep
-  both faces, and *the square window takes nothing* is asserted beside them
-  (§5.22). ⚠ The deliberate-choice clause moved to the STRIPES: a deliberate
-  `plain` tap was measured and does NOT disarm the memory, so asserting it would
-  have demanded behaviour the page lacks. Falsified three ways, each flipping only
-  its own clause — 24.9 rows back → 1a; the slot displacing nothing → both 1b;
-  the restore guard dropped → 3. Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -241,7 +227,9 @@ by Hebrew readers.
 ### The chrome stands on the wall
 
 The page has no header. The language picker and undo/redo stand in the wall
-beside the door, placed by the owner with circles on a screenshot.
+beside the door, placed by the owner with circles on a screenshot; since 27.9
+undo/redo are 52 px and a floppy-disk save stands beside them (`#save-hud`,
+the summary's own `saveCurrent`).
 
 - **`.quote` — the price and a quiet send — moves with the viewport:** in the
   wall under the right-hand lamp on a desktop, a bar at the foot of a phone
@@ -1199,8 +1187,9 @@ are not in `VIEWS`:
 - **repairs** — a real repair at every viewport, every sentence on screen, its
   box covering no option; an undo that moves the price names a spec row.
 - **the summary** — spec before explainer (as an ORDER, not a row count); the
-  table above 700 px and the line below, exactly one drawn; the handing
-  confirmation whole, with `handingWords()`'s exact sentence.
+  table above 700 px and the line below, exactly one drawn; no handing card
+  (removed 27.9 — the order keeps `handingWords()`) and, under the green send,
+  the telephone reading exactly `PHONE_DISPLAY`.
 - **routes** — `prefers-reduced-motion` (nothing left running), bare mode,
   no-photo (drawn room still painting), a wrong code says the code was not
   recognised, the language switch leaves no Hebrew behind, the order sheet
@@ -1475,10 +1464,10 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   (the boot call does not do `goStep`'s ~50 px scroll), and **568×320 is short by
   five pixels** on every step. Named exemptions.
 - **The summary cannot show its whole spec at 1280×720**: the table starts at
-  523 behind the heading and the 122 px handing confirmation (`UX-FINDINGS` §2,
-  asserted whole everywhere). Denser rows, folding the confirmation into the
-  פתיחה row (a product decision — it is the order's sentence), or a wider summary
-  column.
+  385 now (the handing card went on 27.9; it was 523) and 3 of the default
+  door's 8 rows are whole above the pinned foot — which grew 93 → 151 px with
+  the full-width send and the telephone under it. 1100×800 5 of 8, 1440 7,
+  1680 8, 1920×918 7. Denser rows or a wider summary column.
 - **At 320×568 step 01 arrives with its answers 78 px below the fold.** What
   would close it: the illustration note (45 px) not standing between door and
   question on a phone — an honesty commitment, ask before moving it — or shorter

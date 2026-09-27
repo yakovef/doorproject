@@ -25,7 +25,8 @@ import { DETAILS, SIZES } from '../js/catalog.js';
 import { detailGlyph, stripesGlyph } from '../js/renderer.js';
 import { SECTION_ICON, SPEC_ICON } from '../js/icons.js';
 import { L, setLang, T, withLang } from '../js/copy.js';
-import { handingWords, specRows, summaryLine } from '../js/spec.js';
+import { specRows, summaryLine } from '../js/spec.js';
+import { PHONE_DISPLAY, PHONE_TEL } from '../js/share.js';
 import { repair } from '../js/rules.js';
 
 /* Derived, not spelled out: the code grew from seven characters to eight when
@@ -1716,53 +1717,64 @@ for (const v of VIEWS) {
             + `${send.below} px below the fold and the chip is not whole either`);
         }
 
-        /* ── AND THE HANDING IS CONFIRMED, IN THE ORDER'S OWN WORDS ─────
-           ⚠ `handing` IS THE ONLY DEFAULT IN THIS PRODUCT THAT COSTS MONEY TO
-           GET WRONG, and the page answers it for the customer because the
-           drawing has to draw something. Measured at 1280x720: on arrival the
-           ONLY controls the fold cuts through are the two handing pills — so
-           it is pre-answered and below the fold at once. The confirm row on
-           the summary is the answer (`UX-FINDINGS` §2, option B; option A
-           costs a `VERSION` bump for a third value in a packed index).
-
-           Three things, and the third is the one that would rot quietly: the
-           row is there, its control is WHOLE on screen at this viewport, and
-           its sentence is `handingWords()` to the character — the same
-           sentence the WhatsApp order carries. A confirmation phrased its own
-           way is a second statement of the fact that matters most on this
-           page, and §5's whole subject is what two statements of one fact
-           eventually do. */
+        /* ── THE HANDING CARD IS GONE, AND THE TELEPHONE IS UNDER THE SEND ──
+           ⚠ RESTATED 27.9.2026, SAME SUBJECT — WHAT THE SUMMARY SAYS BACK TO
+           THE CUSTOMER BESIDE THE SEND. This asserted a handing confirmation
+           (`.sum-hand`, 31.8) whole on screen with `handingWords()`'s exact
+           sentence. The owner's son asked for it to go (*"remove the thing
+           that says to change the direction of the door"*); the ORDER keeps
+           `handingWords()`, which `npm test` pins in the message and the
+           sheet. So what is asserted here is the card's ABSENCE — on a summary
+           this check first proves it is looking at (§5.15: an absence checked
+           on the wrong screen passes on every screen) — and, in its place, the
+           line he asked for: the telephone under the send, a `tel:` link,
+           whole on screen with the send and 44 px tall, reading exactly
+           `PHONE_DISPLAY` (never typed into the markup; the number has drifted
+           between two copies once). */
         const hand = await p.evaluate(() => {
-          const row = document.querySelector('.sum-hand');
-          const words = document.querySelector('[data-handing-words]');
-          const flip = document.querySelector('.sum-hand__flip');
-          if (!row || !words || !flip) return { missing: true };
-          const r = flip.getBoundingClientRect();
+          const sum = document.querySelector('.sect--sum.is-live:not([hidden])');
+          const tel = document.querySelector('#send-tel');
+          const wa = document.querySelector('#wa-btn');
+          const r = tel ? tel.getBoundingClientRect() : null;
           return {
-            words: (words.textContent || '').trim(),
-            whole: r.width > 0 && r.height > 0 && r.top >= 0 && r.left >= 0
-                   && r.bottom <= innerHeight && r.right <= innerWidth,
-            tap: Math.min(Math.round(r.width), Math.round(r.height)),
-            below: Math.round(Math.max(0, r.bottom - innerHeight)),
+            onSummary: !!sum,
+            card: !!document.querySelector('.sum-hand, [data-handing-words]'),
+            tel: !!tel,
+            text: tel ? tel.textContent.trim() : '',
+            href: tel ? tel.getAttribute('href') : '',
+            afterSend: !!(tel && wa && tel.previousElementSibling === wa),
+            whole: !!r && r.width > 0 && r.height > 0 && r.top >= 0 && r.bottom <= innerHeight,
+            tall: r ? Math.round(r.height) : 0,
           };
         });
-        if (hand.missing) {
-          fault(v.name, 'the summary has no handing confirmation — the one default '
-            + 'in this product that costs money to get wrong is answered for the '
-            + 'customer and never put back to them');
+        if (!hand.onSummary) {
+          fault(v.name, 'the summary check is not on the summary — the handing card\'s absence '
+            + 'and the telephone line would be read off another step');
         } else {
-          if (!hand.whole) {
-            fault(v.name, 'the handing confirmation is not fully on screen'
-              + (hand.below ? ` — ${hand.below} px below the fold` : ''));
+          if (hand.card) {
+            fault(v.name, 'the summary still carries the handing card the owner\'s son asked to '
+              + 'remove (`.sum-hand` / `[data-handing-words]`)');
           }
-          if (hand.tap < 44) {
-            fault(v.name, `the handing confirm control is ${hand.tap} px on its short `
-              + 'side, under the 44 px this project asserts everywhere');
-          }
-          const want = handingWords(DEFAULTS);
-          if (hand.words !== want) {
-            fault(v.name, 'the handing confirmation does not say what the ORDER says: '
-              + `page "${hand.words}" against spec.js "${want}"`);
+          if (!hand.tel) {
+            fault(v.name, 'the summary has no telephone line under the send');
+          } else {
+            if (hand.text !== PHONE_DISPLAY) {
+              fault(v.name, `the telephone under the send reads "${hand.text}", not `
+                + `js/share.js's PHONE_DISPLAY "${PHONE_DISPLAY}"`);
+            }
+            if (hand.href !== `tel:${PHONE_TEL}`) {
+              fault(v.name, `the telephone under the send dials "${hand.href}", not tel:${PHONE_TEL}`);
+            }
+            if (!hand.afterSend) {
+              fault(v.name, 'the telephone line is not directly after the green send — '
+                + 'placeSend moved one without the other');
+            }
+            if (send.wide && !hand.whole) {
+              fault(v.name, 'the telephone under the send is not whole on screen beside it');
+            }
+            if (hand.tall < 44) {
+              fault(v.name, `the telephone line is ${hand.tall} px tall, under the 44 px floor`);
+            }
           }
         }
 
@@ -5584,6 +5596,57 @@ for (const v of VIEWS) {
      that found fewer than one priced step per language is not reading prices. */
   if (priced < 3) fault('explainers', `only ${priced} priced steps were found across three languages — the price reader is not reading the page`);
   if (faults === before0) console.log(`    ${priced} priced steps across three languages, no explainer says the prices are the same; the colour sentence is on the colour step and the summary in all three`);
+}
+
+/* ── THE HANDLE FINISH IS ON THE PAGE ONLY WHERE IT PAINTS SOMETHING ──────
+   27.9.2026, the owner's son: *"make the color options only appear if there is
+   a pull handle, either vertical or horizontal."* `npm test` holds the
+   predicate to the price; this holds the PAGE to the predicate, and it asks it
+   the two ways a door arrives — a link (the paint at boot) and a tap (the
+   paint after a change) — because a listing rule evaluated when the tiles were
+   built froze at the booted state once (8.9). The bell counts (Peretz 20.9;
+   ours to state, CLAUDE.md §0a). */
+{
+  console.log('\nthe handle finish is shown only with something to paint');
+  const before = faults;
+  const pg = await b.newPage({ viewport: { width: 1280, height: 800 } });
+  const read = () => pg.evaluate(() => {
+    const f = document.querySelector('.field[data-group="handleFinish"]');
+    return f ? { hidden: f.hidden, seen: f.checkVisibility() } : null;
+  });
+  const toGrip = () => pg.evaluate(() => document.querySelector('.steps__step[data-step="grip"]')?.click());
+  let asked = 0;
+  for (const [q, want, what] of [['', false, 'no pull handle'], ['&n=idan', true, 'an Idan'],
+       ['&n=channel', false, 'the recessed channel'], ['&gb=grab', true, 'the bow'],
+       ['&bl=bell', true, 'the doorbell']]) {
+    await pg.goto(`file://${process.cwd()}/index.html?lang=he${q}`);
+    await pg.waitForTimeout(300);
+    await toGrip();
+    await pg.waitForTimeout(150);
+    const m = await read();
+    if (!m) { fault('finish-group', `${what}: no handle-finish field on the page — nothing to check`); continue; }
+    asked++;
+    if (m.seen !== want || m.hidden === want) {
+      fault('finish-group', `${what} (link): the finish choice is ${m.seen ? 'shown' : 'hidden'} — `
+        + `it should be ${want ? 'shown' : 'hidden'}`);
+    }
+  }
+  /* and by the tap, both directions, on one page */
+  await pg.goto(`file://${process.cwd()}/index.html?lang=he`);
+  await pg.waitForTimeout(300);
+  await toGrip();
+  for (const [id, want] of [['idan', true], ['none', false]]) {
+    await pg.evaluate(i => document.querySelector(`.field[data-group="handle"] [data-id="${i}"]`)?.click(), id);
+    await pg.waitForTimeout(150);
+    const m = await read();
+    asked++;
+    if (!m || m.seen !== want) {
+      fault('finish-group', `tapping "${id}": the finish choice is ${m && m.seen ? 'shown' : 'hidden'} — `
+        + `it should be ${want ? 'shown' : 'hidden'}; the rule ran when the tiles were built, not on the paint`);
+    }
+  }
+  await pg.close();
+  if (faults === before) console.log(`    ${asked} readings: hidden with nothing to paint, shown with a bar, the bow or the bell, by link and by tap`);
 }
 
 /* ── THE WALL CHROME'S OWN INK STAYS OFF THE DOOR ────────────────────────

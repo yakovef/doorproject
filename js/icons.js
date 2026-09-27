@@ -230,3 +230,28 @@ export const SPEC_ICON = {
 export const specIcon = key => (Object.prototype.hasOwnProperty.call(SPEC_ICON, key)
   ? `<svg class="spec__ico" viewBox="0 0 24 24" aria-hidden="true">${SPEC_ICON[key]}</svg>`
   : '<span class="spec__ico" aria-hidden="true"></span>');
+
+/**
+ * ⚠ THE WALL'S OWN BUTTONS — 27.9.2026. The owner's son: *"make the undo
+ * buttons bigger and put a save button near them, with the icon of an old hard
+ * drive."* Undo and redo are drawn inline in `index.html` (they are in the
+ * markup from the first paint); the save is new and is drawn here, where a
+ * test can read it, and `app.js` puts it into `#save-hud` at boot.
+ * A 3½-inch floppy: the body with its one cut corner, the metal shutter across
+ * the top with its window, the label below. Drawn at 22 px, so one unit is
+ * 0.92 px and every gap here is at least 2.4 units — the 2 px the navigator's
+ * marks keep: the shutter's window stands 2.4 from the shutter's edge, the
+ * shutter 4.6 above the label.
+ */
+export const HUD_ICON = {
+  save: '<path d="M4.4 4.4h12.2l3 3v12.2H4.4Z"/>'
+      + '<path d="M7.6 4.4v5.2h7.8V4.4"/><path d="M12.8 5.8v2.4"/>'
+      + '<path d="M7.6 19.6v-5.4h8.8v5.4"/>',
+};
+
+export const hudIcon = key => {
+  if (!Object.prototype.hasOwnProperty.call(HUD_ICON, key)) {
+    throw new Error(`HUD_ICON has no glyph for "${key}"`);
+  }
+  return `<svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">${HUD_ICON[key]}</svg>`;
+};

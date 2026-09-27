@@ -246,10 +246,14 @@ export const UI = {
   'nav.lang':         ['שפה', 'Language', 'Язык'],
 
   /* ── the stage ────────────────────────────────────────────────── */
-  'stage.h1':         ['בנו את הדלת שלכם', 'Build your door', 'Соберите свою дверь'],
-  'stage.lede':       ['בחרו את הפרטים ותראו את השינוי בזמן אמת',
-                       'Choose the details and watch the door change',
-                       'Выбирайте детали и смотрите, как меняется дверь'],
+  /* ⚠ TWO KEYS FOR ONE HEADING, 27.9.2026 — the owner's son: *"rename to
+     '**עצבו** את הדלת שלכם'"*, the first word bold. The verb is its own key so
+     the markup can set it in `<strong>` in every language without a sentence
+     being split by script. `stage.lede` ("choose the details and watch the
+     change") went the same day on his word: the band above the door
+     (`.stage__band`) spends that height on the step's own name. */
+  'stage.h1.verb':    ['עצבו', 'Design', 'Создайте'],
+  'stage.h1.rest':    ['את הדלת שלכם', 'your door', 'свою дверь'],
   'stage.label':      ['הדלת שלכם', 'Your door', 'Ваша дверь'],
   /* ⚠ SEVEN GRIP KEYS AND `notice.moved` CAME OUT ON 18.9.2026 with the drag,
      the rotate button and the home button: `grip.drag`, `grip.rotate`,
@@ -442,21 +446,12 @@ export const UI = {
                        'Не уверены? Уточним вместе при замере.'],
   'g.panels':         ['פאנלים', 'Panels', 'Панели'],
 
-  /* ⚠ THE ONE QUESTION THE PAGE ANSWERS FOR THE CUSTOMER, ASKED BACK.
-     `handing` has to have a default — the drawing must draw something — and
-     this file calls the ימין/שמאל convention the only mistake on the list
-     that costs real money. Measured on the live page at 1280x720: on arrival
-     the ONLY controls the fold cuts through are the two handing pills. So the
-     highest-stakes decision in the product is pre-answered, below the fold,
-     and the natural gesture — glance, press הבא — accepts it in silence.
-     This is the confirm row on the summary. It is not a second control: same
-     `set()`, same field, no new value, no wire format, no VERSION. The
-     sentence is `handingWords()`, which is what the ORDER already says, so
-     the customer reads the words Peretz will read. */
-  'sum.hand.q':       ['כיוון הפתיחה — נכון?', 'The opening direction — is this right?',
-                       'Сторона открывания — верно?'],
-  'sum.hand.flip':    ['החלפה לצד השני', 'Switch to the other side',
-                       'Сменить на другую сторону'],
+  /* ⚠ `sum.hand.q` AND `sum.hand.flip` CAME OUT ON 27.9.2026 with the card
+     they labelled — the owner's son: *"at the end page … remove the thing that
+     says to change the direction of the door."* It was the handing asked back
+     on the summary (31.8, `UX-FINDINGS` §2 option B). The ORDER still carries
+     `handingWords()` — the message, the A4 sheet and the drawing's
+     `aria-label` — and the pills on step 01 still set it. */
 
   'g.colour.h':       ['הקוד שליד כל גוון הוא הקוד של היצרן.',
                        'The code beside each shade is the manufacturer’s own.',
@@ -678,7 +673,12 @@ export const UI = {
   'send.lead':        ['בחרתם דלת? שלחו לנו אותה ונחזור אליכם עם הצעה מדויקת.',
                        'Happy with it? Send it over and we will come back with an exact quote.',
                        'Готовы? Отправьте нам дверь, и мы вернёмся с точным предложением.'],
-  'send.waOn':        ['שלחו את הדלת בוואטסאפ', 'Send the door on WhatsApp', 'Отправить дверь в WhatsApp'],
+  /* 27.9.2026, the owner's son: *"the WhatsApp button big, saying 'הזמינו את
+     הדלת דרך נציג'"*. The summary's green send only; the bar keeps "שלחו". The
+     untouched door still asks a question (`send.waAsk`) — the label and the
+     message are one decision and the order has not been claimed yet. */
+  'send.waOn':        ['הזמינו את הדלת דרך נציג', 'Order the door through a representative',
+                       'Заказать дверь через представителя'],
   'send.waOff':       ['שלחו לנו הודעה בוואטסאפ', 'Message us on WhatsApp', 'Написать нам в WhatsApp'],
   /* "Send", no more, 27.9.2026 — the owner's son: *"rename the button to just
      send to save space."* The WhatsApp mark beside it says where; the green
@@ -713,7 +713,15 @@ export const UI = {
   /* ── saved designs ────────────────────────────────────────────── */
   'saved.mine':       ['העיצוב שלי', 'My designs', 'Мои дизайны'],
   'saved.none':       ['עדיין לא שמרתם עיצוב.', 'You have not saved a design yet.', 'Вы ещё не сохранили ни одного дизайна.'],
-  'saved.ok':         ['העיצוב נשמר בדפדפן הזה', 'Saved in this browser', 'Сохранено в этом браузере'],
+  /* ⚠ THE COUNT AND WHERE THE LIST LIVES, 27.9.2026 — the save is also a
+     button beside undo now (`#save-hud`), steps away from the drawer that
+     holds what it saved, so "saved" alone left the customer asking where. */
+  'saved.ok':         ['העיצוב נשמר בדפדפן הזה ({0}) — הרשימה בסיכום, תחת "העיצוב שלי"',
+                       'Saved in this browser ({0}) — the list is on the summary, under "My designs"',
+                       'Сохранено в этом браузере ({0}) — список в итоге, в разделе «Мои дизайны»'],
+  'saved.noun':       ['עיצוב שמור|עיצובים שמורים', 'saved design|saved designs',
+                       'сохранённый дизайн|сохранённых дизайна|сохранённых дизайнов'],
+  'saved.hud':        ['שמירת העיצוב', 'Save this design', 'Сохранить дизайн'],
   'saved.no':         ['הדפדפן הזה לא מאפשר לשמור עיצובים', 'This browser will not let us save designs',
                        'Этот браузер не позволяет сохранять дизайны'],
   'saved.remove':     ['הסרת {0}', 'Remove {0}', 'Удалить {0}'],
@@ -726,8 +734,13 @@ export const UI = {
   'works.lede':       ['בחרו דלת קרובה למה שרציתם — ומשם תשנו כל פרט.',
                        'Start from one close to what you had in mind, then change every detail.',
                        'Начните с двери, похожей на задуманную, — а дальше меняйте любую деталь.'],
-  'works.open':       ['התחילו מדלת שכבר התקנו', 'Start from a door we have fitted', 'Начните с уже установленной двери'],
-  'works.count':      ['{0} דלתות אמיתיות', '{0} real doors', '{0} реальных дверей'],
+  /* 27.9.2026, the owner's son: *"the button with the ready doors needs to be
+     more apparent … 'התחילו מדגמים מוכנים' and '30 דלתות שהתקנו'."* The count
+     is `WORKS.length` through `counted`, never typed: Russian takes three
+     forms of the noun and the number is Peretz's to grow. */
+  'works.open':       ['התחילו מדגמים מוכנים', 'Start from ready designs', 'Начните с готовых образцов'],
+  'works.count':      ['{0} שהתקנו', '{0} we have fitted', '{0}, которые мы установили'],
+  'works.noun':       ['דלת|דלתות', 'door|doors', 'дверь|двери|дверей'],
   /* The one dialog in the flow besides the gallery: a lever tapped against
      the pull handle already on the door. One sentence, one button, and the
      door unchanged when it closes — see `openClash` in `js/app.js`. */

@@ -26,6 +26,82 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE BIG ROUND, 1 OF 8: COPY AND SMALL CHROME.** Eleven notes from
+  the owner's son, four settled in chat, eight commits in an order chosen so a
+  session that dies early leaves a coherent branch (page work first, the one
+  wire-format change seventh). This one:
+  · **The title.** *"rename to '**עצבו** את הדלת שלכם'"*, the first word bold;
+    and *"the white strip with the main text smaller and less tall, remove
+    'בחרו את הפרטים ותראו את השינוי בזמן אמת'"*. `stage.h1` became two keys,
+    `stage.h1.verb` in a `<strong>` and `stage.h1.rest`; `stage.lede` and
+    `.stage__lede` went; the type 26–44 px/300 → 18–24 px. Measured on the
+    live page, standard door, he and ru identical — title / leaf height:
+    1280×720 98.7 → 33.5 / 421.0 → 467.9 · 1440×900 99.2 → 36.5 / 550.3 →
+    595.4 · 1920×918 99.2 → 37.6 / 563.3 → 607.6 · 1920×1080 99.2 → 37.6 /
+    679.9 → 724.3 · 1100×800 92.3 → 30.7 / 483.2 → 527.6. The phone is
+    untouched (the title is `sr-only` there). The height is the budget of
+    commit 4's band, whose assertion is the leaf no smaller than these BEFORE
+    figures minus 4 px.
+  · **The gallery opener.** *"more apparent, still in the palette;
+    'התחילו מדגמים מוכנים' and '30 דלתות שהתקנו'"*. Ground `--accent`, text
+    and count `--ink` (5.62:1; `--accent-ink` there would be 1.86). The count
+    is `counted(WORKS.length, 'works.noun')` — Russian takes three forms.
+    `npm test`'s one-accent allow-list names the selector with its new reason,
+    and a new clause reads the rule's `background` and `color` tokens out of
+    the stylesheet and asserts 4.5:1. Found on the way: the base rules for the
+    opener's two lines stood after the phone block, so the phone's weight lost
+    by source order (§8) — moved above it.
+  · **The summary's send.** *"the WhatsApp button big, saying 'הזמינו את הדלת
+    דרך נציג'; and show 053-219-7466."* `send.waOn` in three languages;
+    `#wa-btn` full width, 56 px (79 where Russian wraps at 320–390), the green
+    it has. Under it `#send-tel`, a `tel:` link whose digits `app.js` writes
+    from `PHONE_DISPLAY` into `[data-phone-text]` — the markup carries none;
+    `placeSend` and `buildPanel`'s rescue keep it directly after the button,
+    so above 1100 it rides into the pinned foot (the send its own row, back
+    and telephone the second). `down-css` hides it, the strip carrying the
+    number then. The `wa__ask` untouched state is unchanged. The index.html
+    fallback text had to follow (`npm test`'s static-copy check caught it).
+  · **The handing card.** *"remove the thing that says to change the direction
+    of the door."* `.sum-hand`, `sum.hand.*` and the `[data-handing-words]`
+    writer are gone; `handingWords()` is untouched — the message, the sheet and
+    the `aria-label` still say it, and `npm test` still pins them. The audit
+    block that asserted the card whole at every viewport is RESTATED on its
+    subject (what the summary says back beside the send): it first proves it
+    is on the summary, then asserts no card and the telephone line — reading
+    exactly `PHONE_DISPLAY`, dialling `tel:PHONE_TEL`, directly after the send,
+    whole beside it above 1100, 44 px. The summary's table starts at 385 where
+    it started at 523; at 1280×720 three of the default door's eight rows are
+    whole above the foot (which grew 93 → 151 px with the big send), from one.
+  · **Undo, redo, save.** *"make the undo buttons bigger and put a save button
+    near them, with the icon of an old hard drive."* `.iconbtn` 44 → 52 px,
+    the glyph 20 → 22; `#save-hud` beside them, a floppy disk in
+    `js/icons.js`'s new `HUD_ICON` (every gap ≥ 2.4 units at 22 px), calling
+    the summary's own `saveCurrent`, whose toast now says how many designs
+    are kept and where the list is ("…(3 עיצובים שמורים) — הרשימה בסיכום,
+    תחת 'העיצוב שלי'").
+  · **The finish group.** *"make the color options only appear if there is a
+    pull handle, either vertical or horizontal."* `finishHasSubject` in the
+    catalogue — a bar that takes a finish, the bow, or the bell (ours: the bell
+    takes it on Peretz's 20.9 word, and hiding the choice would strand it) —
+    and the group's `when`, applied by `markGroup` with `hidden` on every
+    paint. `npm test` holds it to the PRICE over every handle × bow × bell:
+    shown if and only if a paid finish moves the door's price. The audit holds
+    the page to it by link and by tap.
+  · **Falsified**: the count in `--accent-ink` (1 fail, 1.86:1); the predicate
+    forgetting the bell (2 fails) and counting the channel (1); `placeSend`
+    leaving the telephone in the card (2 audit faults at 1280×720); the group
+    never hidden (3 audit faults).
+  · **Measured and not fixed here**: the audit's wall-ink gate at 1152 px now
+    reads `Русский` 314 px² (he) / 284 (ru) on the widest double. The cause is
+    the bigger DOOR, not the bigger buttons — the stage grew by the title's
+    65 px, and the wall at 1152 narrowed with it. Commit 4's band takes that
+    height back; re-measured there. The 52 px buttons put no ink on the
+    standard door at any width.
+  · **Gates**: `node --check`, build, `npm test` 9,118,795 passed / 5 failed —
+    the five sheet-staleness rows (shot, recreate, corpus, against, lockset),
+    allowed on an intermediate commit; the sheets run once after commit 7.
+    The per-view audit at 1280×720 and 320×568 clean; the new blocks clean.
+
 - **27.9 — THE HANDLE BRANCH, MERGED INTO THE MAIN ONE.** The owner's son could
   not see the levers on the page: *"is it on the web app, because right now i
   dont see it"* — they were only on `claude/door-handle-design-catalog-votz53`,
@@ -804,6 +880,29 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** The round's gates re-read, and ⚠ **`npm run latency`'s milliseconds
+  turn out to be a reading of the CONTAINER**: the jump 183 → 321/339/386 ms was
+  investigated instead of written down, and `6934c0d` run beside this commit,
+  three each interleaved, gives medians 262 and 275 with overlapping ranges and
+  one new run faster than one old — no difference between the code. The same
+  `6934c0d` that recorded 183 ms reads 262 here, so this container is ~1.4×
+  slower and a single run's spread is ~90 ms. §0c and §7 now say to compare the
+  ELEMENT COUNTS (261 · 531 · 656) and how to run the two commits side by side.
+  Audit clean at all eight `VIEWS`; test 9,210,648 / 0; sheets 0 bare, 0 lockset.
+  Long form: `HISTORY.md`.
+- **27.9** The square window displaces NO face now, and the two audit clauses
+  about that displacement are restated (§5.27 — a new shape). The trio commit
+  stranded two of them, not one: the first guarded its own precondition and
+  failed at all eight viewports (*"this check has lost its subject"*), the second
+  did not and **passed while testing nothing**. Measured: `rect` leaves all four
+  faces alone; the tall SLOT still takes the pair (`why.noRoomBelow`, 337 mm) and
+  the trio (`why.winPlate`, 488), so the displacement claims move there and sweep
+  both faces, and *the square window takes nothing* is asserted beside them
+  (§5.22). ⚠ The deliberate-choice clause moved to the STRIPES: a deliberate
+  `plain` tap was measured and does NOT disarm the memory, so asserting it would
+  have demanded behaviour the page lacks. Falsified three ways, each flipping only
+  its own clause — 24.9 rows back → 1a; the slot displacing nothing → both 1b;
+  the restore guard dropped → 3. Long form: `HISTORY.md`.
 - **27.9** Curved lever MEASURED off three installed doors (*"I trust you to put
   it into the app"*; `research/handles/curved/`), replacing the shape built from
   words 25–26.9: linear taper 21 / 15 / 9.5 (square law drew 20.6 / 11 / 8),

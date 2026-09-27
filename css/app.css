@@ -323,29 +323,10 @@ svg { direction: ltr; }
    it, and the audit measures every interactive element in the flow. The
    marker is drawn rather than left to the browser's triangle, which is a
    different glyph and a different size in every engine. */
-/* ── THE HANDING CONFIRMATION, ON THE SUMMARY ONLY ────────────────────
-   ⚠ IT IS A CARD RATHER THAN A LINE, ON PURPOSE. Everything else on this step
-   is a readout; this is the one thing being ASKED, and it is asked because
-   the field it confirms is the only default in the product that costs money
-   to get wrong. A row of the spec table would read as another fact about a
-   decision already made, which is exactly the state it exists to break.
-   ⚠ The button keeps the 44 px floor this project asserts everywhere; the
-   audit measures every control on every step and would say so if it did not. */
-.sum-hand {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;
-  margin-block-end: 16px; padding: 12px 14px;
-  border: 1px solid var(--rule); border-radius: 10px;
-  background: var(--paper-up);
-}
-.sum-hand__q {
-  flex: 1 0 100%; margin: 0;
-  font: 600 .86rem var(--sans); color: var(--ink);
-}
-.sum-hand__v {
-  flex: 1 1 auto; margin: 0;
-  font: 400 .86rem var(--sans); color: var(--ink-2);
-}
-.sum-hand__flip { flex: 0 0 auto; }
+/* `.sum-hand` — the handing asked back on the summary — was here until
+   27.9.2026, when the owner's son asked for it to go (*"remove the thing that
+   says to change the direction of the door"*). See the note in `buildPanel`;
+   the order still carries `handingWords()`. */
 
 .sect__exp { margin-block-start: 14px; border-block-start: 1px solid var(--rule); }
 .sect__q {
@@ -390,10 +371,16 @@ svg { direction: ltr; }
    height either way: anything that appears in the strip under the leaf takes
    its height out of the door above — measured at 23,021 pixels the one time
    it was allowed to. */
+/* ⚠ 52 px, UP FROM 44 — 27.9.2026, the owner's son: *"make the undo buttons
+   bigger and put a save button near them."* 44 is the floor this page keeps
+   everywhere, not a size; these are the only two controls in their corner and
+   the first a customer reaches for after a tap they regret. The glyph grows
+   with them (20 → 22 px). The third button, `#save-hud`, is the same class. */
 .steps-back { display: flex; gap: 6px; align-items: center; }
+.hud__slot--end { gap: 6px; }
 .iconbtn {
   appearance: none; background: none; cursor: pointer;
-  inline-size: 44px; block-size: 44px; padding: 0;
+  inline-size: 52px; block-size: 52px; padding: 0;
   display: inline-grid; place-items: center;
   border: 1px solid var(--rule); border-radius: 50%;
   color: var(--ink-2);
@@ -413,7 +400,7 @@ svg { direction: ltr; }
   border-color: transparent; background: none;
   color: var(--ink-3);
 }
-.iconbtn .btn__ico { inline-size: 20px; block-size: 20px; }
+.iconbtn .btn__ico { inline-size: 22px; block-size: 22px; }
 
 .langs { display: flex; gap: 2px; align-items: center; min-inline-size: 0; overflow-x: auto; }
 .lang {
@@ -1052,23 +1039,24 @@ svg { direction: ltr; }
    deletion put it, in the tab title and on the order Peretz receives. */
 @media (max-width: 1099px) { .brand { display: none; } }
 
+/* ⚠ SMALLER AND SHORTER, 27.9.2026 — the owner's son: *"the white strip with
+   the main text smaller and less tall"*, and the lede under it removed. It was
+   300-weight 26–44 px over a 13–15 px lede, 92–99 px of the wrap at every
+   desktop width; it is one line now, and what it gives back is the budget of
+   `.stage__band` (the live step's name above the door), because above 1100
+   anything in this column's flow is taken out of the drawing (§0c). The verb
+   is the owner's son's bold. */
 .stage__h1 {
-  margin: 0; padding: 14px 16px 8px;
-  font: 300 clamp(26px, 3.4vw, 44px)/1.05 var(--sans);
-  letter-spacing: -.022em;
+  margin: 0; padding: 8px 16px 2px;
+  font: 300 clamp(18px, 1.6vw, 24px)/1.15 var(--sans);
+  letter-spacing: -.01em;
   color: var(--ink);
   text-align: center;
   text-wrap: balance;
 }
-.stage__lede {
-  display: block; margin-block-start: 10px;
-  font: 400 clamp(13px, 1.4vw, 15px)/1.4 var(--sans);
-  letter-spacing: 0;
-  color: var(--ink-2);
-}
+.stage__h1 strong { font-weight: 700; }
 @media (max-width: 1099px) {
   .stage__h1 { padding: 10px 14px 4px; }
-  .stage__lede { display: none; }   /* the door is the scarce thing here */
 }
 
 .stage {
@@ -2589,24 +2577,36 @@ button.spec__row:focus-visible {
 /* ── THE GALLERY OF REAL DOORS ────────────────────────────────────── */
 
 /* The opener sits above the navigator, so it is the first thing in the panel
-   and the first offer the page makes. Full width and quiet — it is an
-   alternative to choosing, not a competitor to the send button. */
+   and the first offer the page makes.
+   ⚠ ON THE ACCENT, 27.9.2026 — the owner's son: *"the button with the ready
+   doors needs to be more apparent, still in the palette."* It was a paper
+   card with a hairline border, quieter than every tile under it. The ground
+   is `--accent`, the palette's own tan, and the text is `--ink` on it —
+   **5.62:1**, asserted in `npm test` beside the accent's allow-list, which
+   names this selector and why. `--accent-ink` as text on this ground would
+   be 1.86:1; the count takes `--ink` too. Still not the send: no green, no
+   verb about the order. */
 .works-open {
   appearance: none; -webkit-appearance: none;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   inline-size: 100%; min-block-size: 56px;
   margin-block-end: 12px; padding: 10px 14px;
-  background: var(--paper-up);
-  border: 1px solid var(--rule); border-radius: var(--r-tile);
+  background: var(--accent);
+  border: 1px solid var(--accent); border-radius: var(--r-tile);
   font: inherit; color: var(--ink); text-align: start; cursor: pointer;
 }
-.works-open:hover { border-color: var(--accent); }
+.works-open:hover { border-color: var(--ink); }
+.works-open__t { font-weight: 600; font-size: .92rem; }
+.works-open__n { font-size: .78rem; font-weight: 500; color: var(--ink); white-space: nowrap; }
 /* ⚠ AND ON A PHONE IT SHOWS ON THE FIRST STEP ONLY. See the note in
    `markSteps` for why: it is an offer about where to START, and on a phone it
    was standing between the door and the question on all nine steps. The
    attribute is set by the script; the fallback when it is unset — a page whose
    bundle never ran — is to SHOW it, because there is no flow then either and
-   the gallery is one of the few things that still works. */
+   the gallery is one of the few things that still works.
+   ⚠ The two base rules for `__t` and `__n` stood AFTER this block until
+   27.9.2026, so the phone's `font-weight: 500` below lost to them by source
+   order (§8, a media query adds no specificity) — they are above it now. */
 @media (max-width: 1099px) {
   .panel--choose[data-live]:not([data-live="fit"]) .works-open { display: none; }
   /* ⚠ AND ON THE STEP WHERE IT DOES SHOW IT IS A PILL, NOT A CARD. Accounted
@@ -2615,21 +2615,17 @@ button.spec__row:focus-visible {
      question block 105 puts the first size tile at y=571 with the fold — the
      top of the fixed quote bar — at 501. It is the only step with this box on
      it, and it is the only step at 320 that arrives with no answer in view.
-     A card with a filled ground, a full border and 56 px of height reads as
-     something to DO; this is an offer about where to start, and the question
-     underneath it is the thing to do. Now it is a hairline pill at the 44 px
-     tap floor — which is a floor, so this is as short as it may legally be.
+     So it is a pill at the 44 px tap floor — which is a floor, so this is as
+     short as it may legally be. Since 27.9 it keeps the accent ground: shorter
+     is about the height, and "more apparent" is about the colour.
      ⚠ 16 px is all that buys, and it does not close the gap: see CLAUDE.md's
      open list for the arrival measurement and what closing it would cost. */
   .works-open {
     min-block-size: var(--tap); margin-block-end: 8px;
     padding: 4px 14px; border-radius: var(--r-pill);
-    background: none;
   }
-  .works-open__t { font-weight: 500; font-size: .86rem; }
+  .works-open__t { font-weight: 600; font-size: .86rem; }
 }
-.works-open__t { font-weight: 600; font-size: .92rem; }
-.works-open__n { font-size: .74rem; color: var(--accent-ink); white-space: nowrap; }
 
 .works {
   /* ⚠ ONE HEIGHT, NAMED. The dialog's cap and the grid's cap inside it are the
@@ -3281,6 +3277,30 @@ button.spec__row:focus-visible {
 
 .btn--wa { background: var(--wa); color: #fff; }
 .btn--wa:hover { filter: brightness(1.05); }
+/* ⚠ THE SUMMARY'S SEND IS BIG — 27.9.2026, the owner's son: *"the WhatsApp
+   button big, saying 'הזמינו את הדלת דרך נציג'"*. Full width of the card and
+   56 px, the green it has (the 3.05:1 of white on `--wa` is the recorded
+   exception at the foot of the quote bar's note; 17 px/700 is the size lever
+   that note names). The bar's quiet "שלחו" is untouched. */
+#wa-btn { inline-size: 100%; min-block-size: 56px; font-size: 1.06rem; font-weight: 700; }
+
+/* ── AND THE TELEPHONE UNDER IT, BIG ──────────────────────────────────
+   The digits come from `PHONE_DISPLAY` (`app.js`), never from this file or the
+   markup. A 44 px row, ink on the card, the number at reading size and
+   `direction: ltr` so "053-219-7466" is never reordered by a Hebrew line. */
+.send__tel {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  min-block-size: 44px; padding-inline: 8px;
+  color: var(--ink); text-decoration: none;
+  font-size: 1.25rem; font-weight: 700; letter-spacing: .02em;
+}
+.send__tel [data-phone-text] { direction: ltr; unicode-bidi: isolate; }
+.send__tel:hover [data-phone-text] { text-decoration: underline; text-underline-offset: .2em; }
+.send__tel-ico {
+  inline-size: 20px; block-size: 20px; flex: 0 0 auto;
+  fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
 
 /* The send button carries BOTH its labels and shows one.
    `שלחו את הדלת בוואטסאפ` is true only while there is a door to send. With the
@@ -3375,8 +3395,13 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    and the two buttons that were there keep the layout they were measured in. */
 .sect__skip { flex: 0 0 auto; display: none; }
 @media (min-width: 1100px) { .sect__skip:not([hidden]) { display: inline-flex; } }
-/* The summary's way on is the send, so it takes the room the same way. */
-.sect__foot .btn--wa { flex: 1 1 auto; margin-block: 0; }
+/* The summary's way on is the send, so it takes the room the same way.
+   ⚠ AND SINCE 27.9 THE WHOLE ROW: the send is full width (the owner's son,
+   *"big"*), so on the summary the foot wraps — the send on its own row first,
+   the way back and the telephone sharing the second. */
+.sect__foot .btn--wa { flex: 1 0 100%; order: -1; margin-block: 0; }
+.sect--sum .sect__foot { flex-wrap: wrap; row-gap: 6px; }
+.sect__foot .send__tel { flex: 1 1 auto; justify-content: flex-end; }
 .sect__next:not(:disabled) {
   background: var(--ink); color: var(--paper);
   border-color: var(--ink);

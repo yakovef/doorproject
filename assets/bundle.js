@@ -85,12 +85,14 @@
     "nav.contact": ["צור קשר", "Contact", "Контакты"],
     "nav.lang": ["שפה", "Language", "Язык"],
     /* ── the stage ────────────────────────────────────────────────── */
-    "stage.h1": ["בנו את הדלת שלכם", "Build your door", "Соберите свою дверь"],
-    "stage.lede": [
-      "בחרו את הפרטים ותראו את השינוי בזמן אמת",
-      "Choose the details and watch the door change",
-      "Выбирайте детали и смотрите, как меняется дверь"
-    ],
+    /* ⚠ TWO KEYS FOR ONE HEADING, 27.9.2026 — the owner's son: *"rename to
+       '**עצבו** את הדלת שלכם'"*, the first word bold. The verb is its own key so
+       the markup can set it in `<strong>` in every language without a sentence
+       being split by script. `stage.lede` ("choose the details and watch the
+       change") went the same day on his word: the band above the door
+       (`.stage__band`) spends that height on the step's own name. */
+    "stage.h1.verb": ["עצבו", "Design", "Создайте"],
+    "stage.h1.rest": ["את הדלת שלכם", "your door", "свою дверь"],
     "stage.label": ["הדלת שלכם", "Your door", "Ваша дверь"],
     /* ⚠ SEVEN GRIP KEYS AND `notice.moved` CAME OUT ON 18.9.2026 with the drag,
        the rotate button and the home button: `grip.drag`, `grip.rotate`,
@@ -322,27 +324,12 @@
       "Не уверены? Уточним вместе при замере."
     ],
     "g.panels": ["פאנלים", "Panels", "Панели"],
-    /* ⚠ THE ONE QUESTION THE PAGE ANSWERS FOR THE CUSTOMER, ASKED BACK.
-       `handing` has to have a default — the drawing must draw something — and
-       this file calls the ימין/שמאל convention the only mistake on the list
-       that costs real money. Measured on the live page at 1280x720: on arrival
-       the ONLY controls the fold cuts through are the two handing pills. So the
-       highest-stakes decision in the product is pre-answered, below the fold,
-       and the natural gesture — glance, press הבא — accepts it in silence.
-       This is the confirm row on the summary. It is not a second control: same
-       `set()`, same field, no new value, no wire format, no VERSION. The
-       sentence is `handingWords()`, which is what the ORDER already says, so
-       the customer reads the words Peretz will read. */
-    "sum.hand.q": [
-      "כיוון הפתיחה — נכון?",
-      "The opening direction — is this right?",
-      "Сторона открывания — верно?"
-    ],
-    "sum.hand.flip": [
-      "החלפה לצד השני",
-      "Switch to the other side",
-      "Сменить на другую сторону"
-    ],
+    /* ⚠ `sum.hand.q` AND `sum.hand.flip` CAME OUT ON 27.9.2026 with the card
+       they labelled — the owner's son: *"at the end page … remove the thing that
+       says to change the direction of the door."* It was the handing asked back
+       on the summary (31.8, `UX-FINDINGS` §2 option B). The ORDER still carries
+       `handingWords()` — the message, the A4 sheet and the drawing's
+       `aria-label` — and the pills on step 01 still set it. */
     "g.colour.h": [
       "הקוד שליד כל גוון הוא הקוד של היצרן.",
       "The code beside each shade is the manufacturer’s own.",
@@ -579,7 +566,15 @@
       "Happy with it? Send it over and we will come back with an exact quote.",
       "Готовы? Отправьте нам дверь, и мы вернёмся с точным предложением."
     ],
-    "send.waOn": ["שלחו את הדלת בוואטסאפ", "Send the door on WhatsApp", "Отправить дверь в WhatsApp"],
+    /* 27.9.2026, the owner's son: *"the WhatsApp button big, saying 'הזמינו את
+       הדלת דרך נציג'"*. The summary's green send only; the bar keeps "שלחו". The
+       untouched door still asks a question (`send.waAsk`) — the label and the
+       message are one decision and the order has not been claimed yet. */
+    "send.waOn": [
+      "הזמינו את הדלת דרך נציג",
+      "Order the door through a representative",
+      "Заказать дверь через представителя"
+    ],
     "send.waOff": ["שלחו לנו הודעה בוואטסאפ", "Message us on WhatsApp", "Написать нам в WhatsApp"],
     /* "Send", no more, 27.9.2026 — the owner's son: *"rename the button to just
        send to save space."* The WhatsApp mark beside it says where; the green
@@ -625,7 +620,20 @@
     /* ── saved designs ────────────────────────────────────────────── */
     "saved.mine": ["העיצוב שלי", "My designs", "Мои дизайны"],
     "saved.none": ["עדיין לא שמרתם עיצוב.", "You have not saved a design yet.", "Вы ещё не сохранили ни одного дизайна."],
-    "saved.ok": ["העיצוב נשמר בדפדפן הזה", "Saved in this browser", "Сохранено в этом браузере"],
+    /* ⚠ THE COUNT AND WHERE THE LIST LIVES, 27.9.2026 — the save is also a
+       button beside undo now (`#save-hud`), steps away from the drawer that
+       holds what it saved, so "saved" alone left the customer asking where. */
+    "saved.ok": [
+      'העיצוב נשמר בדפדפן הזה ({0}) — הרשימה בסיכום, תחת "העיצוב שלי"',
+      'Saved in this browser ({0}) — the list is on the summary, under "My designs"',
+      "Сохранено в этом браузере ({0}) — список в итоге, в разделе «Мои дизайны»"
+    ],
+    "saved.noun": [
+      "עיצוב שמור|עיצובים שמורים",
+      "saved design|saved designs",
+      "сохранённый дизайн|сохранённых дизайна|сохранённых дизайнов"
+    ],
+    "saved.hud": ["שמירת העיצוב", "Save this design", "Сохранить дизайн"],
     "saved.no": [
       "הדפדפן הזה לא מאפשר לשמור עיצובים",
       "This browser will not let us save designs",
@@ -645,8 +653,13 @@
       "Start from one close to what you had in mind, then change every detail.",
       "Начните с двери, похожей на задуманную, — а дальше меняйте любую деталь."
     ],
-    "works.open": ["התחילו מדלת שכבר התקנו", "Start from a door we have fitted", "Начните с уже установленной двери"],
-    "works.count": ["{0} דלתות אמיתיות", "{0} real doors", "{0} реальных дверей"],
+    /* 27.9.2026, the owner's son: *"the button with the ready doors needs to be
+       more apparent … 'התחילו מדגמים מוכנים' and '30 דלתות שהתקנו'."* The count
+       is `WORKS.length` through `counted`, never typed: Russian takes three
+       forms of the noun and the number is Peretz's to grow. */
+    "works.open": ["התחילו מדגמים מוכנים", "Start from ready designs", "Начните с готовых образцов"],
+    "works.count": ["{0} שהתקנו", "{0} we have fitted", "{0}, которые мы установили"],
+    "works.noun": ["דלת|דלתות", "door|doors", "дверь|двери|дверей"],
     /* The one dialog in the flow besides the gallery: a lever tapped against
        the pull handle already on the door. One sentence, one button, and the
        door unchanged when it closes — see `openClash` in `js/app.js`. */
@@ -2547,6 +2560,7 @@
     return byId(FINISHES, hf.tone);
   }
   var gripTakesFinish = (state2) => !!byId(HANDLES, state2.handle).finishes;
+  var finishHasSubject = (state2) => gripTakesFinish(state2) || (state2.grab || "nograb") !== "nograb" || (state2.bell || "nobell") !== "nobell";
   var byId = (list, id) => list.find((o) => o.id === id) || list.find((o) => (o.aliases || []).includes(id)) || list[0];
   var leafGlazed = (state2) => glassRows(byId(WINDOWS, state2.window)) > 0;
   var SIDE_OPENING_MIN = 370;
@@ -8968,6 +8982,15 @@ ${body}
     speciallock: '<rect x="7.4" y="3.6" width="9.2" height="16.8" rx="4.6"/><path d="M10.6 8.6h.01M13.4 8.6h.01M10.6 12.2h.01M13.4 12.2h.01"/><circle cx="12" cy="16.6" r="1.6"/>'
   };
   var specIcon = (key) => Object.prototype.hasOwnProperty.call(SPEC_ICON, key) ? `<svg class="spec__ico" viewBox="0 0 24 24" aria-hidden="true">${SPEC_ICON[key]}</svg>` : '<span class="spec__ico" aria-hidden="true"></span>';
+  var HUD_ICON = {
+    save: '<path d="M4.4 4.4h12.2l3 3v12.2H4.4Z"/><path d="M7.6 4.4v5.2h7.8V4.4"/><path d="M12.8 5.8v2.4"/><path d="M7.6 19.6v-5.4h8.8v5.4"/>'
+  };
+  var hudIcon = (key) => {
+    if (!Object.prototype.hasOwnProperty.call(HUD_ICON, key)) {
+      throw new Error(`HUD_ICON has no glyph for "${key}"`);
+    }
+    return `<svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">${HUD_ICON[key]}</svg>`;
+  };
 
   // js/url-state.js
   var VERSION = 25;
@@ -9616,6 +9639,12 @@ ${body}
        day the פעמון, which is why the bell's group follows this one on the
        same step rather than staying with the פרזול. Nickel, black +100, gold
        +200, charged on each thing it recolours. */
+    /* ⚠ `when`: SHOWN ONLY WHERE IT PAINTS SOMETHING — 27.9.2026, the owner's
+       son: *"make the color options only appear if there is a pull handle,
+       either vertical or horizontal."* (The bell counts too — see
+       `finishHasSubject`.) Asked on every paint by `markGroup`, which sets the
+       field `hidden`; never by rebuilding the panel — a listing rule read when
+       the tiles are BUILT froze at the booted state once (8.9). */
     {
       key: "handleFinish",
       title: "g.handleFinish",
@@ -9623,7 +9652,8 @@ ${body}
       kind: "hw",
       list: () => HANDLE_FINISHES,
       glyph: handleFinishGlyph,
-      hint: "g.handleFinish.h"
+      hint: "g.handleFinish.h",
+      when: finishHasSubject
     },
     /* ⚠ THE פעמון STANDS WITH THE PULL HANDLES SINCE 20.9.2026 — Peretz: *"put
        the bell with the pull handles and the pirzul for it changes its price by
@@ -9910,6 +9940,11 @@ ${body}
     $("#undo-btn").addEventListener("click", undo);
     $("#redo-btn").addEventListener("click", redo);
     $("#save-btn").addEventListener("click", saveCurrent);
+    const saveHud = $("#save-hud");
+    if (saveHud) {
+      saveHud.innerHTML = hudIcon("save");
+      saveHud.addEventListener("click", saveCurrent);
+    }
     $("#price-toggle").addEventListener("click", () => {
       const box = $("#breakdown"), btn = $("#price-toggle");
       const open = btn.getAttribute("aria-expanded") === "true";
@@ -10144,13 +10179,15 @@ ${body}
     if (send && wa && wa.parentElement !== send.querySelector(".send")) {
       send.querySelector(".send__alt")?.before(wa);
     }
+    const tel = document.getElementById("send-tel");
+    if (wa && tel && tel.previousElementSibling !== wa) wa.after(tel);
     if (send && wrap.contains(send)) $(".layout").appendChild(send);
     wrap.replaceChildren();
     const opener = document.createElement("button");
     opener.type = "button";
     opener.className = "works-open";
     opener.id = "works-btn";
-    opener.innerHTML = `<span class="works-open__t">${T("works.open")}</span><span class="works-open__n">${T("works.count", WORKS.length)}</span>`;
+    opener.innerHTML = `<span class="works-open__t">${T("works.open")}</span><span class="works-open__n">${T("works.count", counted(WORKS.length, "works.noun"))}</span>`;
     opener.addEventListener("click", openWorks);
     wrap.appendChild(opener);
     const nav = document.createElement("nav");
@@ -10238,14 +10275,6 @@ ${body}
     <div class="sect__foot">
       <button type="button" class="btn btn--ghost sect__back">${T("nav.back")}</button>
     </div>`;
-    const hand = document.createElement("div");
-    hand.className = "sum-hand";
-    hand.innerHTML = `<p class="sum-hand__q">${T("sum.hand.q")}</p><p class="sum-hand__v" data-handing-words></p><button type="button" class="btn btn--ghost sum-hand__flip">${T("sum.hand.flip")}</button>`;
-    hand.querySelector(".sum-hand__flip").addEventListener("click", () => {
-      const other = HANDINGS.find((h) => h.id !== state.handing) || HANDINGS[0];
-      set({ ...state, handing: other.id });
-    });
-    sum.querySelector(".sect__body").appendChild(hand);
     if (SUMMARY.exp) {
       const d = document.createElement("details");
       d.className = "sect__exp";
@@ -10539,6 +10568,8 @@ ${body}
     } else if (wa.parentElement !== card) {
       card.querySelector(".send__alt")?.before(wa);
     }
+    const tel = $("#send-tel");
+    if (tel && tel.previousElementSibling !== wa) wa.after(tel);
   }
   var liveStep = SECTIONS[0].key;
   var revealed = false;
@@ -10618,7 +10649,7 @@ ${body}
       toast(T("saved.no"));
       return;
     }
-    toast(T("saved.ok"));
+    toast(T("saved.ok", counted(Math.min(list.length, SAVED_MAX), "saved.noun")));
     paintSaved();
   }
   function paintSaved() {
@@ -10877,10 +10908,6 @@ ${body}
       el.textContent = money;
     });
     renderBreakdown(state);
-    const hw = handingWords(state);
-    document.querySelectorAll("[data-handing-words]").forEach((el) => {
-      el.textContent = hw;
-    });
     markSteps();
     retintOptions(state);
     repriceOptions(state);
@@ -10923,6 +10950,10 @@ ${body}
   }
   function markGroup(g, blocked) {
     if (g.kind === "mashkof") return markMashkof(g);
+    if (g.when) {
+      const field = document.querySelector(`.field[data-group="${g.key}"]`);
+      if (field) field.hidden = !g.when(state);
+    }
     const chosen = [state[g.key]];
     let anyBlocked = false;
     document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"]`).forEach((el) => {

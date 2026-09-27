@@ -28,7 +28,7 @@
  */
 
 import {
-  BELLS, BOWS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
+  BELLS, BOWS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS, finishHasSubject,
   GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LOCKSETS, MASHKOFS,
   mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, BUILD_A,
   PEEPHOLES, PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_A, STRIPE_MAX, WINDOWS,
@@ -46,7 +46,7 @@ import { conflicts, repair } from './rules.js';
    file because a `const` in here can only be read by the browser, and two
    pictures that share a shape can only be found by rasterising them — see the
    header of `js/icons.js`, and the pairwise check in `tools/audit.mjs`. */
-import { sectionIcon, specIcon } from './icons.js';
+import { hudIcon, sectionIcon, specIcon } from './icons.js';
 import { handingWords, specRows, summaryLine } from './spec.js';
 import { canSharePicture, copyMessage, drawingCaveat, fallbackWhatsappUrl,
          gripAddendum, PHONE_DISPLAY, PHONE_TEL, priceCaveat,
@@ -176,8 +176,15 @@ const GROUPS = [
      day the פעמון, which is why the bell's group follows this one on the
      same step rather than staying with the פרזול. Nickel, black +100, gold
      +200, charged on each thing it recolours. */
+  /* ⚠ `when`: SHOWN ONLY WHERE IT PAINTS SOMETHING — 27.9.2026, the owner's
+     son: *"make the color options only appear if there is a pull handle,
+     either vertical or horizontal."* (The bell counts too — see
+     `finishHasSubject`.) Asked on every paint by `markGroup`, which sets the
+     field `hidden`; never by rebuilding the panel — a listing rule read when
+     the tiles are BUILT froze at the booted state once (8.9). */
   { key: 'handleFinish', title: 'g.handleFinish', in: 'grip', kind: 'hw',
-    list: () => HANDLE_FINISHES, glyph: handleFinishGlyph, hint: 'g.handleFinish.h' },
+    list: () => HANDLE_FINISHES, glyph: handleFinishGlyph, hint: 'g.handleFinish.h',
+    when: finishHasSubject },
 
   /* ⚠ THE פעמון STANDS WITH THE PULL HANDLES SINCE 20.9.2026 — Peretz: *"put
      the bell with the pull handles and the pirzul for it changes its price by
@@ -549,6 +556,13 @@ function init() {
   $('#undo-btn').addEventListener('click', undo);
   $('#redo-btn').addEventListener('click', redo);
   $('#save-btn').addEventListener('click', saveCurrent);
+  /* The wall's save (27.9.2026): the SAME function, so the two buttons cannot
+     save two different things or say two different sentences. */
+  const saveHud = $('#save-hud');
+  if (saveHud) {
+    saveHud.innerHTML = hudIcon('save');
+    saveHud.addEventListener('click', saveCurrent);
+  }
 
   /* The price opens its own breakdown. `hidden` and `aria-expanded` move
      together — two statements of one fact, kept in one line so they cannot
@@ -1134,6 +1148,11 @@ function buildPanel() {
   if (send && wa && wa.parentElement !== send.querySelector('.send')) {
     send.querySelector('.send__alt')?.before(wa);
   }
+  /* And the telephone line that rides with it (27.9.2026) — `placeSend` keeps
+     it directly after the button, so it is in the foot whenever the button is,
+     and `index.html` owns it too. */
+  const tel = document.getElementById('send-tel');
+  if (wa && tel && tel.previousElementSibling !== wa) wa.after(tel);
   if (send && wrap.contains(send)) $('.layout').appendChild(send);
   wrap.replaceChildren();
 
@@ -1144,7 +1163,7 @@ function buildPanel() {
   opener.className = 'works-open';
   opener.id = 'works-btn';
   opener.innerHTML = `<span class="works-open__t">${T('works.open')}</span>`
-    + `<span class="works-open__n">${T('works.count', WORKS.length)}</span>`;
+    + `<span class="works-open__n">${T('works.count', counted(WORKS.length, 'works.noun'))}</span>`;
   opener.addEventListener('click', openWorks);
   wrap.appendChild(opener);
 
@@ -1380,39 +1399,16 @@ function buildPanel() {
     <div class="sect__foot">
       <button type="button" class="btn btn--ghost sect__back">${T('nav.back')}</button>
     </div>`;
-  /* ── THE ONE QUESTION THE PAGE ANSWERED FOR THEM, ASKED BACK ─────────
-     ⚠ `handing` IS THE ONLY FIELD WITH A DEFAULT THAT COSTS MONEY TO GET
-     WRONG. `CLAUDE.md` calls the ימין/שמאל convention the only mistake on the
-     list that costs real money — the site had it backwards for weeks — and
-     `js/url-state.js` has to give it a value, because the drawing must draw
-     something. Measured on the live page at 1280x720: on arrival the ONLY
-     controls the fold cuts through are the two handing pills at the foot of
-     step 1. Pre-answered, below the fold, and accepted by pressing הבא.
-
-     ⚠ THIS IS OPTION B OF THE TWO THE REVIEW OFFERED, AND THE OTHER ONE COSTS
-     A VERSION BUMP. "No default" means a third value in a field the short
-     code packs as an INDEX into `HANDINGS`, so every code already written
-     would be refused — for a question we can simply ask again, one screen
-     later, where it can still be changed. No new value, no bit, no
-     `VERSION`, and `DEFAULTS` is untouched.
-
-     The sentence is `handingWords()`, which is what the ORDER says, so the
-     customer confirms in the words Peretz will read. It goes FIRST in the
-     body, above everything, because a confirmation buried under a spec table
-     is the fault this fixes wearing a different hat. */
-  const hand = document.createElement('div');
-  hand.className = 'sum-hand';
-  hand.innerHTML =
-    `<p class="sum-hand__q">${T('sum.hand.q')}</p>`
-    + '<p class="sum-hand__v" data-handing-words></p>'
-    + `<button type="button" class="btn btn--ghost sum-hand__flip">${T('sum.hand.flip')}</button>`;
-  /* Two handings, so confirming is a toggle. Through `set` like every other
-     control — same repair, same history, same URL. */
-  hand.querySelector('.sum-hand__flip').addEventListener('click', () => {
-    const other = HANDINGS.find(h => h.id !== state.handing) || HANDINGS[0];
-    set({ ...state, handing: other.id });
-  });
-  sum.querySelector('.sect__body').appendChild(hand);
+  /* ⚠ THE HANDING CARD STOOD HERE, AND IT IS GONE — 27.9.2026, the owner's
+     son: *"at the end page … remove the thing that says to change the
+     direction of the door."* It asked the handing back on the summary (31.8,
+     `UX-FINDINGS` §2 option B) because it is the one default in the product
+     that costs money to get wrong; he placed the summary's contents, and he is
+     the one removing it (CLAUDE.md §0a).
+     ⚠ WHAT DID NOT GO WITH IT: the ORDER still says `handingWords()` — the
+     WhatsApp message, the A4 sheet and the drawing's `aria-label` — and the
+     pills on step 01 still set the field. The audit's summary block now
+     asserts the card's ABSENCE on a summary it has proved it found. */
 
   if (SUMMARY.exp) {
     const d = document.createElement('details');
@@ -1990,6 +1986,12 @@ function placeSend() {
        which is the order the card was written in. */
     card.querySelector('.send__alt')?.before(wa);
   }
+  /* ⚠ THE TELEPHONE GOES WHERE THE SEND GOES — 27.9.2026. It is the other
+     half of one offer (*"the WhatsApp button big … and show 053-219-7466"*),
+     so it follows the button into the pinned foot above 1100 and back into
+     the card below it, always directly after it. */
+  const tel = $('#send-tel');
+  if (tel && tel.previousElementSibling !== wa) wa.after(tel);
 }
 
 /**
@@ -2247,7 +2249,10 @@ function saveCurrent() {
   const list = savedRead().filter(x => x !== q);
   list.unshift(q);
   if (!savedWrite(list)) { toast(T('saved.no')); return; }
-  toast(T('saved.ok'));
+  /* ⚠ THE COUNT AND WHERE THE LIST IS — 27.9.2026. A save from the wall button
+     happens eight steps from the drawer that holds it, so the toast says how
+     many are kept and where to find them. */
+  toast(T('saved.ok', counted(Math.min(list.length, SAVED_MAX), 'saved.noun')));
   paintSaved();
 }
 
@@ -2932,13 +2937,6 @@ function paint() {
   document.querySelectorAll('[data-price]').forEach(el => { el.textContent = money; });
   renderBreakdown(state);
 
-  /* The handing confirmation on the summary, written the same way and for the
-     same reason: `handingWords` is the sentence the ORDER carries, so the
-     customer confirms in the words Peretz will read rather than in a second
-     phrasing that could drift from it. Written to every element that claims
-     to show it, never to an id. */
-  const hw = handingWords(state);
-  document.querySelectorAll('[data-handing-words]').forEach(el => { el.textContent = hw; });
 
   /* ⚠ EVERY GROUP, FROM THE REAL ARITHMETIC. This loop used to run over the
      grille group alone, under a comment ending "Only the grille group needs
@@ -3119,19 +3117,29 @@ function paint() {
  */
 function markGroup(g, blocked) {
   if (g.kind === 'mashkof') return markMashkof(g);
+  /* ⚠ A GROUP THAT HAS NOTHING TO ACT ON IS NOT SHOWN — 27.9.2026, the handle
+     finish (see its `when`). The whole field goes, heading, tiles and hint,
+     and comes back on the paint that gives it a subject. `hidden` on the
+     field, never a rebuild: this runs on every paint, which is what makes it
+     right after a link, a code, an undo or a repair as well as after a tap. */
+  if (g.when) {
+    const field = document.querySelector(`.field[data-group="${g.key}"]`);
+    if (field) field.hidden = !g.when(state);
+  }
   const chosen = [state[g.key]];
 
-  /* ⚠ A LISTING RULE BELONGS HERE, LIVE, AND NOT IN `list()` — and there is no
-     longer one to apply. The face group had the only one: a filter inside
+  /* ⚠ A LISTING RULE BELONGS HERE, LIVE, AND NOT IN `list()` — and since
+     27.9.2026 there is one again, a whole GROUP's (`when`, above). Per-option
+     there is none. The face group had the only one: a filter inside
      `list()` is read when the tiles are BUILT and so freezes at the state the
      page booted in, which is the 8.9.2026 fault the long note over that group
      records. It was moved here, asked on every paint, and on 14.9.2026 the two
      faces it hid left the catalogue, so the predicate and this loop's `hidden`
      clause go with them: every option in every group is shown, and what a
      customer cannot have is marked `aria-disabled` below rather than removed.
-     If a rule about what is SHOWN is ever wanted again it goes in this
-     function — three lines building a Set of permitted ids off `g.list()` —
-     and it never goes in `list()`. */
+     If a rule about which OPTIONS are shown is ever wanted again it goes in
+     this function — three lines building a Set of permitted ids off
+     `g.list()` — and it never goes in `list()`. */
 
   let anyBlocked = false;
   document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"]`).forEach(el => {
