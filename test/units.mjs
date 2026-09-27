@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { BELLS, PEEPHOLES, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
+import { BELLS, glassRows, PEEPHOLES, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { SECTION_ICON, sectionIcon, SPEC_ICON, specIcon } from '../js/icons.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
@@ -10,7 +10,7 @@ import { breakdownRows, formatAgorot, priceAgorot, priceParts, shekels, tileAgor
 import {
   bellGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
-  bellFits, locksetGlyph, mashkofGlyph, spawnIndexOf, spawnSpots, peepholeFits,
+  bellFits, locksetGlyph, mashkofGlyph, panelUnderGlass, spawnIndexOf, spawnSpots, peepholeFits,
   peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph, stripesGlyph,
   windowGlyph,
 } from '../js/renderer.js';
@@ -950,6 +950,23 @@ group('price');
         P({ window: 'rect' }) - P({})}`);
   ok(repair({ ...DEFAULTS, window: 'rect' }, 'window').state.detail === 'plain',
      'a square window no longer forces a face onto the customer’s door');
+  /* ⚠ AND THE SAME ON THE PAIR, 26.9.2026 — assumption A20. The owner's son
+     made two panels buildable beside the square window: the window replaces
+     the upper panel and the pair keeps its lower one, so the door draws ONE
+     panel and it is the panel the window's ₪3,800 already pays for on a plain
+     face. The pair beside the window therefore costs what plain beside it
+     costs — to the shekel, absolute and as a delta — and on a SOLID leaf it
+     still costs its own `DETAIL.panel2`, which is the half that must stay
+     true. Falsified by deleting `panel2` from `DETAIL_GLAZED`: the glazed
+     pair then charges ₪1,450 for a panel the glass replaced. */
+  ok(P({ window: 'rect', detail: 'panel2' }) - P({}) === 3800,
+     `two panels beside a square window must add the window's ₪3,800 and nothing else, got ${
+        P({ window: 'rect', detail: 'panel2' }) - P({})}`);
+  ok(P({ window: 'rect', detail: 'panel2', colour: DEFAULTS.colour, handle: 'none' }) === 6995,
+     `two panels beside a square window must be ₪6,995 like the plain door, got ${
+        P({ window: 'rect', detail: 'panel2', colour: DEFAULTS.colour, handle: 'none' })}`);
+  ok(P({ detail: 'panel2' }) - P({}) === 1450,
+     `two panels on a SOLID leaf still cost the pair's own ₪1,450, got ${P({ detail: 'panel2' }) - P({})}`);
   /* ⚠ AND THE WITHDRAWN IDS STILL PRICE, THROUGH THE PAIR THEY ALIAS TO. A
      link or a code written while פאנל תחתון was a face must open a door and be
      charged for the door it opens — which is two panels now, at the pair's own
@@ -1213,7 +1230,7 @@ group('renderer invariants');
          one that was meant: the question is whether the leaf grew glass it
          was not asked for. */
       const win = WINDOWS.find(w => w.id === st.window);
-      if (!win.rects.length) {
+      if (!glassRows(win)) {
         ok(!/data-pane="m/.test(svg), `glazing drawn on a solid leaf: ${label}`);
       }
       /* And the sidelight must always have its pane, whatever the leaf is
@@ -1256,13 +1273,27 @@ group('detail and finish');
     ok(svg.includes('--hw-mid:'), `finish tone not applied: ${label}`);
 
     /* Moulded detail must never cross the glazing — a panel drawn under a
-       tall window puts mouldings over the glass, which is not a door. */
-    const w = WINDOWS.find(x => x.id === st.window);
-    if (w.rects.length && svg.includes('data-detail="panel"')) {
-      const m = /data-detail="panel"[^>]*data-top="([\d.]+)"/.exec(svg);
+       tall window puts mouldings over the glass, which is not a door.
+       ⚠ RESTATED 26.9.2026, STRONGER, SAME SUBJECT. It compared the panel's
+       `data-top` — scene coordinates — with the catalogue rectangle's foot in
+       LEAF coordinates, so it passed by the height of the leaf's offset in
+       the scene whatever the panel did, and the square window has no
+       millimetre rectangle to read any more. Now both halves come off the
+       drawing: the moulding's top against the drawn pane's foot. And it is
+       asked of the door a customer can REACH — `repair(st)` — because since
+       today a face keeps its own rows under glass and the trio's kept plate
+       overlaps the square light by design on the raw state the rules refuse
+       (76 mm of casing). A raw state is drawn as what it is; a reachable one
+       must be a door. */
+    const reach = repair(st).state;
+    const rsvg = reach === st ? svg : render(reach);
+    if (glassRows(WINDOWS.find(x => x.id === reach.window)) && rsvg.includes('data-detail="panel"')) {
+      const m = /data-detail="panel"[^>]*data-top="([\d.]+)"/.exec(rsvg);
       ok(m, `the panel group no longer reports data-top, so this check is dead: ${label}`);
-      const glassLow = Math.max(...w.rects.map(r => r.top + r.h));
-      if (m) ok(Number(m[1]) > glassLow, `panel overlaps glazing: ${label}`);
+      const panes = [...rsvg.matchAll(/<rect x="[\d.]+" y="([\d.]+)" width="[\d.]+" height="([\d.]+)" fill="url\(#glass\)"/g)];
+      ok(panes.length, `no drawn pane found on a glazed door, so this check is dead: ${label}`);
+      const glassLow = Math.max(...panes.map(q => Number(q[1]) + Number(q[2])));
+      if (m && panes.length) ok(Number(m[1]) > glassLow, `panel overlaps glazing: ${label} (moulding at ${m[1]}, glass to ${glassLow.toFixed(1)})`);
     }
     n++;
   }
@@ -2510,6 +2541,12 @@ group('a square window brings its panel to both leaves and charges for one');
      + 'and this door has two leaves — Peretz asked for one under each light');
     ok(panels({ ...bare, size, window: 'none' }) === 0,
        `${size}: a plain two-leaf door with no window draws a panel from nowhere`);
+    /* 26.9.2026: two panels beside the square window keep their LOWER panel
+       on the main leaf, and the fixed leaf takes the window's own, so a
+       two-leaf door still shows one panel under each light. */
+    ok(panels({ ...bare, detail: 'panel2', size, window: 'rect' }) === 2,
+       `${size}: two panels beside a square window draw ${panels({ ...bare, detail: 'panel2', size, window: 'rect' })} `
+     + 'panel groups — one under each light is the door');
     /* And the money: the same window on a one-leaf and a two-leaf door adds
        the same figure, so the extra panel is inside the window on both. */
     const one = P({ ...bare, size: 'standard', window: 'rect' }) - P({ ...bare, size: 'standard' });
@@ -2545,12 +2582,23 @@ group('a panel that is charged for is a panel that is drawn');
        the price group; what is asserted here is that the door shows what the
        customer is paying for either way. */
     const wp = w.panel && !d.panel ? 1 : 0;
-    const paid = (d.panel ? (d.panels || 1) : 0) + wp;
+    /* ⚠ RESTATED 26.9.2026, SAME SUBJECT: on a GLAZED leaf a panelled face is
+       paid up for the rows it KEEPS. The pair beside the square window is
+       buildable now — the window replaced its upper panel — and it is charged
+       the window's price and nothing for the face (`DETAIL_GLAZED.panel2`,
+       A20), which is one panel: the lower one. Counting its catalogue
+       `panels` here would call a correct door wrong; counting nothing would
+       let it drop the lower panel for free. `keeps` is the catalogue's own
+       statement of that count and the drawing reads the same field, so this
+       is the order-versus-picture check, not a check of the rule. */
+    const kept = glassRows(w) && d.keeps ? d.keeps.length : null;
+    const paid = kept != null ? kept : (d.panel ? (d.panels || 1) : 0) + wp;
     if (drawn !== paid) missing++;
     ok(drawn === paid,
        `${d.id}/${w.id}/${size}: the price is for ${paid} panel(s) — `
-     + `₪${shekels(d.delta)} on the face${wp ? ' and one inside the window' : ''} — `
-     + `and the drawing shows ${drawn}`);
+     + (kept != null ? `the ${kept} row(s) the face keeps under the window`
+                     : `₪${shekels(d.delta)} on the face${wp ? ' and one inside the window' : ''}`)
+     + ` — and the drawing shows ${drawn}`);
   }
   console.log(`  (${n} buildable faces, ${missing} charged for a panel they do not show)`);
 }
@@ -2600,9 +2648,27 @@ group('what the drawing shows is what the price charges');
          the list price says the option costs something. Two options that are
          both free and both look different (a cylinder against a Coral lever)
          are not a fault, they are the catalogue. */
-      if (o.delta) {
+      /* ⚠ RESTATED 26.9.2026, SAME SUBJECT: "costs something ON THE TILE" is
+         read off the tile's own figure on THIS door (`tileAgorot`), not off
+         the list price `o.delta`. The two were the same number for every
+         option but the Greek set until today, whose glazed price (₪900) is not
+         zero, so the proxy never lied. The pair beside the square window is
+         the first option whose tile reads ₪0 on a glazed door and a list price
+         on a solid one (A20: the window's ₪3,800 pays for the one panel drawn),
+         and the list price here would call that a free drawing the tile
+         charges for, when the tile says it is free. So that the exemption
+         cannot widen by itself, it is NAMED: a priced option whose tile reads
+         ₪0 is allowed only when it is a face keeping its rows under glass,
+         and anything else reading ₪0 against a list price fails here. */
+      const onTile = tileAgorot(key, st);
+      if (o.delta && onTile === 0) {
+        ok(key === 'detail' && glassRows(w) > 0 && (o.keeps || []).length > 0,
+           `${key}="${o.id}" has a list price of ₪${shekels(o.delta)} and its tile reads ₪0 on `
+         + `${size}/${w.id} — only a panelled face beside a window is priced into the window (A20)`);
+      }
+      if (o.delta && onTile !== 0) {
         ok(!drawn || paid !== 0,
-           `${key}="${o.id}" costs ₪${shekels(o.delta)} on the tile but is drawn `
+           `${key}="${o.id}" costs ₪${shekels(onTile ?? o.delta)} on the tile but is drawn `
          + `free on ${size}/${w.id} — the door shows it and the price does not`);
       }
     }
@@ -3164,7 +3230,7 @@ group('the second review\'s night round — 25.9.2026');
       ok(dup.length === 0, `${size}/${window}: the second Greek set duplicates ids ${[...new Set(dup)].slice(0, 5)}`);
     }
     for (const d of DETAILS) for (const w of WINDOWS) {
-      if (!w.rects.length) continue;
+      if (!glassRows(w)) continue;
       const st = { ...base, size, detail: d.id, window: w.id, handle: 'none' };
       if (!buildable(st)) continue;
       const g = glassOf(render(st));
@@ -3286,6 +3352,97 @@ group('the second review\'s night round — 25.9.2026');
     doorLevers++;
   }
   ok(doorLevers >= 12, `only ${doorLevers} curved levers were read off the door — the level clause has no subject`);
+}
+
+group('one square window, and the pair keeps it — 26.9.2026');
+{
+  /* The owner's son: *"When switching from the Greek set to other things like
+     the 2 or 3 panels then the window needs to stay on and not be removed,
+     also the window size and placement then needs to be the same."* Settled in
+     chat: the set's light is THE square window; the window replaces the upper
+     panel of the pair; the trio, whose handle plate the casing lands in, is
+     refused and the window stays; a face tap never removes the window. */
+  const paneOf = svg => [...svg.matchAll(/<rect x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)" fill="url\(#glass\)"/g)]
+    .map(m => m.slice(1).map(Number));
+  const onRect = (size, detail) => ({ ...base, size, window: 'rect', detail, handle: 'none', lockset: 'cylinder' });
+
+  /* 1 · THE WINDOW DOES NOT MOVE A PIXEL WHEN THE FACE CHANGES — asked of the
+     DRAWN pane, the set, plain and the pair, all six sizes. (`apertureLayout`
+     takes no face at all now, so the old form of this — the function asked
+     with the set and with plain — could only pass; the drawing is what the
+     customer sees move.) Falsified by putting a `winFrac` back on the set and
+     reading it in `apertureLayout`: the set's pane parts from plain's. */
+  let sizesChecked = 0;
+  for (const size of sizeKeys) {
+    /* Every pane on the door — both leaves of a double — in drawing order. */
+    const panes = ['classic', 'plain', 'panel2'].map(d => paneOf(render(onRect(size, d))));
+    const want = SIZES[size].side ? 2 : 1;
+    ok(panes.every(p => p.length === want), `${size}: a square window drew ${panes.map(p => p.length)} panes on the set, plain and the pair — expected ${want} each`);
+    if (!panes.every(p => p.length === want)) continue;
+    sizesChecked++;
+    ok(panes.every(p => p.every((r, k) => r.every((v, i) => Math.abs(v - panes[0][k][i]) < 0.05))),
+       `${size}: the square window moves when the face changes — set ${JSON.stringify(panes[0].map(r => r.map(Math.round)))}, `
+     + `plain ${JSON.stringify(panes[1].map(r => r.map(Math.round)))}, pair ${JSON.stringify(panes[2].map(r => r.map(Math.round)))}`);
+  }
+  ok(sizesChecked === 6, `the pane was compared on ${sizesChecked} of 6 sizes`);
+
+  /* 2 · THE PAIR STANDS BESIDE IT AND THE TRIO DOES NOT — every size, and the
+     trio's overlap COMPUTED off the drawing, not matched as a string: the raw
+     render of the trio beside the window draws its kept rows (plate first,
+     `data-top`), the pane's foot plus the casing band (`data-band`, the same
+     stock round a pane and round a panel) is where the casing ends, and the
+     difference must be what the rule says it is, and positive. */
+  for (const size of sizeKeys) {
+    const pair = onRect(size, 'panel2'), trio = onRect(size, 'panel3');
+    ok(buildable(pair), `${size}: two panels beside the square window are refused — the window replaces the upper panel`);
+    ok(!buildable(trio), `${size}: three panels beside the square window are buildable — the casing stands in the handle plate`);
+    const u = panelUnderGlass(trio);
+    const svg = render(trio);
+    const g = /<g data-detail="panel" data-panels="(\d+)"\s+data-top="([\d.]+)"\s+data-band="([\d.]+)">/.exec(svg);
+    const [pane] = paneOf(svg);
+    ok(g && pane, `${size}: the trio's kept rows or the pane were not found on the raw render — the overlap check is dead`);
+    if (!g || !pane) continue;
+    const overlap = pane[1] + pane[3] + Number(g[3]) - Number(g[2]);
+    ok(u && u.why === 'plate' && overlap > 0 && Math.abs(u.by - overlap) < 0.5,
+       `${size}: the rule says ${JSON.stringify(u)} and the drawing puts the casing ${overlap.toFixed(1)} mm into the plate`);
+    ok(conflicts(pair).detail.panel3 === T('why.winPlate'),
+       `${size}: the greyed trio beside the window gives "${conflicts(pair).detail.panel3}" — it should name the plate`);
+    ok(!conflicts(onRect(size, 'plain')).detail.panel2,
+       `${size}: the pair's tile is greyed beside the square window`);
+  }
+
+  /* 3 · A FACE TAP NEVER TAKES THE WINDOW. Every face, from every face, on
+     every window and size, through `repair` with the tap's own intent — the
+     window it arrived with is the window it leaves with. Falsified by putting
+     back the `intent === 'detail'` arm that set `window = 'none'`. */
+  let taps = 0, lost = 0;
+  for (const size of sizeKeys) for (const w of WINDOWS) for (const from of DETAILS) for (const to of DETAILS) {
+    const st = { ...base, size, window: w.id, detail: from.id, handle: 'none', lockset: 'cylinder' };
+    if (!buildable(st)) continue;
+    taps++;
+    const r = repair({ ...st, detail: to.id }, 'detail').state;
+    if (r.window !== st.window && w.id !== 'strip') { lost++; if (lost < 4) ok(false, `${size}/${w.id}: tapping ${to.id} on ${from.id} changed the window to ${r.window}`); }
+  }
+  ok(taps > 50 && lost === 0, `${lost} of ${taps} face taps changed the window`);
+  /* (The one window a face tap may change is the slot, to the square one, when
+     the tap is the Greek set — which is `rectOnly`'s own repair, not a
+     removal, and it predates this: the set cannot stand beside a slot.) */
+
+  /* 4 · AND THE ORDER SAYS WHAT IS DRAWN. 14.9 refused the pair at ₪0 because
+     the order would say "two panels" on a door drawing one; the spec now names
+     the composition on the face row, and the window row stops claiming a
+     lower panel of its own beside it. */
+  for (const lang of LANG_IDS) withLang(lang, () => {
+    const rows = specRows(onRect('standard', 'panel2'));
+    const face = rows.find(r => r.key === 'detail'), win = rows.find(r => r.key === 'window');
+    ok(face && face.value === T('row.upperGlazed', L(DETAILS.find(d => d.id === 'panel2'))),
+       `${lang}: the glazed pair's face row reads "${face && face.value}"`);
+    ok(win && !win.value.includes(T('row.withPanel')),
+       `${lang}: the glazed pair's window row still claims "${T('row.withPanel')}" — a second lower panel in the order`);
+    const plainWin = specRows(onRect('standard', 'plain')).find(r => r.key === 'window');
+    ok(plainWin && plainWin.value.includes(T('row.withPanel')),
+       `${lang}: the plain door's square window no longer says it brings its panel`);
+  });
 }
 
 group('`gp` is a retired parameter, and a link still carrying it is not an error');

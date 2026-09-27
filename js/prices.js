@@ -345,6 +345,17 @@ export const DETAIL_GLAZED = {
      Kept as a note because the reasoning is the reasoning above it: a price
      that depends on the glass is a real thing in this range, and `classic` is
      the remaining one. */
+  /* ⚠ AND THE PAIR UNDER A WINDOW IS NOTHING ON TOP OF THE WINDOW — 26.9.2026,
+     ASSUMPTION A20. The owner's son made the pair buildable beside the square
+     window: the window replaces its upper panel and the pair keeps its lower
+     one. So the door draws ONE panel, and it is the same one panel `WINDOW.rect`
+     already pays for on a plain face — his father's "a blank door with a
+     window, needs to be worth 6995". Charging the pair's solid price on top
+     would be charging for a panel the glass replaced, which is what 14.9
+     refused the pair at ₪0 to avoid saying; the spec row names the
+     composition instead. Whether a glazed two-panel door is really ₪3,800
+     alone is Peretz's to say, and `ASK-PERETZ.md` asks it in one line. */
+  panel2: 0,         // 3195 + 3800 + 0 = 6995, the same as plain behind the same window
 };
 
 /* ── the pull handle ───────────────────────────────────────────────────

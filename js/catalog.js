@@ -419,12 +419,47 @@ export const WINDOWS = [
      which is a gap in the DRAWING and not in this flag: the fixed leaf's
      branch in `renderer.js` draws a clamped aperture and nothing under it.
      Reported by Peretz separately and fixed in its own round. */
+  /* ⚠ ONE SQUARE WINDOW, AND IT IS THE GREEK SET'S — 26.9.2026. The owner's
+     son: *"When switching from the Greek set to other things like the 2 or 3
+     panels then the window needs to stay on and not be removed, also the
+     window size and placement then needs to be the same, if its not, then
+     there are problems with the proportions of the panels or the Greek set."*
+     There were two square windows and they were not the same: this entry drew
+     357 × 902 mm at 185 from the head (the median of ten corpus openings,
+     d092 d097 d099 d106 d108 d116 d122 and their like), and the set drew its
+     own light off Peretz's installed door, fractions 0.289-0.711 across and
+     0.154-0.526 down — on the standard 850 × 2050 leaf 359 wide, 762 tall
+     and 316 down. Asked which is the real one, he chose the set's. So the
+     corpus reading is OVERRULED, kept here as the record: the light now sits
+     131 mm lower and 140 mm shorter than on the ten photographs, and
+     `ASK-PERETZ.md` tells Peretz so in one line.
+     ⚠ FRACTIONS, NOT MILLIMETRES, AND ONE STATEMENT (§5.16). It was the set's
+     `winFrac` and a millimetre `rects` here: one opening written twice, which
+     agreed to 1.3 mm on the standard leaf and parted by 62 on the wide one the
+     last time this file held both. `apertureLayout` turns `frac` into the leaf's
+     own millimetres for every face alike — the set included, whose `winFrac`
+     is gone — so the window cannot move when the face changes. It needs the
+     leaf's height to do it, and asks for it rather than defaulting to zero. */
   { id: 'rect',   he: 'חלון מלבני',     en: 'Rectangular', ru: 'Прямоугольное окно',
     aliases: ['square', 'duo', 'tallwin', 'broad'],
-    doors: ['d108', 'd099', 'd122', 'd116'],
+    doors: ['d108', 'd099', 'd122', 'd116', 'newdoor'],
     panel: true,
-    rects: [{ w: 357, h: 902, top: 185 }] },
+    frac: { x0: 0.289, x1: 0.711, top: 0.154, bot: 0.526 } },
 ];
+
+/**
+ * How many rows of glass a window cuts in the leaf — the one question "is
+ * there a window in this leaf at all" is asked through.
+ *
+ * ⚠ IT WAS `win.rects.length` IN FOURTEEN PLACES, and on 26.9.2026 the square
+ * window stopped having `rects` (it has `frac`, above). Every one of those
+ * readers would have answered "no glass" about the commonest glazed door in
+ * the range — the ones written `(win.rects || []).length` in silence — which
+ * is §5 at its purest: the price of a grille counted from nothing. Distinct
+ * (top, height) rows, exactly what `apertureLayout` groups by.
+ */
+export const glassRows = win =>
+  win.frac ? 1 : new Set((win.rects || []).map(r => `${r.top}|${r.h}`)).size;
 
 /**
  * ── TWO GROUPS, NOT ONE ──────────────────────────────────────────────
@@ -1314,9 +1349,17 @@ export const DETAILS = [
      one read as "bulging".
 
      `panels` is HOW MANY and `top` says the topmost one sits in the upper half
-     of the leaf, where glazing would otherwise go. Both are read by
-     `hasUpperPanel`, which is the one question the rules and the drawing ask:
-     can this face carry a window as well? */
+     of the leaf, where glazing would otherwise go.
+     ⚠ `keeps` — THE ROWS A FACE KEEPS WHEN THERE IS A WINDOW, 26.9.2026. It
+     replaces `hasUpperPanel`, a yes/no with three readers (the drawing, the
+     grip's obstacles, the rules) that answered "this face cannot have a
+     window" for every panelled face. The owner's son: the window stays when
+     the face changes, and on the panelled faces **the window replaces the
+     upper panel**. So each face says, once, which of its own rows (indices
+     into its `PANEL_ROWS` entry in renderer.js) survive under glass; a face
+     with no `keeps` keeps nothing and cannot stand beside a window. Whether
+     what it keeps actually CLEARS the window's casing is geometry, asked of
+     the drawing's own numbers (`panelUnderGlass`), never a list of ids here. */
   /* ⚠ THE LONE LOWER PANEL IS GONE FROM THIS LIST, 14.9.2026, AND ITS PANEL IS
      NOT — IT BELONGS TO THE WINDOW NOW. Peretz: *"remove the one panel option
      from the files entirely, it only exists within the rectangle option."*
@@ -1386,7 +1429,10 @@ export const DETAILS = [
        here since 20.9.2026: Peretz, *"remove entirely the classic panels."* */
     aliases: ['panelTop', 'panel', 'both', 'groove', 'perimeter', 'panel2o', 'panelo'],
     panel: true,  groove: false,
-    panels: 2, top: true },
+    /* Under a window the upper panel is the glass and the lower one stays —
+       0.66-0.92 of the leaf, 205 mm clear of the square window's casing on
+       the standard leaf. Priced at nothing on top of the window (A20). */
+    panels: 2, top: true, keeps: [1] },
   /* ⚠ THE UPPER RECTANGLE ALONE. Asked for from outside: *"add an option of
      only the top panel"*. Every panelled option in this list used to put
      something at the FOOT of the leaf, so a face with a single high panel and
@@ -1418,8 +1464,15 @@ export const DETAILS = [
      The name stays "three panels" because that is what it was asked for as and
      what a customer counts; the plate is the third. See PANEL_ROWS in
      renderer.js for the rows and the ±0.03 on them. */
+  /* ⚠ `keeps` THE PLATE AND THE LOWER PANEL, AND IS REFUSED BESIDE A WINDOW
+     ANYWAY — 26.9.2026, the owner's son: refuse the trio beside a window; the
+     window stays. The plate starts at 0.523 of the leaf (1072 mm on the
+     standard leaf) and the square window's casing reaches 1148, so the casing
+     would stand 76 mm into the handle plate. That is computed by
+     `panelUnderGlass`, not written here, and `plate` names which kept row is
+     the plate so the refusal can say so. */
   { id: 'panel3', sub: 'panel', he: 'שלושה פאנלים',   en: 'Three panels', ru: 'Три панели',   panel: true,  groove: false,
-    panels: 3, top: true, aliases: ['panel3o'] },
+    panels: 3, top: true, keeps: [1, 2], plate: 1, aliases: ['panel3o'] },
 
   /* ── THE SAME PANELS IN THE OTHER SECTION ─────────────────────────
      ⚠ THERE ARE TWO MOULDINGS IN THIS RANGE AND WE DREW ONE. Asked for from
@@ -1594,31 +1647,23 @@ export const DETAILS = [
      measured dimensions survive as a note in the renderer where the call was.
 
      `panel: true` — it has a raised panel, so it prices and repairs as a
-     panelled face. No `top` and no `panels`, so `hasUpperPanel` is false: the
-     composition is BUILT round a window and must not be refused beside one. */
-  /* ⚠ `winFrac` — THE SET OWNS ITS OWN OPENING, and that is not a liberty, it
-     is the product. Measured off the photographs: on a standard leaf 356 wide,
-     781 tall and 326 down, against the catalogue rectangle's 357 / 902 / 185.
-     The width is the same to a millimetre; what differs is that the cornice
-     and frieze take the top of the door, so the glass starts lower and is
-     shorter. Drawn at the catalogue's position the frieze and the glass share
-     60 mm of leaf and the ornament runs straight through the opening — which
-     is what the first render beside the photograph showed.
-     `apertureLayout` reads it, so the drawing and every rule that clears the
-     glass move together.
-
-     ⚠ FRACTIONS OF THE LEAF — the one opening in this file that is not
-     millimetres, and it has to be. Every other piece of the set is a fraction:
-     cornice at 0.029 of the leaf's height, frieze at 0.126, shelf at 0.559.
-     Written in millimetres the light stayed 356 x 781 while the composition
-     round it grew with the door, so on the WIDE leaf the glass came out 62 mm
-     narrower than the timber panel that replaces it, and on the TALL leaf its
-     casing climbed 46 mm into the frieze. Reported from outside as one
-     symptom: *"when i put on a window the panel changes, it supposed to be the
-     same size."* A composition proportioned to itself has to scale as one
-     thing.
-     These four numbers are the renderer's `CLASSIC_GLASS`; it reads them from
-     here, so there is no second copy of them. */
+     panelled face. No `top`, no `panels` and no `keeps`: the composition is
+     BUILT round a window, draws itself (`classicSet`), and is never asked the
+     kept-rows question. */
+  /* ⚠ `winFrac` — THE SET'S OWN OPENING — IS GONE, 26.9.2026, AND IT WAS NOT
+     LOST: it is `WINDOWS.rect.frac` now, the one square window in the range,
+     chosen by the owner's son over the corpus rectangle (see the note there).
+     What this note recorded stays true of the numbers: measured off the
+     photographs, on a standard leaf 356 wide, 781 tall and 326 down, against
+     the old catalogue rectangle's 357 / 902 / 185 — the same width to a
+     millimetre, the glass lower and shorter because the cornice and frieze
+     take the top of the door. And they are FRACTIONS for the reason it gave:
+     every piece of the set is a fraction of the leaf (cornice 0.029, frieze
+     0.126, shelf 0.559), and written in millimetres the light stayed one size
+     while the composition round it grew with the door — *"when i put on a
+     window the panel changes, it supposed to be the same size."*
+     The renderer's `CLASSIC_GLASS` reads `WINDOWS.rect.frac`, so there is
+     still no second copy. */
   /* ⚠ CITES `newdoor` AND NOT THE FIVE DOORS ASK-PERETZ §4 NAMES. d101, d103,
      d108, d112 and d129 all carry a composition of this family, and the
      question about them predates this option by two rounds — but not one of
@@ -1649,14 +1694,11 @@ export const DETAILS = [
        Measured, overruled, kept — REALISM.md §6. The set's own pieces
        (cornice, frieze, shelf, plinth) are drawn by `classicSet` and are
        untouched. */
-    profile: 'reed',
-    /* ⚠ THE ROWS ARE SCALED BY 3698/3730 with CLASSIC_ROWS — the crop the set
-       was measured from was 0.86% short, see the note there. The COLUMNS are
-       left alone: an edge-find on the rectified leaf puts the pane at 0.291 to
-       0.706 against these 0.289 and 0.711, which is 0.007 and inside the
-       instrument's own error, and drawing them back over the photograph in red
-       put them on the glass twice. */
-    winFrac: { x0: 0.289, x1: 0.711, top: 0.154, bot: 0.526 } },
+    profile: 'reed' },
+    /* (The window's fractions — rows scaled by 3698/3730 with CLASSIC_ROWS,
+       columns left at 0.289-0.711 because an edge-find read 0.291-0.706,
+       inside the instrument's error — moved to `WINDOWS.rect.frac` with that
+       reasoning, 26.9.2026.) */
 
   /* `panel3o`, the ogee trio Peretz asked for on 14.9 (*"add an option of 3
      panels but classic ones"*), stood here from that day until 20.9.2026,
@@ -1871,25 +1913,15 @@ export const byId = (list, id) =>
  * CLAUDE.md §5: a quantity computed in two places is a promise that somebody
  * will change one of them. It was computed in three.
  */
-export const leafGlazed = state => byId(WINDOWS, state.window).rects.length > 0;
+export const leafGlazed = state => glassRows(byId(WINDOWS, state.window)) > 0;
 
-/**
- * Does this face put a panel in the UPPER half of the leaf?
- *
- * The one question the rules and the drawing both ask about a panelled face,
- * because the upper half is where glazing goes: a door cannot have both.
- *
- * ⚠ IT USED TO BE WRITTEN OUT AS `d.panels === 2`, IN SIX PLACES. That was
- * true while `panel2` was the only face with anything up there — and it stopped
- * being true the moment `panelTop` and `panel3` were added, in six places at
- * once, silently, with the symptom being a window drawn straight through a
- * moulding. A predicate with a name is what stops the seventh from being
- * missed; the comment beside one of those six even said so, asking for it to
- * be read off `panels` "so a third panelled face added later is covered
- * without anybody remembering to come back here". It was read off `panels`
- * being exactly 2, which is the one form of that test that does not scale.
- */
-export const hasUpperPanel = detail => !!detail.top || detail.panels >= 2;
+/* `hasUpperPanel` stood here — a yes/no, "can this face carry a window as
+   well?" — and it is gone, 26.9.2026: the answer is no longer yes or no. Each
+   panelled face states the rows it KEEPS under glass (`keeps`, on the entry),
+   and whether they clear the window is the drawing's geometry
+   (`panelUnderGlass` in renderer.js). Its own note is still the lesson: it
+   replaced `d.panels === 2`, written out in six places, which stopped being
+   true in all six at once. */
 
 /**
  * The narrowest side OPENING that can carry a copy of the leaf's window, in
@@ -1948,9 +1980,10 @@ export const SIDE_OPENING_MIN = 370;
 export function glazedPanels(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const win  = byId(WINDOWS, state.window);
-  /* Distinct (top, height) rows — exactly what the renderer's `apertureLayout`
-     groups by. Every window in the catalogue has one row today; `duo` had two. */
-  const rows = new Set((win.rects || []).map(r => `${r.top}|${r.h}`)).size;
+  /* Distinct rows of glass — exactly what the renderer's `apertureLayout`
+     groups by, asked through `glassRows` (a `frac` window is one row). Every
+     window in the catalogue has one row today; `duo` had two. */
+  const rows = glassRows(win);
   const out = [];
   if (rows) {
     out.push({ id: 'leaf', panes: rows,

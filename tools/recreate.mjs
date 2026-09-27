@@ -73,6 +73,14 @@ const longestBar = Math.max(...barLens).toFixed(2);
  * derived this one fact; `tools/corpus.mjs` had the identical bug in
  * `handingOf`.
  */
+/* ⚠ THE SQUARE LIGHT IS THE GREEK SET'S SINCE 26.9.2026, on the owner's son's
+   word, so on every square-window door below ours sits LOWER AND SHORTER than
+   the photograph's: 316 mm down and 762 tall on the standard leaf, where the
+   ten corpus openings' median it replaced was 185 and 902. That is an
+   instruction, not a fitting error, and the three notes that need it carry
+   this one sentence rather than letting the sheet read as a regression. */
+const RECT_LOWER = 'our square light sits lower and shorter than this photograph\'s — '
+  + 'the Greek set\'s rows since 26.9.2026, on the owner\'s son\'s word, not a misfit';
 const CASES = [
   { id: 'd003', label: 'basic 3195 - waisted plate',
     q: 'c=rb-7110d&w=none&g=none&n=none&k=plate&d=plain&s=standard',
@@ -127,7 +135,8 @@ const CASES = [
     q: 'c=rb-9016d&w=tallwin&g=scroll-light&n=none&k=coral&d=plain&s=standard',
     gap: 'the grid is the door colour but the medallions inside it are BLACK, and '
        + '`light` is one switch over the whole grille, so ours makes both pale; the '
-       + 'real ornament is denser scrollwork where ours is a single opposed pair' },
+       + 'real ornament is denser scrollwork where ours is a single opposed pair; '
+       + RECT_LOWER },
   { id: 'd106', label: 'luxury 8500 - interlocking rings',
     /* `d=plain` since 14.9.2026 — see the note on d097 above. */
     q: 'c=rb-7080d&w=broad&g=circles&n=none&k=plate&d=plain&s=standard',
@@ -138,7 +147,7 @@ const CASES = [
        the photograph, not finer. The pitch is a measurement now (54 mm, from
        d106's own pane two ways), so what is left is the finish. */
     gap: 'its plate is brass in the photograph, and the finish is withdrawn, so '
-       + 'ours is nickel' },
+       + 'ours is nickel; ' + RECT_LOWER },
   { id: 'd113', label: 'luxury 9500 - smart lock, glazed slot',
     /* ⚠ `n=barblack`, AND IT USED TO SAY `idan` WITH A GAP NOTE ABOUT COLOUR.
        Both halves went stale in the same edit: the black bar exists now, and
@@ -163,7 +172,8 @@ const CASES = [
        is nickel" for as long as a nickel bar was the only one we could draw. */
     q: 'c=rb-6219d&w=rect&g=grid-light&n=idan&hf=hf-black&k=cylinder&d=plain&s=sidelight',
     gap: 'this door carries BOTH — a pale grid over reeded glass — and one list means '
-       + 'one choice, so the reeded pane is the half we drop (see GRILLES)' },
+       + 'one choice, so the reeded pane is the half we drop (see GRILLES); '
+       + RECT_LOWER },
 ];
 
 const load = f => f.endsWith('.png')

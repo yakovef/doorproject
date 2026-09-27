@@ -52,11 +52,11 @@
  */
 
 import { T } from './copy.js';
-import { byId, DETAILS, GRILLES, HANDLES, hasUpperPanel, isGlazed, leafGlazed, LOCKSETS,
+import { byId, DETAILS, glassRows, GRILLES, HANDLES, isGlazed, leafGlazed, LOCKSETS,
          STRIPE_MAX, WINDOWS }
   from './catalog.js';
 import { gripClashesLockset, gripFitsAnywhere,
-         bellFits, panelFits,
+         bellFits, panelUnderGlass,
          peepholeFits } from './renderer.js';
 
 /** Does this detail put ruled line work on the face?
@@ -249,7 +249,14 @@ export function conflicts(state) {
      and `repair` performs it — so greying out every window because two panels
      are selected would overstate a change the customer will barely notice.
      Read off `panels` rather than the id, so a third panelled face added later
-     is covered without anybody remembering to come back here. */
+     is covered without anybody remembering to come back here.
+     ⚠ SUPERSEDED 26.9.2026, KEPT AS THE RECORD: the window no longer refuses
+     the pair — it REPLACES the upper panel and the pair keeps its lower one,
+     on the owner's son's word. What survives of this note is its first half,
+     that the window takes the upper panel's place, and the price rule it
+     fought for: the pair beside a window charges for nothing the drawing does
+     not show (`DETAIL_GLAZED.panel2 = 0`, assumption A20). See the block
+     below that asks `panelUnderGlass`. */
   /* ⚠ A LONE PANEL ON A SOLID DOOR WAS NOT REFUSED, ON THE STRENGTH OF THREE
      DOORS THAT TURNED OUT NOT TO BE WHAT THIS NOTE SAID THEY WERE.
 
@@ -293,21 +300,24 @@ export function conflicts(state) {
      subject; this is the same failure with the arrow reversed, and it is the
      more expensive of the two because it reads as evidence. */
 
+  /* ⚠ AND SINCE 26.9.2026 THE WINDOW REPLACES THE UPPER PANEL RATHER THAN
+     REFUSING THE FACE. The owner's son: *"When switching from the Greek set to
+     other things like the 2 or 3 panels then the window needs to stay on and
+     not be removed"* — asked what the panels do with a window on, the window
+     replaces the upper panel; asked about the trio, whose handle plate the
+     casing lands 76 mm into, refuse the trio and keep the window. So this is
+     no longer "every face with an upper panel is refused": each face keeps the
+     rows its catalogue entry names (`keeps`), and `panelUnderGlass` asks the
+     drawing's own geometry whether they clear the window's casing — the pair's
+     lower panel does, by 205 mm; the trio's plate does not. A face that keeps
+     nothing is still refused with `why.winTakesTop`, and a TALL light still
+     leaves no room for the window's own lone panel (`why.noRoomBelow`, the
+     0.62 corpus line) — one function answers all three, off the numbers the
+     picture is drawn with, so the rule cannot drift from it. */
   if (onLeaf) {
-    for (const d of DETAILS) if (hasUpperPanel(d)) {
-      out.detail[d.id] = T('why.winTakesTop');
-    }
-    /* And a TALL light leaves no room for the lone one either. Same rule as
-       above, one step further: `appliedFrame` draws nothing at all when the
-       rectangle it is given is smaller than the moulding that goes round it,
-       and the price went on charging for the panel. The corpus says the same —
-       the three doors with an opening past 0.62 of leaf height carry no panel.
-       Asked of the drawing's own arithmetic, so it cannot drift. */
     for (const d of DETAILS) {
-      if (!d.panel || out.detail[d.id]) continue;
-      if (!panelFits({ ...state, detail: d.id })) {
-        out.detail[d.id] = T('why.noRoomBelow');
-      }
+      const u = panelUnderGlass({ ...state, detail: d.id });
+      if (u) out.detail[d.id] = T(WHY_UNDER_GLASS[u.why]);
     }
   }
 
@@ -348,7 +358,7 @@ export function conflicts(state) {
   if (onLeaf) out.stripes = T('why.stripesWindow');
   else if (byId(DETAILS, state.detail).panel) out.stripes = T('why.stripesPanel');
   if (lined) {
-    for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = T('why.windowStripes');
+    for (const w of WINDOWS) if (glassRows(w)) out.window[w.id] = T('why.windowStripes');
     for (const d of DETAILS) if (d.panel) out.detail[d.id] = T('why.panelStripes');
   }
 
@@ -417,7 +427,7 @@ export function conflicts(state) {
       out.handle[CHANNEL.id] = T('why.channelPlain');
     }
     if (grip.style === 'channel') {
-      for (const w of WINDOWS) if (w.rects.length) {
+      for (const w of WINDOWS) if (glassRows(w)) {
         out.window[w.id] = out.window[w.id] || T('why.notWithChannel');
       }
       for (const d of DETAILS) if (detailWorked(d)) {
@@ -638,7 +648,13 @@ const SAID = {
      the forced bottom panel and the pull a face brought with it. Both rules
      were withdrawn by Peretz on 14.9.2026; see `conflicts`. */
   stripesCapped: 'fix.stripesCapped',
+  /* 26.9.2026: the trio refused beside a window, on a link — see repair. */
+  trioPlate:    'fix.trioPlate',
 };
+
+/* Which reason a face greyed for the window gives, by what `panelUnderGlass`
+   found. Keys, not sentences — a top-level constant holds a key (§0c). */
+const WHY_UNDER_GLASS = { top: 'why.winTakesTop', plate: 'why.winPlate', room: 'why.noRoomBelow' };
 
 /**
  * Move a design to the nearest buildable one, and say what changed.
@@ -817,42 +833,32 @@ export function repair(state, intent = null) {
      face, and a repair that reads a value another repair is about to change is
      not idempotent. */
 
-  /* Two panels and a window want the same half of the leaf, and the window
-     takes it. The face drops to the single lower panel — a real option at a
-     real price, and the one the drawing was already showing.
-     Same rule as line work above and the same tie-break: whichever the
-     customer just clicked wins. Clicking שני פאנלים on a glazed door means
-     they want the pair, so the glass goes; arriving down a link means the
-     glass stays and the price comes down by ₪140. */
-  /* No room under the glass for a panel of any kind: the face goes plain. */
-  if (leafGlazed(s) && byId(DETAILS, s.detail).panel && !panelFits(s)) {
-    if (intent === 'detail') { s.window = 'none'; change('window', SAID.windowGone); }
-    else { s.detail = 'plain'; change('detail', SAID.noPanelRoom); }
-  }
-
-  if (leafGlazed(s) && hasUpperPanel(byId(DETAILS, s.detail))) {
-    if (intent === 'detail') { s.window = 'none'; change('window', SAID.windowGone); }
-    else {
-      /* ⚠ THE FACE GOES PLAIN, AND UNTIL 14.9.2026 IT WENT TO A SINGLE PANEL.
-         It used to drop onto the lone panel of the same MOULDING SECTION —
-         `panelo` for a customer on the ogee pair, `panel` for the reeded one —
-         and that care was the right care: dropping a customer who had chosen
-         the classical profile onto the plain single changed a decision they
-         had made on purpose. Both singles are withdrawn, so there is no face
-         left with one panel and the profile has nothing to ride on.
-         ⚠ THE BRANCH COULD NOT SIMPLY BE LEFT. `DETAILS.filter(d => d.panel &&
-         !hasUpperPanel(d))` now matches exactly ONE entry — the Greek set,
-         which has `panel: true` and neither `top` nor `panels` — so the old
-         code would have answered "a window over two panels" with a whole
-         cornice-and-plinth composition at ₪2,700. Measured before deleting it,
-         not assumed.
-         What the customer loses is a panel; what they keep is the glass they
-         just asked for, and on the square light they keep a panel too, because
-         that window brings its own. `SAID.rectPanel` says exactly that and
-         `SAID.facePlain` is the honest sentence for the slot, which brings
-         nothing. Two sentences because they are two different doors. */
+  /* ⚠ THE FACE AND THE WINDOW, AND THE WINDOW WINS WHATEVER THE INTENT —
+     26.9.2026. Two branches stood here, each with an `intent === 'detail'`
+     arm that took the WINDOW away when a face was tapped on a glazed door —
+     "clicking שני פאנלים on a glazed door means they want the pair, so the
+     glass goes". The owner's son reversed that: *"the window needs to stay on
+     and not be removed"*. The pair now stands beside the square window (it
+     keeps its lower panel), and where a face genuinely cannot — the trio,
+     whose plate the casing would stand 76 mm into; any face under the tall
+     slot — the FACE yields, on a link and on a tap alike. On the page a face
+     tile greyed for the window never reaches here: `choose` in `app.js` says
+     the tile's reason and leaves the door alone, the gate the greyed pull
+     handle already has. What reaches here is a link, a decoded code, a window
+     tapped onto a face that cannot keep it, and the fuzzer.
+     The face goes PLAIN rather than to the nearest face that fits, for the
+     reason the old branch gave when both singles were withdrawn: there is no
+     panelled face "nearest" the trio that is not a decision the customer did
+     not make, and on the square light a plain face still has a panel under
+     the glass, because that window brings its own. Four sentences, because
+     they are four different doors. */
+  if (leafGlazed(s) && s.detail !== 'plain') {
+    const u = panelUnderGlass(s);
+    if (u) {
       s.detail = 'plain';
-      change('detail', byId(WINDOWS, s.window).panel ? SAID.rectPanel : SAID.facePlain);
+      change('detail', u.why === 'plate' ? SAID.trioPlate
+        : u.why === 'room' ? SAID.noPanelRoom
+        : byId(WINDOWS, s.window).panel ? SAID.rectPanel : SAID.facePlain);
     }
   }
 

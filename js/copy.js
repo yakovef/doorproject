@@ -528,9 +528,13 @@ export const UI = {
      reason written over `exp.lock.a`: these two were still right on the day
      the safe lock's two were not, and being right is not a property a typed
      number keeps. */
-  'exp.face.a':           ['פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — {0} לפס אופקי ו‑{1} לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, וגם לא עם חלון — חלון מרובע מגיע עם הפאנל שלו בתחתית, ואין צורך לבחור אותו כאן. כל עיצוב חזית מתאים לכל ידית משיכה.',
-                       'Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — {0} a horizontal strip and {1} a vertical one. Panels and strips do not go on the same door, and neither goes with a window — a square window brings its own panel below it, and there is nothing to choose here for that. Every face goes with every pull handle.',
-                       'Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: {0} за горизонтальную и {1} за вертикальную. Панели и полосы не совмещаются на одной двери, как и с окном: у квадратного окна своя нижняя панель, и выбирать её здесь не нужно. Любое оформление полотна сочетается с любой ручкой-скобой.'],
+  /* ⚠ 26.9.2026: it said panels do not go "with a window" either, which the
+     owner's son made false the same day — the pair keeps its lower panel
+     under the square window and only the trio is refused. The two face names
+     are `{2}` and `{3}` out of DETAILS, not typed (§0c). */
+  'exp.face.a':           ['פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — {0} לפס אופקי ו‑{1} לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, ולא פסים עם חלון. עם חלון מרובע, ב„{2}” החלון תופס את מקום הפאנל העליון והתחתון נשאר; דלת חלקה מקבלת את הפאנל שהחלון מביא איתו; ו„{3}” לא משתלבים עם חלון — מסגרת החלון נכנסת ללוחית הידית שבאמצע. כל עיצוב חזית מתאים לכל ידית משיכה.',
+                       'Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — {0} a horizontal strip and {1} a vertical one. Panels and strips do not go on the same door, and strips do not go with a window. With the square window, on “{2}” the window takes the upper panel’s place and the lower one stays; a plain door gets the panel the window brings below it; and “{3}” does not go with a window — its frame would run into the handle plate in the middle. Every face goes with every pull handle.',
+                       'Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: {0} за горизонтальную и {1} за вертикальную. Панели и полосы не совмещаются на одной двери, а полосы — с окном. С квадратным окном у варианта «{2}» окно занимает место верхней панели, а нижняя остаётся; гладкая дверь получает нижнюю панель, которую приносит окно; а «{3}» с окном не сочетаются — рама окна заходит на среднюю накладку под ручку. Любое оформление полотна сочетается с любой ручкой-скобой.'],
   'exp.glass.q':          ['מה נכנס לתוך החלון?', 'What goes inside the window?', 'Что ставится в окно?'],
   /* ⚠ THE SIDELIGHT IS NOT A PRODUCT AND THIS SENTENCE WAS STILL SELLING IT —
      25.9.2026. "a door with a sidelight" / "דלת עם חלון צד" / "дверь с боковым
@@ -777,6 +781,10 @@ export const UI = {
   'why.needsWindow':     ['דורש חלון', 'Needs a window', 'Нужно окно'],
   'why.winTakesTop':     ['החלון תופס את מקומו של הפאנל העליון', 'The window takes the upper panel’s place', 'Окно занимает место верхней панели'],
   'why.noRoomBelow':     ['אין מקום לפאנל מתחת לחלון', 'No room for a panel below the window', 'Под окном нет места для панели'],
+  /* 26.9.2026 — the trio beside the square window: the casing would stand in
+     its handle plate (`panelUnderGlass`, 'plate'). The window stays; the tap
+     says this and changes nothing. */
+  'why.winPlate':        ['מסגרת החלון נכנסת ללוחית הידית שבאמצע', 'The window’s frame would run into the handle plate in the middle', 'Рама окна заходит на среднюю накладку под ручку'],
   'why.setNoSlot':       ['הסט היווני לא משתלב עם צוהר אנכי', 'The Greek set does not go with a vertical slot', 'Греческий комплект не сочетается с вертикальным окном'],
   'why.setOwnWindow':    ['הסט היווני מגיע עם חלון מלבני משלו', 'The Greek set comes with a rectangular window of its own', 'У греческого комплекта своё прямоугольное окно'],
   'why.stripesWindow':   ['לא משלבים פסי מתכת עם חלון', 'Metal strips do not go with a window', 'Металлические полосы не сочетаются с окном'],
@@ -816,6 +824,7 @@ export const UI = {
      nothing and leaves a bare leaf under the glass. */
   'fix.facePlain':       ['החלקנו את הדלת — החלון תופס את מקום הפאנלים', 'We cleared the face — the window takes the panels’ place', 'Мы убрали панели — окно занимает их место'],
   'fix.rectPanel':       ['החלקנו את הדלת — החלון המרובע מגיע עם הפאנל שלו בתחתית', 'We cleared the face — the square window comes with its own panel below', 'Мы убрали панели — у квадратного окна своя нижняя панель'],
+  'fix.trioPlate':       ['החלקנו את הדלת — מסגרת החלון נכנסת ללוחית הידית שבאמצע', 'We cleared the face — the window’s frame would run into its middle handle plate', 'Мы убрали панели — рама окна заходит на среднюю накладку под ручку'],
   'fix.noPanelRoom':     ['הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום', 'We removed the panel — the tall window leaves no room for it', 'Мы убрали панель — высокому окну не хватает места'],
   'fix.faceCleared':     ['החלקנו את הדלת — ידית שקועה דורשת פנים חלקות', 'We smoothed the face — a recessed channel needs it plain', 'Мы сделали полотно гладким — врезная ручка этого требует'],
   'fix.grilleGone':      ['הסרנו את הסורג — אין חלון', 'We removed the grille — there is no window', 'Мы убрали решётку — окна нет'],
@@ -916,6 +925,11 @@ export const UI = {
      own: it is not a thing anybody chose, and a row for it would invite the
      question of why it has no price. */
   'row.withPanel':    ['עם פאנל תחתון', 'with a panel below', 'с нижней панелью'],
+  /* 26.9.2026: a glazed PAIR — the window replaced its upper panel. {0} is the
+     face's own name (DETAILS), so the order says the composition in words: 14.9
+     refused the pair at ₪0 because the order would have said "two panels" on a
+     door drawing one, and this is the sentence that makes it say what is drawn. */
+  'row.upperGlazed':  ['{0} — העליון הוחלף בחלון', '{0} — the upper one replaced by the window', '{0} — верхнюю заменило окно'],
   'row.glazing':      ['זיגוג', 'Glazing', 'Остекление'],
   'row.grille':       ['סורג', 'Grille', 'Решётка'],
   'row.glass':        ['זכוכית', 'Glass', 'Стекло'],

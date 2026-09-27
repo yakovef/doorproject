@@ -38,7 +38,7 @@ import { breakdownRows, deltaLabel, formatAgorot, priceAgorot, priceLabel, price
 import {
   describe, detailGlyph, grilleGlyph, handleGlyph, locksetGlyph,
   bellGlyph, handleFinishGlyph, copyOf, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
-  specialLockGlyph, stripesGlyph,
+  panelUnderGlass, specialLockGlyph, stripesGlyph,
   windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
@@ -369,7 +369,8 @@ const SECTIONS = [
   { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz',
     expArgs: () => [L(byId(LOCKSETS, 'cadoor')), L(byId(LOCKSETS, 'sapir'))] },
   { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face',
-    expArgs: () => [formatAgorot(STRIPE_A.h), formatAgorot(STRIPE_A.v)] },
+    expArgs: () => [formatAgorot(STRIPE_A.h), formatAgorot(STRIPE_A.v),
+                    L(byId(DETAILS, 'panel2')), L(byId(DETAILS, 'panel3'))] },
   { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass',
     expArgs: () => [L(SIZES.half)] },
   { key: 'mk',     title: 'step.mk.t',     sub: 'step.mk.s',     lede: 'step.mk.l', exp: 'exp.mk',
@@ -2433,6 +2434,19 @@ function choose(g, id) {
       if (g.key === 'lockset') openClash(); else toast(why);
       return;
     }
+  }
+  /* ⚠ AND A FACE GREYED FOR THE WINDOW CHANGES NOTHING — 26.9.2026. The owner's
+     son: *"the window needs to stay on and not be removed"*. Tapping a face the
+     window refuses — the trio, whose handle plate the casing would stand in;
+     any panelled face under the tall slot — used to go through `repair` with a
+     `detail` intent that took the WINDOW away. That arm is gone from `repair`
+     and this is its page half: the tap says the tile's reason and the door
+     stays as it is. Asked of `panelUnderGlass` so only the window's refusals
+     are gated — a face greyed for the stripes still clears them on a tap, as
+     every other greyed tile performs its repair. */
+  if (g.key === 'detail' && id !== state.detail && panelUnderGlass({ ...state, detail: id })) {
+    const why = conflicts(state).detail[id];
+    if (why) { toast(why); return; }
   }
   /* `said` comes back from the repair itself, one sentence per change, because
      the branch that made the change is the only place that knows why it did.

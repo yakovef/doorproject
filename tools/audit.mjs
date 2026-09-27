@@ -24,7 +24,7 @@ import { deltaLabel, formatAgorot, priceAgorot, priceLabel, priceParts } from '.
 import { DETAILS, SIZES } from '../js/catalog.js';
 import { detailGlyph, stripesGlyph } from '../js/renderer.js';
 import { SECTION_ICON, SPEC_ICON } from '../js/icons.js';
-import { setLang, T, withLang } from '../js/copy.js';
+import { L, setLang, T, withLang } from '../js/copy.js';
 import { handingWords, specRows, summaryLine } from '../js/spec.js';
 import { repair } from '../js/rules.js';
 
@@ -663,7 +663,13 @@ for (const v of VIEWS) {
       await p.waitForTimeout(400);
     };
 
-    await fresh('?d=panel2&w=none&n=none&k=coral&lang=he');
+    /* ⚠ THE TRIO, NOT THE PAIR, SINCE 26.9.2026 — same subject. The square
+       window used to take the PAIR away, and that was this clause's fixture;
+       the owner's son made the pair stand beside it (the window replaces its
+       upper panel), so a window tap on the pair takes nothing and the clause
+       would have faulted "lost its subject" everywhere. The window still takes
+       the TRIO, whose handle plate its casing would stand in. */
+    await fresh('?d=panel3&w=none&n=none&k=coral&lang=he');
     await tap('window', 'rect');
     const took = await now();
     await tap('window', 'none');
@@ -671,8 +677,8 @@ for (const v of VIEWS) {
     if (took.face !== 'plain') {
       fault(v.name, `a square window left the face at ${took.face} — this check has lost `
         + 'its subject, nothing was taken away to give back');
-    } else if (gave.face !== 'panel2') {
-      fault(v.name, `window → rect → none left the face at ${gave.face} and it was panel2 `
+    } else if (gave.face !== 'panel3') {
+      fault(v.name, `window → rect → none left the face at ${gave.face} and it was panel3 `
         + 'before the window took it — going back does not give the panels back');
     }
 
@@ -689,18 +695,21 @@ for (const v of VIEWS) {
         + 'horizontal before — the memory is only working for the window');
     }
 
-    await fresh('?d=panel2&w=none&n=none&k=coral&lang=he');
+    /* The trio is taken by the window, then the PAIR is chosen on purpose
+       beside it (it fits since 26.9.2026); taking the window off must leave
+       the pair, not hand back the trio. */
+    await fresh('?d=panel3&w=none&n=none&k=coral&lang=he');
     await tap('window', 'rect');
-    await tap('detail', 'panel3');
+    await tap('detail', 'panel2');
     await tap('window', 'none');
     const kept = await now();
-    if (kept.face !== 'panel3') {
-      fault(v.name, `a face chosen on purpose (panel3) was overwritten with ${kept.face} `
+    if (kept.face !== 'panel2') {
+      fault(v.name, `a face chosen on purpose (panel2) was overwritten with ${kept.face} `
         + 'when the window came off — the memory must yield to a deliberate choice');
     }
 
     /* And nothing of it rides in the address. */
-    await fresh('?d=panel2&w=none&n=none&k=coral&lang=he');
+    await fresh('?d=panel3&w=none&n=none&k=coral&lang=he');
     await tap('window', 'rect');
     const url = await p.evaluate(() => location.search + location.hash);
     if (/displaced|memo|was%3A|back=/.test(url)) {
@@ -802,16 +811,26 @@ for (const v of VIEWS) {
      the defect was precisely that they differed.
      §5.15: it fails loudly if the tile or the toast cannot be found at all.
      Falsified by putting `said[0]` back: fails at every viewport, naming the
-     sentence that went missing. */
+     sentence that went missing.
+     ⚠ RE-AIMED 26.9.2026, SAME SUBJECT. The fixture was the three-panel face
+     tapped on a slot door, and what made it a multi-change tap was the
+     `intent === 'detail'` arm taking the WINDOW away. The owner's son reversed
+     that — a face tap never removes the window — so the same tap now changes
+     nothing and says the tile's reason, and this check would have faulted
+     "no longer exercises the fault" at every viewport. The fault it exists for
+     is unchanged: one tap, two sentences, both on screen. The tap is now the
+     square window on a solid door carrying a פעמון and an עינית, both on the
+     centre line the glass takes — two removals, two sentences, asked of
+     `repair` in node exactly as before. */
   {
-    await p.goto('file://' + process.cwd() + '/index.html?w=strip&d=plain&n=idan&g=grid&lang=he');
+    await p.goto('file://' + process.cwd() + '/index.html?w=none&d=plain&n=none&bl=bell&ey=peep&lang=he');
     await p.waitForSelector('#stage svg');
     await p.waitForTimeout(300);
     const before = await p.evaluate(() =>
       (document.querySelector('#code')?.textContent || '').trim());
     const state = decodeCode(before);
     const tap = await p.evaluate(() => {
-      const t = document.querySelector('.field[data-group="detail"] [data-id="panel3"]');
+      const t = document.querySelector('.field[data-group="window"] [data-id="rect"]');
       if (!t) return null;
       t.click();
       return true;
@@ -823,9 +842,9 @@ for (const v of VIEWS) {
     });
     if (!state || !tap) {
       fault(v.name, 'the multi-change toast check could not find its subject '
-        + `(code=${before || 'none'}, panel3 tile=${tap ? 'yes' : 'no'}) — it is dead`);
+        + `(code=${before || 'none'}, square window tile=${tap ? 'yes' : 'no'}) — it is dead`);
     } else {
-      const { said } = repair({ ...state, detail: 'panel3' }, 'detail');
+      const { said } = repair({ ...state, window: 'rect' }, 'window');
       if (said.length < 2) {
         fault(v.name, `the tap this check is built on now changes only ${said.length} `
           + 'thing — it no longer exercises the fault and must be re-aimed');
@@ -992,6 +1011,131 @@ for (const v of VIEWS) {
       const done = await read();
       if (done.open) fault(v.name, `${lang}: the OK button does not close the lever dialog`);
       if (done.code !== before.code) fault(v.name, `${lang}: the door changed on OK: ${before.code} → ${done.code}`);
+    }
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(300);
+  }
+
+  /* ⚠ ONE SQUARE WINDOW, AND A FACE TAP NEVER MOVES IT — 26.9.2026. The
+     owner's son: *"When switching from the Greek set to other things like the
+     2 or 3 panels then the window needs to stay on and not be removed, also
+     the window size and placement then needs to be the same."* `npm test`
+     proves the geometry and the rule; only the page can prove the TAP. On the
+     Greek set with its window:
+       1. tap two panels — the pane does not move a pixel (every pane on the
+          stage, read as boxes), the face is the pair beside the same window,
+          the price AND the code move together, a lower panel is drawn below
+          the glass, and the WhatsApp order names the composition in Hebrew;
+       2. tap three panels — nothing changes (code, price, pane) and the toast
+          says the plate, which is the tile's own reason (`why.winPlate`);
+       3. `?sheet=1` of both doors builds with no page error, draws the door,
+          and the pair's sheet names the composition.
+     The fixture is asserted to arrive unrepaired (§5.15). Falsified by putting
+     the `intent === 'detail'` arm back in `repair` (tap 2 loses the window)
+     and by dropping the gate in `choose` (tap 2 lands on plain and says so). */
+  {
+    const load = async q => {
+      await p.goto('file://' + process.cwd() + '/index.html' + q);
+      await p.waitForSelector('#stage svg');
+      await p.waitForTimeout(300);
+    };
+    const read = () => p.evaluate(() => {
+      const t = document.querySelector('#toast');
+      const wa = document.querySelector('[data-wa]');
+      const panes = [...document.querySelectorAll('#stage svg rect[fill="url(#glass)"]')]
+        .map(r => { const q = r.getBoundingClientRect(); return [q.x, q.y, q.width, q.height]; });
+      /* In the drawing's own units: the panel group's box on screen includes
+         its relight rects, which are the whole leaf (see collide.mjs). */
+      const panel = document.querySelector('#stage svg #detail [data-detail="panel"]');
+      const glassFoot = Math.max(...[...document.querySelectorAll('#stage svg rect[fill="url(#glass)"]')]
+        .map(r => Number(r.getAttribute('y')) + Number(r.getAttribute('height'))));
+      return {
+        code: (document.querySelector('#code')?.textContent || '').trim(),
+        price: (document.querySelector('[data-price]')?.textContent || '').trim(),
+        toast: t && !t.hidden ? t.textContent.trim() : '',
+        wa: wa ? decodeURIComponent(wa.getAttribute('href') || '') : '',
+        panes,
+        panelTop: panel ? Number(panel.getAttribute('data-top')) : null,
+        glassFoot,
+      };
+    });
+    const tap = id => p.evaluate(i => {
+      const e = document.querySelector(`.field[data-group="detail"] [data-id="${i}"]`);
+      if (!e) return false; e.click(); return true;
+    }, id).then(hit => p.waitForTimeout(350).then(() => hit));
+    const same = (a, c) => a.length === c.length
+      && a.every((r, k) => r.every((x, i) => Math.abs(x - c[k][i]) < 0.5));
+
+    await load('?w=rect&d=classic&n=none&k=cylinder&s=standard&lang=he');
+    const a = await read();
+    const sa = decodeCode(a.code);
+    if (!sa || sa.detail !== 'classic' || sa.window !== 'rect' || !a.panes.length) {
+      fault(v.name, `the Greek set with its window arrived as ${sa?.detail}/${sa?.window} with `
+        + `${a.panes.length} pane(s) — the face-tap check has no subject`);
+    } else {
+      const hit2 = await tap('panel2');
+      const b2 = await read();
+      const sb = decodeCode(b2.code);
+      if (!hit2) fault(v.name, 'no two-panel tile on the face step — the face-tap check is dead');
+      else {
+        if (!sb || sb.window !== 'rect') {
+          fault(v.name, `tapping two panels beside the Greek set's window left the window at ${sb?.window} `
+            + '— a face tap never removes the window');
+        }
+        if (!sb || sb.detail !== 'panel2') fault(v.name, `tapping two panels landed on ${sb?.detail}`);
+        if (!same(a.panes, b2.panes)) {
+          fault(v.name, `the square window moved when the set became two panels: `
+            + `${JSON.stringify(a.panes.map(r => r.map(Math.round)))} → ${JSON.stringify(b2.panes.map(r => r.map(Math.round)))}`);
+        }
+        if (b2.code === a.code || b2.price === a.price) {
+          fault(v.name, `the face changed and the ${b2.code === a.code ? 'code' : 'price'} did not `
+            + `(${a.code} ${a.price} → ${b2.code} ${b2.price})`);
+        }
+        const foot = b2.glassFoot;
+        if (b2.panelTop == null || !(b2.panelTop > foot)) {
+          fault(v.name, `two panels beside the window draw ${b2.panelTop == null ? 'no' : 'a misplaced'} lower `
+            + `panel (top ${b2.panelTop}, glass to ${foot.toFixed(1)})`);
+        }
+        const says = withLang('he', () => T('row.upperGlazed', L(DETAILS.find(d => d.id === 'panel2'))));
+        if (!b2.wa.includes(says)) {
+          fault(v.name, `the order for two panels beside a window does not say "${says}" — `
+            + 'it would read "two panels" on a door drawing one');
+        }
+        const hit3 = await tap('panel3');
+        const c3 = await read();
+        const plate = withLang('he', () => T('why.winPlate'));
+        if (!hit3) fault(v.name, 'no three-panel tile on the face step — the refusal check is dead');
+        else {
+          if (c3.code !== b2.code || c3.price !== b2.price || !same(b2.panes, c3.panes)) {
+            fault(v.name, `tapping the greyed three panels changed the door: ${b2.code} ${b2.price} → ${c3.code} ${c3.price}`);
+          }
+          if (!c3.toast.includes(plate)) {
+            fault(v.name, `tapping the greyed three panels said "${c3.toast}" — it should name the plate: "${plate}"`);
+          }
+        }
+      }
+    }
+    if (v === VIEWS[0]) {
+      for (const [name, q, needs] of [
+        ['the Greek set', 'w=rect&d=classic&n=none&k=cylinder&s=standard', null],
+        ['two panels', 'w=rect&d=panel2&n=none&k=cylinder&s=standard',
+         withLang('he', () => T('row.upperGlazed', L(DETAILS.find(d => d.id === 'panel2'))))],
+      ]) {
+        const sp = await b.newPage({ viewport: { width: 794, height: 1123 } });
+        const serr = [];
+        sp.on('pageerror', e => serr.push(String(e)));
+        await sp.goto('file://' + process.cwd() + '/index.html?sheet=1&' + q);
+        await sp.waitForTimeout(600);
+        const sh = await sp.evaluate(() => ({
+          panes: document.querySelectorAll('#sheet svg rect[fill*="glass"]').length,
+          text: document.querySelector('#sheet')?.textContent || '',
+        }));
+        if (serr.length) fault('sheet', `${name} beside the square window: ${serr.length} page error(s) on ?sheet=1 — ${serr[0]}`);
+        if (!sh.panes) fault('sheet', `${name} beside the square window: the order sheet draws no pane`);
+        if (needs && !sh.text.includes(needs)) fault('sheet', `${name}: the order sheet does not say "${needs}"`);
+        await sp.close();
+      }
     }
     await p.goto('file://' + process.cwd() + '/index.html');
     await p.waitForSelector('#stage svg');

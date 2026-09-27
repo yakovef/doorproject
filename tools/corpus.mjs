@@ -179,17 +179,37 @@ function windowOf(rec) {
     return { id: 'none', residual: 0, note: 'solid' };
   }
   const r = rec.window.rects[0];
+  /* ⚠ BY FRACTION OF THE LEAF, AND THE SQUARE WINDOW IS NOTHING BUT FRACTIONS
+     SINCE 26.9.2026 — it is the Greek set's light (`WINDOWS.rect.frac`), with
+     no millimetre rectangle to divide. The slot is still millimetres, read
+     against the standard leaf the records are normalised to. */
+  const fracOf = w => w.frac
+    ? { w: w.frac.x1 - w.frac.x0, h: w.frac.bot - w.frac.top }
+    : w.rects && w.rects.length ? { w: w.rects[0].w / LEAF_W, h: w.rects[0].h / LEAF_H } : null;
+  /* ⚠ AND A PANEL UNDER THE GLASS DECIDES THE FAMILY BEFORE THE SHAPE DOES —
+     26.9.2026. d097 was a coin toss on shape alone (0.155 to the old rect
+     against 0.159 to the slot) and moving the square window to the set's
+     rows tipped it to the slot: the brief's own tripwire, "no door may swap
+     rect <-> strip", caught it. The record had the answer all along: of the
+     ten glazed doors the SEVEN with a panel under the glass are square-window
+     doors and the THREE without are slots, which is Peretz's own "the panel
+     can only work with the normal window" and the 0.62 line in
+     `panelUnderGlass`. So a photographed panel restricts the fit to windows
+     that bring one; the shape then picks among them and its residual is
+     still printed. */
+  const panelled = !!(rec.detail && rec.detail.panel);
+  const pool = WINDOWS.filter(w => fracOf(w) && (!panelled || w.panel));
   let best = null, bestD = Infinity;
-  for (const w of WINDOWS) {
-    if (!w.rects.length) continue;
-    const q = w.rects[0];
-    const d = Math.hypot(q.w / LEAF_W - r.w, q.h / LEAF_H - r.h);
+  for (const w of (pool.length ? pool : WINDOWS)) {
+    const q = fracOf(w);
+    if (!q) continue;
+    const d = Math.hypot(q.w - r.w, q.h - r.h);
     if (d < bestD) { bestD = d; best = w; }
   }
-  const q = best.rects[0];
+  const q = fracOf(best);
   return { id: best.id, residual: bestD,
     note: `${r.w.toFixed(3)}x${r.h.toFixed(3)} of leaf -> `
-        + `${(q.w / LEAF_W).toFixed(3)}x${(q.h / LEAF_H).toFixed(3)} (${best.en})` };
+        + `${q.w.toFixed(3)}x${q.h.toFixed(3)} (${best.en})` };
 }
 
 /** Straight off the catalogue's own `doors` lists — the hand reading. The

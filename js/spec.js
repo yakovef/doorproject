@@ -44,7 +44,7 @@
 
 import { L, T, withLang } from './copy.js';
 import {
-  byId, colourCode, COLOURS, DETAILS, glazedPanels, GRILLES, grillePlacement,
+  byId, colourCode, COLOURS, DETAILS, glassRows, glazedPanels, GRILLES, grillePlacement,
   gripTakesFinish, handleLength, HANDINGS, HANDLES, HANDLE_FINISHES, isGlazed, LOCKSETS,
   MASHKOFS, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BELLS, PEEPHOLES,
 } from './catalog.js';
@@ -76,6 +76,14 @@ export function specRows(state) {
   const dt = byId(DETAILS, state.detail);
   const sz = SIZES[state.size] || SIZES.standard;
   const hn = byId(HANDINGS, state.handing);
+  /* ⚠ A PANELLED FACE UNDER THE SQUARE WINDOW, 26.9.2026: the window replaced
+     its upper panel and the face keeps its own rows (`keeps`) — so the lower
+     panel is the FACE's, not the window's, and the two rows below say so the
+     one way round: the face row names the composition ("two panels — the
+     upper one replaced by the window") and the window row drops its "with a
+     panel below", which would otherwise put a second lower panel in the
+     order beside the pair's. */
+  const keptUnderGlass = glassRows(w) > 0 && (dt.keeps || []).length > 0;
   /* ⚠ THE FINISH IS THE CUSTOMER'S CHOICE NOW, 20.9.2026, not the product's
      declaration — `declaredFinish(hd)` stood here and answered for two bars
      that no longer exist. It is named on the handle's row whenever the handle
@@ -105,7 +113,7 @@ export function specRows(state) {
        would otherwise describe a plain leaf with a window and no panel.
        `specRows` is the one description of a door; this is the one place. */
     { key: 'window', label: T('row.window'), id: w.id,
-      value: w.panel ? `${L(w)} (${T('row.withPanel')})` : L(w) },
+      value: w.panel && !keptUnderGlass ? `${L(w)} (${T('row.withPanel')})` : L(w) },
   ];
 
   /* ⚠ A דלת וחצי DRAWS TWO LIGHTS AND THIS USED TO NAME ONE. `glazedPanels`
@@ -201,7 +209,8 @@ export function specRows(state) {
     rows.push({ key: 'peephole', label: T('row.peephole'), id: ep.id, value: L(ep) });
   }
   if (dt.id !== 'plain') {
-    rows.push({ key: 'detail', label: T('row.detail'), id: dt.id, value: L(dt) });
+    rows.push({ key: 'detail', label: T('row.detail'), id: dt.id,
+                value: keptUnderGlass ? T('row.upperGlazed', L(dt)) : L(dt) });
   }
   /* ⚠ THE COUNT AND THE DIRECTION, because Peretz is paid per stripe. Eleven
      bands and four bands used to arrive as one phrase — "פסי מתכת" — and the

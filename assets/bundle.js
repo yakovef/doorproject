@@ -426,10 +426,14 @@
        reason written over `exp.lock.a`: these two were still right on the day
        the safe lock's two were not, and being right is not a property a typed
        number keeps. */
+    /* ⚠ 26.9.2026: it said panels do not go "with a window" either, which the
+       owner's son made false the same day — the pair keeps its lower panel
+       under the square window and only the trio is refused. The two face names
+       are `{2}` and `{3}` out of DETAILS, not typed (§0c). */
     "exp.face.a": [
-      "פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — {0} לפס אופקי ו‑{1} לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, וגם לא עם חלון — חלון מרובע מגיע עם הפאנל שלו בתחתית, ואין צורך לבחור אותו כאן. כל עיצוב חזית מתאים לכל ידית משיכה.",
-      "Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — {0} a horizontal strip and {1} a vertical one. Panels and strips do not go on the same door, and neither goes with a window — a square window brings its own panel below it, and there is nothing to choose here for that. Every face goes with every pull handle.",
-      "Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: {0} за горизонтальную и {1} за вертикальную. Панели и полосы не совмещаются на одной двери, как и с окном: у квадратного окна своя нижняя панель, и выбирать её здесь не нужно. Любое оформление полотна сочетается с любой ручкой-скобой."
+      "פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — {0} לפס אופקי ו‑{1} לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, ולא פסים עם חלון. עם חלון מרובע, ב„{2}” החלון תופס את מקום הפאנל העליון והתחתון נשאר; דלת חלקה מקבלת את הפאנל שהחלון מביא איתו; ו„{3}” לא משתלבים עם חלון — מסגרת החלון נכנסת ללוחית הידית שבאמצע. כל עיצוב חזית מתאים לכל ידית משיכה.",
+      "Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — {0} a horizontal strip and {1} a vertical one. Panels and strips do not go on the same door, and strips do not go with a window. With the square window, on “{2}” the window takes the upper panel’s place and the lower one stays; a plain door gets the panel the window brings below it; and “{3}” does not go with a window — its frame would run into the handle plate in the middle. Every face goes with every pull handle.",
+      "Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: {0} за горизонтальную и {1} за вертикальную. Панели и полосы не совмещаются на одной двери, а полосы — с окном. С квадратным окном у варианта «{2}» окно занимает место верхней панели, а нижняя остаётся; гладкая дверь получает нижнюю панель, которую приносит окно; а «{3}» с окном не сочетаются — рама окна заходит на среднюю накладку под ручку. Любое оформление полотна сочетается с любой ручкой-скобой."
     ],
     "exp.glass.q": ["מה נכנס לתוך החלון?", "What goes inside the window?", "Что ставится в окно?"],
     /* ⚠ THE SIDELIGHT IS NOT A PRODUCT AND THIS SENTENCE WAS STILL SELLING IT —
@@ -707,6 +711,10 @@
     "why.needsWindow": ["דורש חלון", "Needs a window", "Нужно окно"],
     "why.winTakesTop": ["החלון תופס את מקומו של הפאנל העליון", "The window takes the upper panel’s place", "Окно занимает место верхней панели"],
     "why.noRoomBelow": ["אין מקום לפאנל מתחת לחלון", "No room for a panel below the window", "Под окном нет места для панели"],
+    /* 26.9.2026 — the trio beside the square window: the casing would stand in
+       its handle plate (`panelUnderGlass`, 'plate'). The window stays; the tap
+       says this and changes nothing. */
+    "why.winPlate": ["מסגרת החלון נכנסת ללוחית הידית שבאמצע", "The window’s frame would run into the handle plate in the middle", "Рама окна заходит на среднюю накладку под ручку"],
     "why.setNoSlot": ["הסט היווני לא משתלב עם צוהר אנכי", "The Greek set does not go with a vertical slot", "Греческий комплект не сочетается с вертикальным окном"],
     "why.setOwnWindow": ["הסט היווני מגיע עם חלון מלבני משלו", "The Greek set comes with a rectangular window of its own", "У греческого комплекта своё прямоугольное окно"],
     "why.stripesWindow": ["לא משלבים פסי מתכת עם חלון", "Metal strips do not go with a window", "Металлические полосы не сочетаются с окном"],
@@ -746,6 +754,7 @@
        nothing and leaves a bare leaf under the glass. */
     "fix.facePlain": ["החלקנו את הדלת — החלון תופס את מקום הפאנלים", "We cleared the face — the window takes the panels’ place", "Мы убрали панели — окно занимает их место"],
     "fix.rectPanel": ["החלקנו את הדלת — החלון המרובע מגיע עם הפאנל שלו בתחתית", "We cleared the face — the square window comes with its own panel below", "Мы убрали панели — у квадратного окна своя нижняя панель"],
+    "fix.trioPlate": ["החלקנו את הדלת — מסגרת החלון נכנסת ללוחית הידית שבאמצע", "We cleared the face — the window’s frame would run into its middle handle plate", "Мы убрали панели — рама окна заходит на среднюю накладку под ручку"],
     "fix.noPanelRoom": ["הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום", "We removed the panel — the tall window leaves no room for it", "Мы убрали панель — высокому окну не хватает места"],
     "fix.faceCleared": ["החלקנו את הדלת — ידית שקועה דורשת פנים חלקות", "We smoothed the face — a recessed channel needs it plain", "Мы сделали полотно гладким — врезная ручка этого требует"],
     "fix.grilleGone": ["הסרנו את הסורג — אין חלון", "We removed the grille — there is no window", "Мы убрали решётку — окна нет"],
@@ -879,6 +888,11 @@
        own: it is not a thing anybody chose, and a row for it would invite the
        question of why it has no price. */
     "row.withPanel": ["עם פאנל תחתון", "with a panel below", "с нижней панелью"],
+    /* 26.9.2026: a glazed PAIR — the window replaced its upper panel. {0} is the
+       face's own name (DETAILS), so the order says the composition in words: 14.9
+       refused the pair at ₪0 because the order would have said "two panels" on a
+       door drawing one, and this is the sentence that makes it say what is drawn. */
+    "row.upperGlazed": ["{0} — העליון הוחלף בחלון", "{0} — the upper one replaced by the window", "{0} — верхнюю заменило окно"],
     "row.glazing": ["זיגוג", "Glazing", "Остекление"],
     "row.grille": ["סורג", "Grille", "Решётка"],
     "row.glass": ["זכוכית", "Glass", "Стекло"],
@@ -1040,7 +1054,7 @@
        so the set's glazed supplement comes down by the same 100 and his 4700
        still holds exactly. Change either number alone and the other silently
        stops being what he said. */
-    classic: 900
+    classic: 900,
     // 3800 + 900 = 4700, which is what he said
     /* ⚠ `panel: 0` WAS HERE AND THE MECHANISM IT STOOD FOR HAS MOVED UP A LEVEL,
        14.9.2026. It zeroed the lower panel on a glazed leaf, because a square
@@ -1052,6 +1066,18 @@
        Kept as a note because the reasoning is the reasoning above it: a price
        that depends on the glass is a real thing in this range, and `classic` is
        the remaining one. */
+    /* ⚠ AND THE PAIR UNDER A WINDOW IS NOTHING ON TOP OF THE WINDOW — 26.9.2026,
+       ASSUMPTION A20. The owner's son made the pair buildable beside the square
+       window: the window replaces its upper panel and the pair keeps its lower
+       one. So the door draws ONE panel, and it is the same one panel `WINDOW.rect`
+       already pays for on a plain face — his father's "a blank door with a
+       window, needs to be worth 6995". Charging the pair's solid price on top
+       would be charging for a panel the glass replaced, which is what 14.9
+       refused the pair at ₪0 to avoid saying; the spec row names the
+       composition instead. Whether a glazed two-panel door is really ₪3,800
+       alone is Peretz's to say, and `ASK-PERETZ.md` asks it in one line. */
+    panel2: 0
+    // 3195 + 3800 + 0 = 6995, the same as plain behind the same window
   };
   var HANDLE = {
     none: 0,
@@ -1324,17 +1350,39 @@
        which is a gap in the DRAWING and not in this flag: the fixed leaf's
        branch in `renderer.js` draws a clamped aperture and nothing under it.
        Reported by Peretz separately and fixed in its own round. */
+    /* ⚠ ONE SQUARE WINDOW, AND IT IS THE GREEK SET'S — 26.9.2026. The owner's
+       son: *"When switching from the Greek set to other things like the 2 or 3
+       panels then the window needs to stay on and not be removed, also the
+       window size and placement then needs to be the same, if its not, then
+       there are problems with the proportions of the panels or the Greek set."*
+       There were two square windows and they were not the same: this entry drew
+       357 × 902 mm at 185 from the head (the median of ten corpus openings,
+       d092 d097 d099 d106 d108 d116 d122 and their like), and the set drew its
+       own light off Peretz's installed door, fractions 0.289-0.711 across and
+       0.154-0.526 down — on the standard 850 × 2050 leaf 359 wide, 762 tall
+       and 316 down. Asked which is the real one, he chose the set's. So the
+       corpus reading is OVERRULED, kept here as the record: the light now sits
+       131 mm lower and 140 mm shorter than on the ten photographs, and
+       `ASK-PERETZ.md` tells Peretz so in one line.
+       ⚠ FRACTIONS, NOT MILLIMETRES, AND ONE STATEMENT (§5.16). It was the set's
+       `winFrac` and a millimetre `rects` here: one opening written twice, which
+       agreed to 1.3 mm on the standard leaf and parted by 62 on the wide one the
+       last time this file held both. `apertureLayout` turns `frac` into the leaf's
+       own millimetres for every face alike — the set included, whose `winFrac`
+       is gone — so the window cannot move when the face changes. It needs the
+       leaf's height to do it, and asks for it rather than defaulting to zero. */
     {
       id: "rect",
       he: "חלון מלבני",
       en: "Rectangular",
       ru: "Прямоугольное окно",
       aliases: ["square", "duo", "tallwin", "broad"],
-      doors: ["d108", "d099", "d122", "d116"],
+      doors: ["d108", "d099", "d122", "d116", "newdoor"],
       panel: true,
-      rects: [{ w: 357, h: 902, top: 185 }]
+      frac: { x0: 0.289, x1: 0.711, top: 0.154, bot: 0.526 }
     }
   ];
+  var glassRows = (win) => win.frac ? 1 : new Set((win.rects || []).map((r) => `${r.top}|${r.h}`)).size;
   var HANDLES = [
     {
       id: "none",
@@ -1987,9 +2035,17 @@
          one read as "bulging".
     
          `panels` is HOW MANY and `top` says the topmost one sits in the upper half
-         of the leaf, where glazing would otherwise go. Both are read by
-         `hasUpperPanel`, which is the one question the rules and the drawing ask:
-         can this face carry a window as well? */
+         of the leaf, where glazing would otherwise go.
+         ⚠ `keeps` — THE ROWS A FACE KEEPS WHEN THERE IS A WINDOW, 26.9.2026. It
+         replaces `hasUpperPanel`, a yes/no with three readers (the drawing, the
+         grip's obstacles, the rules) that answered "this face cannot have a
+         window" for every panelled face. The owner's son: the window stays when
+         the face changes, and on the panelled faces **the window replaces the
+         upper panel**. So each face says, once, which of its own rows (indices
+         into its `PANEL_ROWS` entry in renderer.js) survive under glass; a face
+         with no `keeps` keeps nothing and cannot stand beside a window. Whether
+         what it keeps actually CLEARS the window's casing is geometry, asked of
+         the drawing's own numbers (`panelUnderGlass`), never a list of ids here. */
     /* ⚠ THE LONE LOWER PANEL IS GONE FROM THIS LIST, 14.9.2026, AND ITS PANEL IS
          NOT — IT BELONGS TO THE WINDOW NOW. Peretz: *"remove the one panel option
          from the files entirely, it only exists within the rectangle option."*
@@ -2065,8 +2121,12 @@
       aliases: ["panelTop", "panel", "both", "groove", "perimeter", "panel2o", "panelo"],
       panel: true,
       groove: false,
+      /* Under a window the upper panel is the glass and the lower one stays —
+         0.66-0.92 of the leaf, 205 mm clear of the square window's casing on
+         the standard leaf. Priced at nothing on top of the window (A20). */
       panels: 2,
-      top: true
+      top: true,
+      keeps: [1]
     },
     /* ⚠ THE UPPER RECTANGLE ALONE. Asked for from outside: *"add an option of
        only the top panel"*. Every panelled option in this list used to put
@@ -2099,6 +2159,13 @@
        The name stays "three panels" because that is what it was asked for as and
        what a customer counts; the plate is the third. See PANEL_ROWS in
        renderer.js for the rows and the ±0.03 on them. */
+    /* ⚠ `keeps` THE PLATE AND THE LOWER PANEL, AND IS REFUSED BESIDE A WINDOW
+       ANYWAY — 26.9.2026, the owner's son: refuse the trio beside a window; the
+       window stays. The plate starts at 0.523 of the leaf (1072 mm on the
+       standard leaf) and the square window's casing reaches 1148, so the casing
+       would stand 76 mm into the handle plate. That is computed by
+       `panelUnderGlass`, not written here, and `plate` names which kept row is
+       the plate so the refusal can say so. */
     {
       id: "panel3",
       sub: "panel",
@@ -2109,6 +2176,8 @@
       groove: false,
       panels: 3,
       top: true,
+      keeps: [1, 2],
+      plate: 1,
       aliases: ["panel3o"]
     },
     /* ── THE SAME PANELS IN THE OTHER SECTION ─────────────────────────
@@ -2280,31 +2349,23 @@
          measured dimensions survive as a note in the renderer where the call was.
     
          `panel: true` — it has a raised panel, so it prices and repairs as a
-         panelled face. No `top` and no `panels`, so `hasUpperPanel` is false: the
-         composition is BUILT round a window and must not be refused beside one. */
-    /* ⚠ `winFrac` — THE SET OWNS ITS OWN OPENING, and that is not a liberty, it
-         is the product. Measured off the photographs: on a standard leaf 356 wide,
-         781 tall and 326 down, against the catalogue rectangle's 357 / 902 / 185.
-         The width is the same to a millimetre; what differs is that the cornice
-         and frieze take the top of the door, so the glass starts lower and is
-         shorter. Drawn at the catalogue's position the frieze and the glass share
-         60 mm of leaf and the ornament runs straight through the opening — which
-         is what the first render beside the photograph showed.
-         `apertureLayout` reads it, so the drawing and every rule that clears the
-         glass move together.
-    
-         ⚠ FRACTIONS OF THE LEAF — the one opening in this file that is not
-         millimetres, and it has to be. Every other piece of the set is a fraction:
-         cornice at 0.029 of the leaf's height, frieze at 0.126, shelf at 0.559.
-         Written in millimetres the light stayed 356 x 781 while the composition
-         round it grew with the door, so on the WIDE leaf the glass came out 62 mm
-         narrower than the timber panel that replaces it, and on the TALL leaf its
-         casing climbed 46 mm into the frieze. Reported from outside as one
-         symptom: *"when i put on a window the panel changes, it supposed to be the
-         same size."* A composition proportioned to itself has to scale as one
-         thing.
-         These four numbers are the renderer's `CLASSIC_GLASS`; it reads them from
-         here, so there is no second copy of them. */
+         panelled face. No `top`, no `panels` and no `keeps`: the composition is
+         BUILT round a window, draws itself (`classicSet`), and is never asked the
+         kept-rows question. */
+    /* ⚠ `winFrac` — THE SET'S OWN OPENING — IS GONE, 26.9.2026, AND IT WAS NOT
+       LOST: it is `WINDOWS.rect.frac` now, the one square window in the range,
+       chosen by the owner's son over the corpus rectangle (see the note there).
+       What this note recorded stays true of the numbers: measured off the
+       photographs, on a standard leaf 356 wide, 781 tall and 326 down, against
+       the old catalogue rectangle's 357 / 902 / 185 — the same width to a
+       millimetre, the glass lower and shorter because the cornice and frieze
+       take the top of the door. And they are FRACTIONS for the reason it gave:
+       every piece of the set is a fraction of the leaf (cornice 0.029, frieze
+       0.126, shelf 0.559), and written in millimetres the light stayed one size
+       while the composition round it grew with the door — *"when i put on a
+       window the panel changes, it supposed to be the same size."*
+       The renderer's `CLASSIC_GLASS` reads `WINDOWS.rect.frac`, so there is
+       still no second copy. */
     /* ⚠ CITES `newdoor` AND NOT THE FIVE DOORS ASK-PERETZ §4 NAMES. d101, d103,
        d108, d112 and d129 all carry a composition of this family, and the
        question about them predates this option by two rounds — but not one of
@@ -2344,15 +2405,12 @@
          Measured, overruled, kept — REALISM.md §6. The set's own pieces
          (cornice, frieze, shelf, plinth) are drawn by `classicSet` and are
          untouched. */
-      profile: "reed",
-      /* ⚠ THE ROWS ARE SCALED BY 3698/3730 with CLASSIC_ROWS — the crop the set
-         was measured from was 0.86% short, see the note there. The COLUMNS are
-         left alone: an edge-find on the rectified leaf puts the pane at 0.291 to
-         0.706 against these 0.289 and 0.711, which is 0.007 and inside the
-         instrument's own error, and drawing them back over the photograph in red
-         put them on the glass twice. */
-      winFrac: { x0: 0.289, x1: 0.711, top: 0.154, bot: 0.526 }
+      profile: "reed"
     }
+    /* (The window's fractions — rows scaled by 3698/3730 with CLASSIC_ROWS,
+       columns left at 0.289-0.711 because an edge-find read 0.291-0.706,
+       inside the instrument's error — moved to `WINDOWS.rect.frac` with that
+       reasoning, 26.9.2026.) */
     /* `panel3o`, the ogee trio Peretz asked for on 14.9 (*"add an option of 3
        panels but classic ones"*), stood here from that day until 20.9.2026,
        when he withdrew the classic panels outright. It aliases onto `panel3`. */
@@ -2384,13 +2442,12 @@
   }
   var gripTakesFinish = (state2) => !!byId(HANDLES, state2.handle).finishes;
   var byId = (list, id) => list.find((o) => o.id === id) || list.find((o) => (o.aliases || []).includes(id)) || list[0];
-  var leafGlazed = (state2) => byId(WINDOWS, state2.window).rects.length > 0;
-  var hasUpperPanel = (detail) => !!detail.top || detail.panels >= 2;
+  var leafGlazed = (state2) => glassRows(byId(WINDOWS, state2.window)) > 0;
   var SIDE_OPENING_MIN = 370;
   function glazedPanels(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const win = byId(WINDOWS, state2.window);
-    const rows = new Set((win.rects || []).map((r) => `${r.top}|${r.h}`)).size;
+    const rows = glassRows(win);
     const out = [];
     if (rows) {
       out.push({
@@ -2702,6 +2759,7 @@
     const dt = byId(DETAILS, state2.detail);
     const sz = SIZES[state2.size] || SIZES.standard;
     const hn = byId(HANDINGS, state2.handing);
+    const keptUnderGlass = glassRows(w) > 0 && (dt.keeps || []).length > 0;
     const hf = byId(HANDLE_FINISHES, state2.handleFinish);
     const fin = gripTakesFinish(state2) ? hf : null;
     const rows = [
@@ -2725,7 +2783,7 @@
         key: "window",
         label: T("row.window"),
         id: w.id,
-        value: w.panel ? `${L(w)} (${T("row.withPanel")})` : L(w)
+        value: w.panel && !keptUnderGlass ? `${L(w)} (${T("row.withPanel")})` : L(w)
       }
     ];
     const panels = glazedPanels(state2);
@@ -2765,7 +2823,12 @@
       rows.push({ key: "peephole", label: T("row.peephole"), id: ep.id, value: L(ep) });
     }
     if (dt.id !== "plain") {
-      rows.push({ key: "detail", label: T("row.detail"), id: dt.id, value: L(dt) });
+      rows.push({
+        key: "detail",
+        label: T("row.detail"),
+        id: dt.id,
+        value: keptUnderGlass ? T("row.upperGlazed", L(dt)) : L(dt)
+      });
     }
     if (state2.stripeDir !== "none" && state2.stripeCount) {
       const dir = T(state2.stripeDir === "h" ? "stripes.h" : "stripes.v");
@@ -3335,7 +3398,7 @@ ${stops}
     const hingeX = hingeOnLeft ? mainX : mainX1;
     const leverDir = hingeOnLeft ? -1 : 1;
     const centreX = mainX + leafW / 2;
-    const openings = apertureLayout(win, leafW, detail, leafH);
+    const openings = apertureLayout(win, leafW, leafH);
     const winBottom = openings.length ? y0 + Math.max(...openings.map((o) => o.top + o.h)) : y0;
     const winSpan = openings.length ? {
       x: mainX + Math.min(...openings.map((o) => o.x)),
@@ -3714,7 +3777,8 @@ ${stops}
          long backplate that carries the keyway) and the photograph this
          drawing came from, d092, is BRONZE — so it demonstrably ships in more
          than one finish. The owner named two handles; these are those two.
-         ASK-PERETZ §0a7 puts the near-name to him. -->
+         ASK-PERETZ §0a7 put the near-name to him; the owner's son answered
+         26.9 that both knobs follow the פרזול (see domeRamp). -->
     <linearGradient id="lockUnitSoft" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="${FINISH_TONES.steel[1]}"/>
       <stop offset="0.5" stop-color="${FINISH_TONES.steel[3]}"/>
@@ -4713,8 +4777,8 @@ ${stops}
         leaf: { x: sideX, y: y0, w: sideW, h: leafH }
       }) : "") + classicSet(sideX, y0, sideW, leafH, paint2, pale, tone, glazedSet, "s");
     })() : size.sideGlazed && sideW > 320 ? (() => {
-      const top = y0 + (win.rects.length ? win.rects[0].top : leafH * 0.09);
-      const tall = win.rects.length ? win.rects[0].h : leafH * 0.79;
+      const top = y0 + (openings.length ? openings[0].top : leafH * 0.09);
+      const tall = openings.length ? openings[0].h : leafH * 0.79;
       return aperture({
         x: sideX + 95,
         y: top,
@@ -4741,16 +4805,20 @@ ${stops}
         PANEL_INSET,
         mouldOf(detail)
       ) : "");
-    })() : win.rects[0] && sideW > 320 ? (() => {
-      const paneW = Math.min(win.rects[0].w, sideW - 240);
-      const paneTop = y0 + win.rects[0].top;
+    })() : openings.length && sideW > 320 ? (() => {
+      const main = openings[0];
+      const own = win.frac ? classicFixedLight(sideW, leafH) : null;
+      const paneW = own ? own.w : Math.min(main.w, sideW - 240);
+      const paneX = own ? own.x : (sideW - paneW) / 2;
+      const paneTop = y0 + (own ? own.top : main.top);
+      const paneH = own ? own.h : main.h;
       return aperture({
-        x: sideX + (sideW - paneW) / 2,
+        x: sideX + paneX,
         y: paneTop,
         w: paneW,
-        h: win.rects[0].h,
+        h: paneH,
         /* The ornament at the MAIN leaf's scale — see grillePaths. */
-        ornW: win.rects[0].w,
+        ornW: main.w,
         paint: paint2,
         edge,
         grille,
@@ -4764,7 +4832,7 @@ ${stops}
         leafH,
         paint2,
         pale,
-        paneTop + win.rects[0].h,
+        paneTop + paneH,
         null,
         0,
         "s",
@@ -4817,21 +4885,29 @@ ${stops}
         same rectangle it always drew: `mouldOf(plain)` is the reed, which is
         the section the seven glazed corpus doors with a panel carry. */
     ""}
-    ${(detail.panel || win.panel) && !detail.classic ? appliedFrame(
-      mainX,
-      y0,
-      leafW,
-      leafH,
-      paint2,
-      pale,
-      winBottom,
-      hasUpperPanel(detail) ? panelRows(detail) : null,
-      0,
-      "m",
-      openings.length ? Math.min(...openings.map((o) => o.x)) - MOULD_BAND : null,
-      panelInset(detail),
-      mouldOf(detail)
-    ) : ""}
+    ${/* ⚠ WHICH ROWS, ASKED OF `faceRowsOn` SINCE 26.9.2026 — the same answer
+        `faceObstacles` and the rules get. On a glazed pair that is its lower
+        panel at its own inset; on a plain door behind a square window it is
+        the window's own lone panel, lined up with the casing. */
+    ""}
+    ${(() => {
+      const f = faceRowsOn(detail, win, openings, leafW, leafH);
+      return f.rows.length ? appliedFrame(
+        mainX,
+        y0,
+        leafW,
+        leafH,
+        paint2,
+        pale,
+        winBottom,
+        f.lone ? null : f.rows,
+        0,
+        "m",
+        f.lone ? f.inset : null,
+        panelInset(detail),
+        mouldOf(detail)
+      ) : "";
+    })()}
     ${/* ⚠ THE TRIO'S MIDDLE RECTANGLE IS A HANDLE PLATE AND THE PULL THAT WAS
         BOLTED ACROSS IT IS GONE, 14.9.2026. Peretz: *"remove the handle from
         the clasic set option and the 3 panel option — the handle should only
@@ -5148,6 +5224,22 @@ ${body}
   var PANEL_INSETS = {};
   var panelRows = (detail) => detail.panels >= 3 ? PANEL_ROWS.trio : detail.panels === 2 ? PANEL_ROWS.pair : detail.top ? PANEL_ROWS.top : [PANEL_ROWS.lone];
   var panelInset = (detail) => (detail.panels >= 3 ? PANEL_INSETS.trio : null) ?? PANEL_INSET;
+  function faceRowsOn(detail, win, openings, leafW, leafH) {
+    const none = { rows: [], inset: 0, lone: false };
+    if (detail.classic) return none;
+    if (!openings.length) {
+      return detail.panel ? { rows: panelRows(detail), inset: leafW * panelInset(detail), lone: false } : none;
+    }
+    const kept = (detail.keeps || []).map((i) => panelRows(detail)[i]).filter(Boolean);
+    if (kept.length) return { rows: kept, inset: leafW * panelInset(detail), lone: false };
+    if (!detail.panel && !win.panel) return none;
+    const winBottom = Math.max(...openings.map((o) => o.top + o.h));
+    return {
+      rows: [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]],
+      inset: Math.max(0, Math.min(...openings.map((o) => o.x)) - MOULD_BAND),
+      lone: true
+    };
+  }
   function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper, clearTo = 0, key = "m", alignTo = null, inset0 = PANEL_INSET, profile = MOULD_DEFAULT) {
     const band = MOULD_BAND;
     const inset = alignTo != null ? Math.max(0, alignTo) : Math.min(lw * PANEL_INSET_MAX, Math.max(lw * inset0, clearTo));
@@ -5165,7 +5257,7 @@ ${body}
       `p${key}${n}`,
       profile
     );
-    if (upper && upper.length && winBottom <= ly + 1) {
+    if (upper && upper.length) {
       return `<g data-detail="panel" data-panels="${upper.length}"
                data-top="${(ly + lh * upper[0][0]).toFixed(1)}"
                data-band="${band.toFixed(1)}">${upper.map(([t, bt], n) => rect(t, bt, n)).join("")}</g>`;
@@ -5222,12 +5314,7 @@ ${body}
     const size = SIZES[state2.size] || SIZES.standard;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const detail = byId(DETAILS, state2.detail);
-    const openings = apertureLayout(
-      byId(WINDOWS, state2.window),
-      leafW,
-      byId(DETAILS, state2.detail),
-      leafH
-    );
+    const openings = apertureLayout(byId(WINDOWS, state2.window), leafW, leafH);
     const paneBand = detail.classic ? CLASSIC_BAND : MOULD_BAND;
     const paneFoot = paneBand;
     const out = openings.map((o) => ({
@@ -5251,16 +5338,14 @@ ${body}
       }
       return out;
     }
-    if (detail.panel || byId(WINDOWS, state2.window).panel) {
-      const inset = openings.length ? Math.max(0, Math.min(...openings.map((o) => o.x)) - MOULD_BAND) : leafW * panelInset(detail);
-      const winBottom = openings.length ? Math.max(...openings.map((o) => o.top + o.h)) : 0;
-      const rows = hasUpperPanel(detail) && !openings.length ? panelRows(detail) : [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]];
-      for (const [t, b] of rows) {
+    {
+      const f = faceRowsOn(detail, byId(WINDOWS, state2.window), openings, leafW, leafH);
+      for (const [t, b] of f.rows) {
         const r = {
           kind: "panel",
-          x: inset,
+          x: f.inset,
           y: leafH * t,
-          w: leafW - inset * 2,
+          w: leafW - f.inset * 2,
           h: leafH * (b - t),
           band: MOULD_BAND
         };
@@ -5304,12 +5389,7 @@ ${body}
   function peepholeFits(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-    const openings = apertureLayout(
-      byId(WINDOWS, state2.window),
-      leafW,
-      byId(DETAILS, state2.detail),
-      leafH
-    );
+    const openings = apertureLayout(byId(WINDOWS, state2.window), leafW, leafH);
     if (!openings.length) return true;
     const cx = leafW / 2, cy = leafH - PEEPHOLE_AFF;
     const R = peepholeR(state2) + 8;
@@ -5318,36 +5398,50 @@ ${body}
   function bellFits(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-    const openings = apertureLayout(
-      byId(WINDOWS, state2.window),
-      leafW,
-      byId(DETAILS, state2.detail),
-      leafH
-    );
+    const openings = apertureLayout(byId(WINDOWS, state2.window), leafW, leafH);
     if (!openings.length) return true;
     const PAINT = 8;
     const cx = leafW / 2, cy = leafH - KNOCKER_AFF;
     return !openings.some((o) => cx + KNOCKER_REACH.x + PAINT > o.x && cx - KNOCKER_REACH.x - PAINT < o.x + o.w && cy + KNOCKER_REACH.down + PAINT > o.top && cy - KNOCKER_REACH.up - PAINT < o.top + o.h);
   }
-  function panelFits(state2) {
+  function panelUnderGlass(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const detail = byId(DETAILS, state2.detail);
-    if (!detail.panel && !byId(WINDOWS, state2.window).panel) return true;
+    const win = byId(WINDOWS, state2.window);
+    if (detail.classic) return null;
+    if (!detail.panel && !win.panel) return null;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-    const openings = apertureLayout(
-      byId(WINDOWS, state2.window),
-      leafW,
-      byId(DETAILS, state2.detail),
-      leafH
-    );
-    if (!openings.length) return true;
+    const openings = apertureLayout(win, leafW, leafH);
+    if (!openings.length) return null;
+    if (detail.panels && !(detail.keeps || []).length) return { why: "top", by: 0 };
+    const f = faceRowsOn(detail, win, openings, leafW, leafH);
     const winBottom = Math.max(...openings.map((o) => o.top + o.h));
-    const GLASS_STOPS_BY = 0.62;
-    if (winBottom > leafH * GLASS_STOPS_BY) return false;
-    const top = Math.max(leafH * PANEL_ROWS.lone[0], winBottom + leafW * 0.08);
-    const bottom = leafH * PANEL_ROWS.lone[1];
-    const inset = Math.max(0, Math.min(...openings.map((o) => o.x)) - MOULD_BAND);
-    return leafW - inset * 2 > MOULD_BAND * 2.2 && bottom - top > MOULD_BAND * 2.2;
+    if (f.lone) {
+      const GLASS_STOPS_BY = 0.62;
+      if (winBottom > leafH * GLASS_STOPS_BY) return { why: "room", by: winBottom - leafH * GLASS_STOPS_BY };
+      const [[t, b]] = f.rows;
+      const fits = leafW - f.inset * 2 > MOULD_BAND * 2.2 && leafH * (b - t) > MOULD_BAND * 2.2;
+      return fits ? null : { why: "room", by: 0 };
+    }
+    const rows = panelRows(detail);
+    for (const i of detail.keeps) {
+      const [t, b] = rows[i];
+      const r = { x: f.inset, y: leafH * t, w: leafW - f.inset * 2, h: leafH * (b - t) };
+      for (const o of openings) {
+        const c = {
+          x: o.x - MOULD_BAND,
+          y: o.top - MOULD_BAND,
+          w: o.w + MOULD_BAND * 2,
+          h: o.h + MOULD_BAND * 2
+        };
+        const across = Math.min(r.x + r.w, c.x + c.w) - Math.max(r.x, c.x);
+        const down = Math.min(r.y + r.h, c.y + c.h) - Math.max(r.y, c.y);
+        if (across > 0 && down > 0) {
+          return { why: i === detail.plate ? "plate" : "room", by: c.y + c.h - r.y };
+        }
+      }
+    }
+    return null;
   }
   var homeKey = (st) => `${st.size}|${st.handle}|${st.lockset}|${st.detail}|${st.window}|${st.handing}`;
   var HOME_CACHE = /* @__PURE__ */ new Map();
@@ -5368,7 +5462,7 @@ ${body}
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const backset = lockBackset(handle, lockset);
     const raw = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state2));
-    const panelled = detail.panel && !byId(WINDOWS, state2.window).rects.length;
+    const panelled = detail.panel && !glassRows(byId(WINDOWS, state2.window));
     const standoff = raw;
     const grabY = () => {
       if (detail.classic) return leafH * (CLASSIC_ROWS.band[0] + CLASSIC_ROWS.band[1]) / 2;
@@ -5995,10 +6089,18 @@ ${body}
   }
   var MOUNT_REACH = 121;
   var HW_STILE = MOUNT_REACH + LOCK_CLEAR;
-  var apertureLayout = memo(function apertureLayout2(win, leafW, detail, leafH = 0) {
+  var apertureLayout = memo(function apertureLayout2(win, leafW, leafH) {
     const rows = /* @__PURE__ */ new Map();
-    const F = detail && detail.winFrac;
-    const rects = F && (win.rects || []).length ? [{ w: leafW * (F.x1 - F.x0), h: leafH * (F.bot - F.top), top: leafH * F.top }] : win.rects || [];
+    const F = win.frac;
+    if (F && !(leafH > 0)) {
+      throw new Error(`apertureLayout: the "${win.id}" window is stated as fractions of the leaf and was asked without the leaf's height`);
+    }
+    const rects = F ? [{
+      w: leafW * (F.x1 - F.x0),
+      h: leafH * (F.bot - F.top),
+      top: leafH * F.top,
+      dx: leafW * ((F.x0 + F.x1) / 2 - 0.5)
+    }] : win.rects || [];
     for (const r of rects) {
       const k = `${r.top}|${r.h}`;
       if (!rows.has(k)) rows.set(k, []);
@@ -6021,7 +6123,7 @@ ${body}
       out.push({ x: at(lo), w: at(hi) - at(lo), top: sorted[0].top, h: sorted[0].h, splits });
     }
     return out;
-  }, (win, leafW, detail, leafH = 0) => `${win.id}|${leafW}|${detail ? detail.id : "-"}|${leafH}`);
+  }, (win, leafW, leafH) => `${win.id}|${leafW}|${leafH}`);
   function aperture({
     x,
     y,
@@ -6464,11 +6566,11 @@ ${body}
     plinth: [0.206, 0.794]
     // width 0.588 — the frieze, upside down
   };
-  var CLASSIC_GLASS = byId(DETAILS, "classic").winFrac;
+  var CLASSIC_GLASS = byId(WINDOWS, "rect").frac;
   var CLASSIC_CORBEL = { w: 0.07, gap: 6e-3 };
   var CLASSIC_BAND = 59;
   function classicLight(leafW, leafH, fixed = false) {
-    const [o] = fixed ? [classicFixedLight(leafW, leafH)] : apertureLayout(byId(WINDOWS, "rect"), leafW, byId(DETAILS, "classic"), leafH);
+    const [o] = fixed ? [classicFixedLight(leafW, leafH)] : apertureLayout(byId(WINDOWS, "rect"), leafW, leafH);
     return {
       x: o.x - CLASSIC_BAND,
       y: o.top - CLASSIC_BAND,
@@ -6477,7 +6579,7 @@ ${body}
     };
   }
   function classicFixedLight(leafW, leafH) {
-    const F = byId(DETAILS, "classic").winFrac;
+    const F = CLASSIC_GLASS;
     return {
       x: leafW * F.x0,
       w: leafW * (F.x1 - F.x0),
@@ -6966,10 +7068,10 @@ ${body}
   function glassClearance(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const win = byId(WINDOWS, state2.window);
-    if (!win.rects.length) return Infinity;
+    if (!glassRows(win)) return Infinity;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const hingeOnLeft = byId(HANDINGS, state2.handing).hinge === "left";
-    const u = apertureLayout(win, leafW, byId(DETAILS, state2.detail), leafH).map((o) => hingeOnLeft ? leafW - (o.x + o.w) : o.x);
+    const u = apertureLayout(win, leafW, leafH).map((o) => hingeOnLeft ? leafW - (o.x + o.w) : o.x);
     return Math.min(...u) - MOULD_BAND - lockBackset(gripOf(state2), byId(LOCKSETS, state2.lockset));
   }
   function gripClashesLockset(state2) {
@@ -7756,7 +7858,7 @@ ${body}
   }
   function windowGlyph(win) {
     const W = 950, H = 2100, pad = 40;
-    const rects = apertureLayout(win, W - 100, null, H - REBATE).map((o) => {
+    const rects = apertureLayout(win, W - 100, H - REBATE).map((o) => {
       const x = 50 + o.x;
       return `<rect x="${x}" y="${o.top}" width="${o.w}" height="${o.h}"
                   fill="#7C8891" stroke="#3A3D40" stroke-width="26"/>` + o.splits.map((sp) => `<rect x="${50 + sp.x}" y="${o.top}" width="${sp.w}"
@@ -8342,14 +8444,9 @@ ${body}
       for (const g of GRILLES) if (g.id !== "none") out.grille[g.id] = T("why.needsWindow");
     }
     if (onLeaf) {
-      for (const d of DETAILS) if (hasUpperPanel(d)) {
-        out.detail[d.id] = T("why.winTakesTop");
-      }
       for (const d of DETAILS) {
-        if (!d.panel || out.detail[d.id]) continue;
-        if (!panelFits({ ...state2, detail: d.id })) {
-          out.detail[d.id] = T("why.noRoomBelow");
-        }
+        const u = panelUnderGlass({ ...state2, detail: d.id });
+        if (u) out.detail[d.id] = T(WHY_UNDER_GLASS[u.why]);
       }
     }
     for (const d of DETAILS) {
@@ -8367,7 +8464,7 @@ ${body}
     if (onLeaf) out.stripes = T("why.stripesWindow");
     else if (byId(DETAILS, state2.detail).panel) out.stripes = T("why.stripesPanel");
     if (lined) {
-      for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = T("why.windowStripes");
+      for (const w of WINDOWS) if (glassRows(w)) out.window[w.id] = T("why.windowStripes");
       for (const d of DETAILS) if (d.panel) out.detail[d.id] = T("why.panelStripes");
     }
     const CHANNEL = HANDLES.find((h) => h.style === "channel");
@@ -8376,7 +8473,7 @@ ${body}
         out.handle[CHANNEL.id] = T("why.channelPlain");
       }
       if (grip.style === "channel") {
-        for (const w of WINDOWS) if (w.rects.length) {
+        for (const w of WINDOWS) if (glassRows(w)) {
           out.window[w.id] = out.window[w.id] || T("why.notWithChannel");
         }
         for (const d of DETAILS) if (detailWorked(d)) {
@@ -8443,8 +8540,11 @@ ${body}
     /* `needPanel` and `ownPull` are gone with the two rules they announced —
        the forced bottom panel and the pull a face brought with it. Both rules
        were withdrawn by Peretz on 14.9.2026; see `conflicts`. */
-    stripesCapped: "fix.stripesCapped"
+    stripesCapped: "fix.stripesCapped",
+    /* 26.9.2026: the trio refused beside a window, on a link — see repair. */
+    trioPlate: "fix.trioPlate"
   };
+  var WHY_UNDER_GLASS = { top: "why.winTakesTop", plate: "why.winPlate", room: "why.noRoomBelow" };
   function repair(state2, intent = null) {
     let s = { ...state2 };
     const changed = [];
@@ -8508,22 +8608,11 @@ ${body}
         change("stripes", SAID.lineWorkGone);
       }
     }
-    if (leafGlazed(s) && byId(DETAILS, s.detail).panel && !panelFits(s)) {
-      if (intent === "detail") {
-        s.window = "none";
-        change("window", SAID.windowGone);
-      } else {
+    if (leafGlazed(s) && s.detail !== "plain") {
+      const u = panelUnderGlass(s);
+      if (u) {
         s.detail = "plain";
-        change("detail", SAID.noPanelRoom);
-      }
-    }
-    if (leafGlazed(s) && hasUpperPanel(byId(DETAILS, s.detail))) {
-      if (intent === "detail") {
-        s.window = "none";
-        change("window", SAID.windowGone);
-      } else {
-        s.detail = "plain";
-        change("detail", byId(WINDOWS, s.window).panel ? SAID.rectPanel : SAID.facePlain);
+        change("detail", u.why === "plate" ? SAID.trioPlate : u.why === "room" ? SAID.noPanelRoom : byId(WINDOWS, s.window).panel ? SAID.rectPanel : SAID.facePlain);
       }
     }
     if (byId(HANDLES, s.handle).style === "channel" && (leafGlazed(s) || faceWorked(s))) {
@@ -9426,7 +9515,12 @@ ${body}
       sub: "step.face.s",
       lede: "step.face.l",
       exp: "exp.face",
-      expArgs: () => [formatAgorot(STRIPE_A.h), formatAgorot(STRIPE_A.v)]
+      expArgs: () => [
+        formatAgorot(STRIPE_A.h),
+        formatAgorot(STRIPE_A.v),
+        L(byId(DETAILS, "panel2")),
+        L(byId(DETAILS, "panel3"))
+      ]
     },
     {
       key: "glass",
@@ -10302,6 +10396,13 @@ ${body}
       if (why) {
         if (g.key === "lockset") openClash();
         else toast(why);
+        return;
+      }
+    }
+    if (g.key === "detail" && id !== state.detail && panelUnderGlass({ ...state, detail: id })) {
+      const why = conflicts(state).detail[id];
+      if (why) {
+        toast(why);
         return;
       }
     }

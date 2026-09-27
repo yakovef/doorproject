@@ -17,7 +17,7 @@
  */
 
 import { byId, COLOURS, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
-         handleLength, hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOF_PARTS, MASHKOFS, PEEPHOLES, PIRZUL,
+         glassRows, handleLength, LOCKSETS, MASHKOF_MAX, MASHKOF_PARTS, MASHKOFS, PEEPHOLES, PIRZUL,
          REBATE, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS } from './catalog.js';
 import { L, T } from './copy.js';
 import { describeSentence } from './spec.js';
@@ -1751,7 +1751,7 @@ export function render(state) {
      ironmongery is bolted to. Everything downstream reads THESE and not the
      catalogue's rectangles, or the drawing and the rules disagree about where
      the glass is. Leaf-local, so add mainX to reach stage space. */
-  const openings = apertureLayout(win, leafW, detail, leafH);
+  const openings = apertureLayout(win, leafW, leafH);
 
   /* The glazing envelope, so moulded detail and the grip can be kept clear of
      it. Declared before the grip is placed, because the grip now reads it. */
@@ -2216,7 +2216,8 @@ export function render(state) {
          long backplate that carries the keyway) and the photograph this
          drawing came from, d092, is BRONZE — so it demonstrably ships in more
          than one finish. The owner named two handles; these are those two.
-         ASK-PERETZ §0a7 puts the near-name to him. -->
+         ASK-PERETZ §0a7 put the near-name to him; the owner's son answered
+         26.9 that both knobs follow the פרזול (see domeRamp). -->
     <linearGradient id="lockUnitSoft" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="${FINISH_TONES.steel[1]}"/>
       <stop offset="0.5" stop-color="${FINISH_TONES.steel[3]}"/>
@@ -3210,8 +3211,11 @@ export function render(state) {
           })()
       : size.sideGlazed && sideW > 320
         ? (() => {
-            const top = y0 + (win.rects.length ? win.rects[0].top : leafH * 0.09);
-            const tall = win.rects.length ? win.rects[0].h : leafH * 0.79;
+            /* The main leaf's own opening (`openings`, off `apertureLayout`):
+               the square window is fractions of the leaf since 26.9.2026 and
+               has no millimetre rectangle of its own to read. */
+            const top = y0 + (openings.length ? openings[0].top : leafH * 0.09);
+            const tall = openings.length ? openings[0].h : leafH * 0.79;
             return aperture({ x: sideX + 95, y: top, w: sideW - 190, h: tall,
                               paint, edge, grille, key: 's', profile: mouldOf(detail),
                               leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
@@ -3220,7 +3224,7 @@ export function render(state) {
                                  null, PANEL_INSET, mouldOf(detail))
                   : '');
           })()
-      : win.rects[0] && sideW > 320
+      : openings.length && sideW > 320
         ? (() => {
             /* ⚠ THE SECOND LEAF GETS THE PANEL TOO — 14.9.2026, and it is the
                same one-line omission as in `panelFits` and `faceObstacles`,
@@ -3238,17 +3242,37 @@ export function render(state) {
                The rows are `PANEL_ROWS.lone` through `appliedFrame`'s lone
                branch, and because both leaves are the same height the two
                panels line up across the door without being told to. */
-            const paneW = Math.min(win.rects[0].w, sideW - 240);
-            const paneTop = y0 + win.rects[0].top;
-            return aperture({ x: sideX + (sideW - paneW) / 2, y: paneTop,
-                     w: paneW, h: win.rects[0].h,
+            /* ⚠ OFF THE MAIN LEAF'S CUT OPENING, SINCE 26.9.2026. This read
+               the catalogue's millimetre rectangle, which the square window no
+               longer has — it is fractions of the leaf, the Greek set's — so
+               the fixed leaf takes the main leaf's top, height and (for the
+               ornament's scale) width off `openings`, and the two lights share
+               a top and a height because they are the same numbers (G3). */
+            /* ⚠ AND THE SQUARE WINDOW TAKES ITS OWN FRACTIONS OF THIS LEAF, the
+               way the Greek set's light always did here (`classicFixedLight`)
+               — so a face tap does not move this pane either. It was the main
+               pane clamped to `sideW - 240`: 110 mm on the 350 mm leaf beside
+               the set's 148, which the new "the window does not move when the
+               face changes" check found on all three two-leaf sizes. d119's
+               narrow leaf read 0.34 of its width against the 0.314 the clamp
+               gave; 0.422 overrules that reading on the same word that
+               overruled the ten corpus doors on the main leaf. The slot is
+               millimetres and keeps the clamp. */
+            const main = openings[0];
+            const own = win.frac ? classicFixedLight(sideW, leafH) : null;
+            const paneW = own ? own.w : Math.min(main.w, sideW - 240);
+            const paneX = own ? own.x : (sideW - paneW) / 2;
+            const paneTop = y0 + (own ? own.top : main.top);
+            const paneH = own ? own.h : main.h;
+            return aperture({ x: sideX + paneX, y: paneTop,
+                     w: paneW, h: paneH,
                      /* The ornament at the MAIN leaf's scale — see grillePaths. */
-                     ornW: win.rects[0].w,
+                     ornW: main.w,
                      paint, edge, grille, key: 's', profile: mouldOf(detail),
                      leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
               + (detail.panel || win.panel
                   ? appliedFrame(sideX, y0, sideW, leafH, paint, pale,
-                                 paneTop + win.rects[0].h, null, 0, 's',
+                                 paneTop + paneH, null, 0, 's',
                                  null, PANEL_INSET, mouldOf(detail))
                   : '');
           })()
@@ -3296,12 +3320,18 @@ export function render(state) {
           reasons to make it, and the lone branch of `appliedFrame` draws the
           same rectangle it always drew: `mouldOf(plain)` is the reed, which is
           the section the seven glazed corpus doors with a panel carry. */''}
-    ${(detail.panel || win.panel) && !detail.classic
-        ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom,
-            hasUpperPanel(detail) ? panelRows(detail) : null, 0, 'm',
-            openings.length ? Math.min(...openings.map(o => o.x)) - MOULD_BAND : null,
-            panelInset(detail), mouldOf(detail))
-        : ''}
+    ${/* ⚠ WHICH ROWS, ASKED OF `faceRowsOn` SINCE 26.9.2026 — the same answer
+          `faceObstacles` and the rules get. On a glazed pair that is its lower
+          panel at its own inset; on a plain door behind a square window it is
+          the window's own lone panel, lined up with the casing. */''}
+    ${(() => {
+        const f = faceRowsOn(detail, win, openings, leafW, leafH);
+        return f.rows.length
+          ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom,
+              f.lone ? null : f.rows, 0, 'm', f.lone ? f.inset : null,
+              panelInset(detail), mouldOf(detail))
+          : '';
+      })()}
     ${/* ⚠ THE TRIO'S MIDDLE RECTANGLE IS A HANDLE PLATE AND THE PULL THAT WAS
           BOLTED ACROSS IT IS GONE, 14.9.2026. Peretz: *"remove the handle from
           the clasic set option and the 3 panel option — the handle should only
@@ -4072,8 +4102,9 @@ const PANEL_INSETS = {};
  *
  * All three used to name PANEL_ROWS.pair directly, guarded by `panels === 2`.
  * That is right while there is exactly one multi-panel face and wrong in three
- * places at once the moment there are three of them. See `hasUpperPanel` in
- * catalog.js for the same lesson from the other side.
+ * places at once the moment there are three of them. (`hasUpperPanel` in
+ * catalog.js taught the same lesson from the other side; it is gone since
+ * 26.9.2026, replaced by `keeps` and `faceRowsOn` below.)
  */
 const panelRows = detail =>
   detail.panels >= 3 ? PANEL_ROWS.trio
@@ -4083,6 +4114,40 @@ const panelRows = detail =>
 /** And the inset that goes with them — same shape, same three readers. */
 const panelInset = detail =>
   (detail.panels >= 3 ? PANEL_INSETS.trio : null) ?? PANEL_INSET;
+
+/**
+ * THE PANELS A FACE DRAWS ON THIS LEAF — one statement, read by `render`, by
+ * `faceObstacles`, by `panelUnderGlass` and so by the rules. 26.9.2026.
+ *
+ * The owner's son: the window stays when the face changes, and on a panelled
+ * face **the window replaces the upper panel**. So under glass a face draws
+ * the rows its catalogue entry KEEPS (`keeps`, indices into its own
+ * `panelRows`) at its own inset — the pair's lower panel is the pair's lower
+ * panel, 0.66-0.92 at 0.23, whether the top of the door is a panel or glass.
+ * A face that keeps nothing (plain, and any face with no `keeps`) falls back
+ * to the lower panel the square window brings of its own (`win.panel`), which
+ * lines up with the window's casing — the d097 reading (`appliedFrame`).
+ * On a solid leaf every face draws all its rows. The Greek set draws itself
+ * and is never asked.
+ *
+ * Returns `{ rows, inset, lone }`: rows as fractions of the leaf's height,
+ * the inset in millimetres from each edge, and whether it is the window's own
+ * lone panel (which `appliedFrame` draws against the glass's foot).
+ */
+export function faceRowsOn(detail, win, openings, leafW, leafH) {
+  const none = { rows: [], inset: 0, lone: false };
+  if (detail.classic) return none;
+  if (!openings.length) {
+    return detail.panel
+      ? { rows: panelRows(detail), inset: leafW * panelInset(detail), lone: false } : none;
+  }
+  const kept = (detail.keeps || []).map(i => panelRows(detail)[i]).filter(Boolean);
+  if (kept.length) return { rows: kept, inset: leafW * panelInset(detail), lone: false };
+  if (!detail.panel && !win.panel) return none;
+  const winBottom = Math.max(...openings.map(o => o.top + o.h));
+  return { rows: [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]],
+           inset: Math.max(0, Math.min(...openings.map(o => o.x)) - MOULD_BAND), lone: true };
+}
 function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0, key = 'm',
                       alignTo = null, inset0 = PANEL_INSET, profile = MOULD_DEFAULT) {
   const band = MOULD_BAND;     // the same stock that goes round a pane
@@ -4112,17 +4177,21 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0
     moulding(x, ly + lh * t, w, lh * (b - t), band, paint, pale, leaf, `p${key}${n}`,
              profile);
 
-  /* ANY FACE WITH A PANEL IN THE UPPER HALF: the classic pair, the three-panel
-     face, or the upper rectangle on its own. Only on a solid leaf — with
-     glazing above there is nowhere for the top one, which is why `upper` is
-     `hasUpperPanel(detail)` at the call site and why `rules.js` refuses the
-     pairing before it ever gets here.
+  /* THE ROWS A FACE DRAWS: the pair, the three-panel face, or — under glass
+     — the rows it keeps (`faceRowsOn`). Until 26.9.2026 this was "only on a
+     solid leaf", `upper` was `hasUpperPanel(detail)` at the call site, and the
+     rules refused every panelled face beside a window.
      ⚠ `upper` IS THE ROWS NOW, not a boolean. It was `true` meaning "draw the
      pair", and `data-panels="2"` was written out as a literal beside it — so a
      three-panel door would have drawn two panels and then labelled itself
      correctly, which is the worst of both. The count comes off the array it
      actually drew. */
-  if (upper && upper.length && winBottom <= ly + 1) {
+  /* ⚠ AND ON A GLAZED LEAF TOO, SINCE 26.9.2026: `upper` is whatever rows
+     `faceRowsOn` says this face keeps, and under glass that is the pair's
+     lower panel. It was gated on `winBottom <= ly + 1` — "only on a solid
+     leaf" — because until today a face with rows could not stand beside a
+     window at all. */
+  if (upper && upper.length) {
     return `<g data-detail="panel" data-panels="${upper.length}"
                data-top="${(ly + lh * upper[0][0]).toFixed(1)}"
                data-band="${band.toFixed(1)}">${
@@ -4248,8 +4317,7 @@ export const faceObstacles = memo(function faceObstacles(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const detail = byId(DETAILS, state.detail);
-  const openings = apertureLayout(byId(WINDOWS, state.window), leafW,
-                                  byId(DETAILS, state.detail), leafH);
+  const openings = apertureLayout(byId(WINDOWS, state.window), leafW, leafH);
   /* ⚠ THE SAME BAND THE DRAWING CASES IT IN. This said MOULD_BAND flat, and
      for the Greek set the drawing now says 59: an obstacle eleven
      millimetres bigger than the thing it describes is the §5 shape again. */
@@ -4304,27 +4372,22 @@ export const faceObstacles = memo(function faceObstacles(state) {
      It is the same one-line omission as in `panelFits`, which is why both read
      the same two flags. The row arithmetic below is already the glazed one:
      `openings.length` is non-zero here by construction. */
-  if (detail.panel || byId(WINDOWS, state.window).panel) {
-    /* The SAME inset `appliedFrame` draws with — the opening's outer edge on a
-       glazed leaf, PANEL_INSET on a solid one. It was PANEL_INSET either way,
-       and `npm run collide` caught it the moment the panel started lining up
-       with the window: twelve doors where the rules believed a moulding stood
-       19 mm from where the drawing had put it. That check exists for exactly
-       this, and this is the second description drifting. */
-    const inset = openings.length
-      ? Math.max(0, Math.min(...openings.map(o => o.x)) - MOULD_BAND)
-      : leafW * panelInset(detail);
-    const winBottom = openings.length ? Math.max(...openings.map(o => o.top + o.h)) : 0;
-    /* `hasUpperPanel`, not `panels === 2` — see its docstring in catalog.js.
-       The rows themselves come from `panelRows`, which is the one statement of
-       where a panelled face puts its metal; this used to name PANEL_ROWS.pair
-       directly and would have drawn a two-panel door for a three-panel one. */
-    const rows = hasUpperPanel(detail) && !openings.length
-      ? panelRows(detail)
-      : [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]];
-    for (const [t, b] of rows) {
-      const r = { kind: 'panel', x: inset, y: leafH * t,
-                  w: leafW - inset * 2, h: leafH * (b - t), band: MOULD_BAND };
+  /* ⚠ `win.panel` IS ASKED HERE TOO, 14.9.2026 — a square light brings its
+     own lower panel on a plain face, and a placement rule told the bottom of
+     the leaf was bare timber would bolt a bar's feet through a panel frame.
+     ⚠ AND THE ROWS ARE `faceRowsOn`'s SINCE 26.9.2026, not arithmetic of this
+     function's own. This block computed the inset and the lone row itself —
+     the second description of the panel, which drifted 19 mm from the drawing
+     once (`npm run collide` caught it) — and asked `hasUpperPanel` to decide
+     between the face's rows and the lone one. Under glass the pair now keeps
+     its lower panel, and a copy of the old arithmetic here would have told
+     every placement rule that panel was the window's lone one, 20 mm off each
+     side. One function draws it and the same function declares it. */
+  {
+    const f = faceRowsOn(detail, byId(WINDOWS, state.window), openings, leafW, leafH);
+    for (const [t, b] of f.rows) {
+      const r = { kind: 'panel', x: f.inset, y: leafH * t,
+                  w: leafW - f.inset * 2, h: leafH * (b - t), band: MOULD_BAND };
       /* `moulding` draws nothing at all below this size, and an obstacle that
          is not on the door would refuse a handle for a frame nobody can see. */
       if (r.w > MOULD_BAND * 2.2 && r.h > MOULD_BAND * 2.2) out.push(r);
@@ -4434,8 +4497,7 @@ export const faceObstacles = memo(function faceObstacles(state) {
 export function peepholeFits(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-  const openings = apertureLayout(byId(WINDOWS, state.window),
-                                  leafW, byId(DETAILS, state.detail), leafH);
+  const openings = apertureLayout(byId(WINDOWS, state.window), leafW, leafH);
   if (!openings.length) return true;
   /* The fitting, in the leaf's own coordinates: centred across, and
      `PEEPHOLE_AFF` up from the floor, which is `leafH - PEEPHOLE_AFF` down
@@ -4515,8 +4577,7 @@ export function peepholeFits(state) {
 export function bellFits(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-  const openings = apertureLayout(byId(WINDOWS, state.window),
-                                  leafW, byId(DETAILS, state.detail), leafH);
+  const openings = apertureLayout(byId(WINDOWS, state.window), leafW, leafH);
   if (!openings.length) return true;
   /* Where the drawing puts it: centred across, `KNOCKER_AFF` up from the
      floor. `bellKnocker`'s reach is asymmetric, so this is four numbers and
@@ -4531,47 +4592,86 @@ export function bellFits(state) {
     cy - KNOCKER_REACH.up - PAINT < o.top + o.h);
 }
 
-export function panelFits(state) {
+/**
+ * Does this face's panel work beside this window — and if not, why not?
+ * `null` when it does, when the leaf is solid, or when there is no panel;
+ * otherwise `{ why, by }`:
+ *   'top'    the face has rows in the upper half and keeps none under glass
+ *   'plate'  a kept row is the face's handle PLATE and the window's casing
+ *            stands `by` mm into it — the trio beside the square window
+ *   'room'   a kept row, or the window's own lone panel, has no room under
+ *            the glass
+ *
+ * ⚠ ONE QUESTION, 26.9.2026, AND IT REPLACES A YES/NO AND A LIST. The rules
+ * asked `hasUpperPanel` ("can this face carry a window at all?"), and this
+ * function asked only about the lone panel. The owner's son made a panelled
+ * face and the window compatible — the window replaces the upper panel — and
+ * refused the trio beside it because its plate would stand under the casing.
+ * Both halves are GEOMETRY off the drawing's own numbers, `faceRowsOn` and
+ * `apertureLayout`, so which faces can stand beside which window is computed
+ * rather than listed, and the day a row or the window is re-measured the
+ * answer moves with it. On the standard 850 x 2050 leaf the square window's
+ * casing reaches 1148 mm down; the pair's lower panel starts at 1353 (205
+ * clear) and the trio's plate at 1072 (76 under).
+ */
+export function panelUnderGlass(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const detail = byId(DETAILS, state.detail);
+  const win = byId(WINDOWS, state.window);
+  /* The Greek set is built round its light and draws itself; it is not a face
+     with rows to keep. */
+  if (detail.classic) return null;
   /* ⚠ THE WINDOW CAN BRING A PANEL OF ITS OWN, 14.9.2026, and this question is
      about the PANEL rather than about the face that asked for one. `plain`
-     behind a square light draws a lower panel now (`WINDOWS.rect` carries
+     behind a square light draws a lower panel (`WINDOWS.rect` carries
      `panel: true`), so asking only `detail.panel` would have answered "fits"
-     without looking at anything. As it happens no window in the range fails
-     this — `rect` stops at 0.52 of the leaf, well inside the 0.62 below — but
-     a reader that is right by accident stops being right when the list grows,
-     and this one is asked by the rules as well as by the drawing. */
-  if (!detail.panel && !byId(WINDOWS, state.window).panel) return true;
+     without looking at anything. */
+  if (!detail.panel && !win.panel) return null;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-  const openings = apertureLayout(byId(WINDOWS, state.window), leafW,
-                                  byId(DETAILS, state.detail), leafH);
-  if (!openings.length) return true;
+  const openings = apertureLayout(win, leafW, leafH);
+  if (!openings.length) return null;
+  if (detail.panels && !(detail.keeps || []).length) return { why: 'top', by: 0 };
+  const f = faceRowsOn(detail, win, openings, leafW, leafH);
   const winBottom = Math.max(...openings.map(o => o.top + o.h));
-  /* ⚠ THE GLASS HAS TO STOP HIGH ENOUGH, AND "not literally zero" IS NOT HIGH
-     ENOUGH. The two lines below ask whether `moulding` would draw ANYTHING —
-     whether the rectangle left over is bigger than the stock that goes round
-     it — and that is a drawing question, not a door question. Under the
-     vertical slot it says yes to a panel 157 mm tall where the lone panel's
-     own row is 451: a sliver of moulding jammed against the sill, drawn,
-     charged ₪380 for, and not a panel.
-     Reported from outside: *"the panel can only work with the normal window,
-     the other one doesnt give enough space, so just make it impossible."*
-     The corpus had already drawn the line and nobody had read it off. Of the
-     ten glazed doors, the SEVEN with a panel below the glass have openings
-     running to 0.36-0.61 of leaf height, and the THREE that run past that —
-     d113 at 0.62, d125 at 0.76, d128 at 0.78 — carry no panel at all. So 0.62
-     is not a tolerance picked to exclude the slot; it is where Peretz's own
-     doors stop having room, and the slot (0.79) is well past it.
-     ⚠ Stated as a FRACTION of leaf height, so a tall door gets the same
-     judgement as a standard one rather than a different one for free. */
-  const GLASS_STOPS_BY = 0.62;
-  if (winBottom > leafH * GLASS_STOPS_BY) return false;
-  const top = Math.max(leafH * PANEL_ROWS.lone[0], winBottom + leafW * 0.08);
-  const bottom = leafH * PANEL_ROWS.lone[1];
-  const inset = Math.max(0, Math.min(...openings.map(o => o.x)) - MOULD_BAND);
-  return (leafW - inset * 2) > MOULD_BAND * 2.2 && (bottom - top) > MOULD_BAND * 2.2;
+  if (f.lone) {
+    /* ⚠ THE GLASS HAS TO STOP HIGH ENOUGH, AND "not literally zero" IS NOT
+       HIGH ENOUGH. Asking only whether `moulding` would draw ANYTHING says yes
+       under the vertical slot to a panel 157 mm tall where the lone panel's own
+       row is 451: a sliver of moulding jammed against the sill, drawn, charged
+       for, and not a panel. Reported from outside: *"the panel can only work
+       with the normal window, the other one doesnt give enough space, so just
+       make it impossible."* The corpus had already drawn the line: of the ten
+       glazed doors, the SEVEN with a panel below the glass have openings
+       running to 0.36-0.61 of leaf height, and the THREE that run past that —
+       d113 at 0.62, d125 at 0.76, d128 at 0.78 — carry no panel at all. So
+       0.62 is where Peretz's own doors stop having room, stated as a FRACTION
+       so a tall door gets the same judgement as a standard one. */
+    const GLASS_STOPS_BY = 0.62;
+    if (winBottom > leafH * GLASS_STOPS_BY) return { why: 'room', by: winBottom - leafH * GLASS_STOPS_BY };
+    const [[t, b]] = f.rows;
+    const fits = (leafW - f.inset * 2) > MOULD_BAND * 2.2 && leafH * (b - t) > MOULD_BAND * 2.2;
+    return fits ? null : { why: 'room', by: 0 };
+  }
+  /* A kept row must stand clear of the casing round the glass — the same
+     MOULD_BAND the drawing cases a light in on every face but the set. */
+  const rows = panelRows(detail);
+  for (const i of detail.keeps) {
+    const [t, b] = rows[i];
+    const r = { x: f.inset, y: leafH * t, w: leafW - f.inset * 2, h: leafH * (b - t) };
+    for (const o of openings) {
+      const c = { x: o.x - MOULD_BAND, y: o.top - MOULD_BAND,
+                  w: o.w + MOULD_BAND * 2, h: o.h + MOULD_BAND * 2 };
+      const across = Math.min(r.x + r.w, c.x + c.w) - Math.max(r.x, c.x);
+      const down = Math.min(r.y + r.h, c.y + c.h) - Math.max(r.y, c.y);
+      if (across > 0 && down > 0) {
+        return { why: i === detail.plate ? 'plate' : 'room', by: c.y + c.h - r.y };
+      }
+    }
+  }
+  return null;
 }
+/** The yes/no the drawing and the rules have always asked. */
+export const panelFits = state => !panelUnderGlass(state);
 
 /**
  * Where the grip sits when nobody has moved it: `x` inboard from the CLOSING
@@ -4633,7 +4733,7 @@ function gripIdeal(state) {
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const backset = lockBackset(handle, lockset);
   const raw = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state));
-  const panelled = detail.panel && !byId(WINDOWS, state.window).rects.length;
+  const panelled = detail.panel && !glassRows(byId(WINDOWS, state.window));
   /* ⚠ NOT INSIDE THE PANEL ANY MORE — 24.9.2026. This floored a pull's
      standoff at `insideField` so that on a panelled face the bar stood in the
      panel's field; the owner's son has since ruled that a pull handle may not
@@ -6289,34 +6389,40 @@ const HW_STILE = MOUNT_REACH + LOCK_CLEAR;
  * Where the glass actually goes. ONE enumeration — the drawing, the placement
  * rules, `panelFits`, `glassClearance` and the catalogue glyph all read it.
  *
- * ⚠ `detail` IS AN INPUT BECAUSE A FACE DESIGN CAN OWN ITS OWN WINDOW.
- * The Greek set is a composition, not a feature: a cornice over a frieze
- * over the glass over a corbelled shelf over a panel over a plinth, each sized
- * to the next. Its window is 326 mm down a standard leaf and 781 tall; the
- * catalogue's rectangle is 185 down and 902 tall, and drawn there the frieze
- * and the glass occupy the same 60 mm of door. Measured on the first render
- * beside the photograph, and unmissable — the ornament went straight through
- * the opening.
- * The alternative was to override the rectangle at the call site in `render`,
- * which is the CLAUDE.md §5 trap in its purest form: the drawing would move
- * the glass and `gripPlacement`, `panelFits` and `glassClearance` would all go
- * on clearing the old one. Threading it through the one function instead means
- * there is still one answer to where the glass is.
- * The memo key carries it. A key that leaves an input out is a wrong answer
- * cached — see `homeKey`.
+ * ⚠ `detail` WAS AN INPUT UNTIL 26.9.2026, BECAUSE A FACE OWNED ITS OWN
+ * WINDOW. The Greek set is a composition — a cornice over a frieze over the
+ * glass over a corbelled shelf over a panel over a plinth, each sized to the
+ * next — and its light was 326 mm down a standard leaf and 781 tall where the
+ * catalogue's rectangle was 185 down and 902 tall; drawn there, the frieze and
+ * the glass occupied the same 60 mm of door. Threading the face through THIS
+ * function, rather than overriding the rectangle in `render`, is what kept one
+ * answer to where the glass is while there were two windows. There is one
+ * window now (below), so the threading went with the second window.
  *
- * ⚠ AND `leafH` IS AN INPUT FOR THE SAME REASON. The set's own opening is
- * declared as FRACTIONS of the leaf, because everything else about that
- * composition is — see `winFrac` in the catalogue. A rect in millimetres needs
- * no leaf height and the catalogue's three shapes still do not use it; the
- * set's does, and without it the light stayed one size while the ornament
- * round it grew with the door.
+ * ⚠ `leafH` STAYS AN INPUT, FOR THE REASON IT BECAME ONE. The opening is
+ * declared as FRACTIONS of the leaf, because everything about the set's
+ * composition is, and in millimetres the light stayed one size while the
+ * ornament round it grew with the door.
  */
-export const apertureLayout = memo(function apertureLayout(win, leafW, detail, leafH = 0) {
+/* ⚠ AND `detail` IS NOT AN INPUT ANY MORE — 26.9.2026. The owner's son: the
+ * window stays when the face changes, and its size and placement stay with
+ * it. So the Greek set's opening became THE square window (`WINDOWS.rect.frac`)
+ * and no face substitutes anything: the question "where is the glass" has one
+ * answer per window and leaf, whatever is laid on the face round it, and a
+ * parameter that could make the answer depend on the face is a parameter that
+ * one day will. `leafH` is REQUIRED for a `frac` window — it used to default to
+ * 0, and the 25.8 fault was one caller that did not pass it; a zero-height
+ * light draws nothing, charges for itself and throws nowhere. It throws here.
+ */
+export const apertureLayout = memo(function apertureLayout(win, leafW, leafH) {
   const rows = new Map();
-  const F = detail && detail.winFrac;
-  const rects = F && (win.rects || []).length
-    ? [{ w: leafW * (F.x1 - F.x0), h: leafH * (F.bot - F.top), top: leafH * F.top }]
+  const F = win.frac;
+  if (F && !(leafH > 0)) {
+    throw new Error(`apertureLayout: the "${win.id}" window is stated as fractions of the leaf and was asked without the leaf's height`);
+  }
+  const rects = F
+    ? [{ w: leafW * (F.x1 - F.x0), h: leafH * (F.bot - F.top), top: leafH * F.top,
+         dx: leafW * ((F.x0 + F.x1) / 2 - 0.5) }]
     : (win.rects || []);
   for (const r of rects) {
     const k = `${r.top}|${r.h}`;
@@ -6341,8 +6447,7 @@ export const apertureLayout = memo(function apertureLayout(win, leafW, detail, l
     out.push({ x: at(lo), w: at(hi) - at(lo), top: sorted[0].top, h: sorted[0].h, splits });
   }
   return out;
-}, (win, leafW, detail, leafH = 0) =>
-     `${win.id}|${leafW}|${detail ? detail.id : '-'}|${leafH}`);
+}, (win, leafW, leafH) => `${win.id}|${leafW}|${leafH}`);
 
 /* ── a glazed opening, with a raised moulded surround ───────────── */
 /* ⚠ `ornW` — THE WIDTH THE ORNAMENT IS DRAWN AT, which is not always the width
@@ -7251,8 +7356,12 @@ const CLASSIC_COLS = {
    apart the moment the leaf stopped being 850 x 2050: the drawing's solid
    panel scaled with the door and `apertureLayout`'s glass did not. Same
    fractions, one statement, and `apertureLayout` turns them into millimetres
-   for whatever leaf it is handed. */
-const CLASSIC_GLASS = byId(DETAILS, 'classic').winFrac;
+   for whatever leaf it is handed.
+   ⚠ AND SINCE 26.9.2026 THE STATEMENT IS THE SQUARE WINDOW'S, not the set's:
+   the owner's son made the set's light the one square window in the range
+   (`WINDOWS.rect.frac`), so the set, the plain door and the pair all cut the
+   same hole and a face tap cannot move it. */
+const CLASSIC_GLASS = byId(WINDOWS, 'rect').frac;
 /* The stock the SET's light is cased in, and it is not the range's 70 mm.
    Ruler-read: the frieze block ends at 0.126 of the leaf and the glass starts
    at 0.155, which leaves 0.029 — 59 mm on a 2,050 leaf. At 70 the casing runs
@@ -7321,7 +7430,7 @@ export const CLASSIC_BAND = 59;
  * THE SET'S OPENING WITH ITS CASING ROUND IT — the rectangle that holds glass
  * on the glazed variant and timber on the solid one.
  *
- * ⚠ THROUGH `apertureLayout`, NOT OFF THE FRACTIONS. Multiplying `winFrac` by
+ * ⚠ THROUGH `apertureLayout`, NOT OFF THE FRACTIONS. Multiplying the frac by
  * the leaf here would agree with the glazed variant on five sizes out of six
  * and disagree on the narrow leaf, where `apertureLayout` pulls the opening in
  * so the architrave does not eat the stile the ironmongery is bolted to. One
@@ -7333,17 +7442,18 @@ function classicLight(leafW, leafH, fixed = false) {
      bolted to — has nothing to protect there, and on a 350 mm leaf it would
      squeeze the light to nothing. That leaf takes the set's own fractions. */
   const [o] = fixed ? [classicFixedLight(leafW, leafH)]
-    : apertureLayout(byId(WINDOWS, 'rect'), leafW, byId(DETAILS, 'classic'), leafH);
+    : apertureLayout(byId(WINDOWS, 'rect'), leafW, leafH);
   return { x: o.x - CLASSIC_BAND, y: o.top - CLASSIC_BAND,
            w: o.w + CLASSIC_BAND * 2,
            h: o.h + CLASSIC_BAND * 2 };
 }
 
-/* The set's glass on a leaf that carries no ironmongery: `winFrac` straight,
-   the same rows as the main leaf's, so the two lights of a door-and-a-half are
-   at the same height and the same height tall by construction. */
+/* The square window's glass on a leaf that carries no ironmongery — the fixed
+   leaf of a door-and-a-half, under the set and (since 26.9.2026) under every
+   face: the fractions straight, the same rows as the main leaf's, so the two
+   lights are at the same height and the same height tall by construction. */
 function classicFixedLight(leafW, leafH) {
-  const F = byId(DETAILS, 'classic').winFrac;
+  const F = CLASSIC_GLASS;
   return { x: leafW * F.x0, w: leafW * (F.x1 - F.x0), top: leafH * F.top,
            h: leafH * (F.bot - F.top) };
 }
@@ -8163,7 +8273,7 @@ export function gripStandoff(handle, lockset, leafW, leafH, toGlass = Infinity) 
 export function glassClearance(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const win = byId(WINDOWS, state.window);
-  if (!win.rects.length) return Infinity;
+  if (!glassRows(win)) return Infinity;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const hingeOnLeft = byId(HANDINGS, state.handing).hinge === 'left';
   /* Nearest glass edge to the closing edge, as a distance inboard from it.
@@ -8171,7 +8281,7 @@ export function glassClearance(state) {
      rectangles: on a narrow leaf the opening is cut narrower than the
      catalogue asks, and a rule measuring the uncut figure would refuse
      combinations that fit. */
-  const u = apertureLayout(win, leafW, byId(DETAILS, state.detail), leafH).map(o =>
+  const u = apertureLayout(win, leafW, leafH).map(o =>
     hingeOnLeft ? leafW - (o.x + o.w) : o.x);
   /* To the MOULDING's outer edge, not to the glass: a fitting that stops at
      the pane still runs across the raised surround. */
@@ -9837,7 +9947,7 @@ export function windowGlyph(win) {
      matters: two rectangles in the catalogue, ONE opening with a mullion on
      the door, and a tile showing two separate lights would be advertising a
      door we stopped drawing. */
-  const rects = apertureLayout(win, W - 100, null, H - REBATE).map(o => {
+  const rects = apertureLayout(win, W - 100, H - REBATE).map(o => {
     const x = 50 + o.x;
     return `<rect x="${x}" y="${o.top}" width="${o.w}" height="${o.h}"
                   fill="#7C8891" stroke="#3A3D40" stroke-width="26"/>`

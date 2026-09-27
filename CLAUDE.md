@@ -127,6 +127,9 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
 Older and long-form: **`HISTORY.md`** (verbatim to 26.9.2026). Dates are the
 day of the change.
 
+- **26.9** One square window, the Greek set's (`WINDOWS.rect.frac`, `glassRows`);
+  the pair keeps its lower panel under it at ₪0 (A20), the trio is refused (76
+  mm into the plate); a face tap never removes the window (`panelUnderGlass`).
 - **26.9** The כדור follows the פרזול (*"a bug"*, overruling 31.8): ball via
   `domeRamp` (measured literal on nickel, `scaleTone` elsewhere), shank on
   `nickelSoft`; the ספיר stays constant. `exp.pz.a` names both via `expArgs`.
@@ -256,9 +259,9 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | ~9.09 M assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 25.9 |
+| `npm test` | ~7.37 M assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything (it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves); read the failure count | 27.9 |
 | `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) | 25.9 |
-| `npm run collide` | `all` and `boxes` clean | 25.9 |
+| `npm run collide` | `all` (1,082 designs) and `boxes` clean | 27.9 |
 | `npm run latency` | 215 ms worst door against a 600 ms gate | 25.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
@@ -581,6 +584,16 @@ and `lone` (the square window's own panel).
   d067/d068/d077 carry a turned pull through it; d065/d070/d087 are the same
   door without the plate. No face brings its own pull (14.9); a bow chosen on
   this face is homed in the plate's field (`gripIdeal`).
+- ⚠ **Under the square window a face draws the rows it `keeps`** (26.9, on the
+  catalogue entry — `panel2` keeps its lower panel, `panel3` its plate and
+  lower); `faceRowsOn` is the one statement, read by the drawing,
+  `faceObstacles` and `panelUnderGlass`. Whether kept rows clear the casing is
+  computed: on the standard leaf the casing reaches 1148 mm, the pair's lower
+  panel starts at 1353 (205 clear), the trio's plate at 1072 (**76 into it — the
+  trio is refused beside a window, the window stays**). The pair's kept panel is
+  its own 0.23 inset (459 mm), 20 mm inside the casing each side — not aligned.
+  A face that keeps nothing falls back to the window's own lone panel, aligned
+  to the casing (d097); plain behind the square window draws that.
 
 **The stripes are a COUNT and a DIRECTION, not tiles** (27.8), priced per
 stripe. `metalStrips` places them from four measured tables, doors named beside
@@ -599,11 +612,16 @@ frieze, corbelled shelf, panel, plinth — because those pieces are proportioned
 to each other, not to the leaf. `CLASSIC_ROWS`, `CLASSIC_COLS`,
 `CLASSIC_GLASS` are measured off `research/newdoor/`. Load-bearing:
 
-- **It supplies its own opening as FRACTIONS** (`detail.winFrac`, 0.289–0.711
-  across, 0.154–0.526 down), substituted by `apertureLayout(win, leafW, detail,
-  leafH)`; `repair` forces `window: 'rect'` off `rectOnly`. `bot` is the GLASS,
-  not the casing. In millimetres the light stayed one size while the ornament
-  grew with the door.
+- **Its opening IS the square window** (26.9 — the owner's son chose the set's
+  light over the corpus rectangle): `WINDOWS.rect.frac`, 0.289–0.711 across,
+  0.154–0.526 down, turned into millimetres by `apertureLayout(win, leafW,
+  leafH)` for every face alike; `winFrac` and the `detail` parameter are gone,
+  so a face tap cannot move the glass. `bot` is the GLASS, not the casing. In
+  millimetres the light stayed one size while the ornament grew with the door.
+  The old corpus rectangle (357 × 902 at 185) is prose now; the light sits 131
+  mm lower and 140 shorter than on those ten photographs. The fixed leaf of a
+  door-and-a-half takes the same fractions of its own width (`classicFixedLight`)
+  under every face. `repair` still forces `window: 'rect'` off `rectOnly`.
 - **Glazed and solid are ONE rectangle** (`classicLight` asks `apertureLayout`
   and adds the casing). Computed twice, they drifted (§5.16).
 - **The glazing is drawn BEFORE the set** and after every other face.
@@ -1166,6 +1184,18 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 
 ### Measured and not fixed — each is arithmetic or a product decision
 
+- **The square window scales with the leaf now, and two things moved with it**
+  (26.9). It is 0.422 of the leaf's width, so the lone panel under it (aligned
+  to the casing) went 497 → 499 mm on the standard leaf, 530 on `extra1` and
+  604 on `extra2`; and on `extra2`/`halfextra2` the window is 464 wide where it
+  was 357, the stile beside it 54 mm narrower, and a Coral lever no longer
+  stands beside a vertical bar there — the lever is greyed and yields to the
+  cylinder (the main sweep's buildable designs 101,592 → 82,008). Both are the
+  owner's son's window drawn honestly; neither was adjusted.
+- **The trio cannot stand beside a window** (26.9): the casing would stand 76
+  mm into its handle plate (`panelUnderGlass`, `why.winPlate`). Refused, not
+  redesigned; `ASK-PERETZ.md` asks the owner's son whether a glazed trio exists.
+
 - **The `plate` tile's backplate is not the door's** (19.9). The tile draws the
   Rotem's plate 90 × 240; `handleFootprint` declares about 166 × 340 — not one
   scale in both axes, so it is a redraw from `plateHandle`'s outline (moving the
@@ -1243,6 +1273,8 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 Section numbers here are that file's. Ask **1a** first (A13, which window is
 "tall" — ₪500 a glazed order); then **0g** (a דו כנפי is two equal leaves or one
 and a fixed half — the drawing on three sizes, A18); **1g** (the rose's size);
+**0j** (26.9: whether a glazed trio exists — to the owner's son; whether a glazed
+pair is the ₪3,800 alone, A20; that the square window moved 131 mm down);
 **0a2** (the ₪300 bell: ring, electric push, or both); **0a5** (a gold פרזול's
 keyhole); **1b** (the curved lever's name, the Idan's stock length, a picture of
 the digital viewer); **1c** (the wide-margin three-panel doors); **2** (ברזל
@@ -1275,6 +1307,7 @@ edit if Peretz says otherwise. `ASK-PERETZ.md` carries the open ones in Hebrew.
 | A17 | A דו כנפי's fixed leaf is 400 mm on all three bands; the extra width goes into the leaf that opens | two numbers in `SIZES` |
 | A18 | His דו כנפי is our דלת וחצי — a main leaf and a narrow FIXED leaf, not two equal leaves | **the drawing**, on three of six sizes |
 | A19 | ~~The curved lever priced as the Coral~~ — closed 20.9: ₪200. Its NAME is open and its id can never be renamed | one label, three languages |
+| A20 | Two panels beside the square window cost the window's ₪3,800 and nothing for the face (`DETAIL_GLAZED.panel2 = 0`): the window replaced the upper panel and the one panel drawn is the one the window already pays for (26.9) | one number in `prices.js` |
 
 ⚠ **A2, A7 and A13 are the three worth asking first**; A13 is ₪500 on most glazed
 orders and rests on the shape of two Hebrew names.
