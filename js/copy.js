@@ -680,7 +680,10 @@ export const UI = {
                        'Готовы? Отправьте нам дверь, и мы вернёмся с точным предложением.'],
   'send.waOn':        ['שלחו את הדלת בוואטסאפ', 'Send the door on WhatsApp', 'Отправить дверь в WhatsApp'],
   'send.waOff':       ['שלחו לנו הודעה בוואטסאפ', 'Message us on WhatsApp', 'Написать нам в WhatsApp'],
-  'send.waOnShort':   ['שלחו בוואטסאפ', 'Send on WhatsApp', 'Отправить в WhatsApp'],
+  /* "Send", no more, 27.9.2026 — the owner's son: *"rename the button to just
+     send to save space."* The WhatsApp mark beside it says where; the green
+     send on the summary keeps its full sentence (`send.waOn`). */
+  'send.waOnShort':   ['שלחו', 'Send', 'Отправить'],
   'send.waOffShort':  ['שלחו הודעה', 'Message us', 'Написать нам'],
   /* ⚠ A THIRD LABEL, FOR A DOOR NOBODY HAS TOUCHED YET. Two sends are live on
      arrival and both say "send the door" — so a confused first-timer can fire

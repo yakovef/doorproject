@@ -581,7 +581,10 @@
     ],
     "send.waOn": ["שלחו את הדלת בוואטסאפ", "Send the door on WhatsApp", "Отправить дверь в WhatsApp"],
     "send.waOff": ["שלחו לנו הודעה בוואטסאפ", "Message us on WhatsApp", "Написать нам в WhatsApp"],
-    "send.waOnShort": ["שלחו בוואטסאפ", "Send on WhatsApp", "Отправить в WhatsApp"],
+    /* "Send", no more, 27.9.2026 — the owner's son: *"rename the button to just
+       send to save space."* The WhatsApp mark beside it says where; the green
+       send on the summary keeps its full sentence (`send.waOn`). */
+    "send.waOnShort": ["שלחו", "Send", "Отправить"],
     "send.waOffShort": ["שלחו הודעה", "Message us", "Написать нам"],
     /* ⚠ A THIRD LABEL, FOR A DOOR NOBODY HAS TOUCHED YET. Two sends are live on
        arrival and both say "send the door" — so a confused first-timer can fire
@@ -1107,8 +1110,26 @@
        refused the pair at ₪0 to avoid saying; the spec row names the
        composition instead. Whether a glazed two-panel door is really ₪3,800
        alone is Peretz's to say, and `ASK-PERETZ.md` asks it in one line. */
-    panel2: 0
+    panel2: 0,
     // 3195 + 3800 + 0 = 6995, the same as plain behind the same window
+    /* ⚠ AND THE TRIO IS THE PAIR'S DIFFERENCE, 27.9.2026 — ASSUMPTION A21, and
+       the one figure in this file that is written as arithmetic rather than as a
+       number. The owner's son made the trio buildable beside the square window
+       (the window takes its upper panel, the plate and the lower panel stay), so
+       a glazed trio draws exactly ONE panel more than a glazed pair draws: the
+       handle plate. The pair beside that window is ₪0 on top of it by A20,
+       because the one panel it draws is the panel `WINDOW.rect` already pays for.
+       So what the trio may charge is what the plate is worth, and the only figure
+       in the range that says so is the difference between Peretz's own two
+       solid faces — ₪1,900 for three, ₪1,450 for two.
+       It is the expression and not ₪450 deliberately: both of those are HIS
+       numbers, and the day he moves either one this row has to move with it or it
+       starts charging for something he did not say. A typed 450 would keep the
+       old difference in silence, which is §5.10 with money in it.
+       ⚠ It is still an ASSUMPTION — he priced two solid faces and has never
+       priced a glazed trio. `ASK-PERETZ.md` asks it in one line. */
+    panel3: DETAIL.panel3 - DETAIL.panel2
+    // ₪450 — the handle plate, and nothing else
   };
   var HANDLE = {
     none: 0,
@@ -1759,25 +1780,27 @@
          shorter blade is drawn by `leverTaper()` and is this.
     
          ⚠ THE ID IS A PLACEHOLDER AND IT IS PERMANENT. `lever-taper` is our word,
-         not his — he has not said what this handle is called and ASK-PERETZ asks.
-         An id is a WIRE FORMAT: it is packed into every short code by index and
-         written into every link by name, so whatever it says today it will still
-         say in five years. When his name arrives it becomes the LABEL below, in
-         three languages, and this id stays exactly as it is. Renaming it would
-         break every code and link already written, which is the one thing an
-         alias cannot rescue (see `VERSION` in url-state.js).
-    
-         ⚠ AND IT PRICES AS THE CORAL UNTIL HE SAYS OTHERWISE — ₪0, included.
-         That is an assumption, not a quotation: `CLAUDE.md` §9, A19. It is the
-         safe direction to be wrong in only if he checks it, so it is asked. */
+         not his. An id is a WIRE FORMAT: it is packed into every short code by
+         index and written into every link by name, so whatever it says today it
+         will still say in five years. Renaming it would break every code and link
+         already written, which is the one thing an alias cannot rescue (see
+         `VERSION` in url-state.js).
+         ⚠ AND ITS NAME IS SETTLED, 27.9.2026 — the owner's son: *"Give the curved
+         lever a permanent name"*, and he chose ידית מתעקלת / Curved lever /
+         Изогнутая ручка: the label it carried with "(שם זמני)" / "(provisional)"
+         dropped. The name went into the LABEL, as this note always said it
+         would; the id above did not move.
+         (This note also said it priced as the Coral at ₪0 "until he says
+         otherwise". He said otherwise on 20.9 — ₪200, `LOCKSET` in prices.js,
+         A19 closed — and the sentence stayed here a week.) */
     /* `photo: null` — it is the drawing the Coral used to be, asked for by the
        owner from the screen rather than from a product. If a cut-out turns out
        to match it, that is A0's question and not an assumption to make here. */
     {
       id: "lever-taper",
-      he: "ידית מתעקלת (שם זמני)",
-      en: "Curved lever (provisional)",
-      ru: "Изогнутая ручка (временное название)",
+      he: "ידית מתעקלת",
+      en: "Curved lever",
+      ru: "Изогнутая ручка",
       style: "levertaper",
       lever: true,
       photo: null
@@ -5340,20 +5363,34 @@ ${body}
   var PANEL_INSET_MAX = 0.39;
   var PANEL_ROWS = {
     pair: [[0.07, 0.58], [0.66, 0.92]],
-    trio: [[0.064, 0.497], [0.523, 0.617], [0.642, 0.913]],
     top: [[0.07, 0.58]],
     lone: [0.68, 0.9]
   };
+  var TRIO_RAIL = [0.026, 0.025];
+  var TRIO_PLATE_H = 0.094;
+  var TRIO_FOOT = 0.913;
+  var squareWindow = () => {
+    const win = byId(WINDOWS, "rect");
+    if (!win || !win.frac) throw new Error("the square window has no frac: the trio is laid out against it");
+    return win;
+  };
+  var trioRows = (leafH) => {
+    const band = MOULD_BAND / leafH;
+    const { top, bot } = squareWindow().frac;
+    const upper = [top - band, bot + band];
+    const plate = [upper[1] + TRIO_RAIL[0], upper[1] + TRIO_RAIL[0] + TRIO_PLATE_H];
+    return [upper, plate, [plate[1] + TRIO_RAIL[1], TRIO_FOOT]];
+  };
   var PANEL_INSETS = {};
-  var panelRows = (detail) => detail.panels >= 3 ? PANEL_ROWS.trio : detail.panels === 2 ? PANEL_ROWS.pair : detail.top ? PANEL_ROWS.top : [PANEL_ROWS.lone];
+  var panelRows = (detail, leafH) => detail.panels >= 3 ? trioRows(leafH) : detail.panels === 2 ? PANEL_ROWS.pair : detail.top ? PANEL_ROWS.top : [PANEL_ROWS.lone];
   var panelInset = (detail) => (detail.panels >= 3 ? PANEL_INSETS.trio : null) ?? PANEL_INSET;
   function faceRowsOn(detail, win, openings, leafW, leafH) {
     const none = { rows: [], inset: 0, lone: false };
     if (detail.classic) return none;
     if (!openings.length) {
-      return detail.panel ? { rows: panelRows(detail), inset: leafW * panelInset(detail), lone: false } : none;
+      return detail.panel ? { rows: panelRows(detail, leafH), inset: leafW * panelInset(detail), lone: false } : none;
     }
-    const kept = (detail.keeps || []).map((i) => panelRows(detail)[i]).filter(Boolean);
+    const kept = (detail.keeps || []).map((i) => panelRows(detail, leafH)[i]).filter(Boolean);
     if (kept.length) return { rows: kept, inset: leafW * panelInset(detail), lone: false };
     if (!detail.panel && !win.panel) return none;
     const winBottom = Math.max(...openings.map((o) => o.top + o.h));
@@ -5554,7 +5591,7 @@ ${body}
       const fits = leafW - f.inset * 2 > MOULD_BAND * 2.2 && leafH * (b - t) > MOULD_BAND * 2.2;
       return fits ? null : { why: "room", by: 0 };
     }
-    const rows = panelRows(detail);
+    const rows = panelRows(detail, leafH);
     for (const i of detail.keeps) {
       const [t, b] = rows[i];
       const r = { x: f.inset, y: leafH * t, w: leafW - f.inset * 2, h: leafH * (b - t) };
@@ -5598,7 +5635,7 @@ ${body}
     const grabY = () => {
       if (detail.classic) return leafH * (CLASSIC_ROWS.band[0] + CLASSIC_ROWS.band[1]) / 2;
       if (panelled) {
-        const rows = panelRows(detail);
+        const rows = panelRows(detail, leafH);
         if (rows.length >= 3) return leafH * (rows[1][0] + rows[1][1]) / 2;
         if (rows.length === 2) return leafH * (rows[0][1] + rows[1][0]) / 2;
       }
@@ -8372,26 +8409,6 @@ ${body}
       <!-- the outer kant, lapping the street side -->
       <rect x="${x0}" y="${f(yBot - T2)}" width="${f(O)}" height="${T2}"/>
     </g>
-    <g fill="none" stroke="currentColor" stroke-width="2.4" opacity=".55">
-      <!-- the outer kant, under its arm. FIRST of the two horizontal runs,
-           and the inner kant is last: that order is what the test reads. -->
-      <path d="M${x0} ${f(yBot + 12)}H${f(x0 + O)}"/>
-      <path d="M${x0} ${f(yBot + 7)}v10"/>
-      <path d="M${f(x0 + O)} ${f(yBot + 7)}v10"/>
-      <!-- the falc, beside the profile: the only vertical run -->
-      <path d="M${dimX} ${f(yTop)}V${f(yBot)}"/>
-      <path d="M${dimX - 5} ${f(yTop)}h10"/>
-      <path d="M${dimX - 5} ${f(yBot)}h10"/>
-      <!-- the inner kant, over its arm -->
-      <path d="M${x0} ${f(yTop - 12)}H${f(x0 + I)}"/>
-      <path d="M${x0} ${f(yTop - 17)}v10"/>
-      <path d="M${f(x0 + I)} ${f(yTop - 17)}v10"/>
-    </g>
-    <g class="glyph__dim" fill="currentColor" font-size="17" opacity=".85">
-      <text x="${f(x0 + O / 2)}" y="${f(yBot + 32)}" text-anchor="middle">${mk.out}</text>
-      <text x="${numX}" y="${f(cy - 2)}" text-anchor="end">${mk.in}</text>
-      <text x="${f(x0 + I / 2)}" y="${f(yTop - 21)}" text-anchor="middle">${mk.inner == null ? mk.out : mk.inner}</text>
-    </g>
     <g class="glyph__lbl" fill="currentColor" font-size="12" opacity=".7">
       <text x="${lblX}" y="${f(yBot + 16)}">${L(part("out"))}</text>
       <text x="${numX}" y="${f(cy + 15)}" text-anchor="end">${L(part("in"))}</text>
@@ -8522,7 +8539,7 @@ ${body}
                        height="${H * (b - t)}" fill="none" stroke="currentColor"
                        stroke-width="36"/>`;
       })
-    ].join("") : !detail.panel ? "" : panelRows(detail).map(([t, b]) => panelAt(t, b)).join("");
+    ].join("") : !detail.panel ? "" : panelRows(detail, SIZES.standard.h - REBATE).map(([t, b]) => panelAt(t, b)).join("");
     return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
     <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
     ${panels}
@@ -8893,42 +8910,23 @@ ${body}
 
   // js/icons.js
   var SECTION_ICON = {
-    /* HOW BIG THE OPENING IS: the ruler every joiner's drawing uses. It was a
-       door with the arrow underneath, and the door was the whole problem — at
-       21 px it was the same rectangle as the summary's page. */
-    fit: '<path d="M4.4 4.4v15.2M19.6 4.4v15.2"/><path d="M4.4 12h15.2"/><path d="m7.4 9.4-3 2.6 3 2.6M16.6 9.4l3 2.6-3 2.6"/>',
-    /* THE FRAME: the casing outside, the opening inside, drawn as one section
-       through the head. Two nested rectangles say "a frame round a hole"; a
-       cross says nothing. Shared with `SPEC_ICON.mashkof`. */
-    mk: '<path d="M3.2 4.6h17.6v14.8H3.2Z"/><path d="M7.4 8.8h9.2v10.6H7.4Z"/>',
-    /* a paint drop. Shared with `SPEC_ICON.colour` since 15.9 */
-    colour: '<path d="M12 3.4 6.6 10a7 7 0 1 0 10.8 0Z"/><path d="M5.4 14.6h13.2"/>',
-    /* a panelled face */
-    face: '<path d="M5 3.6h14v16.8H5Z"/><path d="M8.4 6.6h7.2v4.4H8.4Z"/><path d="M8.4 13.6h7.2v3.8H8.4Z"/>',
-    /* A GLAZED LIGHT: a transom across the head and two streaks of reflection
-       below it. The streaks are what say GLASS — the four-pane grid this used to
-       draw said "a divided rectangle", which at 21 px is `mk` with more lines.
-       ⚠ The sill was dropped, not moved: a wide rule under a landscape pane is a
-       laptop and a narrow one is a monitor stand. Both were tried and looked at,
-       and both were worse than no rule at all. */
-    glass: '<path d="M4.4 5.4h15.2v11.2H4.4Z"/><path d="M4.4 8.6h15.2"/><path d="M10 10.4 7.4 14M15.4 10.4 11.6 15"/>',
-    /* THE PULL BAR: the leaf's edge on the left, the bar standing off it on two
-       brackets. The bar has to be beside something for the standoffs to read as
-       standoffs — on its own it was a line with two ticks. */
-    grip: '<path d="M4.4 3.6h5v16.8h-5"/><path d="M15.8 5.2v13.6"/><path d="M9.4 8h6.4M9.4 16h6.4"/>',
-    /* THE LOCK: a keyhole. A round case over a tapered slot is the one mark on
-       this page a stranger names without being told, and the step it heads is
-       the lock furniture. */
-    lock: '<path d="M12 4.4a7.4 7.4 0 0 0-7.4 7.4v7.8h14.8v-7.8A7.4 7.4 0 0 0 12 4.4Z"/><path d="M12 9.4a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/><path d="m11 13.2-.8 3.6h3.6l-.8-3.6"/>',
-    /* THE FINISH: a lever handle, with a highlight along its shank saying the
-       choice is which METAL. Two concentric circles read as a paint swatch, and
-       this is the one step whose subject is not colour but material.
-       Shared with `SPEC_ICON.pirzul`. */
-    pz: '<path d="M14.6 12a2.6 2.6 0 1 0-5.2 0 2.6 2.6 0 0 0 5.2 0Z"/><path d="M14.6 12h4.8a1.8 1.8 0 0 1 0 3.6"/><path d="M9.4 12H4.6"/><path d="M6.8 8.6h2.4"/>',
-    /* A SHEET OF PAPER WITH FIGURES ON IT, and the folded corner is the whole
-       point of it: a plain rectangle with three lines inside was the same
-       picture as the door on the first step. */
-    sum: '<path d="M6.6 3.6h7.4l3.4 3.4v13.4H6.6Z"/><path d="M14 3.6v3.4h3.4"/><path d="M9.4 11.4h5.2M9.4 14.6h5.2M9.4 17.8h3"/>'
+    fit: '<path d="M4.6 20.6V3.4h14.8v17.2"/><path d="M2.8 20.6h18.4"/><path d="M4.6 3.4 12.4 5.6v13L4.6 20.6Z"/><path d="M10.4 12.2h.01"/>',
+    /* the front swatch whole, the two behind it only where they show */
+    colour: '<path d="M9.7 17.9V5.9a2.3 2.3 0 0 1 4.6 0v12a2.3 2.3 0 0 1-4.6 0Z"/><path d="M9.7 9.6h4.6M9.7 13.4h4.6"/><path d="M12 17.9h.01"/><path d="M9.8 20.2 2.3 9.3a2.3 2.3 0 0 1 3.8-2.6l3.6 5.4"/><path d="M14.2 20.2l7.5-10.9a2.3 2.3 0 0 0-3.8-2.6l-3.6 5.4"/>',
+    lock: '<rect x="5.6" y="3.2" width="5.8" height="17.6" rx="2.9"/><path d="M11.4 6.4h7a1.7 1.7 0 0 1 0 3.4h-7"/><circle cx="8.5" cy="14.2" r="1.2"/><path d="M8.5 15.4v2.4"/>',
+    /* ⚠ the glint is ONE four-point star. A second, smaller "+" beside it read
+       as "add" at 21 px, and screw dots on the leaf were single pixels. */
+    pz: '<path d="M9.4 5.4H4.2v13.2h5.2"/><rect x="9.4" y="3.4" width="3.2" height="17.2" rx="1.6"/><path d="M9.4 9.4h3.2M9.4 14.6h3.2"/><path d="M17.8 7.4c.4 3.2 1.6 4.4 4.4 4.6-2.8.2-4 1.4-4.4 4.6-.4-3.2-1.6-4.4-4.4-4.6 2.8-.2 4-1.4 4.4-4.6Z"/>',
+    face: '<rect x="7.2" y="2.4" width="9.6" height="19.2" rx=".6"/><path d="M9.6 5h4.8v6.2H9.6Z"/><path d="M9.6 15.2h4.8M9.6 18.4h4.8"/><path d="M14.6 13.2h.01"/>',
+    /* ⚠ A SLANT ON A SQUARE-ON PAGE, deliberately and only here: the rule in
+       CLAUDE.md §4 is about the door's drawing. A glazed pane seen square-on is
+       a rectangle, and the rail already had five. */
+    glass: '<path d="M8.2 3.4h12.4l-4.8 17.2H3.4Z"/><path d="M16.4 6.6l-3.4 3.8M16 10.8l-1.6 1.8"/><path d="M7.4 17.4c1.2-.2 2.2-1.2 2.6-2.8-1.6-.2-2.6.9-2.6 2.8Z"/>',
+    grip: '<rect x="3.2" y="2.8" width="2.2" height="18.4"/><path d="M5.4 6.8h6.2M5.4 17.2h6.2"/><rect x="11.6" y="4.2" width="3" height="15.6" rx="1.5"/><path d="M19.6 4.2v15.6M18 5.8l1.6-1.6 1.6 1.6M18 18.2l1.6 1.6 1.6-1.6"/>',
+    /* open at the foot: two nested CLOSED rectangles, which this was, are a
+       picture frame or a monitor */
+    mk: '<path d="M3.4 20.6V3.2h17.2v17.4"/><path d="M7.8 20.6V7.6h8.4v13"/><path d="M1.8 20.6h20.4"/>',
+    sum: '<path d="M5.4 3h8.8l4.4 4.4V21H5.4Z"/><path d="M14.2 3v4.4h4.4"/><path d="m8.4 14 2.4 2.6 4.8-5.4"/>'
   };
   function sectionIcon(key) {
     if (!Object.prototype.hasOwnProperty.call(SECTION_ICON, key)) {
@@ -8937,7 +8935,10 @@ ${body}
     return `<svg class="steps__g" viewBox="0 0 24 24" aria-hidden="true">${SECTION_ICON[key]}</svg>`;
   }
   var SPEC_ICON = {
-    colour: '<path d="M12 3.4 6.6 10a7 7 0 1 0 10.8 0Z"/><path d="M5.4 14.6h13.2"/>',
+    /* ⚠ FIVE ROWS SHARE THEIR STEP'S MARK BY REFERENCE, 27.9 — one idea, one
+       mark, and a reference cannot come apart the way two copies of a string
+       did. Worst spec pair after: colour ~ grille 0.54 at 18 px. */
+    colour: SECTION_ICON.colour,
     window: '<path d="M4.6 5h14.8v11.4H4.6Z"/><path d="M12 5v11.4M4.6 10.7h14.8"/>',
     glazing: '<path d="M3.4 6.2h7.2v11.6H3.4Z"/><path d="M13.4 6.2h7.2v11.6h-7.2Z"/>',
     /* the ironwork itself, not the pane it sits in */
@@ -8946,10 +8947,9 @@ ${body}
     /* the horizontal bow, 26.9.2026: a bar lying across two posts — the handle's
        mark turned on its side would be the handle's mark */
     grab: '<path d="M4.4 8.6h15.2v3.4H4.4Z"/><path d="M8 12v5.4M16 12v5.4"/>',
-    /* a key going into the case */
-    lockset: '<circle cx="7.4" cy="12" r="2.4"/><path d="M9.8 12h3.8"/><path d="M13.6 9.2h4.4v5.6h-4.4Z"/>',
+    lockset: SECTION_ICON.lock,
     detail: '<path d="M5.2 4.4h13.6v15.2H5.2Z"/><path d="M8.4 7.6h7.2v8.8H8.4Z"/>',
-    size: '<path d="M4.4 4.4v15.2M19.6 4.4v15.2"/><path d="M4.4 12h15.2"/><path d="m7.4 9.4-3 2.6 3 2.6M16.6 9.4l3 2.6-3 2.6"/>',
+    size: SECTION_ICON.fit,
     handing: '<path d="M6 3.8h12v16.4H6Z"/><path d="m14.6 8.6 3.4 3.4-3.4 3.4"/>',
     /* ⚠ FOUR ROWS HAD NO MARK, AND THE GAP WAS VISIBLE. `specRows` can return
        twelve keys and this table held nine, so the DEFAULT door — eight rows —
@@ -8961,8 +8961,8 @@ ${body}
        Drawn to match their own step's circle rather than invented afresh: the
        frame is the same nested pair, the פרזול the same lever. One idea, one
        mark, wherever it appears. */
-    mashkof: '<path d="M3.4 5h17.2v14H3.4Z"/><path d="M7.4 9h9.2v10H7.4Z"/>',
-    pirzul: '<path d="M14.4 12a2.4 2.4 0 1 0-4.8 0 2.4 2.4 0 0 0 4.8 0Z"/><path d="M14.4 12h4.6a1.7 1.7 0 0 1 0 3.4"/><path d="M9.6 12H5"/>',
+    mashkof: SECTION_ICON.mk,
+    pirzul: SECTION_ICON.pz,
     stripes: '<path d="M4.6 7.4h14.8M4.6 12h14.8M4.6 16.6h14.8"/>',
     /* the קודן's own case — the one of the two a stranger names */
     speciallock: '<rect x="7.4" y="3.6" width="9.2" height="16.8" rx="4.6"/><path d="M10.6 8.6h.01M13.4 8.6h.01M10.6 12.2h.01M13.4 12.2h.01"/><circle cx="12" cy="16.6" r="1.6"/>'
@@ -9920,6 +9920,8 @@ ${body}
     $("#clash-ok").addEventListener("click", closeClash);
     const barNext = document.querySelector(".quote__next");
     if (barNext) barNext.addEventListener("click", () => stepBy(1));
+    const barBack = document.querySelector(".quote__back");
+    if (barBack) barBack.addEventListener("click", () => stepBy(-1));
     document.querySelectorAll("[data-wa]").forEach((el) => {
       el.addEventListener("click", async (ev) => {
         if (!canSharePicture()) return;
@@ -10709,10 +10711,20 @@ ${body}
       if (Math.abs(dx) > 0.5) row.scrollBy({ left: dx, behavior: "instant" });
     }
     const i = keys.indexOf(liveStep);
-    for (const b of document.querySelectorAll(".sect__back")) b.disabled = i <= 0;
+    const word = (k) => T(k).replace(/[‹›]/g, "").trim();
+    const name = (b, k) => {
+      if (b.classList.contains("quote__arrow")) {
+        b.setAttribute("aria-label", word(k));
+        b.title = word(k);
+      } else b.textContent = T(k);
+    };
+    for (const b of document.querySelectorAll(".sect__back")) {
+      b.disabled = i <= 0;
+      if (b.classList.contains("quote__arrow")) name(b, "nav.back");
+    }
     for (const b of document.querySelectorAll(".sect__next")) {
       b.disabled = i >= keys.length - 1;
-      b.textContent = T(i === keys.length - 2 ? "nav.toSummary" : "nav.next");
+      name(b, i === keys.length - 2 ? "nav.toSummary" : "nav.next");
     }
     for (const b of document.querySelectorAll(".sect__skip")) b.hidden = i >= keys.length - 2;
   }

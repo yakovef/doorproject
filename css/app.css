@@ -1453,8 +1453,9 @@ svg { direction: ltr; }
 
    `flex-basis: auto` here is the figure's own width, so a five-digit door
    (₪11,295, 67 px at this size) takes what it needs rather than being told.
-   The grid inside is untouched — it is what stops the CAPTION setting the
-   box's width, which is a different question and still the right answer. */
+   ⚠ The grid inside did NOT stop the caption setting the box's width, as this
+   note used to say — Russian's 152 px caption set it at every width. Below
+   1100 the caption now yields; see the rule after `.sect__foot`, 27.9. */
 .quote__price {
   position: relative;
   flex: 0 0 auto;
@@ -1567,6 +1568,28 @@ svg { direction: ltr; }
 .quote__send:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
 .quote__ico { inline-size: 17px; block-size: 17px; flex: 0 0 auto; opacity: .85; }
 
+/* ── THE WAY BACK AND THE WAY ON, IN THE BAR, ON A PHONE ONLY ───────
+   27.9.2026, the owner's son: back and next "moved to the bottom of the page
+   and be seen at all times". Two ICON arrows in one group, 4 px apart: the
+   group takes the room the worded way on took (73-88 px measured; two 44 px
+   arrows and the gap are 92), and a worded back beside a worded next would
+   want more than a 320 px phone's row. Each is 44 px across and keeps
+   `.btn`'s 52 px height, because at 320 px the way on's 52 px is what set the
+   bar's 67 px and `--quote-h` feeds every fold check: the bar must not move.
+   The chevron mirrors with the INTERFACE (chrome mirrors; the door never
+   does). A disabled arrow is hidden but keeps its box, so the send and the
+   price never shift between steps. */
+.quote__nav { flex: 0 0 auto; display: flex; gap: 4px; }
+.quote__chev {
+  inline-size: 20px; block-size: 20px;
+  fill: none; stroke: currentColor; stroke-width: 2.4;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.quote__back .quote__chev { transform: scaleX(-1); }
+html[dir="rtl"] .quote__next .quote__chev { transform: scaleX(-1); }
+html[dir="rtl"] .quote__back .quote__chev { transform: none; }
+.quote__arrow:disabled { visibility: hidden; }
+
 /* ── THE WAY ON, IN THE BAR, ON A PHONE ONLY ─────────────────────────
    See the note in index.html for the measurement that put it here. Solid ink
    like the one in the flow, because it is the same action and a customer
@@ -1574,14 +1597,12 @@ svg { direction: ltr; }
    ⚠ HIDDEN WHEN DISABLED rather than greyed. It is disabled on exactly one
    step — the summary, where there is nowhere to go — and a dead button beside
    the send on the screen whose whole job is sending is a distraction with no
-   purpose. The bar becomes the price and the send, which is that step. */
+   purpose. Since 27.9 it keeps its box when hidden (`.quote__arrow:disabled`),
+   so the price and the send do not move on the summary. */
 .quote__next {
   flex: 0 0 auto;
-  min-block-size: 44px; padding: 0 16px;
-  font-size: .86rem; font-weight: 600;
   background: var(--ink); color: var(--paper); border-color: var(--ink);
 }
-.quote__next:disabled { display: none; }
 /* ⚠ THE "not above 1100" HALF OF THIS RULE IS NOT HERE, AND THAT IS THE POINT.
    It was, and it lost: `.btn { display: flex }` is defined eight hundred lines
    FURTHER DOWN this file at the same specificity, and a media query adds none.
@@ -2935,12 +2956,13 @@ button.spec__row:focus-visible {
    swan-neck and a cushion knob are only different if you can see them. */
 .tiles--hw { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
 .tiles--hw .tile__art, .glyph--hw { block-size: 74px; }
-/* The משקוף glyph is the only picture on the page with type in it — the two
-   dimensions Peretz orders by, written on the section. It takes the same
-   mono face as `.tile__meta` beside it so a number on the drawing and a
-   number under it read as the same kind of thing; the size is a `font-size`
-   attribute in the SVG's own units, because that is where the layout is. */
-.glyph__dim { font-family: var(--mono); }
+/* ⚠ `.glyph__dim` IS GONE, 27.9.2026, AND ITS RULE WITH IT. It set `--mono` on
+   the משקוף section's three dimension figures, so a number on the drawing and a
+   number under it read as the same kind of thing. The owner's son took the
+   figures off — *"it's better to not show a number than show a false one"* —
+   and a rule for a class nothing emits is dead code that reads as load-bearing.
+   The section's part NAMES keep `.glyph__lbl`, which takes the page's own sans:
+   they are words, and `--mono` has no Hebrew in it (§9). */
 
 .tile__name { font-size: .78rem; line-height: 1.2; }
 .tile__meta { font-family: var(--mono); font-size: .62rem; color: var(--ink-2); }
@@ -3312,7 +3334,7 @@ html.is-live.is-untouched .wa__ask { display: inline; }
 
 /* ⚠ AND HERE IS THE OTHER HALF, AFTER `.btn`, WHERE IT WINS. Above 1100 the
    card has a sticky foot of its own and the wall is not a place for a verb. */
-@media (min-width: 1100px) { .quote__next { display: none; } }
+@media (min-width: 1100px) { .quote__next, .quote__nav { display: none; } }
 
 /* ── THE FOOT OF A STEP: the way on, and the way back ────────────────
    ⚠ `.sect__foot` HAD NO RULES, so two buttons that carry a customer through
@@ -3346,10 +3368,9 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    the door as it stands. Below 1100 the navigator is a fixed row of circles at
    the top of the screen and its NINTH is the summary — 44 x 44 at y=8, on
    every screen a customer ever sees — so the skip is already there in the one
-   form a phone has room for. The quote bar has none: measured at 320 px in
-   Russian its content box is 300 and the price, the send and the way on use
-   exactly 300, with the send already flexing down from 114 to 72 as the price
-   grows. A fourth control there comes out of the primary action.
+   form a phone has room for. The quote bar has none: since 27.9 it holds the
+   price, the send and two arrows (back and next), and at 320 px its 300 px
+   row is spoken for; a fifth control there comes out of the send.
    `display: none` and not `visibility`, so it takes no room in the flex row
    and the two buttons that were there keep the layout they were measured in. */
 .sect__skip { flex: 0 0 auto; display: none; }
@@ -3380,6 +3401,49 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    of three. Written here rather than up with the rest of `.quote__next` for
    exactly the reason the display rule is here: after, not before. */
 .quote__next { flex: 0 0 auto; }
+/* The arrows' size, after `.btn` for the same reason: `.btn`'s padding and
+   width would otherwise win at equal specificity. The height is `.btn`'s. */
+.quote__arrow { inline-size: 44px; min-inline-size: 44px; padding: 0; }
+.quote__back { background: none; color: var(--ink); border-color: var(--rule); }
+
+/* ⚠ BELOW 1100 A STEP HAS NO FOOT — 27.9.2026. Its back and next live in the
+   quote bar, seen at all times (see `.quote__nav`); the foot held nothing
+   else on a phone (the skip is desktop-only, and the summary's green send
+   stays in its own card below 1100 — `placeSend`). After the base rule,
+   because a media query adds no specificity (§8). Above 1100 the sticky foot
+   is untouched. */
+@media (max-width: 1099px) { .sect__foot { display: none; } }
+
+/* ⚠ AND BELOW 1100 THE CAPTION YIELDS, NOT THE SEND — 27.9.2026. The 11.9
+   note on `.quote__price` said its grid "stops the CAPTION setting the box's
+   width"; measured, it did not: in Russian "ОРИЕНТИРОВОЧНАЯ ЦЕНА" is 152 px
+   and the box was 152 wide at every width (81 in Hebrew, 103 in English), so
+   at 360-390 the send — "Отправить", 120 px natural, one word now on the
+   owner's son's instruction — was cut to "Отправ…".
+   ⚠ AND THE FLOOR IS REAL, WHICH THE FIRST VERSION'S WAS NOT. It said "never
+   below its min-content, which is the figure"; falsified with a worded back
+   beside a worded next, the box went to 13.6 px under a 57.8 px figure,
+   because a `minmax(0, 1fr)` column has no minimum. Now the column's minimum
+   IS the figure (`minmax(min-content, 1fr)`: the caption may break anywhere,
+   so its own minimum is a letter, and it is clamped to one line with an
+   ellipsis), the box shrinks only down to that, and the one-word send keeps
+   its width. Where even that does not fit the row overflows the bar, which
+   the audit asserts against. Measured in he, en and ru at 320/360/375/390/834,
+   the standard door and an ₪18,085 one: nothing cut but the Russian caption
+   between 360 and about 480 px, the bar 67.0 and 71.3 px as before. The
+   caption still goes below 360 (the rule above). After the base rules (§8). */
+@media (max-width: 1099px) {
+  .quote__price { flex: 0 1 auto; min-inline-size: min-content;
+                  grid-template-columns: minmax(min-content, 1fr); }
+  .quote__send { flex-shrink: 0; }
+}
+@media (min-width: 360px) and (max-width: 1099px) {
+  .quote__price .send__label {
+    justify-self: stretch; min-inline-size: 0;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1;
+    overflow: hidden; overflow-wrap: anywhere; white-space: normal;
+  }
+}
 
 /* ⚠ AND ON A DESKTOP THE FOOT IS PINNED TO THE BOTTOM OF THE CARD, because it
    was falling off the bottom of the screen. Measured at 1440x900 on the

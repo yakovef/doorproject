@@ -669,16 +669,24 @@ for (const v of VIEWS) {
        upper panel), so a window tap on the pair takes nothing and the clause
        would have faulted "lost its subject" everywhere. The window still takes
        the TRIO, whose handle plate its casing would stand in. */
+    /* ⚠ THE VERTICAL SLOT, NOT THE SQUARE WINDOW, SINCE 27.9.2026 — same
+       subject, moved a second time. `5676973` derived the trio's rows from the
+       square window, so the square window takes nothing from the trio any
+       more and this clause faulted "lost its subject" at every view (found on
+       the levers' merge; the main branch faulted the same, 8 of 8). The
+       refusal MOVED to the vertical slot, which still lands in the plate
+       (`why.winPlate`): measured on the page, strip takes panel3 to plain and
+       none gives it back; rect keeps panel3 throughout. */
     await fresh('?d=panel3&w=none&n=none&k=coral&lang=he');
-    await tap('window', 'rect');
+    await tap('window', 'strip');
     const took = await now();
     await tap('window', 'none');
     const gave = await now();
     if (took.face !== 'plain') {
-      fault(v.name, `a square window left the face at ${took.face} — this check has lost `
+      fault(v.name, `the vertical slot left the face at ${took.face} — this check has lost `
         + 'its subject, nothing was taken away to give back');
     } else if (gave.face !== 'panel3') {
-      fault(v.name, `window → rect → none left the face at ${gave.face} and it was panel3 `
+      fault(v.name, `window → strip → none left the face at ${gave.face} and it was panel3 `
         + 'before the window took it — going back does not give the panels back');
     }
 
@@ -1031,10 +1039,23 @@ for (const v of VIEWS) {
           stage, read as boxes), the face is the pair beside the same window,
           the price AND the code move together, a lower panel is drawn below
           the glass, and the WhatsApp order names the composition in Hebrew;
-       2. tap three panels — nothing changes (code, price, pane) and the toast
-          says the plate, which is the tile's own reason (`why.winPlate`);
+       2. tap three panels — ⚠ RESTATED 27.9.2026, THE OPPOSITE ANSWER, on the
+          owner's son's *"change them so that the window will fit there
+          perfectly"*: the trio's rows are derived from the casing now, so the
+          tap BUILDS. The pane still does not move a pixel, the code and the
+          price move, TWO panels are drawn below the glass (the plate and the
+          lower), and the order names the composition. Beside it, the clause
+          that must stay true (§5.22): on the tall SLOT the trio is still
+          refused by the plate, its tap changes nothing, and the toast still
+          says `why.winPlate` — the computed check was never relaxed;
        3. `?sheet=1` of both doors builds with no page error, draws the door,
           and the pair's sheet names the composition.
+     ⚠ This block asserted the refusal for one commit AFTER the refusal was
+     reversed — a slip of that commit, found by reading the tool rather than by
+     running it, because the slow run comes at the end of a round. The unit
+     suite's own version of the claim was restated in the same commit as the
+     change; this one was not, and the difference is that `npm test` runs on
+     every commit and the audit does not.
      The fixture is asserted to arrive unrepaired (§5.15). Falsified by putting
      the `intent === 'detail'` arm back in `repair` (tap 2 loses the window)
      and by dropping the gate in `choose` (tap 2 lands on plain and says so). */
@@ -1061,6 +1082,10 @@ for (const v of VIEWS) {
         wa: wa ? decodeURIComponent(wa.getAttribute('href') || '') : '',
         panes,
         panelTop: panel ? Number(panel.getAttribute('data-top')) : null,
+        /* How many panels the face says it drew — the main leaf's group is the
+           one that declares it (the fixed leaf's does not; see `test/units.mjs`,
+           where reading the first group agreed by coincidence for rounds). */
+        panels: panel ? Number(panel.getAttribute('data-panels')) : null,
         glassFoot,
       };
     });
@@ -1108,14 +1133,53 @@ for (const v of VIEWS) {
         }
         const hit3 = await tap('panel3');
         const c3 = await read();
+        const sc = decodeCode(c3.code);
         const plate = withLang('he', () => T('why.winPlate'));
-        if (!hit3) fault(v.name, 'no three-panel tile on the face step — the refusal check is dead');
+        if (!hit3) fault(v.name, 'no three-panel tile on the face step — the trio check is dead');
         else {
-          if (c3.code !== b2.code || c3.price !== b2.price || !same(b2.panes, c3.panes)) {
-            fault(v.name, `tapping the greyed three panels changed the door: ${b2.code} ${b2.price} → ${c3.code} ${c3.price}`);
+          if (!sc || sc.detail !== 'panel3') {
+            fault(v.name, `tapping three panels beside the window landed on ${sc?.detail} — the plate `
+              + 'clears the casing by a rail since 27.9 and the tap must build');
           }
-          if (!c3.toast.includes(plate)) {
-            fault(v.name, `tapping the greyed three panels said "${c3.toast}" — it should name the plate: "${plate}"`);
+          if (!sc || sc.window !== 'rect') {
+            fault(v.name, `tapping three panels left the window at ${sc?.window} — a face tap never removes it`);
+          }
+          if (!same(b2.panes, c3.panes)) {
+            fault(v.name, `the square window moved when the pair became three panels: `
+              + `${JSON.stringify(b2.panes.map(r => r.map(Math.round)))} → ${JSON.stringify(c3.panes.map(r => r.map(Math.round)))}`);
+          }
+          if (c3.code === b2.code || c3.price === b2.price) {
+            fault(v.name, `the face changed to three panels and the ${c3.code === b2.code ? 'code' : 'price'} `
+              + `did not (${b2.code} ${b2.price} → ${c3.code} ${c3.price})`);
+          }
+          if (c3.panels !== 2) {
+            fault(v.name, `three panels beside the window draw ${c3.panels} panel(s) — the plate and the lower one`);
+          }
+          if (c3.panelTop == null || !(c3.panelTop > c3.glassFoot)) {
+            fault(v.name, `three panels beside the window draw ${c3.panelTop == null ? 'no' : 'a misplaced'} plate `
+              + `(top ${c3.panelTop}, glass to ${c3.glassFoot.toFixed(1)})`);
+          }
+          const says3 = withLang('he', () => T('row.upperGlazed', L(DETAILS.find(d => d.id === 'panel3'))));
+          if (!c3.wa.includes(says3)) {
+            fault(v.name, `the order for three panels beside a window does not say "${says3}"`);
+          }
+          /* ⚠ AND THE CLAUSE THAT MUST STAY TRUE: the tall slot still refuses
+             it, by the plate. The cheap way to make a glazed trio buildable is
+             to stop asking, and this is what catches that. */
+          await load('?w=strip&d=plain&n=none&k=cylinder&s=standard&lang=he');
+          const s0 = await read();
+          const hitS = await tap('panel3');
+          const s1 = await read();
+          if (!hitS) fault(v.name, 'no three-panel tile beside the slot — the refusal clause is dead');
+          else {
+            if (s1.code !== s0.code || s1.price !== s0.price) {
+              fault(v.name, `tapping the greyed three panels beside the SLOT changed the door: `
+                + `${s0.code} ${s0.price} → ${s1.code} ${s1.price}`);
+            }
+            if (!s1.toast.includes(plate)) {
+              fault(v.name, `tapping three panels beside the slot said "${s1.toast}" — it should still `
+                + `name the plate: "${plate}"`);
+            }
           }
         }
       }
@@ -3512,6 +3576,16 @@ for (const v of VIEWS) {
    which the defect cannot appear is run 106's T11 again, so this asserts the
    label actually GREW — if the two states ever stop differing it says so
    rather than passing on the short one.
+   ⚠ RESTATED 27.9.2026: the engaged label is ONE WORD now (*"rename the
+   button to just send to save space"* — "שלחו" / "Send" / "Отправить"), so
+   it no longer grows; in Hebrew it is shorter than "יש לי שאלה". The clause
+   keeps its subject — the check must measure the ENGAGED bar — and now asks
+   that the label CHANGED and that what it changed to is the on-label
+   (`.wa__on`'s own text, whatever the copy says). And the bar has FOUR
+   controls since the same day — back beside next — so the "painted under"
+   clause asks of both arrows, and a new clause asks that the four stand in
+   ONE row (every child's middle on the bar's middle): the bar's height is
+   `--quote-h`, which every fold check reads, and a wrapped row would move it.
 
    §5.15 throughout: the bar, its three children and the engagement each
    report if they were not found.
@@ -3536,6 +3610,7 @@ for (const v of VIEWS) {
           .map(x => x.textContent.trim()).join(' ');
       });
       const before = await label();
+      const onLabel = await pg.evaluate(() => (document.querySelector('.quote__send .wa__on') || {}).textContent?.trim() || null);
       const walked = await pg.evaluate(() => {
         const n = document.querySelector('.quote__next');
         if (!n || n.disabled || !n.offsetParent) return false;
@@ -3551,6 +3626,7 @@ for (const v of VIEWS) {
         const box = bar.querySelector('.quote__price');
         const send = bar.querySelector('.quote__send');
         const way = bar.querySelector('.quote__next');
+        const back = bar.querySelector('.quote__back');
         if (!fig || !box || !send) return { noParts: `${!!fig},${!!box},${!!send}` };
         const R = e => e.getBoundingClientRect();
         const f = R(fig);
@@ -3573,6 +3649,20 @@ for (const v of VIEWS) {
           spill: +(f.width - R(box).width).toFixed(1),
           onSend: +ox(f, R(send)).toFixed(0),
           onWay: way && !way.disabled && way.offsetParent ? +ox(f, R(way)).toFixed(0) : 0,
+          onBack: back && !back.disabled && back.offsetParent ? +ox(f, R(back)).toFixed(0) : 0,
+          arrows: [way, back].filter(Boolean).length,
+          /* And inside it: a control past the bar's edge is a control off the
+             screen. Since 27.9 the price has a floor (the figure) and the
+             send does not shrink, so a row that cannot fit overflows here. */
+          outside: [...bar.children].filter(k => getComputedStyle(k).display !== 'none')
+            .filter(k => R(k).left < R(bar).left - 0.5 || R(k).right > R(bar).right + 0.5)
+            .map(k => k.className.split(' ').pop()),
+          /* One row: every shown child's vertical middle on the bar's. */
+          offRow: (() => {
+            const b0 = R(bar), mid = (b0.top + b0.bottom) / 2 - (parseFloat(getComputedStyle(bar).paddingBottom) - parseFloat(getComputedStyle(bar).paddingTop)) / 2;
+            return [...bar.children].filter(k => getComputedStyle(k).display !== 'none')
+              .map(k => Math.abs((R(k).top + R(k).bottom) / 2 - mid)).reduce((a, c) => Math.max(a, c), 0);
+          })(),
           hitNear: hit(f.left + 2), hitFar: hit(f.right - 2),
           sendW: +R(send).width.toFixed(1),
         };
@@ -3585,13 +3675,20 @@ for (const v of VIEWS) {
       } else if (!walked) {
         fault(where, "the quote bar's way on could not be pressed, so the send never "
           + 'took its long label and this check measured the easy case');
-      } else if (before === after) {
-        fault(where, `walking a step did not change the send's label (still "${after}") — `
-          + 'this check is pinned to the label that GROWS on engagement, and it no '
-          + 'longer grows');
-      } else if (m.onSend || m.onWay) {
+      } else if (before === after || !onLabel || after !== onLabel) {
+        fault(where, `walking a step changed the send's label from "${before}" to "${after}", `
+          + `not to the on-label "${onLabel}" — this check is pinned to the ENGAGED bar`);
+      } else if (m.arrows !== 2) {
+        fault(where, `the quote bar holds ${m.arrows} of its two arrows — the way back and the way `
+          + 'on live in the bar below 1100 (27.9)');
+      } else if (m.outside.length) {
+        fault(where, `the quote bar's row does not fit: ${m.outside.join(', ')} stand(s) past its edge`);
+      } else if (m.offRow > 2) {
+        fault(where, `a control in the quote bar stands ${m.offRow.toFixed(1)} px off the bar's `
+          + 'middle — the row has wrapped, and `--quote-h` has moved under every fold check');
+      } else if (m.onSend || m.onWay || m.onBack) {
         fault(where, `the price ${m.text} is painted under the `
-          + `${m.onSend ? 'send button' : 'way on'} — ${m.onSend || m.onWay} px² of the `
+          + `${m.onSend ? 'send button' : m.onWay ? 'way on' : 'way back'} — ${m.onSend || m.onWay || m.onBack} px² of the `
           + `one number on the page (a ${m.figW} px figure in a ${m.boxW} px box)`);
       } else if (m.spill > 0) {
         fault(where, `the price figure is ${m.figW} px wide in a ${m.boxW} px box and `
@@ -3610,6 +3707,73 @@ for (const v of VIEWS) {
     console.log(`    ${said} width x language pairs: the figure is whole, in its own box, `
       + 'with nothing on top of it');
   }
+}
+
+/* ── ON A PHONE, BACK AND NEXT ARE IN THE BAR ON EVERY STEP — 27.9.2026 ──
+   The owner's son: *"On the phone I want the next and back buttons to be
+   removed from the bottom of each section and moved to the bottom of the page
+   and be seen at all times."* Walked FORWARD WITH THE BAR'S OWN ARROW at 320,
+   360 and 390 in Hebrew and Russian: on every step exactly one visible way on
+   and (after the first) one visible way back, both INSIDE the bar, at least
+   44 x 44; the live step's foot not shown (nothing under the options); the
+   bar the same height on every step (a disabled arrow keeps its box); and
+   from the summary the bar's back returns to the step before it. §5.15: the
+   walk must reach the summary, or it says so. Falsified by showing
+   `.sect__foot` again below 1100: every step faults. */
+{
+  console.log('\non a phone, back and next are in the bar on every step');
+  const HOME = `file://${process.cwd()}/index.html`;
+  let walked = 0;
+  for (const lang of ['he', 'ru']) for (const [w, h] of [[320, 568], [360, 740], [390, 844]]) {
+    const where = `bar-nav ${lang} ${w}`;
+    const p = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await p.goto(`${HOME}?lang=${lang}`);
+      await p.waitForSelector('#stage svg');
+      await p.waitForTimeout(300);
+      const heights = new Set();
+      let reached = false;
+      for (let i = 0; i < 12; i++) {
+        const m = await p.evaluate(() => {
+          const shown = e => e.offsetParent !== null && getComputedStyle(e).visibility !== 'hidden' && !e.disabled;
+          const bar = document.querySelector('.quote');
+          const live = document.querySelector('.sect:not([hidden])');
+          const nexts = [...document.querySelectorAll('.sect__next')].filter(shown);
+          const backs = [...document.querySelectorAll('.sect__back')].filter(shown);
+          const foot = live && live.querySelector('.sect__foot');
+          const box = e => { const r = e.getBoundingClientRect(); return [r.width, r.height]; };
+          return {
+            key: live ? live.dataset.section : null, first: live === document.querySelector('.sect'),
+            nexts: nexts.length, backs: backs.length,
+            inBar: [...nexts, ...backs].every(e => bar.contains(e)),
+            small: [...nexts, ...backs].map(box).filter(([bw, bh]) => bw < 44 || bh < 44).length,
+            foot: foot ? getComputedStyle(foot).display : 'none',
+            h: Math.round(bar.getBoundingClientRect().height * 10) / 10,
+          };
+        });
+        heights.add(m.h);
+        const isSum = m.key === 'sum';
+        if (m.foot !== 'none') fault(where, `step "${m.key}": its own foot is shown below 1100 — back and next belong in the bar`);
+        if (!m.inBar) fault(where, `step "${m.key}": a visible back or next is outside the quote bar`);
+        if (m.small) fault(where, `step "${m.key}": ${m.small} bar arrow(s) under 44 px`);
+        if (m.nexts !== (isSum ? 0 : 1)) fault(where, `step "${m.key}": ${m.nexts} visible ways on`);
+        if (m.backs !== (m.first ? 0 : 1)) fault(where, `step "${m.key}": ${m.backs} visible ways back`);
+        if (isSum) { reached = true; break; }
+        await p.evaluate(() => document.querySelector('.quote__next').click());
+        await p.waitForTimeout(260);
+      }
+      if (!reached) { fault(where, 'the bar\'s way on never reached the summary — this walk is dead'); continue; }
+      if (heights.size !== 1) fault(where, `the bar's height changed between steps: ${[...heights].join(', ')} px`);
+      await p.evaluate(() => document.querySelector('.quote__back').click());
+      await p.waitForTimeout(260);
+      const back = await p.evaluate(() => document.querySelector('.sect:not([hidden])').dataset.section);
+      if (back === 'sum') fault(where, 'the bar\'s way back did not leave the summary');
+      walked++;
+    } catch (e) {
+      fault(where, `could not be walked: ${e.message}`);
+    } finally { await p.close(); }
+  }
+  if (walked) console.log(`    ${walked} walks, 9 steps each: one way on and one way back in the bar, no foot, one bar height`);
 }
 
 /* ── A PHONE HELD SIDEWAYS CAN SEE WHAT IT IS BEING ASKED ────────────────
@@ -5584,11 +5748,15 @@ try {
   const SHAPES = [[1100, 800], [1152, 800], [1200, 800], [1280, 720], [1366, 768],
                   [1440, 900], [1536, 864], [1680, 950], [1920, 918]];
   const GAP = 8;                 // the same 8 px the vertical clamp keeps
-  /* The four readings where the card already stands on the door, measured on
-     the commit before the clamp and unchanged by it. Each is a wall narrower
-     than the card it has to hold; §9 has the arithmetic. */
-  const ON_DOOR_OK = new Set(['en 1100x800 halfextra2', 'ru 1100x800 halfextra1',
-                              'ru 1100x800 halfextra2', 'ru 1152x800 halfextra2']);
+  /* The readings where the card stands on the door and that is known. EMPTY
+     since 27.9.2026: there were four (en 1100x800 halfextra2, ru 1100x800
+     halfextra1 and halfextra2, ru 1152x800 halfextra2), 1-22 px onto the leaf
+     with a 184-207 px card. The phone's send became "Send" (7b9dc43) and the
+     card is 113-142 px there now, 0 px on the door on all four — measured on
+     that commit alone, before the icon commit on top of it. The clause below
+     now fires for EVERY reading; the set stays so a future known overlap has a
+     place to be named, and the stale-exemption check still walks it. */
+  const ON_DOOR_OK = new Set();
   const stillOverlapping = new Set();
   let room = 0, tight = [], measured = 0, popovers = 0;
   const p = await b.newPage();
@@ -5709,7 +5877,7 @@ try {
   if (faults === before) {
     console.log(`    ${measured} readings in three languages x nine desktop widths x all six `
       + `sizes: the price card is whole on all ${room} where the wall can hold it, it stands on `
-      + `the door on none but the ${ON_DOOR_OK.size} §9 names, and its breakdown is centred on `
+      + `the door on ${ON_DOOR_OK.size ? `none but the ${ON_DOOR_OK.size} §9 names` : 'none'}, and its breakdown is centred on `
       + `it in all ${popovers}. ${tight.length} cut where the wall cannot hold it (§9): `
       + tight.slice(0, 4).join(', ') + (tight.length > 4 ? ` +${tight.length - 4} more` : ''));
   }

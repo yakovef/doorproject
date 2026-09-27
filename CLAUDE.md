@@ -139,6 +139,15 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The handle branch merged into this one (*"yes you should"* — the levers
+  were only on `claude/door-handle-design-catalog-votz53` and the owner's son
+  looked for them on the page). Code merged clean; `CLAUDE.md`, `HISTORY.md`
+  merged by hand. On the merge: test 9,118,759 / 0, collide 1,508 + boxes,
+  fuzz clean, latency 190 ms; against this branch 40 of 57 sheets moved, every
+  one only by its nickel lock furniture (14 `against-` by one lever-sized patch).
+  ⚠ The audit was red HERE before the merge: its "window takes the trio"
+  clause still tapped the square window `5676973` made the trio keep (8 faults,
+  same on this branch's own code); it taps the vertical slot now.
 - **27.9** Curved lever MEASURED off three installed doors (*"I trust you to put
   it into the app"*; `research/handles/curved/`), replacing the shape built from
   words 25–26.9: linear taper 21 / 15 / 9.5 (square law drew 20.6 / 11 / 8),
@@ -151,36 +160,58 @@ lines here. Dates are the day of the change.
   the derivation's); the covered 70 mm escutcheon is the Coral's only
   (`escutcheon: 'covered'`, `escutcheonR`); the plug is derived (test caught the
   literal: 2 fails). Gates: test 9,105,074 / 0, audit clean, collide 1,488 +
-  boxes, fuzz clean, latency 218 ms. Sheets: 39 of 54 moved — 30 for the nickel
-  furniture alone, 6 window crops for the LAST round's unrendered twins
-  (`fe65505` committed with its sheets red), 5 both; +3 `-light` sheets it never added.
+  boxes, fuzz clean, latency 218 ms. Sheets on the handle branch: 39 of 54
+  moved — 30 for the nickel furniture alone, the rest the design pairs of
+  `fe65505`, which the main branch's slow run (`6934c0d`) rendered too.
 - **27.9** The Coral drawn against four installed doors — *"fix the coral
   handle"* — **proposal only, app untouched** (`research/handles/coral/`).
   Size was right (reach, blade, keyway spacing within 4%); shape and metal were
   not: the root is a rounded end on the spindle, not a flared neck; the nickel
   read 20–30% light and cold (photos warm, hue ≈40°); the escutcheon is 70 mm
   with rings, a plug 5 mm above centre, no euro keyhole. No gates (no app change).
-- **27.9** Every window design in black OR the door's colour, all seven — the
-  owner's son reversing his own 26.9 note (`8e1905d` reverted whole, the outline
-  removal kept): base black, `-light` twin the paint; `circles-light`,
-  `vine-light`, `tree-light` appended (15/16). Tiles re-tint (`retintOptions`).
-  Falsified: twins black, `tree-light` dropped. Test 9,196,962 / 5 (sheets).
-  Long form: `HISTORY.md`.
-- **27.9** No outline round the inside of the glass — *"there is a black
-  outline around the inside of the window, I want it removed"*: `aperture`'s
-  stroke of the paint ×0.6 deleted; the 8 mm rebate stays (under the opaque
-  pane, 0 px on screen). Falsified: the stroke back fails every pane (48).
-  Sheets, one run for all three 27.9 changes, as predicted: 19 bare moved, all
-  glazed, 0 solid, 0 lockset; 11 of the 19 carry the white/black change too
-  (the light twins, circles, tree, the four glazed recreates, corpus-07).
-  Gates: test 7,483,871 / 0, audit clean (its breakdown check had measured an
-  animation, 9.7 px once — it waits now), collide 1,488, fuzz clean, glass unmoved.
-- **27.9** A design is white or black, never the door's colour — *"The colors
-  of the designs are only white or black, they are not based on the door
-  color"* (overruling Peretz's 26.8 *"…גם בגוון הדלת"*): `-light` twins white on
-  door and tile alike (`grilleTint`), etched rings white, the tree a fixed
-  near-black. Falsified: `lighten(paint, 0.10)` back fails 64 light rows, 0
-  black. Labels לבן / white / белый; ids unchanged. Test 7,483,741 / 5 (sheets).
+- **27.9** No figures on the משקוף section — *"…it's better to not show a number
+  than show a false one."* The three figures (46/82, 62/112, 148/198) and the
+  dimension marks they sat on go from `mashkofGlyph`; the C, the three part NAMES
+  and the pills' prices stay, so the section says it RELATIVELY — a widened part
+  is a longer arm or a deeper falc, asserted off the catalogue's own `wide` list.
+  `MASHKOF_PARTS` keeps its widths (the drawing needs two parts of three). The
+  one-ruler assertion reads the three drawn PIECES, and *no `<text>` carries a
+  digit* is asked of EVERY text rather than of the deleted `glyph__dim` group
+  (§5.15); the CSS rule went with the class. Falsified: one figure back → 8, one
+  per frame; the section ignoring its frame → 32; the MARKS back → nothing, and
+  correctly — they are `<path>` and the clause reads the three `<rect>` pieces.
+  ⚠ Also carries the audit assertion `5676973` left out: it went on asserting
+  the refusal that commit reversed, so the audit was red there. Long form:
+  `HISTORY.md`.
+- **27.9** The three-panel face takes the window, and its rows are DERIVED from
+  it — *"…the window doesn't change size no matter what, and what is not right is
+  probably the proportions of the panels, change them so that the window will fit
+  there perfectly."* ⚠ Reverses the 26.9 refusal, on his word. `trioRows(leafH)`
+  replaces `PANEL_ROWS.trio`: upper = the square window's casing rectangle, the
+  plate one measured rail below it, the lower panel the second rail below that
+  (0.120–0.560 · 0.586–0.680 · 0.705–0.913 standard) — a FUNCTION, because 70 mm
+  of casing is a different fraction on every size (§5.16). The 24.9 rows are kept
+  beside it: measured, overruled, kept. ⚠ The refusal MOVED rather than going —
+  the tall slot still lands 322–488 mm in the plate, so `why.winPlate` keeps a
+  reader. Price `DETAIL_GLAZED.panel3 = DETAIL.panel3 − DETAIL.panel2`, ₪450
+  (A21) → a glazed trio is ₪7,445. ⚠ And *"a panel that is charged for is a panel
+  that is drawn"* had been reading the FIXED leaf's group on a double and agreeing
+  by coincidence; it reads the group that DECLARES the count now. Falsified: the
+  24.9 rows typed back → 30 faults. `collide -- all` 1,488 → 1,508. Long form:
+  `HISTORY.md`; §3 carries the derivation and what it cost.
+- **27.9** The curved lever's name is permanent: ידית מתעקלת / Curved lever /
+  Изогнутая ручка (*"give the curved lever a permanent name"*); id untouched,
+  1b and A19 closed. New: nothing on sale carries a provisional name. Slow run
+  for the design pairs, the bar and this, as predicted: 11 bare sheets moved
+  and 3 new, all twins or etched (the navigator-marks commit, now in
+  `HISTORY.md`, carries the same files byte-identically); the audit's stale
+  on-door exemption was found here too and is closed by the entry below.
+  Gates: test 9,197,205 / 0 (after the rebase),
+  collide 1,488, fuzz clean, latency 183 ms, audit clean. Long form: `HISTORY.md`.
+- **27.9** The audit's four named "price card on the door" readings (1100/1152
+  px, widest doubles) were stale: "Send" shrank the card to 113–142 px and it
+  is on no door now (measured on `7b9dc43` alone). `ON_DOOR_OK` emptied, so
+  that clause fires on every reading. Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -247,6 +278,14 @@ beside the door, placed by the owner with circles on a screenshot.
   **The price is stated once**; the SEND is stated twice (the quiet one and
   the summary's green one), and the audit requires both on every step with the
   identical href.
+- ⚠ **On a phone the bar is the way through, too** (27.9, the owner's son:
+  back and next *"moved to the bottom of the page and be seen at all times"*,
+  the send *"just send to save space"*): price · "שלחו" · two 44 px icon
+  arrows (`.quote__nav`, the word in `aria-label`/`title` from `markSteps`);
+  below 1100 no step shows its `.sect__foot`. The bar's height is unchanged
+  (67.0 px under 360, 71.3 above — `--quote-h` feeds every fold check), a
+  disabled arrow keeps its box, and below 1100 the CAPTION yields
+  (`minmax(min-content, 1fr)` floors the box at the figure), never the send.
 - ⚠ **`.stage__hud` IS ABSOLUTE AND MUST STAY ABSOLUTE.** Above 1100 px the
   stage is a flex item, so anything in the flow up there takes its height out
   of the drawing — a control that merely appeared in `.stage__bar` once cost
@@ -277,14 +316,14 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | ~9.1 M assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything (it has swung between 7.48 M and 9.2 M with the window twins and the bow's sweeps); read the failure count | 27.9 |
+| `npm test` | ~9.12 M assertions, **0 failed** — the total is the product of catalogue list lengths and is not evidence of anything (it rose from 7.48 M on 27.9 with three more grilles; it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves); read the failure count | 27.9 |
 | `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) — about 20 minutes now; the price-breakdown check waits for its animation since 27.9 | 27.9 |
-| `npm run collide` | `all` (1,488 designs, 552 with the bow) and `boxes` clean | 27.9 |
+| `npm run collide` | `all` (1,508 designs — 1,338 base, 552 of them with the bow, plus 170 face-detail; the 20 over 26.9 are the glazed trio) and `boxes` clean | 27.9 |
 | `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, nothing broke | 27.9 |
-| `npm run latency` | 218 ms worst door against a 600 ms gate (run beside `npm test`; 185 alone on 26.9) | 27.9 |
+| `npm run latency` | 190 ms worst door against a 600 ms gate (measured beside a running audit) | 27.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
-| `npm run sheets` | the 48 bare sheets and 6 `lockset` sheets byte-stable across commits that do not touch the drawing; the 27.9 levers moved 39 of 54 (every one with nickel lock furniture in frame, or the previous round's unrendered window twins); the 15 still are window-only crops and 7 `recreate-` files no tool writes any more. ⚠ A round that commits with its sheet rows red leaves its drawing change unrendered for the NEXT round to carry — `fe65505` did | 27.9 |
+| `npm run sheets` | the 51 bare sheet files (three twins' `against` sheets added 27.9) and 6 `lockset` sheets byte-stable across commits that do not touch the drawing; the design pairs moved 11 and added 3, every one a twin or an etched design. ⚠ The trio's rows and the משקוף section moved **0 bare sheets and 0 lockset**, as predicted: no fixture carries a three-panel face (`js/works.js` is 27 `plain` + 3 `panel2`, `tools/against.mjs` sets no face at all) and a tile is not in `?bare=1`. Only `.stamps.json` and 7 of the 12 `shot` sheets — the documented noise floor ⚠ The levers' merge (27.9) moved 40 of the 57: every one by its nickel lock furniture only — the 10 recreates and 10 corpus the tools write, all 6 lockset, 14 `against-` crops by one lever-sized patch at their edge; the 17 still are window-only crops and 7 `recreate-` files no tool writes any more | 27.9 |
 
 ⚠ **When a bare sheet moves on a commit that could not have moved it, find out
 what did** — that is how chrome painted across every sheet was found once. And
@@ -600,23 +639,50 @@ people consult.
 
 **Every family is a MEASURED composition with its own doors named** — the
 recurring mistake here has been deriving one from another (`trio` from `pair`,
-a stripe count from a span formula). `PANEL_ROWS` holds `pair`, `trio`, `top`
-and `lone` (the square window's own panel).
+a stripe count from a span formula). `PANEL_ROWS` holds `pair`, `top` and
+`lone` (the square window's own panel); the trio is the one exception and it is
+derived from the WINDOW rather than from another face.
 
 - `PANEL_ROWS.pair` 0.07–0.58 and 0.66–0.92.
-- `PANEL_ROWS.trio` **0.064–0.497 · 0.523–0.617 · 0.642–0.913** (24.9, off an
-  installed door, de-keystoned). The middle rectangle is a **handle plate**:
-  d067/d068/d077 carry a turned pull through it; d065/d070/d087 are the same
-  door without the plate. No face brings its own pull (14.9); a bow chosen on
-  this face is homed in the plate's field (`gripIdeal`).
+- ⚠ **THE TRIO'S ROWS ARE DERIVED FROM THE WINDOW SINCE 27.9.2026**, the
+  owner's son: *"…I remind you that the window doesn't change size no matter
+  what, and what is not right is probably the proportions of the panels, change
+  them so that the window will fit there perfectly."* `trioRows(leafH)`:
+  the **upper row IS the square window's casing rectangle** (`WINDOWS.rect.frac`
+  grown by `MOULD_BAND` each side) — 0.120–0.560 on the standard leaf — then the
+  **plate** one measured rail below it (0.586–0.680) and the **lower panel** the
+  second rail below that to the measured foot (0.705–0.913). So "the window fits
+  there perfectly" is true by construction on every size, and it stays true when
+  the window or the casing is re-measured.
+  ⚠ **A function and not a table, because `MOULD_BAND` is 70 mm of stock**: as a
+  fraction it shrinks on a taller leaf (0.120–0.560 at 2050, 0.124–0.556 at
+  2350), so a constant could only be right on one of the six sizes — §5.16.
+  ⚠ **Solid or glazed, it is the SQUARE window it is built round**, so switching
+  the window on and off moves nothing. The tall slot runs to 0.79 of the leaf
+  and the computed clearance still refuses the trio beside it (488 mm into the
+  plate on the standard leaf) — the check was never relaxed, the drawing moved.
+  ⚠ **What it cost, measured:** the head rail goes 131 → 246 mm, so the trio
+  loses the equal margins all round that made the 14.9 reading credible; the
+  plate drops 129 mm (its centre 0.570 → 0.633 of the leaf, still inside
+  `HOME_REACH`) and the lower panel is 426 mm where it was 556.
+  **The 24.9 reading — 0.064–0.497 · 0.523–0.617 · 0.642–0.913, off an installed
+  door, de-keystoned — is kept in full beside `trioRows`: measured, overruled,
+  kept.** What survives of it unchanged is the plate's own height (0.094) and
+  the two rails (0.026, 0.025), which is what the derivation is built from.
+  The middle rectangle is still a **handle plate**: d067/d068/d077 carry a
+  turned pull through it; d065/d070/d087 are the same door without it. No face
+  brings its own pull (14.9); a bow chosen on this face is homed in the plate's
+  field (`gripIdeal`) and follows it down.
 - ⚠ **Under the square window a face draws the rows it `keeps`** (26.9, on the
   catalogue entry — `panel2` keeps its lower panel, `panel3` its plate and
   lower); `faceRowsOn` is the one statement, read by the drawing,
   `faceObstacles` and `panelUnderGlass`. Whether kept rows clear the casing is
   computed: on the standard leaf the casing reaches 1148 mm, the pair's lower
-  panel starts at 1353 (205 clear), the trio's plate at 1072 (**76 into it — the
-  trio is refused beside a window, the window stays**). The pair's kept panel is
-  its own 0.23 inset (459 mm), 20 mm inside the casing each side — not aligned.
+  panel starts at 1353 (205 clear) and **the trio's plate at 1201, one 53 mm
+  rail below it** — so both stand beside the square window, and a glazed trio
+  costs the plate (A21). The kept panels are at their own 0.23 inset (459 mm),
+  20 mm inside the casing each side — not aligned, because the inset is Peretz's
+  14.9 overrule and the window's own x fractions are the owner's son's light.
   A face that keeps nothing falls back to the window's own lone panel, aligned
   to the casing (d097); plain behind the square window draws that.
 
@@ -772,8 +838,9 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
   bar second, never the bow.
 - **`LOCKSETS` — the lock furniture**, always: what you turn and the keyway.
   ⚠ **`lever-taper` (the curved lever) has a placeholder id that can never be
-  renamed** — Peretz's name for it becomes the label, never the id (1b in
-  `ASK-PERETZ.md`). **Both levers are measured off installed doors since 27.9**
+  renamed** — its name went into the LABEL: ידית מתעקלת / Curved lever /
+  Изогнутая ручка, permanent since 27.9 on the owner's son's word.
+  **Both levers are measured off installed doors since 27.9**
   (`research/handles/coral/`, `…/curved/`): the Coral a stadium blade whose
   rounded root sits on the spindle; the curved lever a LINEAR taper (13 → 4.5
   half-depth) on a centreline that dives from 4.5 above the spindle into it —
@@ -843,10 +910,25 @@ on the whole (A3). The door moves for two parts of three, and the hint says why.
 The control (`buildMashkof`) is three rows of standard/wide over **a section of
 the frame: a square C** — the falc as the upright, the two kants as the arms,
 nothing else (no wall, no leaf), exactly as the owner's son drew it. Units are
-millimetres (`sc = 1`), so each dimension mark is the length of the piece it
-names; the profile's thickness is a drawing weight, labelled in the code as the
-one unmeasured length. `mashkofGlyph` is the control's diagram only; `render()`
+millimetres (`sc = 1`), so each piece is drawn at the length the catalogue gives
+it; the profile's thickness is a drawing weight, labelled in the code as the one
+unmeasured length. `mashkofGlyph` is the control's diagram only; `render()`
 never calls it.
+
+⚠ **AND IT PRINTS NO FIGURE, SINCE 27.9.2026** — the owner's son: *"Remove the
+numbers from the mashkof section, maybe in the future I will give you accurate
+numbers but right now I don't have them so I think it's better to not show a
+number than show a false one."* The three figures and the three dimension marks
+they sat on are gone; the C and the three part NAMES (`glyph__lbl`, `L(part)`)
+stay, and the pills keep their prices, which are Peretz's and are not in doubt.
+So the section says the same thing **relatively**: a widened part is a visibly
+longer arm or a deeper falc, asserted off the catalogue's own `wide` list rather
+than by eye. ⚠ **`MASHKOF_PARTS` keeps its widths** — the DRAWING needs them for
+two parts of three, and the day he gives real ones the marks come back to the
+same numbers. The one-ruler assertion now reads the three drawn PIECES instead
+of the marks beside them, which is a step closer to the door; `.glyph__dim` went
+from `css/app.css` with the class, because a rule for a class nothing emits is
+dead code that reads as load-bearing.
 
 ### The handle has one place, from a table (18.9)
 
@@ -1088,7 +1170,7 @@ against nothing and landed on "slightly better".
 | `npm run against` | each design and grip beside its own source doors, cropped |
 | `npm run lockset` | our lock furniture beside photographs of it, each photograph beside our door in **that door's own paint**, both scaled by the LEAF. One `fitting()` measures photo and render alike, and it prints its own calibration |
 | `npm run shot` | the whole page at twelve sizes and designs — ⚠ **not byte-stable** (two runs of identical code differ on ~7 of 12, up to 9/255 in one small box), so it proves nothing either way |
-| `npm run sheets` | regenerates every family. **The 48 bare sheets (`corpus-`, `recreate-`, `against-`) and the 6 `lockset-` sheets are the proof**: `?bare=1` rasterises flat vector with no webfont, photograph or animation, so they are stable |
+| `npm run sheets` | regenerates every family. **The 51 bare sheet files (`corpus-`, `recreate-`, `against-`; a few are withdrawn designs' and no longer rewritten) and the 6 `lockset-` sheets are the proof**: `?bare=1` rasterises flat vector with no webfont, photograph or animation, so they are stable |
 | `npm run backdrop` | rebuilds both rooms in `assets/` from the owner's originals; the asset is a pure function of an original plus one number |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and de-skews it bilinearly from four measured corners (§3) |
 
@@ -1127,7 +1209,7 @@ are not in `VIEWS`:
   no-photo (drawn room still painting), a wrong code says the code was not
   recognised, the language switch leaves no Hebrew behind, the order sheet
   prints on **one page** (real PDFs at 703 px, counting pages).
-- **pictures** — the navigator's nine marks and the spec's thirteen, rasterised
+- **pictures** — the navigator's nine marks and the spec's fourteen, rasterised
   at shipped size and compared pairwise (floor 0.50); the stripe pills; the
   gallery grid never one column, no tile under 132 px; the photographed floor
   and sconces measured in pixels against the drawn ones.
@@ -1264,6 +1346,18 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 
 ### Measured and not fixed — each is arithmetic or a product decision
 
+- **On a near-black door a window design's two ends are almost the same option**
+  (27.9). Every design is a pair — black, or the door's colour — and the contrast
+  between the two inks is decided by the paint: **13.69:1 on לבן 9016, 2.01:1 on
+  the default חום-אפור כהה 7126, 1.53:1 on אפור פחם 7021**. So the choice is real
+  on a pale door and almost none on a dark one, and 1.53 is under the 3:1 a
+  graphic element wants. It is arithmetic about his own instruction rather than
+  anything the drawing does, so nothing is refused and no tile is adjusted;
+  `npm test` separates a pair by MARKUP, which is all a string-level check can
+  say, and it asks it on the door the page opens with — the hardest of the three.
+  What would settle whether it matters is a look at the two tiles side by side on
+  a charcoal door: a question about a picture, not about a ratio.
+
 - **The square window scales with the leaf now, and two things moved with it**
   (26.9). It is 0.422 of the leaf's width, so the lone panel under it (aligned
   to the casing) went 497 → 499 mm on the standard leaf, 530 on `extra1` and
@@ -1291,9 +1385,13 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   off the leaf's LEFT edge always — on a hinge-left door it stands on the hinge
   side. No bar reaches either place today (the sweep above), so nothing is
   drawn wrong; the box is simply in the wrong place.
-- **The trio cannot stand beside a window** (26.9): the casing would stand 76
-  mm into its handle plate (`panelUnderGlass`, `why.winPlate`). Refused, not
-  redesigned; `ASK-PERETZ.md` asks the owner's son whether a glazed trio exists.
+- ✅ ~~**The trio cannot stand beside a window** (26.9): the casing would stand
+  76 mm into its handle plate.~~ **CLOSED 27.9** — the owner's son answered by
+  asking for the opposite: the window does not move, the PANELS do. The trio's
+  rows are derived from the casing now (§3, `trioRows`) and it stands beside the
+  square window on all six sizes. ⚠ **The refusal did not go, it moved to the
+  window it is about**: the tall slot still lands 322–488 mm into the plate, off
+  the same computed check, so `why.winPlate` still has a reader.
 
 - **The escutcheon under every lever but the Coral** (27.9, read, not fixed):
   three curved-lever doors carry three different cylinder guards — an open euro
@@ -1333,8 +1431,11 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 - **Two controls pinned by rules that mirror differently stand in opposite walls
   in one language and the same wall in another** — the mechanism behind a
   closed fault (the removed grip controls under the price card in Hebrew only).
-  Check it for anything put in the wall next. And at 1100–1152 px the wall is
-  140–152 px against a 163 px price chip: nothing else fits there.
+  Check it for anything put in the wall next. At 1100–1152 px the wall is
+  140–152 px: the price card fits it since 27.9 (111/113/142 px in he/en/ru,
+  from 163/184/207, when the send became one word) and stands on no door at
+  any size — the audit's four named on-door readings are gone — but nothing
+  else fits there.
 - **The phone's Back button leaves the guide** (12.9): the whole walk is one
   history entry. The obvious fix — `pushState` per step — was built and
   **thrown away**: the in-page back button then grows the stack and system Back
@@ -1385,8 +1486,8 @@ and a fixed half — the drawing on three sizes, A18); **1g** (the rose's size);
 **0j** (26.9: whether a glazed trio exists — to the owner's son; whether a glazed
 pair is the ₪3,800 alone, A20; that the square window moved 131 mm down);
 **0a2** (the ₪300 bell: ring, electric push, or both); **0a5** (a gold פרזול's
-keyhole); **1b** (the curved lever's name, the Idan's stock length, a picture of
-the digital viewer); **1c** (the wide-margin three-panel doors); **2** (ברזל
+keyhole); **1b** (a picture of the curved lever, the Idan's stock length, a
+picture of the digital viewer); **1c** (the wide-margin three-panel doors); **2** (ברזל
 מחושל on ten doors he says do not carry it); **3** (warranty term, permission to
 use the photographs).
 
@@ -1415,8 +1516,9 @@ edit if Peretz says otherwise. `ASK-PERETZ.md` carries the open ones in Hebrew.
 | A16 | The חריגה is drawn at 1025 × 2250, the midpoint of the two sizes it replaced (leaf aspect 0.4205 against the corpus median 0.415) | two numbers in `SIZES` |
 | A17 | A דו כנפי's fixed leaf is 400 mm on all three bands; the extra width goes into the leaf that opens | two numbers in `SIZES` |
 | A18 | His דו כנפי is our דלת וחצי — a main leaf and a narrow FIXED leaf, not two equal leaves | **the drawing**, on three of six sizes |
-| A19 | ~~The curved lever priced as the Coral~~ — closed 20.9: ₪200. Its NAME is open and its id can never be renamed | one label, three languages |
+| A19 | ~~The curved lever priced as the Coral~~ — closed 20.9: ₪200; its name closed 27.9 (ידית מתעקלת, the owner's son). The id `lever-taper` can never be renamed | — |
 | A20 | Two panels beside the square window cost the window's ₪3,800 and nothing for the face (`DETAIL_GLAZED.panel2 = 0`): the window replaced the upper panel and the one panel drawn is the one the window already pays for (26.9) | one number in `prices.js` |
+| A21 | Three panels beside the square window cost the HANDLE PLATE and nothing else — `DETAIL_GLAZED.panel3 = DETAIL.panel3 − DETAIL.panel2`, ₪450 (27.9). A glazed trio draws one panel more than a glazed pair, and the only figure in the range that says what that plate is worth is the difference between Peretz's own two solid faces. He has priced two solid faces and never a glazed trio | one expression in `prices.js` |
 
 ⚠ **A2, A7 and A13 are the three worth asking first**; A13 is ₪500 on most glazed
 orders and rests on the shape of two Hebrew names.

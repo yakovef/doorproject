@@ -1,4 +1,4 @@
-# The curved lever (`lever-taper`, name still provisional), against three installed doors — 27.9.2026
+# The curved lever (ידית מתעקלת, id `lever-taper`), against three installed doors — 27.9.2026
 
 **Status: in the app** (`leverTaper` and its constants in `js/renderer.js`). The
 owner's son sent three photographs of installed doors carrying it: *"I trust you

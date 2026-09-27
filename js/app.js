@@ -571,6 +571,10 @@ function init() {
      at boot, on an element nothing rebuilds. */
   const barNext = document.querySelector('.quote__next');
   if (barNext) barNext.addEventListener('click', () => stepBy(1));
+  /* And the way back beside it, since 27.9.2026 — the same reasoning, the same
+     once-at-boot wiring. */
+  const barBack = document.querySelector('.quote__back');
+  if (barBack) barBack.addEventListener('click', () => stepBy(-1));
 
   /* ── THE PICTURE GOES WITH THE ORDER ──────────────────────────────
      Both send buttons keep their `wa.me` href and keep it correct — that is
@@ -2424,12 +2428,25 @@ function markSteps() {
     if (Math.abs(dx) > 0.5) row.scrollBy({ left: dx, behavior: 'instant' });
   }
 
-  /* The way on and the way back, disabled at the ends rather than wrapping. */
+  /* The way on and the way back, disabled at the ends rather than wrapping.
+     ⚠ THE BAR'S TWO ARE ARROWS (27.9.2026): the same word goes into their
+     `aria-label` and `title` instead of their text, without the ‹ › glyph the
+     worded buttons carry — the arrow IS the glyph. One statement of what the
+     button is called, whichever form shows it. */
   const i = keys.indexOf(liveStep);
-  for (const b of document.querySelectorAll('.sect__back')) b.disabled = i <= 0;
+  const word = k => T(k).replace(/[‹›]/g, '').trim();
+  const name = (b, k) => {
+    if (b.classList.contains('quote__arrow')) {
+      b.setAttribute('aria-label', word(k)); b.title = word(k);
+    } else b.textContent = T(k);
+  };
+  for (const b of document.querySelectorAll('.sect__back')) {
+    b.disabled = i <= 0;
+    if (b.classList.contains('quote__arrow')) name(b, 'nav.back');
+  }
   for (const b of document.querySelectorAll('.sect__next')) {
     b.disabled = i >= keys.length - 1;
-    b.textContent = T(i === keys.length - 2 ? 'nav.toSummary' : 'nav.next');
+    name(b, i === keys.length - 2 ? 'nav.toSummary' : 'nav.next');
   }
   /* The skip is pointless on the last two: the summary IS the destination, and
      the step before it already offers לסיכום on `.sect__next`. `hidden` rather
