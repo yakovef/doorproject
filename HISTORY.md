@@ -26,6 +26,56 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE CORAL, DRAWN AGAINST FOUR INSTALLED DOORS. A PROPOSAL; THE APP
+  IS UNTOUCHED.** The owner's son set the way this work runs: *"I will send
+  pictures of doors with handles … first of all draw them … then criticize your
+  design against the real thing … just send me the drawing and not put them of
+  the web app"*, and then, stopping a first attempt at the horizontal bow and
+  the curved lever: *"I think it should be best if I give you a couple of images
+  and say the exact thing that I want you to copy … fix the coral handle."*
+  Asked four questions one by one: the photographs are Peretz's doors or his
+  supplier's (so a NEW handle can be sold once Peretz names and prices it);
+  names and lengths mostly will not come with them; the work lives on this
+  session's branch; photographs and sheets are committed under `research/`.
+  · **Method.** Each leaf rectified by a homography through its four corners
+    (read off ruled 6× crops) onto 850 × 2050 mm, the lock stile cut out at
+    4 px/mm; our Coral rendered over the same millimetre window of `#leaf` in
+    the nearest catalogue paint. The standard leaf is an assumption — the four
+    rectified aspects (0.40–0.414 against 0.4146) agree with it and cannot tell
+    850 from 800. Native resolution 0.38–0.63 px/mm; door 3 is motion-blurred.
+  · **Found: the size was right.** Reach 133 (≈128 after the blade's 60 mm
+    parallax) against our 128; blade 23 against 23; lever→keyway 102 against
+    105; rose 64 against 60 (5%).
+  · **Found: the shape and the metal were wrong.** (1) The root is a rounded
+    end centred on the spindle, ≈10 mm past it (RB 0.38 of the rose radius);
+    ours flared a pale 33 mm neck out of the rose. (2) Blade over paint read
+    1.90 / 1.03 / 0.57 against the photographs' 1.53 / 0.90 / 0.48 — 20–30%
+    light on every door; the rose 45–80% light; hue 210° against a warm ≈40°
+    that holds on the neutral anthracite door, so not white balance. (3) The
+    escutcheon is 70 mm (66.5–72.5), stepped rings, a plug carrying RB's slot
+    5 mm ABOVE centre (ours 2 below), and no euro keyhole silhouette on any of
+    the four or on RB's cut-out.
+  · **The proposal** (`research/handles/coral/proposed-coral.js`): a stadium
+    blade with its root on the spindle and a shaded crescent inside it; a rose
+    with a bevelled rim and a raised face at 0.76 R; the escutcheon as read;
+    two soft sheen bands at 0.55 and 0.72 of the reach (on all four doors — a
+    lighting judgement, said so); `FINISH_TONES.steel` warmed to hue 40° and
+    darkened 20%. It lands blade/paint 1.67 / 0.91 / 0.50, rose 1.60 / 0.87 /
+    0.48. Two faults of its own found at 6 px/mm and fixed before sending: the
+    shared `hwShadow` filter box (30% of the element's height) clipped a
+    shadow dropped 15 mm into a hard edge, and `step()`'s round caps leave a
+    dot where the lit and dark arcs meet — both present in the shipped drawing
+    too, not touched there.
+  · **Not changed, on purpose:** the photographs' long stairwell shadows (one
+    key light for every fitting); the 105 spacing (a ten-door corpus figure,
+    3% off); a taper (doors 2 and 4 hint at one, door 1 and RB do not, Peretz
+    asked for an even blade on 14.9).
+  · **If it goes in:** the nickel ramp repaints every nickel fitting;
+    `cylinder()` is the keyway under every lever and knob; `LEVER_ROSETTE` and
+    `LOCK_R` move `handleFootprint` and every placement; the tile
+    (`FITTING_GLYPH.lever`) must be redrawn from the same numbers. Each named
+    in the README so it is a decision, not a surprise.
+
 - **27.9 — EVERY WINDOW DESIGN COMES IN BLACK OR THE DOOR'S COLOUR, ALL SEVEN.**
   The owner's son: *"Revert the change with the color of the design, it does
   follow the color of the door, so there should be 2 options for each design,

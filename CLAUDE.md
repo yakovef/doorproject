@@ -120,6 +120,16 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
 - **"Don't deploy."** The site is held back on their instruction until they
   say it is finished (§0c). Showing them a change means sending a screenshot,
   never publishing.
+- **Handles from photographs (since 27.9).** They send photographs of doors and
+  name the one fitting to copy (*"fix the coral handle"*). The loop: identify
+  it against the catalogue (never add one we have or Peretz withdrew), rectify
+  each leaf through its four corners onto 850 × 2050 mm, measure, draw it in a
+  scratch copy of the renderer (`tools/_<name>/`, gitignored), compare photo |
+  shipped | proposed at one scale, correct, and **send the sheet — the app is
+  not touched until they say.** Photographs, sheets, readings and the proposed
+  code are committed under `research/handles/<name>/`. A new product needs
+  Peretz's name and price before it can be sold. This work lives on
+  `claude/door-handle-design-catalog-votz53`, their choice.
 
 ---
 
@@ -129,6 +139,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The Coral drawn against four installed doors — *"fix the coral
+  handle"* — **proposal only, app untouched** (`research/handles/coral/`).
+  Size was right (reach, blade, keyway spacing within 4%); shape and metal were
+  not: the root is a rounded end on the spindle, not a flared neck; the nickel
+  read 20–30% light and cold (photos warm, hue ≈40°); the escutcheon is 70 mm
+  with rings, a plug 5 mm above centre, no euro keyhole. No gates (no app change).
 - **27.9** Every window design in black OR the door's colour, all seven — the
   owner's son reversing his own 26.9 note (`8e1905d` reverted whole, the outline
   removal kept): base black, `-light` twin the paint; `circles-light`,
@@ -313,7 +329,9 @@ screen. Two different questions, and for a long time only one had been put.
 ## 1. Standing constraints — do not violate
 
 - **Branch:** develop on `claude/door-builder-website-plan-rgg7gu`. Never push
-  to another branch without explicit permission. **Never open a pull request**
+  to another branch without explicit permission. (The handle-drawing work of
+  §0a lives on `claude/door-handle-design-catalog-votz53`, the owner's son's
+  choice on 27.9.) **Never open a pull request**
   unless asked.
 - **`git pull --rebase` before every push; never force-push.** A recurring
   agent pushes to the same branch every few hours (§10). `git push -u origin
@@ -1281,7 +1299,10 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   sweep reads 0.082, a hand flood fill 0.0726, our outline drawn over four
   photographs 0.095–0.103 — and that last method is the one this project
   normally trusts. RB's cut-out has no door in it and cannot settle a ratio to
-  the leaf; the corpus leaves are at widths we do not know (A2). A derivation
+  the leaf; the corpus leaves are at widths we do not know (A2). Four installed
+  Coral doors (27.9, `research/handles/coral/`, perspective-corrected) read
+  0.074–0.078 — **if** their leaves are the standard 850, which their aspect
+  agrees with but cannot prove. A derivation
   via RB's 1.48 rose diameters is **refused** — that is a catalogue layout. One
   photograph of a door of stated width, or the rose's diameter from Peretz,
   settles it (`ASK-PERETZ.md` §1g).
