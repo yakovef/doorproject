@@ -178,6 +178,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** What the new face moved, put back (1b) — the audit on commit 1, eleven
+  faults, all widths. **Print:** English's widest double went to two pages
+  (276.5 mm), Russian past its 280 ceiling (283.9); rows 6 → 4 px on paper put all
+  six prints on ONE page (Russian 270.2) — its 30.8 exemption is gone. **Picker:**
+  109.7 → 128.3 px (the old fallback drew Latin at 89%); weight 400, 5/4 px, `.75/
+  .74rem` clears every gate. **Landscape:** grip now shows an answer too — the
+  exemption narrows. Long form: `HISTORY.md`.
 - **28.9** The page's own type, in its folder (1 of 10) — *"change the font …
   Hebrew first"*: **Rubik** for the text (the face Peretz's own site uses),
   **Bona Nova** for the price, `<h1>` and band — the only candidates with
@@ -204,12 +211,6 @@ lines here. Dates are the day of the change.
   rules, the price's null-state and every sweep; `lt=` retired. The פרזול
   tiles stay a composite of the door (lock furniture, hinges, viewer). Long
   form: `HISTORY.md`.
-- **28.9** **עילי** (`ilai`), a new lockset, INCLUDED (*"very similar to rotem, it
-  is also in the price, i want you to call it 'עילי'"*): the waisted backplate —
-  220 tall, 91 at head and foot, 78 at a waist 0.54 down, a slim 14 mm bar under
-  an arched neck, the Rotem's egg and satin — measured off three doors. It is the
-  plate the Rotem was drawn as until 27.9; the five gallery doors carrying it
-  (d004 d022 d029 d106 d108) are cited and refit to it. Appended: no VERSION.
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -1627,12 +1628,12 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   backward moves call `history.back()`, no push for the live step, a bounded
   depth, focus restored on `popstate`, a decision about reloads. A product
   decision; **anything built here carries the URL-matches-door assertion first.**
-- **The widest door's Russian order sheet prints on two pages** — the דו כנפי
-  חריגה שנייה with a square window and a keypad, 277.5 mm against 273. A named
-  exemption with a 280 mm ceiling. The lever is the elevation's `max-block-size:
-  140mm`, which nobody chose by printing; what it needs first is how large the
-  drawing must be for Peretz to read it in a workshop. The 8 mm body padding and
-  12 mm `@page` margin are not to be shaved.
+- ✅ ~~**The widest door's Russian order sheet prints on two pages**~~ —
+  **CLOSED 28.9**: every door in every language prints on ONE page, the Russian
+  double at 270.2 mm of 273. The new face first made it worse (283.9 mm, and
+  English newly two pages at 276.5); printed rows went 6 → 4 px, the text's size,
+  the elevation's 140 mm, the 8 mm body padding and the 12 mm margin untouched.
+  The audit's exemption is gone and its one-page clause holds all six prints.
 - **The desktop price breakdown is a short window on a long column** — less so
   since the card moved to the door's head (27.9). A thirteen-row door, rows
   whole in the column, before → after: 1280×720 10 → 10 (capped by the box's
@@ -1646,8 +1647,9 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 - **A short-and-wide screen shows the question and little answer** (13.9): a
   phone on its side (844×390) and a laptop at 200% zoom (640×360) leave 75–92 px
   under the fixed furniture. Since 27.9 the question is always on screen (the
-  band above the door) and the glass step shows an answer at both — one of
-  eight; the other seven still show none. **The layout is
+  band above the door) and the glass step shows an answer at both — and since
+  28.9 the grip step too (Rubik's narrower Hebrew shortened its question): two
+  of eight; the other six still show none. **The layout is
   chosen by WIDTH and the problem is HEIGHT** — but `max-width: 1099px` is
   read 19 times in the stylesheet alone (the fixed rail, body padding, quote
   bar, sticky stage, `placeSend`, the toast's anchor among them; the
