@@ -137,75 +137,103 @@
   --tap: 44px;
 
   --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
-  /* ⚠ ASSISTANT FIRST, THEN A FALLBACK TUNED TO ASSISTANT, THEN THE OLD STACK
-     UNCHANGED BEHIND BOTH. The middle entry is the whole trick; it is declared
-     immediately after this block, with the four measurements behind it. */
-  --sans: "Assistant", "Assistant Fallback",
+  /* ⚠ RUBIK FIRST, THEN A FALLBACK TUNED TO RUBIK, THEN THE OLD STACK UNCHANGED
+     BEHIND BOTH (28.9, the owner's son: *"change the font … apply the fonts to
+     the whole text, Hebrew first"*). Rubik is local (`assets/fonts/`, declared
+     in index.html's head) and is the face Peretz's own site sets every word in.
+     The middle entry is the whole trick; it is declared immediately after this
+     block, one rule per script, with the measurements behind it. */
+  --sans: "Rubik", "Rubik Fallback",
           "Segoe UI", "Arial Hebrew", Arial, system-ui, sans-serif;
-  /* ⚠ THE PRICE'S OWN FACE, AND IT IS STILL A SYSTEM SERIF. Asked for from
-     outside: *"pick a creative font for the price, something that reads
-     rich."* That instruction is newer than the plan that wanted the figure set
-     in a light sans, and it stands: a high-contrast serif — thin hairlines
-     against thick stems — is the whole visual signature of money set in type,
-     and it is the opposite of the interface sans around it. It also costs
-     nothing to load, which now matters more rather than less: Assistant is the
-     page's one network request and the figure is the thing a customer looks at
-     first, so it may not be the thing waiting on a CDN.
-     Georgia leads because its figures are generous and it is on every Windows
-     and Mac; Charter and the iOS/Android serifs follow. */
-  --serif: Georgia, "Charter", "Iowan Old Style", "Times New Roman",
-           "Noto Serif Hebrew", "Frank Ruehl CLM", serif;
+  /* ⚠ THE DISPLAY FACE — the price, the `<h1>` and the band's title (28.9). It
+     was `--serif`, Georgia's stack, on the price alone, after *"pick a creative
+     font for the price, something that reads rich"*; that instruction still
+     governs the choice, and a high-contrast serif is still the answer to it.
+     Bona Nova is that serif with Hebrew, Latin and Cyrillic — of the four
+     display faces drawn on `research/fonts/contact.png` the only one that sets
+     the Russian page in the same face as the Hebrew. The old stack stays behind
+     it for the folder without `assets/fonts/`. Renamed rather than kept, because
+     a token called `--serif` that three rules share is a statement about ONE
+     role, and what those three share is the role, not the shape. */
+  --display: "Bona Nova", Georgia, "Charter", "Iowan Old Style", "Times New Roman",
+             "Noto Serif Hebrew", "Frank Ruehl CLM", serif;
 
   --ease: cubic-bezier(.33, 1, .68, 1);
 }
 
 /* ══════════════════════════════════════════════════════════════════════
-   THE FALLBACK IS TUNED TO THE WEBFONT, NOT THE WEBFONT TO THE FALLBACK
+   THE FALLBACK IS TUNED TO THE WEBFONT, NOT THE WEBFONT TO THE FALLBACK —
+   AND SINCE 28.9 IT IS TUNED PER SCRIPT
    ══════════════════════════════════════════════════════════════════════
 
-   Assistant loads from Google Fonts as an enhancement (see the head of
-   index.html). `font-display: swap` paints the fallback first and swaps —
-   and the two faces have different metrics, so text REFLOWS on the swap
-   unless something is done about it. The usual advice is to tune the webfont
-   to the fallback, and it cannot be done: the fallback is Segoe UI on
-   Windows, Arial Hebrew on a Mac, something else again on Android, and one
-   set of overrides cannot match three faces.
+   `font-display: swap` paints the fallback first and swaps — and two faces with
+   different metrics REFLOW on the swap unless something is done. Tuning the
+   webfont to the fallback cannot be done: the fallback is Segoe UI on Windows,
+   Arial Hebrew on a Mac, something else on Android. So a second family wraps a
+   local Arial and stretches it onto Rubik's metrics, and the stack puts it
+   directly behind Rubik: the page lays out at Rubik's metrics from the first
+   frame whether or not Rubik ever arrives.
 
-   So it is done the other way. This declares a SECOND family that wraps a
-   local font and stretches it onto Assistant's metrics, and the stack puts it
-   directly behind Assistant. The page then lays out at Assistant's metrics
-   from the first frame, whether or not Assistant ever arrives — and the swap,
-   when it comes, moves nothing.
+   ⚠ ONE RULE PER SCRIPT, BECAUSE ONE NUMBER COULD NOT DO IT. Rubik's Hebrew is
+   NARROWER than Arial's and its Latin and Cyrillic are WIDER, so the single
+   Hebrew-tuned `size-adjust` 28.8 used for Assistant (which had no Cyrillic,
+   so the Russian page never swapped at all) set English and Russian 8% narrow:
+   measured, 5 and 8 lines lost across the nine explainers. `size-adjust` can
+   differ per `unicode-range`, so each script has its own, over exactly the
+   range its Rubik file covers. Hebrew prose carries Latin-range spaces, digits
+   and marks, so the Latin value was fixed first (English prose is Latin
+   throughout) and the other two solved GIVEN it.
 
-   ⚠ EVERY NUMBER HERE WAS MEASURED, in `tools/_font/measure.mjs`, against the
-   real woff2 files. Per 100 px: Assistant's ascent is 102 and its descent 29
-   against Arial's 91 and 21, and Assistant is NARROWER — 1591 units of Hebrew
-   against 1840. Hence a size-adjust below 100 % and an ascent above it.
+   ⚠ EVERY NUMBER HERE WAS MEASURED (`tools/_font/measure.mjs`, 28.9) against
+   the real woff2 files, on the page's own nine explainer answers in each
+   language. Arial is not installed where it was measured, so Arimo — Croscore's
+   metric-compatible Arial, whose vertical metrics are Arial's exactly (1854 /
+   434 / 67 of 2048) — stood in for it. Rubik is 935 / 250 / 0 of 1000; each
+   override is Rubik's metric divided by that script's size-adjust, so the
+   line box is Rubik's whichever script is on the line.
 
-   Verified rather than asserted, on a real paragraph:
+                       size-adjust  ascent   descent   line gap
+     Hebrew               93.23%    100.29%   26.82%     0%
+     Latin               103.55%     90.29%   24.14%     0%
+     Cyrillic            103.78%     90.10%   24.09%     0%
 
-                          inline run   line box   wrapped 360 px
-     Assistant (target)      237.1        19.0        69.8
-     this face               235.1        19.0        69.8     <- 2.0 / 0 / 0
-     raw Arial metrics       245.3        18.0        54.0     <- 8.2 / 1 / 15.8
+   Verified, nine paragraphs each, wrapped at 360 px:
 
-   The last row is what the swap looked like without this: eight pixels on a
-   line and a whole line on a paragraph.
+                          run width   line box   paragraphs whose wrap moved
+     he  this face       −11.6 px      0 px       0 of 9  (61 lines)
+         raw Arial      +1012.3 px    −1 px       3 lines lost
+     en  this face       −34.2 px      0 px       1 of 9  (80 lines)
+         raw Arial       −902.5 px    −1 px       3 lines
+     ru  this face      +117.8 px      0 px       0 of 9  (86 lines)
+         raw Arial       −848.1 px    −1 px       3 lines
+
+   ⚠ ONE ENGLISH PARAGRAPH MOVES AT EVERY VALUE FROM 102.0% TO 105.0%. It is a
+   paragraph on a knife edge — a letter-width distribution no uniform scale
+   separates — and English is the language this page never chooses for anyone
+   (§0c). Recorded, not chased.
 
    ⚠ AND IT IS APPROXIMATE ON ANDROID, which is worth writing down rather than
    discovering. `local("Arial")` resolves to a real Arial on Windows, macOS and
    iOS; on Android it commonly resolves to Roboto, whose metrics are close to
-   Arial's but not identical. The residual there is a fraction of the 8 px this
-   removes everywhere else. If `local()` matches nothing at all the face is
-   simply skipped and the old stack applies unadjusted — the same page as
-   before this block existed. */
+   Arial's but not identical. If `local()` matches nothing at all the face is
+   simply skipped and the old stack applies unadjusted. */
 @font-face {
-  font-family: "Assistant Fallback";
+  font-family: "Rubik Fallback";
   src: local("Arial"), local("Helvetica Neue"), local("Liberation Sans");
-  size-adjust: 89.05%;
-  ascent-override: 114.55%;
-  descent-override: 32.57%;
-  line-gap-override: 0%;
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+  size-adjust: 103.78%; ascent-override: 90.10%; descent-override: 24.09%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Rubik Fallback";
+  src: local("Arial"), local("Helvetica Neue"), local("Liberation Sans");
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+  size-adjust: 93.23%; ascent-override: 100.29%; descent-override: 26.82%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Rubik Fallback";
+  src: local("Arial"), local("Helvetica Neue"), local("Liberation Sans");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  size-adjust: 103.55%; ascent-override: 90.29%; descent-override: 24.14%; line-gap-override: 0%;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -885,7 +913,7 @@ svg { direction: ltr; }
    ~17 px one with arrow buttons at both ends — a hard grey stripe with a
    scrollbar thumb in it, rammed down the inside edge of a card that is
    supposed to be floating paper, splitting the page beside the photograph.
-   Same class of thing as the Assistant fallback: the platform default is what
+   Same class of thing as the text face's tuned fallback: the platform default is what
    most people actually see, and this container is the one place that never
    shows it.
    `thin` with the page's own hairline as the thumb; the track is transparent
@@ -1054,8 +1082,10 @@ svg { direction: ltr; }
    is the owner's son's bold. */
 .stage__h1 {
   margin: 0; padding: 8px 16px 2px;
-  font: 300 clamp(18px, 1.6vw, 24px)/1.15 var(--sans);
-  letter-spacing: -.01em;
+  /* ⚠ `--display` since 28.9, at 400 — Bona Nova has no 300, and a weight the
+     face does not have is a weight the browser invents. */
+  font: 400 clamp(18px, 1.6vw, 24px)/1.15 var(--display);
+  letter-spacing: 0;
   color: var(--ink);
   text-align: center;
   text-wrap: balance;
@@ -1087,8 +1117,11 @@ svg { direction: ltr; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .band__title {
-  font: 600 clamp(22px, 2.1vw, 30px)/1.15 var(--sans);
-  letter-spacing: -.01em; color: var(--ink);
+  /* `--display` since 28.9 (*"the header of the section … in some good font"*),
+     at 700: Bona Nova's two weights are 400 and 700, and a 600 would be matched
+     to the 700 anyway — the rule says what is painted. */
+  font: 700 clamp(22px, 2.1vw, 30px)/1.15 var(--display);
+  letter-spacing: 0; color: var(--ink);
 }
 .band__now {
   font: 400 clamp(13px, 1.1vw, 15px)/1.35 var(--sans);
@@ -1104,7 +1137,7 @@ svg { direction: ltr; }
     display: flex; justify-content: center; align-items: baseline; gap: 8px;
     block-size: var(--band-h); padding: 4px 14px 0; overflow: hidden;
   }
-  .band__title { font-size: 1.02rem; font-weight: 600; flex: 0 1 auto; min-inline-size: 0; }
+  .band__title { font-size: 1.02rem; font-weight: 700; flex: 0 1 auto; min-inline-size: 0; }
   .band__now { font-size: .86rem; flex: 0 1 auto; min-inline-size: 0; min-block-size: 0; }
   .band__now:not(:empty)::before { content: '·'; margin-inline-end: 8px; color: var(--ink-3); }
 }
@@ -1560,7 +1593,7 @@ svg { direction: ltr; }
   padding: 0;
 }
 .quote__price .send__figure {
-  font: 400 1.45rem/1.05 var(--serif);
+  font: 400 1.45rem/1.05 var(--display);
   letter-spacing: .005em;
   font-variant-numeric: lining-nums tabular-nums;
 }
@@ -2970,8 +3003,9 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
 .swatch.is-selected:hover .swatch__chip { --ring: var(--accent-ink); }
 
 .swatch__name { font-size: .82rem; line-height: 1.25; }
+/* `--sans` since 28.9: it held Hebrew in `--mono`, which has none (§9, closed). */
 .swatch__meta {
-  font-family: var(--mono); font-size: .66rem; color: var(--ink-2);
+  font-family: var(--sans); font-size: .66rem; color: var(--ink-2);
 }
 
 /* ── tiles: windows, grilles, sizes ───────────────────────── */
@@ -3056,8 +3090,22 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
    The section's part NAMES keep `.glyph__lbl`, which takes the page's own sans:
    they are words, and `--mono` has no Hebrew in it (§9). */
 
-.tile__name { font-size: .78rem; line-height: 1.2; }
-.tile__meta { font-family: var(--mono); font-size: .62rem; color: var(--ink-2); }
+.tile__name {
+  font-size: .78rem; line-height: 1.2;
+  /* ⚠ A WORD NEVER LEAVES ITS TILE (28.9). Rubik's Cyrillic is wider than the
+     system sans the Russian page was always painted in, and three names are one
+     word wider than an 80 px grille tile — "Геометрические", "Переплетённые",
+     "Виноградная": measured, names outside their tile went 4 → 6 of 15 at 320,
+     390, 768 and 1024 px. `hyphens: auto` breaks them where the language says
+     (the page carries `lang`; Chrome on Android and Safari hyphenate Russian),
+     and `overflow-wrap: anywhere` is the backstop where no dictionary is
+     installed, as in headless Linux: an ugly break inside the tile beats clean
+     text across the next one. Hebrew and English names are single short words
+     and never reach either rule. */
+  hyphens: auto; overflow-wrap: anywhere;
+}
+/* `--sans` since 28.9: it held Hebrew in `--mono`, which has none (§9, closed). */
+.tile__meta { font-family: var(--sans); font-size: .62rem; color: var(--ink-2); }
 /* ⚠ ONE LINE, AND NOT RED. `דורש חלון` was `--warn` at three wrapped lines,
    which did two things to a grid of tiles: it made the reason the LOUDEST
    colour on a page whose accent is tan, and it doubled the height of the tiles
@@ -3068,7 +3116,8 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
    So the reason is stated the way a caption is — one line, ellipsised, in the
    secondary ink — and the ROW keeps its shape. */
 .tile__why {
-  font-family: var(--mono); font-size: .6rem; color: var(--ink-2);
+  /* `--sans` since 28.9: `--mono` has no Hebrew, and this is a Hebrew sentence (§9, closed). */
+  font-family: var(--sans); font-size: .6rem; color: var(--ink-2);
   inline-size: 100%;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
@@ -3989,7 +4038,8 @@ html.is-live.is-untouched .wa__ask { display: inline; }
 }
 .sheet__dims {
   margin-block-start: 4px; text-align: center;
-  font-family: var(--mono); font-size: .8rem; color: var(--ink-2);
+  /* `--sans` since 28.9: `--mono` has no Hebrew (§9, closed); the figures stay tabular. */
+  font-family: var(--sans); font-size: .8rem; color: var(--ink-2);
 }
 /* ⚠ `block`, AND IT WAS `grid; gap: 0` — WHICH IS THE WHOLE REASON THE FLOAT
    ABOVE DOES ANYTHING. A grid container establishes a block formatting

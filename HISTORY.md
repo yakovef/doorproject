@@ -26,6 +26,140 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — THE PAGE'S OWN TYPE, IN ITS OWN FOLDER (1 of 10).** The owner's son:
+  *"change the font — find a font or download from the web, apply the fonts to
+  the whole text, Hebrew first."*
+
+  **WHAT WAS THERE.** `--sans` was Assistant, fetched from Google Fonts on
+  `http(s)` only behind a metric-matched fallback; `--serif` was Georgia's stack
+  and painted the price alone; `--mono` painted four Hebrew captions in a face
+  with no Hebrew (§9). Assistant has NO CYRILLIC, so the Russian page had never
+  been in it, and every `file://` load — every screenshot, every audit route,
+  Peretz's laptop — rendered without it.
+
+  **THE PICK, ON A CONTACT SHEET OF THE REAL PAGE** (`research/fonts/contact.png`,
+  the pick and the rejections written on it). Coverage settled most of it before
+  a pixel was drawn: of the text faces only Rubik, Arimo and Open Sans carry
+  Cyrillic; of the display faces only Bona Nova. **Rubik** for the text — its
+  Hebrew captions read at 12 px, one variable file per script (300–900), real
+  tabular figures, 58 KB for three scripts, and it is the face Peretz's own site
+  sets every word in (`research/works/css-14.css`: its `--sans` AND its `--serif`
+  are Rubik). **Bona Nova** for the price, the `<h1>` and the band's title — the
+  high-contrast serif the 26.8 *"something that reads rich"* asked for, with
+  Hebrew, Latin and Cyrillic. Rejected, each by name so any can be reinstated:
+  Heebo and Assistant (no Cyrillic), Arimo (the system look this leaves), Open
+  Sans (90 KB against 58 for nothing the sheet shows), Frank Ruhl Libre, Secular
+  One, Suez One (no Cyrillic; the last two one weight). ⚠ Two claims were taken
+  OFF the sheet's note before it was committed — that Rubik was "designed for
+  Hebrew" and that Open Sans's Hebrew was "drawn to the Latin" — because neither
+  was measured.
+  ⚠ Both faces have a real `tnum` feature (every figure string one width under
+  `tabular-nums`, measured), which is why the "1" in ₪3,195 sits in a full-width
+  slot: the price keeps one width as it changes. A visible cost, kept on the
+  order's word; `font-variant-numeric` is one line to reverse.
+
+  **SELF-HOSTED.** Nine woff2 files in `assets/fonts/` (Rubik × hebrew/latin/
+  cyrillic; Bona Nova 400 and 700 × the same), 165 KB, each behind the
+  `unicode-range` Google publishes for it, with the OFL texts beside them carrying
+  each font's own copyright line (read out of its `name` table). The
+  `@font-face` rules live in `index.html`'s head — the file that owns every URL,
+  as the rooms' do — and `tools/build.mjs` stamps each with its hash, fails the
+  build for a file in the folder the page does not name, and fails it for a name
+  with no file (both falsified). The first cut of that second guard read the
+  folder's name in the head's own COMMENT as a reference and refused the page —
+  §5's last note ("prose is not geometry"), met again; it reads `url("…")` only.
+  The Google Fonts script is gone: **the page makes no request outside its
+  folder**, which is README.md's promise made literal.
+  A Hebrew visit fetches the Hebrew and Latin files, ~112 KB. **By the time
+  `goto` returns the faces are loaded** — 12 of 12 loads in three languages read
+  `document.fonts.status === "loaded"` with nothing pending, because Chromium
+  holds `load` for fonts requested in the first layout — so the instruments
+  measure the real faces, not the swap.
+
+  **THE FALLBACK, RE-MEASURED — AND IT HAD TO BE PER SCRIPT.** Measured against
+  the real files on the page's own nine explainer answers per language, with
+  Arimo standing in for Arial (its vertical metrics are Arial's exactly, 1854 /
+  434 / 67 of 2048). One Hebrew-tuned `size-adjust` (95.09%) matched Hebrew to
+  12.8 px in 19,589 and set English and Russian 8% narrow — 5 and 8 lines lost.
+  Assistant never met that, because it had no Cyrillic and the Russian page never
+  swapped. So `"Rubik Fallback"` is three rules, one per script over exactly its
+  Rubik file's range, the Latin value fixed first (English prose is Latin
+  throughout) and the other two solved GIVEN it, then searched against
+  per-paragraph wrap counts rather than total width:
+
+  |          | size-adjust | ascent | descent | line gap |
+  |---|---|---|---|---|
+  | Hebrew   | 93.23% | 100.29% | 26.82% | 0% |
+  | Latin    | 103.55% | 90.29% | 24.14% | 0% |
+  | Cyrillic | 103.78% | 90.10% | 24.09% | 0% |
+
+  Paragraphs whose wrap the swap moves, of nine at 360 px: **Hebrew 0, Russian 0,
+  English 1** — one knife-edge English paragraph moves at every value from 102.0
+  to 105.0, which no uniform scale separates; recorded rather than chased
+  (English is never chosen for anybody).
+
+  **`--serif` → `--display`**, and it goes where the order says: the price, the
+  `<h1>` (at 400 — Bona Nova has no 300, and a weight a face lacks is one the
+  browser invents) and the band's title (700, which is what a 600 was matched
+  to anyway). **`--mono` leaves the four Hebrew captions** — `.swatch__meta`,
+  `.tile__meta`, `.tile__why`, `.sheet__dims` — for `--sans`, whose Rubik has
+  Hebrew; §9's item closes. It stays on the Latin-only slots (the step counter,
+  the colour codes, the short code).
+
+  **WHAT THE WIDER FACE COST, MEASURED AGAINST `9abc298` WITH THE SAME HARNESS.**
+  Rubik's Cyrillic is wider than the system sans Russian was painted in: grille
+  names running outside their tile went **4 → 6 of 15** at 320, 390, 768 and
+  1024 px — "Геометрические", "Переплетённые", "Виноградная", each one word wider
+  than an 80 px tile. That is a regression this change made, so it was fixed, not
+  recorded: `.tile__name` takes `hyphens: auto` (the page carries `lang`; Chrome
+  on Android and Safari hyphenate Russian) and `overflow-wrap: anywhere` as the
+  backstop where no dictionary is installed. **0 of 15**, which also closes the
+  four that were already there (§9's "Russian labels overrun their tiles"). Where
+  no dictionary exists — headless Linux — the break falls without a hyphen
+  ("Геометри / ческие"), inside the tile. English and Hebrew unchanged; the
+  "Needs a w…" clip §9 records at 1024×768 was ALREADY gone at `9abc298`, so it
+  is not this change's to claim.
+
+  **ASSERTED.** `npm test`, a new group: nothing loads from outside the folder
+  (`src`, `<link href>`, `url(`, comments stripped); every face's file exists
+  and carries its current stamp; each script has a face in both families; each
+  `"Rubik Fallback"` rule covers exactly one Rubik face's range and puts the line
+  box at Rubik's 93.5 / 25; `--sans` puts the fallback directly behind Rubik;
+  the price, `<h1>` and band are `--display`; the four captions are off `--mono`.
+  Falsified six ways, each firing only its own clause: the Google loader back; a
+  font file changed with its stamp kept; the fallback's Hebrew range drifted; an
+  override not re-derived for its size-adjust (the ascent read 106.79); a caption
+  back in mono; the price back in Georgia.
+  `npm run audit`, a new per-view clause: the body, the price, the `<h1>` and the
+  band compute to their face AND the FontFace the browser would match for that
+  element's weight, over every character on it, is `loaded` — at the first
+  viewport in all three languages. ⚠ **Its first form used
+  `document.fonts.check`, which returns TRUE for a face in the `error` state** —
+  it only reports faces still loading — so it could never have caught a failed
+  load; rewritten to read the faces' status. ⚠ **Its second form checked "any
+  face of that family covering the character"**, and a missing Bona Nova 700
+  Cyrillic was masked by the loaded 400 Cyrillic on the `<h1>`; it matches by
+  weight now. Falsified three ways: the Hebrew Rubik file truncated, the 700
+  Cyrillic Bona Nova removed, the band back in the text face.
+
+  **RECORDED WITH IT.** `research/fonts/` carries the sheet, its note and the
+  scripts that made and measured it (`fetch.py`, `contact.mjs`, `compose.mjs`,
+  `measure.mjs`); the candidate files and crops they fetch are gitignored. 28.8
+  cited `tools/_font/measure.mjs`, a gitignored path nobody else could open.
+  README.md's size figures (823 KB on disk, 288 KB over the wire) dated from
+  `63f8ddb` and were already wrong: it was 1,147 KB and 389 KB before this
+  change, and is 1,312 KB and ~500 KB for a Hebrew visit after it. The fonts are
+  its third kind of deletable file.
+
+  **GATES.** `node --check js/renderer.js`, `npm run build`, `npm test`
+  **9,440,830 passed / 5 failed** — the five sheet-staleness rows (shot, recreate,
+  corpus, against, lockset: the freshness hash covers `css/` and `index.html`),
+  allowed on an intermediate commit. `npm run audit` was running when this was
+  committed — the order runs it after this commit — clean through its first
+  four viewports; its verdict is recorded with the next commit. Sheets: 0 bare
+  may move (the drawing carries no text, and `?bare=1` hides the chrome); they
+  are regenerated once, after commit 10.
+
 - **28.9 — THE DIGITAL VIEWER NO LONGER FOLLOWS THE פרזול.** The owner's son,
   shown it in nickel, white and gold: *"i want you to remove the pirzul effect
   from them, quick fix."* The bezel is `#lockUnit`, the constant steel of the
@@ -1627,6 +1761,17 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** The record (8 of 8): §0a — the placements they make themselves and
+  the five decisions taken for them; §0c's gates; §3's flow; §5.28–29; §9's
+  wall table and breakdown window re-measured (unchanged by the band). The
+  big round is closed: `npm test` 0 failed, the audit clean. Long form:
+  `HISTORY.md`.
+- **27.9** The swing bar lock and the פרזול tiles (7 of 8): `LATCHES`, `lt=`,
+  one bit, `VERSION` 26; price to follow (`null` + `priceTBD`, A22 — "מחיר
+  בהמשך", "—", "(מחיר יימסר)", out of the total); drawn at the head of the
+  closing edge in `#nickel` (published dimensions; fitted inside in reality —
+  asked, §0k); each פרזול tile is this door's metal. 0 bare sheets moved, as
+  predicted. Long form: above.
 - **27.9** The summary as pictures (6 of 8): *"show the icons of all the
   things the person chose … clicking one takes them to that section."* A
   button per spec row, the tile's own glyph (the colour its swatch) and the

@@ -13,7 +13,7 @@
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=e43fd687">
+<link rel="stylesheet" href="css/app.css?v=8358aaa1">
 
 <!-- ⚠ THE PHOTOGRAPHED ROOM, IN TWO CROPS, AND ONLY ONE IS EVER FETCHED.
      The owner supplied the same entrance framed 3:4 and 16:9 and both ship:
@@ -49,58 +49,73 @@
 <link rel="prefetch" as="image" id="room-src" href="assets/room.webp?v=99dcfd43">
 <link rel="prefetch" as="image" id="room-wide-src" href="assets/room-wide.webp?v=c5d1d6af">
 
-<!-- ⚠ THE ONE THING THIS PAGE LOADS FROM ANYWHERE ELSE, AND IT IS AN
-     ENHANCEMENT, NEVER A DEPENDENCY.
+<!-- ⚠ THE PAGE'S OWN TYPE, AND IT IS IN THE FOLDER — 28.9.2026. The owner's son:
+     *"change the font — find a font or download from the web, apply the fonts
+     to the whole text, Hebrew first."* Two faces, both under the SIL Open Font
+     License (the licence texts sit beside the files in `assets/fonts/`):
 
-     `README.md` promises three files that open from a folder with no server,
-     and that promise still holds: with no network — which is every `file://`
-     load, and therefore every screenshot and every audit route this repository
-     takes — Assistant never arrives and the page renders in the stack behind
-     it. So the OFFLINE path is the one that is continuously verified, which is
-     the right way round for a page most customers open on a phone.
+       · RUBIK, the text face, for everything — and it is the face Peretz's own
+         site already sets every word in (`research/works/css-14.css`: its
+         `--sans` AND its `--serif` are Rubik). Hebrew, Latin and Cyrillic in one
+         variable file per script, weights 300–900.
+       · BONA NOVA, the display face, for the price, the `<h1>` and the band's
+         title — a serif with Hebrew, Latin AND Cyrillic, the only one of the
+         four display candidates that covers Russian.
 
-     ⚠ IT DOES NOT BLOCK THE FIRST PAINT. A plain stylesheet `<link>` is
-     render-blocking for the whole document, which would trade the one thing
-     the reference sites actually agree on — restraint and speed over
-     decoration — for a typeface. `media="print"` makes it non-blocking and the
-     `onload` promotes it the moment it has arrived. No `<noscript>` twin: if
-     scripting is off the font simply does not load, which is the case this
-     whole arrangement is built to survive.
+     The pick, the rejections and the contact sheet of the real page they were
+     judged on are `research/fonts/contact.png`; name another face and it is
+     these nine rules and nine files.
 
-     ⚠ AND THE SWAP MOVES NOTHING, because the FALLBACK is tuned to Assistant
-     rather than the other way round — see `@font-face "Assistant Fallback"` in
-     css/app.css and the four measured numbers behind it.
+     ⚠ NOTHING IS FETCHED FROM ANYWHERE ELSE ANY MORE. Assistant came from Google
+     Fonts on `http(s)` only, which meant every `file://` load — every
+     screenshot, every audit route, Peretz's laptop — rendered WITHOUT the
+     webfont, and the Russian page had never been in it at all (Assistant has no
+     Cyrillic). The files are local now, so the page the instruments measure is
+     the page a customer sees, and README.md's promise is literal: opened from a
+     folder or a server, the page makes no request outside its own folder.
 
-     ⚠ AND IT IS ONLY ASKED FOR WHERE THERE IS SOMEWHERE TO ASK. This was a
-     plain `<link>` first, and `npm run audit` caught the cost inside one run:
-     every `file://` load — every screenshot, every audit route, every
-     measurement this repository takes, and Peretz's own laptop with the folder
-     open — fired a request that cannot resolve, and Chromium logged
-     `net::ERR_CONNECTION_RESET` **four times per page**. The audit counts a
-     console error as a fault, correctly; it also waits for `load`, so the run
-     went from about 15 minutes to 24.
+     ⚠ ONE FILE PER SCRIPT, BEHIND ITS `unicode-range`, so a browser downloads
+     only the scripts on screen: a Hebrew page takes the Hebrew and Latin files
+     (digits and punctuation are Latin-range), about 114 KB, and never the
+     Cyrillic. `font-display: swap` — the first paint never waits — and the
+     swap moves nothing measurable, because `--sans` puts a fallback tuned to
+     Rubik directly behind it (`@font-face "Rubik Fallback"` in css/app.css,
+     one rule per script, the measurements beside it).
 
-     Teaching the audit to ignore that class of error was the obvious fix and
-     it is the wrong one — an instrument taught to ignore a kind of error will
-     ignore the real one. Not making the request is the right one: a font is
-     only useful where there is a network, so it is asked for on `http(s)` and
-     nowhere else, and the README's promise becomes literally true again —
-     opened from a folder this page makes no network request at all.
-
-     Written as three lines of script rather than a tag, with the same
-     discipline: `media` starts at `print` so it can never block the first
-     paint, and `onload` promotes it when it has arrived. With scripting off
-     there is no font, which is exactly the case this whole arrangement exists
-     to survive. -->
-<script>
-  if (/^https?:$/.test(location.protocol)) {
-    document.head.insertAdjacentHTML('beforeend',
-      '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-      + '<link rel="stylesheet" media="print" onload="this.media=&quot;all&quot;"'
-      + ' href="https://fonts.googleapis.com/css2?family=Assistant'
-      + ':wght@300;400;500;600&display=swap">');
-  }
-</script>
+     ⚠ THE URLS LIVE HERE AND NOWHERE ELSE, as the rooms' do: `tools/build.mjs`
+     stamps each with its file's hash, fails the build if a file in
+     `assets/fonts/` is not named here, and `css/app.css` names families, never
+     files. DELETE THE FOLDER AND THE PAGE IS COMPLETE — the stack behind each
+     face paints, exactly as it did before 28.9. -->
+<style>
+@font-face { font-family: "Rubik"; font-style: normal; font-weight: 300 900; font-display: swap;
+  src: url("assets/fonts/rubik-cyrillic.woff2?v=bdb2b33a") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: "Rubik"; font-style: normal; font-weight: 300 900; font-display: swap;
+  src: url("assets/fonts/rubik-hebrew.woff2?v=197b6dbe") format("woff2");
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+@font-face { font-family: "Rubik"; font-style: normal; font-weight: 300 900; font-display: swap;
+  src: url("assets/fonts/rubik-latin.woff2?v=691cd1d9") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Bona Nova"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("assets/fonts/bonanova-400-cyrillic.woff2?v=1191c16b") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: "Bona Nova"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("assets/fonts/bonanova-400-hebrew.woff2?v=8afed45a") format("woff2");
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+@font-face { font-family: "Bona Nova"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("assets/fonts/bonanova-400-latin.woff2?v=b7aa3adb") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Bona Nova"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("assets/fonts/bonanova-700-cyrillic.woff2?v=fe67a610") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: "Bona Nova"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("assets/fonts/bonanova-700-hebrew.woff2?v=536ff93f") format("woff2");
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+@font-face { font-family: "Bona Nova"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("assets/fonts/bonanova-700-latin.woff2?v=c5b83caa") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+</style>
 </head>
 <body>
 

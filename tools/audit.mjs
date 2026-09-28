@@ -153,6 +153,81 @@ for (const v of VIEWS) {
      the day the default changes. */
   setLang(await p.evaluate(() => document.documentElement.lang) || 'he', null);
 
+  /* ⚠ THE PAGE'S OWN TYPE IS WHAT IS PAINTED — 28.9.2026. Rubik and Bona Nova
+     are local files now, and a face that fails to load or to decode falls back
+     to the stack IN SILENCE: the unit suite proves the files exist and are
+     stamped, and only a browser can say they were used. So, at every viewport:
+     the body, the price figure, the `<h1>` and the band's title compute to their
+     face, and `document.fonts.check` confirms that face is available FOR THE
+     TEXT ACTUALLY ON THEM — which is what catches a script subset that did not
+     arrive. At the first viewport the other two languages are loaded as well,
+     because each has its own file and a Hebrew page never asks for them. */
+  for (const lang of v === VIEWS[0] ? [null, 'ru', 'en'] : [null]) {
+    if (lang) {
+      await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
+      await p.waitForTimeout(300);
+    }
+    const type = await p.evaluate(() => {
+      const fam = e => e ? getComputedStyle(e).fontFamily.split(',')[0].replace(/"/g, '').trim() : null;
+      const said = e => (e && e.textContent.trim()) || '';
+      /* ⚠ NOT `document.fonts.check`: it answers true for a face in the
+         `error` state (it only reports faces still loading), so it cannot see
+         the one failure this clause is for. Instead: for every character on
+         the element, the FontFace of that family whose unicode-range covers
+         it, and its status. */
+      const ranges = r => r.split(',').map(x => x.trim().replace(/^U\+/i, '')).map(x => {
+        const [a, b2] = x.split('-'); return [parseInt(a, 16), parseInt(b2 || a, 16)];
+      });
+      const faces = [...document.fonts].map(ff => {
+        const [lo, hi] = String(ff.weight).split(/\s+/).map(Number);
+        return { fam: ff.family.replace(/"/g, ''), st: ff.status, rs: ranges(ff.unicodeRange), lo, hi: hi || lo };
+      });
+      /* ⚠ THE FACE THE BROWSER WOULD PICK FOR THIS WEIGHT, not any face that
+         covers the character: Bona Nova's 400 Cyrillic file loaded on the
+         `<h1>` masked a missing 700 Cyrillic under the band's title until this
+         matched weights (falsified, 28.9). CSS Fonts' rule, reduced to what two
+         static weights and one variable range need: a face whose range holds
+         the weight, else the nearest — heavier first above 500, lighter first
+         at or below it. */
+      const pick = (cands, w) => cands.find(x => w >= x.lo && w <= x.hi)
+        || cands.slice().sort((a, b2) => {
+          const d = x => (w > 500 ? (x.lo >= w ? x.lo - w : 1000 + w - x.hi) : (x.hi <= w ? w - x.hi : 1000 + x.lo - w));
+          return d(a) - d(b2);
+        })[0];
+      const missing = (f, w, text) => [...new Set([...text].filter(c => c.trim()))].filter(c => {
+        const cp = c.codePointAt(0);
+        const cover = faces.filter(x => x.fam === f && x.rs.some(([a, b2]) => cp >= a && cp <= b2));
+        const used = cover.length && pick(cover, w);
+        return used && used.st !== 'loaded';
+      });
+      const els = { body: document.body, price: document.querySelector('.quote__price .send__figure'),
+                    h1: document.querySelector('.stage__h1'), band: document.querySelector('.band__title') };
+      const out = { lang: document.documentElement.lang };
+      for (const [k, e] of Object.entries(els)) {
+        const f = fam(e);
+        const text = k === 'body'
+          ? said(document.querySelector('.sect:not([hidden]) .field__hint, .sect:not([hidden]) h3, .band__now')) || said(els.h1)
+          : said(e);
+        const m = e && text ? missing(f, +getComputedStyle(e).fontWeight, text) : [];
+        const covered = faces.some(x => x.fam === f);
+        out[k] = { found: !!e && !!text, family: f, text: text.slice(0, 40), covered, missing: m.join('') };
+      }
+      return out;
+    });
+    for (const [k, want] of [['body', 'Rubik'], ['price', 'Bona Nova'], ['h1', 'Bona Nova'], ['band', 'Bona Nova']]) {
+      const r = type[k];
+      if (!r.found) { fault(v.name, `the ${k} is not on the page, or says nothing — the type check has lost its subject`); continue; }
+      if (r.family !== want) fault(v.name, `${type.lang}: the ${k} computes to "${r.family}", not ${want}`);
+      else if (!r.covered) fault(v.name, `${type.lang}: no @font-face of ${want} is declared — the ${k} paints the fallback`);
+      else if (r.missing) fault(v.name, `${type.lang}: ${want} did not load for "${r.missing}" on the ${k} ("${r.text}") — `
+        + 'its file or its script subset failed, and the page is painting the fallback in silence');
+    }
+  }
+  if (v === VIEWS[0]) {
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForTimeout(400);
+  }
+
   /* The cabinet: on first paint the customer must see the four SECTIONS and
      nothing else — no category headings and no options. That is the whole
      change, so it is asserted rather than assumed; a regression here looks

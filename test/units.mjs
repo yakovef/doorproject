@@ -5320,6 +5320,84 @@ group('a new build reaches a browser that has been here before');
   }
 }
 
+/* ── THE PAGE'S TYPE IS IN THE FOLDER, AND NOTHING ELSE IS FETCHED — 28.9 ──
+   The owner's son: *"change the font — find a font or download from the web,
+   apply the fonts to the whole text, Hebrew first."* Rubik and Bona Nova are
+   local now, so four things can go wrong without a pixel saying so, and each
+   clause below is one of them:
+     · a request to somewhere else creeps back in — the README promises the
+       page asks nothing outside its folder, and until 28.9 it asked Google;
+     · a font file is replaced and its URL keeps the old stamp, so a returning
+       browser paints last month's glyphs — the rooms' reason, above;
+     · the fallback's per-script ranges drift from the faces' — the measured
+       `size-adjust` for a script then lands on the WRONG script's characters,
+       and the swap reflows the paragraph it was measured to protect. One
+       statement in two files, §5.16's shape: asserted equal, rule by rule;
+     · a Hebrew caption goes back to `--mono`, which has no Hebrew (§9, closed).
+   Where a clause finds its subject by a pattern it asserts the pattern found
+   something (§5.15). */
+group('the page\'s type is in its own folder, stamped, and its fallback covers what it swaps from');
+{
+  const html = readFileSync('index.html', 'utf8');
+  const css = readFileSync('css/app.css', 'utf8');
+  const stamp = f => createHash('sha256').update(readFileSync(f)).digest('hex').slice(0, 8);
+  /* 1. No request leaves the folder. A navigation (`<a href>`) is not a request,
+     and neither is a data URI; everything that LOADS is `src=`, a `<link>`'s
+     `href` or a CSS `url(`. Comments are prose, stripped first. */
+  const code = s => s.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  const loads = [
+    ...[...code(html).matchAll(/<(?:script|img|iframe|source)\b[^>]*\bsrc="([^"]+)"/g)].map(m => m[1]),
+    ...[...code(html).matchAll(/<link\b[^>]*\bhref="([^"]+)"/g)].map(m => m[1]),
+    ...[...code(html + css).matchAll(/url\(\s*["']?([^"')]+)/g)].map(m => m[1]),
+  ];
+  ok(loads.length >= 12, `found ${loads.length} loaded URLs in the page — the scan has lost its subject`);
+  const away = loads.filter(u => /^(?:[a-z]+:)?\/\//i.test(u) && !/^data:/i.test(u));
+  ok(!away.length, `the page loads from outside its folder: ${away.join(', ')} — README.md promises it asks nothing of anywhere else`);
+  ok(!/<script>[^<]*googleapis|fonts\.gstatic/.test(code(html)), 'the Google Fonts loader is back in the head');
+  /* 2. Every face's file exists, is stamped, and the stamp is its content. */
+  const faces = [...code(html).matchAll(/@font-face\s*\{[^}]*font-family:\s*"([^"]+)"[^}]*url\("(assets\/fonts\/[^"?]+)(?:\?v=([0-9a-f]+))?"\)[^}]*unicode-range:\s*([^;]+);/g)]
+    .map(m => ({ family: m[1], file: m[2], v: m[3], range: m[4].replace(/\s+/g, '') }));
+  ok(faces.length === 9, `the head declares ${faces.length} faces, not Rubik's three scripts and Bona Nova's two weights × three`);
+  for (const f of faces) {
+    ok(existsSync(f.file), `${f.family} names ${f.file}, which is not in the folder — the face falls back in silence`);
+    if (!existsSync(f.file)) continue;
+    ok(f.v === stamp(f.file), `${f.file} is stamped ?v=${f.v} and hashes to ${stamp(f.file)} — run npm run build`);
+  }
+  for (const fam of ['Rubik', 'Bona Nova']) {
+    ok(faces.some(f => f.family === fam), `no @font-face for ${fam} in the head`);
+    for (const script of ['0590-05FF', '0400-045F', '0000-00FF'])
+      ok(faces.some(f => f.family === fam && f.range.includes(script)),
+        `${fam} has no face covering U+${script} — one of the three languages paints in the fallback`);
+  }
+  /* 3. The fallback: one rule per Rubik face, over exactly its range. */
+  const fb = [...code(css).matchAll(/@font-face\s*\{[^}]*font-family:\s*"Rubik Fallback"[^}]*unicode-range:\s*([^;]+);[^}]*size-adjust:\s*([\d.]+)%;\s*ascent-override:\s*([\d.]+)%;\s*descent-override:\s*([\d.]+)%/g)]
+    .map(m => ({ range: m[1].replace(/\s+/g, ''), sa: +m[2], asc: +m[3], desc: +m[4] }));
+  const rubik = faces.filter(f => f.family === 'Rubik');
+  ok(fb.length === rubik.length && rubik.length === 3,
+    `"Rubik Fallback" has ${fb.length} rules for Rubik's ${rubik.length} faces — one per script, or a script swaps unmeasured`);
+  for (const r of rubik) {
+    const m = fb.find(x => x.range === r.range);
+    ok(m, `no "Rubik Fallback" rule over exactly ${r.file}'s range — its characters take another script's size-adjust`);
+    /* Rubik is 935 / 250 per 1000; each override is that over the script's size-adjust, so the line box is Rubik's on every script. */
+    if (m) ok(Math.abs(m.asc * m.sa / 100 - 93.5) < 0.05 && Math.abs(m.desc * m.sa / 100 - 25) < 0.05,
+      `the fallback over ${r.file} puts the ascent at ${(m.asc * m.sa / 100).toFixed(2)} and the descent at ${(m.desc * m.sa / 100).toFixed(2)} — Rubik's are 93.5 and 25, so the line box moves on the swap`);
+  }
+  ok(/--sans:\s*"Rubik",\s*"Rubik Fallback"/.test(css), '`--sans` does not put the tuned fallback directly behind Rubik');
+  ok(/--display:\s*"Bona Nova"/.test(css) && !/var\(--serif\)|--serif:/.test(code(css)),
+    '`--display` is not Bona Nova, or `--serif` is still in use');
+  for (const sel of ['.stage__h1 {', '.band__title {', '.quote__price .send__figure {']) {
+    const i = css.indexOf(sel);
+    ok(i >= 0, `no \`${sel}\` rule — this clause has lost its subject`);
+    if (i >= 0) ok(/var\(--display\)/.test(css.slice(i, css.indexOf('}', i))), `\`${sel}\` is not set in the display face`);
+  }
+  /* 4. The four Hebrew captions §9 named are in a face with Hebrew. */
+  for (const sel of ['.swatch__meta {', '.tile__meta {', '.tile__why {', '.sheet__dims {']) {
+    const i = css.indexOf(sel);
+    ok(i >= 0, `no \`${sel}\` rule — this clause has lost its subject`);
+    if (i >= 0) ok(!/var\(--mono\)/.test(css.slice(i, css.indexOf('}', i))), `\`${sel}\` is in --mono, which has no Hebrew (§9)`);
+  }
+}
+
 /* ── ONE ACCENT, RATIONED, AND THE LIST IS THE POINT ──────────────────
    `DESIGN-LEVEL.md` §1.3 and §5. The whole visual argument of this page is
    *"the product is the only colour"* — the door is warm and saturated and
