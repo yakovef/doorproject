@@ -3385,8 +3385,18 @@ ${stops}
   var MOULD_BAND = 70;
   var BAR_GAP = 0.125;
   var BAR_GAP_MIN = 0.09;
-  var GRAB = { fromTop: 0.59, len: 280, ratio: 1 / 15, post: [0.175, 0.825] };
-  var GRAB_D = GRAB.len * GRAB.ratio;
+  var GRAB = { fromTop: 0.59, len: 300, d: 25.5, post: [0.175, 0.825], rose: 21, ball: 14 };
+  var GRAB_END = {
+    knob: [0, 9, 13],
+    neck: [8, 13, 8.5],
+    finial: [13, 25, 28],
+    stem: [25, 36, 12],
+    inner: [65, 75, 13],
+    // the ball's own neck, toward the shaft
+    collar: [75, 82, 28.5]
+    // the ring the shaft ends in
+  };
+  var GRAB_D = GRAB.d;
   var PLATE = {
     w: 88.5,
     // 87.3 / 91.7 / 86.5 by edge profile (87 / 93 / 90 off a ruled grid); was 90
@@ -5944,7 +5954,7 @@ ${body}
     const along = (offsets, r) => offsets.map((d) => p.rot === 90 ? { x: cx + d, y: cy, r } : { x: cx, y: cy + d, r });
     if (handle.style === "grab") {
       const dirX = hingeLeftOf(state2) ? -1 : 1;
-      const r = GRAB_D * 0.9;
+      const r = GRAB.rose;
       return GRAB.post.map((t) => ({ x: cx + dirX * GRAB.len * t, y: cy, r }));
     }
     if (handle.style === "shiran") {
@@ -7305,8 +7315,16 @@ ${body}
          position at all on a standard leaf carrying a lever.
          The bow now starts at its axis and runs GRAB.len inboard, and this says
          exactly that. `npm run collide -- boxes` checks it against the art. */
+      /* ⚠ `in` IS GRAB.len + 5 SINCE 28.9, AND IT WAS + 10. The bow went 280 →
+         300 off four installed doors, and at + 10 the DECLARED box stood 0.5 mm
+         past the trio's plate field on the standard leaf — where the owner's
+         son's 24.9 rule wants the bow wholly inside it — while the DRAWN bar
+         stands 9.5 mm clear of the moulding each side. The margin is for the
+         drawing's strokes; the drawn metal ends at exactly GRAB.len (`npm run
+         collide -- boxes`: 0 / 300 / 21). Five covers that. The bar was not
+         shortened to pass the rule: 297 and 298 were measured. */
       case "grab":
-        return { out: 4, in: GRAB.len + 10, vy: 26 };
+        return { out: 4, in: GRAB.len + 5, vy: 26 };
       /* ⚠ `vy` IS A REACH FROM THE AXIS, not half a height, and for these four
          the two are not the same number. `cy` is the LEVER SPINDLE and it sits
          0.30 down a backplate, so the plate hangs 0.70 of its height below the
@@ -7513,65 +7531,78 @@ ${body}
     </g>`;
   }
   function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
-    const D = GRAB_D;
     const by = cy;
     const x0 = dir > 0 ? cx : cx - GRAB.len;
     const L2 = GRAB.len;
-    const P = (f) => x0 + L2 * f;
     const n1 = (v) => v.toFixed(1);
-    const rod = (a, b, hh, rx, fill) => `
-      <rect x="${n1(P(a))}" y="${n1(by - hh)}" width="${n1(P(b) - P(a))}"
-            height="${n1(hh * 2)}" rx="${n1(rx)}" fill="${fill}"/>`;
-    const POST = GRAB.post;
-    const drew = { x: x0, y: by - D * 0.85, w: L2, h: D * 1.7 };
+    const both = (f) => f((m) => x0 + m) + f((m) => x0 + L2 - m);
+    const span = (at, [a, b, dia], fill, rx = dia / 2) => {
+      const x1 = Math.min(at(a), at(b)), x2 = Math.max(at(a), at(b));
+      return `
+        <rect x="${n1(x1)}" y="${n1(by - dia / 2)}" width="${n1(x2 - x1)}" height="${n1(dia)}"
+              rx="${n1(Math.min(rx, (x2 - x1) / 2))}" fill="${fill}"/>`;
+    };
+    const posts = GRAB.post.map((t) => x0 + L2 * t);
+    const [f0, f1, fd] = GRAB_END.finial, fPeak = 18.5;
+    const finial = (at) => `
+        <path d="M ${n1(at(f0))} ${n1(by - GRAB_END.neck[2] / 2)} L ${n1(at(fPeak - 1))} ${n1(by - fd / 2)}
+                 L ${n1(at(fPeak + 1))} ${n1(by - fd / 2)} L ${n1(at(f1))} ${n1(by - GRAB_END.stem[2] / 2)}
+                 L ${n1(at(f1))} ${n1(by + GRAB_END.stem[2] / 2)} L ${n1(at(fPeak + 1))} ${n1(by + fd / 2)}
+                 L ${n1(at(fPeak - 1))} ${n1(by + fd / 2)} L ${n1(at(f0))} ${n1(by + GRAB_END.neck[2] / 2)} Z"
+              fill="url(#gripHard)"/>
+        <path d="M ${n1(at(fPeak - 1))} ${n1(by - fd / 2 + 1.2)} L ${n1(at(fPeak + 1))} ${n1(by - fd / 2 + 1.2)}"
+              stroke="#fff" stroke-opacity="0.45" stroke-width="1.6"/>`;
+    const [k0, k1, kd] = GRAB_END.knob;
+    const knob = (at) => `
+        <ellipse cx="${n1((at(k0) + at(k1)) / 2)}" cy="${n1(by)}" rx="${n1((k1 - k0) / 2)}" ry="${n1(kd / 2)}"
+                 fill="url(#gripHard)"/>`;
+    const drew = { x: x0, y: by - GRAB.rose, w: L2, h: GRAB.rose * 2 };
     const svg = `
     <g>
       <g data-hw="grab">
         <!-- The shadow is a tight band under the shaft and two rounder, darker
-             pools under the posts, because only the posts stand proud. It was
-             a diagonally offset copy of the whole bar, which is what a flat
-             cut-out throws, not a turned spindle on two feet. -->
-        <rect x="${n1(P(0.1))}" y="${n1(by + D * 0.28)}" width="${n1(P(0.9) - P(0.1))}"
-              height="${n1(D * 0.55)}" rx="${n1(D * 0.27)}" fill="#000" opacity="0.22"
+             pools under the posts, because only the posts stand proud. -->
+        <rect x="${n1(x0 + 20)}" y="${n1(by + GRAB_D * 0.28)}" width="${n1(L2 - 40)}"
+              height="${n1(GRAB_D * 0.55)}" rx="${n1(GRAB_D * 0.27)}" fill="#000" opacity="0.22"
               filter="url(#hwShadow)"/>
-        ${POST.map((t) => `
-        <ellipse cx="${n1(P(t) + D * 0.15)}" cy="${n1(by + D * 0.9)}" rx="${n1(D * 1.1)}"
-                 ry="${n1(D * 0.55)}" fill="#000" opacity="0.30" filter="url(#hwShadow)"/>`).join("")}
+        ${posts.map((px) => `
+        <ellipse cx="${n1(px + 3)}" cy="${n1(by + GRAB.rose * 0.8)}" rx="${n1(GRAB.rose * 1.2)}"
+                 ry="${n1(GRAB.rose * 0.55)}" fill="#000" opacity="0.30" filter="url(#hwShadow)"/>`).join("")}
 
-        <!-- The rose behind each ball. Square-on it is concentric with the
-             ball, so all that shows is a ring of it — and that ring is the
-             whole of the standoff anyone is allowed to draw. -->
-        ${POST.map((t) => `
-        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="url(#gripSoft)"/>
-        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="#000" opacity="0.10"/>`).join("")}
+        <!-- The rose on the door behind each ball, 42 across: square-on it is
+             concentric with the ball, so what shows is a ring of it, lit along
+             its head. -->
+        ${posts.map((px) => `
+        <circle cx="${n1(px)}" cy="${n1(by)}" r="${GRAB.rose}" fill="url(#gripSoft)"/>
+        <circle cx="${n1(px)}" cy="${n1(by)}" r="${GRAB.rose}" fill="#000" opacity="0.12"/>
+        <path d="${arcPath(px, by, GRAB.rose - 1.2, 190, 350)}" fill="none"
+              stroke="#fff" stroke-opacity="0.35" stroke-width="1.4"/>`).join("")}
 
-        <!-- Outboard stems, visibly thinner than the shaft; then the terminal
-             beads, which is what every one of these doors ends in. -->
-        ${rod(0.075, 0.155, D * 0.3, D * 0.15, "url(#gripHard)")}
-        ${rod(0.845, 0.925, D * 0.3, D * 0.15, "url(#gripHard)")}
-        ${rod(0.03, 0.078, D * 0.55, D * 0.5, "url(#gripHard)")}
-        ${rod(0.922, 0.97, D * 0.55, D * 0.5, "url(#gripHard)")}
-        ${rod(0, 0.032, D * 0.22, D * 0.11, "url(#gripHard)")}
-        ${rod(0.968, 1, D * 0.22, D * 0.11, "url(#gripHard)")}
-        <!-- the flat rings just outboard of each ball -->
-        ${rod(0.106, 0.124, D * 0.6, D * 0.1, "url(#gripSoft)")}
-        ${rod(0.876, 0.894, D * 0.6, D * 0.1, "url(#gripSoft)")}
+        <!-- The turned ends: a stem out of the post, the double-cone finial, a
+             neck and the knob at the tip; inboard, the ball's neck and the
+             collar ring the shaft ends in. -->
+        ${both((at) => span(at, GRAB_END.stem, "url(#gripHard)"))}
+        ${both((at) => span(at, GRAB_END.neck, "url(#gripHard)"))}
+        ${both(finial)}
+        ${both(knob)}
+        ${both((at) => span(at, GRAB_END.inner, "url(#gripHard)"))}
 
-        <!-- The shaft: constant diameter, and the tone runs ACROSS it. A dark
-             line at the top, a narrow specular at a third down, a broad dark
-             core through the belly and a soft bounce along the bottom. Ours
-             was one flat white ribbon, which is why it looked unlit. -->
-        ${rod(0.2, 0.8, D / 2, D * 0.16, "url(#grabRod)")}
-        <!-- step collars where the shaft meets each ball -->
-        ${rod(0.203, 0.228, D * 0.575, D * 0.2, "url(#gripSoft)")}
-        ${rod(0.772, 0.797, D * 0.575, D * 0.2, "url(#gripSoft)")}
+        <!-- The shaft: constant diameter, and the tone runs ACROSS it (grabRod,
+             read off the photographs: a dark top line, a specular a quarter
+             down, a dark core, a bounce along the bottom). -->
+        ${span((m) => x0 + m, [GRAB_END.collar[1] - 1, L2 - GRAB_END.collar[1] + 1, GRAB_D], "url(#grabRod)", GRAB_D * 0.16)}
+        ${both((at) => span(at, GRAB_END.collar, "url(#grabRod)", 3))}
+        ${both((at) => `
+        <path d="M ${n1(at(GRAB_END.collar[1]))} ${n1(by - GRAB_END.collar[2] / 2 + 1)} v ${n1(GRAB_END.collar[2] - 2)}"
+              stroke="#000" stroke-opacity="0.35" stroke-width="1"/>`)}
 
         <!-- the post balls, turned and standing in front of their roses -->
-        ${POST.map((t) => `
-        <ellipse cx="${n1(P(t))}" cy="${n1(by)}" rx="${n1(D * 0.675)}" ry="${n1(D * 0.725)}"
-                 fill="url(#gripHard)"/>
-        <ellipse cx="${n1(P(t) - D * 0.16)}" cy="${n1(by - D * 0.26)}" rx="${n1(D * 0.34)}"
-                 ry="${n1(D * 0.17)}" fill="#fff" opacity="0.32"/>`).join("")}
+        ${posts.map((px) => `
+        <circle cx="${n1(px)}" cy="${n1(by)}" r="${GRAB.ball}" fill="url(#gripHard)"/>
+        <circle cx="${n1(px)}" cy="${n1(by)}" r="${GRAB.ball}" fill="none" stroke="#000"
+                stroke-opacity="0.30" stroke-width="1.2"/>
+        <ellipse cx="${n1(px - GRAB.ball * 0.3)}" cy="${n1(by - GRAB.ball * 0.4)}" rx="${n1(GRAB.ball * 0.42)}"
+                 ry="${n1(GRAB.ball * 0.22)}" fill="#fff" opacity="0.34"/>`).join("")}
       </g>
     </g>`;
     return { svg, box: drew };
@@ -8714,22 +8745,35 @@ ${plate.defs}${plate.body}
        own silhouette, the lockset has its own list and its own tiles, and a
        customer comparing grips was being shown a lever inside the one option
        that is not a lever. Reported from the outside in those words.
-       What is left traces the drawing on the door: a straight spindle of
-       constant diameter, two posts set INBOARD at 0.175 and 0.825 of the length,
-       and beyond each of them a stem, a ring and a turned terminal bead. */
+       What is left traces the drawing on the door, off the same tables (GRAB,
+       GRAB_END — 28.9, measured off four installed doors): a straight shaft of
+       constant diameter, two posts INBOARD at 0.175 and 0.825 of the length, each
+       a ball on its rose, and beyond each a stem, the double-cone finial, a neck
+       and the knob. Scaled so the bar spans 560 units, as it always has. */
     grab: () => {
-      const L2 = 560, D = L2 / 15, y = 0;
-      const P = (f) => -L2 / 2 + L2 * f;
-      const rod = (a, b, hh, r) => `<rect x="${P(a)}" y="${y - hh}" width="${P(b) - P(a)}" height="${hh * 2}" rx="${r}"/>`;
-      return { box: [-L2 / 2 - 6, -D * 1.1, L2 / 2 + 6, D * 1.1], art: `
-    ${rod(0, 0.032, D * 0.22, D * 0.11)}${rod(0.968, 1, D * 0.22, D * 0.11)}
-    ${rod(0.03, 0.078, D * 0.55, D * 0.5)}${rod(0.922, 0.97, D * 0.55, D * 0.5)}
-    ${rod(0.075, 0.155, D * 0.3, D * 0.15)}${rod(0.845, 0.925, D * 0.3, D * 0.15)}
-    ${rod(0.106, 0.124, D * 0.6, D * 0.1)}${rod(0.876, 0.894, D * 0.6, D * 0.1)}
-    ${rod(0.2, 0.8, D * 0.5, D * 0.16)}
-    ${rod(0.203, 0.228, D * 0.575, D * 0.2)}${rod(0.772, 0.797, D * 0.575, D * 0.2)}
-    <ellipse cx="${P(0.175)}" cy="${y}" rx="${D * 0.675}" ry="${D * 0.725}"/>
-    <ellipse cx="${P(0.825)}" cy="${y}" rx="${D * 0.675}" ry="${D * 0.725}"/>` };
+      const k = 560 / GRAB.len, L2 = GRAB.len;
+      const n = (v) => (v * k).toFixed(1);
+      const at = (m) => m - L2 / 2;
+      const both = (f) => f((m) => at(m)) + f((m) => at(L2 - m));
+      const span = (a2, [a, b, dia], r = dia / 2) => {
+        const x1 = Math.min(a2(a), a2(b)), x2 = Math.max(a2(a), a2(b));
+        return `<rect x="${n(x1)}" y="${n(-dia / 2)}" width="${n(x2 - x1)}" height="${n(dia)}" rx="${n(Math.min(r, (x2 - x1) / 2))}"/>`;
+      };
+      const [f0, f1, fd] = GRAB_END.finial, fp = 18.5;
+      const finial = (a2) => `<path d="M ${n(a2(f0))} ${n(-GRAB_END.neck[2] / 2)} L ${n(a2(fp))} ${n(-fd / 2)}
+      L ${n(a2(f1))} ${n(-GRAB_END.stem[2] / 2)} L ${n(a2(f1))} ${n(GRAB_END.stem[2] / 2)}
+      L ${n(a2(fp))} ${n(fd / 2)} L ${n(a2(f0))} ${n(GRAB_END.neck[2] / 2)} Z"/>`;
+      const [k0, k1, kd] = GRAB_END.knob;
+      const knob = (a2) => `<ellipse cx="${n((a2(k0) + a2(k1)) / 2)}" cy="0" rx="${n((k1 - k0) / 2)}" ry="${n(kd / 2)}"/>`;
+      const posts = GRAB.post.map((t) => at(L2 * t));
+      const R = GRAB.rose * k;
+      return { box: [-L2 * k / 2 - 6, -R - 4, L2 * k / 2 + 6, R + 4], art: `
+    ${posts.map((x) => `<circle cx="${n(x)}" cy="0" r="${n(GRAB.rose)}" opacity="0.55"/>`).join("")}
+    ${both((a2) => span(a2, GRAB_END.stem))}${both((a2) => span(a2, GRAB_END.neck))}
+    ${both(finial)}${both(knob)}${both((a2) => span(a2, GRAB_END.inner))}
+    ${span(at, [GRAB_END.collar[1] - 1, L2 - GRAB_END.collar[1] + 1, GRAB.d], GRAB.d * 0.16)}
+    ${both((a2) => span(a2, GRAB_END.collar, 2))}
+    ${posts.map((x) => `<circle cx="${n(x)}" cy="0" r="${n(GRAB.ball)}"/>`).join("")}` };
     },
     /* Pull bars.
        ⚠ THE BOX IS FIXED, and it has to be. Every other glyph here scales its

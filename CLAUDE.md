@@ -178,6 +178,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** **The bow** (`grab`) redrawn off four installed doors (*"now i want
+  you to copy the horizontal handle"*): 300 tip to tip (was 280), a 25.5 shaft
+  (was 18.7), posts at 0.175/0.825 confirmed, 42 mm roses with 28 mm balls, a
+  double-cone finial and a knob at each end (`GRAB`, `GRAB_END`). Footprint
+  `in` + 10 → + 5 (the trio's field, §9); channel + Coral + bow no longer fits
+  on two sizes. Sheets: `against-grab` only.
 - **28.9** **כדור על אורך** (`knobplate`) redrawn off ONE photograph (*"i only
   have one image of this but i want it in … refine it"*): a waisted plate 90 ×
   216 (waist 70 at 0.54 — the עילי's family, 8 mm narrower), a 54 mm knob on a
@@ -212,12 +218,6 @@ lines here. Dates are the day of the change.
   short name (the colour's code — ours, §0a), "label: value" its name, at every
   width; `#spec` no longer `aria-hidden` (§5.29). 1280×720: 4 of 8 tiles whole
   above the send (was 3). Long form: `HISTORY.md`.
-- **27.9** The confirm dialog (5 of 8): *"…a window to pop up before you remove
-  the other thing … a red button that says yes and a black that says no."*
-  `#confirm` replaces `#clash`; `displacedBy` (pure, `rules.js`) on a dry run
-  of the tap decides; the sentence is the spec rows' values; `--danger`
-  6.57:1. Peretz's refusals (handle/bow against window or face) stand. The
-  fuzzer answers yes and no. Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -889,7 +889,11 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
   absent — aliased onto a bar it would charge ₪500 for a ₪300 bow in silence.
   One home per face, no ladder (`bowHome` = `gripIdeal` of `bowState`): plain
   0.59, the trio's plate field, the Greek band, the pair's rail — under the
-  window the rail is read off `faceObstacles`. Drawn first, as
+  window the rail is read off `faceObstacles`. **Measured off four installed
+  doors since 28.9** (`research/handles/bow/`): 300 tip to tip, a 25.5 mm
+  shaft, posts at 0.175 / 0.825 on 42 mm roses with 28 mm balls, and at each
+  end a stem, a double-cone finial, a neck and a 13 mm knob — `GRAB` and the
+  `GRAB_END` table, read by the door and the tile alike. Drawn first, as
   `<g data-hw="bow">` round the inner `data-hw="grab"`; the ONE
   `data-hw="handle"` on a door is the bar's. **Ranking: face and window > bow
   > bar > lever** — beside the strip the bow is greyed (`bowObstacle`,
@@ -1553,6 +1557,18 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   on those doors. Not fudged: 66.5–72.5 was measured. If it matters, the
   choice is a product one — accept it, or ask whether the Coral's lock really
   sits that close to a bar on an oversize door.
+- **The bow's measured 300 mm costs two things** (28.9, `research/handles/bow/`).
+  (1) **The trio's handle plate is 287 mm of flat field on the standard leaf**
+  (Peretz's 0.23 inset) and the owner's son's 24.9 rule wants the bow wholly
+  inside it: the drawn bar stands 9.5 mm clear each side, and the declared
+  footprint only fits because its `in` margin went + 10 → + 5 (the drawn metal
+  ends at exactly `GRAB.len`). A wider bow, or a margin put back, refuses the
+  trio on the standard and double sizes. (2) **The recessed channel, a Coral
+  blade (`coral`, `square`) and the bow no longer go together** on `standard`
+  and `half` — 8 designs in the collide sweep: the centred bar's tip is 10 mm
+  nearer the lock, and the channel no longer fits between it and the 133 mm
+  blade, so the lever yields to the cylinder (Peretz's ranking). Geometry, not
+  a margin: with no outboard margin at all the 8 stay refused.
 - **The escutcheon under every lever but the Coral** (27.9, read, not fixed):
   three curved-lever doors carry three different cylinder guards — an open euro
   profile shaped like an egg, widest at the plug and narrowing down (ours WIDENS

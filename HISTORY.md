@@ -26,6 +26,41 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — THE BOW (`grab`) REDRAWN OFF FOUR INSTALLED DOORS.** The owner's son,
+  with four photographs: *"now i want you to copy the horizontal handle."* Same
+  product, id, place and price; the drawing had been built from corpus
+  thumbnails at a few pixels a fitting.
+  · **Read** (`research/handles/bow/`): doors 1-3 square-on, each scaled by its
+    leaf's height at the bow's column (0.546 / 0.521 / 0.548 px/mm); door 4 from
+    the side, fractions along the bar only. Door 2's black bow on white gave a
+    threshold silhouette along the bar; edge profiles across each shaft; door 1
+    the rose and ball (a copper ball on a darker rose).
+  · **What moved:** 280 → **300** tip to tip (297 / 298 / ~305); the shaft 18.7 →
+    **25.5** (25.3 / 25.7 by edge profile; 1:15 → 1:11.8); the rose 34 → **42**;
+    the ball ~26 → **28**; the ends — a 20 mm bead with a 9 mm stub and a flat
+    22 mm ring — → a stem, a **double-cone finial** 28 across at 18.5 from the
+    tip, a neck and a **13 mm knob** (`GRAB_END`, one table for both ends);
+    the collar a ring in the shaft's own tone (`grabRod`) where it had been a
+    lighter flat one. **The posts at 0.175 / 0.825 were confirmed** (0.167-0.18,
+    0.82-0.833) and did not move; nor did the shaft's tone across (`grabRod`).
+    `gripFeet` reads the rose as the foot (`GRAB.rose`, was 0.9 D = 16.8).
+    The tile is drawn from the same tables. Posts 192 apart with 54 outboard:
+    a stock 300 pull on 192 centres, which the photographs fit and do not prove.
+  · **Found by the collide count dropping 1,646 → 1,634, traced before
+    accepting it.** (1) The trio refused the bow on `standard` and `half`
+    ("the feet on the panel's frame"): not the feet — the owner's son's 24.9
+    rule that the bow lie WHOLLY inside a panel's field, read off the DECLARED
+    box (`in: GRAB.len + 10` = 310), which stood 0.5 mm past the 287 mm plate
+    field while the drawn 300 bar stands 9.5 mm clear. The margin is for
+    strokes and the drawn metal ends at exactly 300, so `+ 5`; the bar was not
+    shortened to pass. (2) Channel + Coral (and `square`) + bow on `standard`
+    and `half`, 8 designs: the tip 10 mm nearer the lock leaves the channel no
+    room beside the 133 mm blade, so the lever yields (Peretz's ranking).
+    Checked to be geometry: with the outboard margin at 0 the 8 stay refused.
+    Both in `CLAUDE.md` §9.
+  · Sheets: `against-grab` only (bare); no gallery door carries the bow, and
+    `js/works.js` did not move. New: `research/handles/bow/sheet-photo-before-
+    now.webp`, `…/doors-before-now.webp`.
 - **28.9 — כדור על אורך (`knobplate`) REDRAWN OFF ONE PHOTOGRAPH.** The owner's
   son: *"i only have one image of this but i want it in, this is the 'knob on
   backplate' handle i want you to refine it."* Same product, id, name and price
@@ -1590,6 +1625,12 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** The confirm dialog (5 of 8): *"…a window to pop up before you remove
+  the other thing … a red button that says yes and a black that says no."*
+  `#confirm` replaces `#clash`; `displacedBy` (pure, `rules.js`) on a dry run
+  of the tap decides; the sentence is the spec rows' values; `--danger`
+  6.57:1. Peretz's refusals (handle/bow against window or face) stand. The
+  fuzzer answers yes and no. Long form: `HISTORY.md`.
 - **27.9** The band above the door and the arrows (4 of 8): the step's name
   big over the door, its chosen option under it; the leaf at 1280/1440/1920
   426.2/550.2/562.4 against 421.0/550.3/563.3 before the round (asserted ≥ −4);
