@@ -6075,108 +6075,45 @@ for (const v of VIEWS) {
   if (faults === before) console.log(`    ${asked} readings: hidden with nothing to paint, shown with a bar, the bow or the bell, by link and by tap`);
 }
 
-/* ── THE SWING BAR LOCK SAYS ITS PRICE IS TO FOLLOW, AND THE פרזול TILES ARE
-   THIS DOOR'S — 27.9.2026 ─────────────────────────────────────────────────
-   The owner's son: *"add 'סגר בטחון' to the pirzul section … and in the pirzul
-   icons show the lever the person chose, the bar lock if chosen, the pins …
-   the peephole if chosen."* Peretz has not priced the latch (A22), and `npm
-   test` holds the money to that: `null`, never ₪0. What only a browser can
-   see is the PAGE saying so — the tile's "מחיר בהמשך" (never כלול), the
-   breakdown's "—", the total unmoved, the order carrying "(מחיר יימסר)", the
-   summary's picture — and the פרזול tiles being redrawn when the door they
-   picture changes, which is a paint-time refresh and not a build-time one
-   (the 8.9 lesson again). Hebrew and Russian.
-   Falsified by printing the tile's price through the old `!agorot` branch
-   (the tile clause: it read כלול) and by dropping `composite` from the פרזול
-   group (the refresh clause: the tiles kept the Rotem after the Coral). */
+/* ── THE פרזול TILES ARE THIS DOOR'S — 27.9.2026 ───────────────────────────
+   The owner's son: *"in the pirzul icons show the lever the person chose …
+   the peephole if chosen."* The tiles are redrawn when the door they picture
+   changes — a paint-time refresh, not a build-time one (the 8.9 lesson).
+   (It carried the swing bar lock's price-to-follow clauses for a day; the
+   latch was withdrawn 28.9 and they went with it.) Hebrew and Russian.
+   Falsified by dropping `composite` from the פרזול group (27.9: the tiles kept
+   the Rotem after the Coral). */
 {
-  console.log('\nthe swing bar lock says its price is to follow, and the פרזול tiles are this door\'s');
+  console.log('\nthe פרזול tiles are this door\'s');
   const before = faults;
   let readings = 0;
   for (const lang of ['he', 'ru']) {
     const pg = await b.newPage({ viewport: { width: 1280, height: 800 } });
-    const tbd = withLang(lang, () => T('price.tbd'));
-    const incl = withLang(lang, () => T('price.included'));
     await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&ey=peep`);
     await pg.waitForTimeout(400);
     const go = step => pg.evaluate(k => document.querySelector(`.steps__step[data-step="${k}"]`)?.click(), step);
-    await go('pz');
-    await pg.waitForTimeout(250);
-    const read = () => pg.evaluate(() => {
-      const f = document.querySelector('.field[data-group="latch"]');
-      const t = f && f.querySelector('[data-id="latch"]');
-      const pz = document.querySelector('.field[data-group="pirzul"] [data-id="pz-nickel"] .tile__art');
-      const bd = [...document.querySelectorAll('#breakdown-body tr')].map(r =>
-        [r.querySelector('th')?.textContent.trim(), r.querySelector('td')?.textContent.trim()]);
-      return {
-        field: !!f, seen: !!f && f.checkVisibility(),
-        meta: t ? (t.querySelector('.tile__meta') || {}).textContent?.trim() : null,
-        pz: pz ? pz.innerHTML : '',
-        pzLatch: !!document.querySelector('.field[data-group="pirzul"] [data-pz="latch"]'),
-        pzViewer: !!document.querySelector('.field[data-group="pirzul"] [data-pz="viewer"]'),
-        drawn: !!document.querySelector('#stage [data-hw="latch"]'),
-        code: document.getElementById('code')?.textContent.trim(),
-        price: document.querySelector('[data-price]')?.textContent.trim(),
-        bd, wa: document.querySelector('[data-wa]')?.getAttribute('href') || '',
-        spec: [...document.querySelectorAll('#spec .spec__row')].map(r => r.getAttribute('aria-label') || ''),
-      };
-    });
+    const read = () => pg.evaluate(() => ({
+      pz: (document.querySelector('.field[data-group="pirzul"] [data-id="pz-nickel"] .tile__art') || {}).innerHTML || '',
+      viewer: !!document.querySelector('.field[data-group="pirzul"] [data-pz="viewer"]'),
+      code: document.getElementById('code')?.textContent.trim(),
+    }));
+    await go('pz'); await pg.waitForTimeout(250);
     const a = await read();
-    if (!a.field || !a.seen) {
-      fault('latch', `${lang}: no swing bar lock on the פרזול step — this check has lost its subject`);
-      await pg.close(); continue;
-    }
     readings++;
-    if (a.meta !== tbd) {
-      fault('latch', `${lang}: the latch tile prints "${a.meta}" — its price is to follow ("${tbd}")`
-        + (a.meta === incl ? ', and כלול says it is included, which nobody has said' : ''));
-    }
-    if (a.pzLatch) fault('latch', `${lang}: the פרזול tiles show a latch on a door without one`);
-    if (!a.pzViewer) fault('latch', `${lang}: the פרזול tiles do not show the viewer this door carries`);
-    /* the tap */
-    await pg.evaluate(() => document.querySelector('.field[data-group="latch"] [data-id="latch"]')?.click());
-    await pg.waitForTimeout(350);
-    const c = await read();
-    readings++;
-    const st = decodeCode(c.code || '');
-    if (!st || st.latch !== 'latch') fault('latch', `${lang}: tapping the latch left the code at ${c.code}`);
-    if (!c.drawn) fault('latch', `${lang}: the latch is chosen and the door draws none`);
-    if (c.price !== a.price) {
-      fault('latch', `${lang}: the latch moved the price ${a.price} → ${c.price} — a price nobody gave is in the total`);
-    }
-    const bdName = withLang(lang, () => T('bd.latch'));
-    const row = c.bd.find(r => r[0] === bdName);
-    if (!row) fault('latch', `${lang}: the breakdown has no "${bdName}" row`);
-    else if (row[1] !== '—') fault('latch', `${lang}: the breakdown prints "${row[1]}" for the latch — it has no figure yet ("—")`);
-    if (!c.pzLatch) fault('latch', `${lang}: the latch is chosen and the פרזול tiles do not show it`);
-    if (!decodeURIComponent(c.wa).includes('סגר בטחון (מחיר יימסר)')) {
-      fault('latch', `${lang}: the order does not carry the latch with "(מחיר יימסר)"`);
-    }
-    if (!c.spec.some(x => x.includes(withLang(lang, () => T('row.priceTBD'))))) {
-      fault('latch', `${lang}: the summary's pictures do not name the latch with its price to follow`);
-    }
-    /* the refresh: a different lock furniture redraws the פרזול tiles */
-    await go('lock');
-    await pg.waitForTimeout(200);
+    if (!a.pz) { fault('pirzul', `${lang}: no פרזול tile — this check has lost its subject`); await pg.close(); continue; }
+    if (!a.viewer) fault('pirzul', `${lang}: the פרזול tiles do not show the viewer this door carries`);
+    await go('lock'); await pg.waitForTimeout(200);
     await pg.evaluate(() => document.querySelector('.field[data-group="lockset"] [data-id="coral"]')?.click());
     await pg.waitForTimeout(300);
-    await go('pz');
-    await pg.waitForTimeout(250);
+    await go('pz'); await pg.waitForTimeout(250);
     const d = await read();
     readings++;
-    const st2 = decodeCode(d.code || '');
-    if (!st2 || st2.lockset !== 'coral') {
-      fault('latch', `${lang}: the Coral did not land (${st2 && st2.lockset}) — the refresh clause has no subject`);
-    } else if (d.pz === c.pz) {
-      fault('latch', `${lang}: the lock furniture changed to the Coral and the פרזול tiles still draw the old one`);
-    }
+    const st = decodeCode(d.code || '');
+    if (!st || st.lockset !== 'coral') fault('pirzul', `${lang}: the Coral did not land — the refresh clause has no subject`);
+    else if (d.pz === a.pz) fault('pirzul', `${lang}: the lock furniture changed to the Coral and the פרזול tiles still draw the old one`);
     await pg.close();
   }
-  if (faults === before) {
-    console.log(`    ${readings} readings in two languages: the tile says the price is to follow, the breakdown `
-      + 'a dash, the total unmoved, the order and the summary name it; the פרזול tiles show the viewer, '
-      + 'then the latch, then the Coral once chosen');
-  }
+  if (faults === before) console.log(`    ${readings} readings in two languages: the tiles show the viewer, then the Coral once chosen`);
 }
 
 /* ── THE WALL CHROME'S OWN INK STAYS OFF THE DOOR ────────────────────────

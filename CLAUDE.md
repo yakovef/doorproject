@@ -147,8 +147,8 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   lamp, move to near the door, at the up right corner"* — his own 28.8 circle
   under the lamp, moved by him); the handing card taken off the summary (27.9,
   *"remove the thing that says to change the direction of the door"* — the
-  order keeps `handingWords()`); the swing bar lock at the head of the lock
-  side (27.9). A placement they made is theirs: measure it and say what it
+  order keeps `handingWords()`); and they take things OUT as fast — the swing
+  bar lock went in on 27.9 and out on 28.9 (*"remove the bar lock quickly"*). A placement they made is theirs: measure it and say what it
   costs, do not relitigate it.
 - **Decisions taken FOR them in the big round (27.9), each named so they can
   reverse it in a line:**
@@ -167,8 +167,8 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   Settled with them in chat, not ours: where the new "ask before removing"
   rule meets Peretz's refusal — a pull handle or bow with no room beside the
   window or the face — **Peretz's rule stands**, refused with its reason and
-  no dialog offering to take the window away; and the swing bar lock is an
-  option on the פרזול step with its price to follow (A22).
+  no dialog offering to take the window away. (The swing bar lock, settled
+  the same way as an option with its price to follow, was withdrawn 28.9.)
 
 ---
 
@@ -184,6 +184,11 @@ lines here. Dates are the day of the change.
   an arched neck, the Rotem's egg and satin — measured off three doors. It is the
   plate the Rotem was drawn as until 27.9; the five gallery doors carrying it
   (d004 d022 d029 d106 d108) are cited and refit to it. Appended: no VERSION.
+- **28.9** The swing bar lock withdrawn — *"remove the bar lock quickly."*
+  Out of the catalogue, the code (`VERSION` 27; 26 is burnt), the drawing, the
+  rules, the price's null-state and every sweep; `lt=` retired. The פרזול
+  tiles stay a composite of the door (lock furniture, hinges, viewer). Long
+  form: `HISTORY.md`.
 - **27.9** The record (8 of 8): §0a — the placements they make themselves and
   the five decisions taken for them; §0c's gates; §3's flow; §5.28–29; §9's
   wall table and breakdown window re-measured (unchanged by the band). The
@@ -372,9 +377,7 @@ Chromium here can die under raster pressure (§7). Establish it each run.
 expensive one is **A13** — which of our two windows is his "tall" — ₪500 on
 most glazed orders, resting on nothing but the shape of two Hebrew names.
 One place where he contradicts his own doors is recorded, not resolved: he says
-there is no ברזל מחושל, and it is on ten of his installed doors. One product
-is on the site with no price at all, on purpose: the swing bar lock (27.9, A22,
-§0k) — "מחיר בהמשך" on its tile and out of the total until he names one.
+there is no ברזל מחושל, and it is on ten of his installed doors.
 
 ### Not built, on purpose
 
@@ -409,7 +412,7 @@ screen. Two different questions, and for a long time only one had been put.
   retire an option, alias its id onto the nearest real one, for ever.
 - **The short code stores INDICES**, which no alias can rescue. Any change to
   an option list's ORDER or to the bit layout needs a `VERSION` bump in
-  `js/url-state.js` (**26** on 27.9 — read the file, do not trust this figure),
+  `js/url-state.js` (**27** on 28.9 — read the file, do not trust this figure),
   so an old code is refused with a notice rather than decoded into a different
   door. **Appending to the end of a list, or changing a property, costs no
   bump.**
@@ -934,23 +937,11 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
   (`photo: null`). **Every viewer is refused beside a window** (`viewerOn`,
   27.9 — the rules had named `'peep'` only). Two LISTS, not a multi-select: the withdrawn add-ons were a
   bitmask under the retired `a=`.
-- **`LATCHES` — the swing bar lock (סגר בטחון)**, on the פרזול step since 27.9
-  (`lt=`, one bit appended, `VERSION` 26): *"add 'סגר בטחון' to the pirzul
-  section — a swing bar lock, at the top of the door's side, mounted on the
-  mashkof and the door, affected by the pirzul."* **Price to follow** (A22):
-  `LATCH.latch` is `null`, allowed only on an entry marked `priceTBD` —
-  `priceInto` throws on a null without the flag and on the flag with a figure.
-  The total leaves it out (`pendingParts` names it); the tile prints "מחיר
-  בהמשך" (`priceLabel(null)`, never כלול), the breakdown "—", the order's row
-  "סגר בטחון (מחיר יימסר)". Drawn from published dimensions and his position
-  (`LATCH`, `latchArt`, `photo: null`): a keeper on the leaf 30 mm in from the
-  closing edge, 150 mm below the head, a plate on the frame — on a דלת וחצי
-  on the fixed leaf across the mullion — and the arm across, in `#nickel`.
-  ⚠ On these doors it is fitted INSIDE (they open inwards, like the hinges
-  the drawing does not show); drawn because he asked to see it, and
-  `ASK-PERETZ.md` asks. The keeper is an obstacle in `faceObstacles` (and the
-  placement key); `latchFits` refuses it where a window or moulding comes
-  within its box — nowhere in today's range, measured in `npm test`.
+- ~~**`LATCHES` — the swing bar lock (סגר בטחון)**~~ — in the site 27.9 (the
+  פרזול step, `lt=`, price to follow), **withdrawn 28.9**: *"remove the bar
+  lock quickly."* Its bit left the code (`VERSION` 26 → **27**, 26 never
+  reused), `lt=` is RETIRED, and the null-price machinery went with its only
+  user. The drawing, rule and tests are in `7b57b0c` if it comes back.
 
 ⚠ **Whose metal is it? — five owners, and every new drawing must answer
 before it picks a fill.**
@@ -970,7 +961,7 @@ at least once, always silently.
 
 | | |
 |---|---|
-| follows it | the lever and its furniture, the כדור's ball and shank (26.9 — the owner's son called the constant ball a bug, overruling 31.8), the keyhole, the hinges, the peephole (both kinds), the security latch (a choice on the פרזול step and drawn since 27.9, `#nickel`), the metal strips. The כדור על אורך (`knobplate`) too — d092 is bronze. The פרזול tiles show exactly these on THIS door since 27.9 — its lock furniture, the hinges, the latch and the viewer when chosen — redrawn when they change (`composite`) |
+| follows it | the lever and its furniture, the כדור's ball and shank (26.9 — the owner's son called the constant ball a bug, overruling 31.8), the keyhole, the hinges, the peephole (both kinds), the security latch (in his list; not drawn — it is fitted inside, and the choice offered 27.9 was withdrawn 28.9), the metal strips. The כדור על אורך (`knobplate`) too — d092 is bronze. The פרזול tiles show these on THIS door since 27.9 — its lock furniture, the hinges and the viewer when chosen — redrawn when they change (`composite`) |
 | never | the pull handle, the bow and the פעמון (their own `hf=`) · the extra lock (`#lockUnit`) · the ספיר (the maker's finish, 31.8) |
 
 ### The lock furniture's measurements (`npm run lockset`, 19.9)
@@ -1338,10 +1329,7 @@ are not in `VIEWS`:
   not *readable*: it read green while ₪3,195 sat under the green pill on every
   Russian phone); the breakdown readable to its total; the card at the door's
   head corner (27.9), inside the picture, never on `#frame`, its breakdown
-  centred on it; the swing bar lock's price to follow (27.9) — the tile's
-  "מחיר בהמשך", never כלול, the breakdown's "—", the total unmoved, the order
-  and the summary naming it — and the פרזול tiles redrawn when the lock
-  furniture changes.
+  centred on it; the פרזול tiles redrawn when the lock furniture changes.
 - **repairs** — a real repair at every viewport, every sentence on screen, its
   box covering no option; an undo that moves the price names a spec row; a tap
   that would take something away asks first (the Coral against a bar and a
@@ -1454,8 +1442,8 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 ## 8. Things that will bite
 
 - **BigInt is required** in `url-state.js`: the code layout is **wider than 32
-  bits** (the payload is 55 bits and `TOTAL_BITS` rounds it, with the check
-  nibble, to 60 on 27.9 — read the file). The build targets es2020, so
+  bits** (the payload is 54 bits and `TOTAL_BITS` rounds it, with the check
+  nibble, to 60 on 28.9 — read the file). The build targets es2020, so
   `Object.hasOwn` is unavailable — use `Object.prototype.hasOwnProperty.call`.
 - **The short code is an ENCODING, not a hash.** It decodes without a server,
   because it is read aloud down the telephone.
@@ -1687,9 +1675,7 @@ Section numbers here are that file's. Ask **1a** first (A13, which window is
 and a fixed half — the drawing on three sizes, A18); **1g** (the rose's size);
 **0j** (26.9: whether a glazed trio exists — to the owner's son; whether a glazed
 pair is the ₪3,800 alone, A20; that the square window moved 131 mm down);
-**0k** (27.9: the swing bar lock's price, A22 — shown as "to follow" until he
-names it — a photograph, and whether a fitting mounted inside should be drawn
-on the outside view at all); **0a2** (the ₪300 bell: ring, electric push, or both); **0a5** (a gold פרזול's
+**0a2** (the ₪300 bell: ring, electric push, or both); **0a5** (a gold פרזול's
 keyhole); **1b** (a picture of the curved lever, the Idan's stock length, a
 picture of the digital viewer); **1c** (the wide-margin three-panel doors); **2** (ברזל
 מחושל on ten doors he says do not carry it); **3** (warranty term, permission to
@@ -1708,7 +1694,7 @@ edit if Peretz says otherwise. `ASK-PERETZ.md` carries the open ones in Hebrew.
 | A4 | ~~`rings` survives~~ — closed 25.9: withdrawn, resolves to `circles` | — |
 | A5 | `knobplate` is a "circle" at +₪200 | one number |
 | A6 | The widened משקוף is 60 mm outside / 300 mm inside | two numbers in `MASHKOF_PARTS` |
-| A7 | The peephole is standard on every door — the עינית is a ₪0 CHOICE on this strength. (It said "and the security latch" until 27.9, when the owner's son asked for the latch as a CHOICE on the פרזול step: it is not assumed standard any more, and its price is A22) | one number, and whether the tile says כלול |
+| A7 | The peephole and security latch are standard on every door — the עינית is a ₪0 CHOICE on this strength (the latch was offered as a priced-later choice for one day, 27.9, and withdrawn 28.9) | one number, and whether the tile says כלול |
 | A8 | ~~A single bottom panel is ₪725~~ — closed 14.9: the panel belongs to `WINDOWS.rect` | — |
 | A9 | ~~`Math.ceil` on the handle's 20 cm steps~~ — closed 20.9: two length bands | — |
 | A10 | ~~Colours are all included~~ — settled 30.8: three included, fourteen at +₪200 | — |
@@ -1722,7 +1708,7 @@ edit if Peretz says otherwise. `ASK-PERETZ.md` carries the open ones in Hebrew.
 | A18 | His דו כנפי is our דלת וחצי — a main leaf and a narrow FIXED leaf, not two equal leaves | **the drawing**, on three of six sizes |
 | A19 | ~~The curved lever priced as the Coral~~ — closed 20.9: ₪200; its name closed 27.9 (ידית מתעקלת, the owner's son). The id `lever-taper` can never be renamed | — |
 | A20 | Two panels beside the square window cost the window's ₪3,800 and nothing for the face (`DETAIL_GLAZED.panel2 = 0`): the window replaced the upper panel and the one panel drawn is the one the window already pays for (26.9) | one number in `prices.js` |
-| A22 | The swing bar lock (סגר בטחון) has no price yet: `null`, shown as "מחיר בהמשך" / "—" / "(מחיר יימסר)" and left out of the total (27.9). Not ₪0 — that would print כלול and say it is included — and not a guess | one number in `prices.js`, and the `priceTBD` flag off its entry |
+| A22 | ~~The swing bar lock has no price yet~~ — closed 28.9: the option was withdrawn | — |
 | A21 | Three panels beside the square window cost the HANDLE PLATE and nothing else — `DETAIL_GLAZED.panel3 = DETAIL.panel3 − DETAIL.panel2`, ₪450 (27.9). A glazed trio draws one panel more than a glazed pair, and the only figure in the range that says what that plate is worth is the difference between Peretz's own two solid faces. He has priced two solid faces and never a glazed trio | one expression in `prices.js` |
 
 ⚠ **A2, A7 and A13 are the three worth asking first**; A13 is ₪500 on most glazed

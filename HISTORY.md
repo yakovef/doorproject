@@ -26,6 +26,34 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — THE SWING BAR LOCK WITHDRAWN.** The owner's son, the morning after
+  it went in: *"remove the bar lock quickly."*
+  · **Out:** `LATCHES`, `LATCH` (prices.js), the field and its bit, `lt=`,
+    the spec row, the group on the פרזול step, `latchArt`/`latchGlyph`/
+    `latchFits`/`LATCH`, the keeper in `fittingBoxes` and both memo keys, the
+    conflict and repair and their copy, the CSS cues, the fuzz picker, the
+    collide cases and boxes rows, the unit group and the audit clauses. The
+    null-price machinery (`priceTBD` in `priceInto`, `pendingParts`,
+    `priceLabel(null)`, the breakdown's dash, `price.tbd`, `row.priceTBD`)
+    had no other user and went with it — it is in `7b57b0c` if a price ever
+    has to wait again.
+  · **The code:** the bit left the end of the pack order, so the layout is
+    v25's again — and `VERSION` is **27**, not 25: 26 was written by this page
+    for a day, and a reused number is a code that can decode into the wrong
+    door. `lt` joins `RETIRED` (a link from that day opens as itself, no
+    notice). `corpus-links.md` rewritten at v=27.
+  · **Kept:** the פרזול tiles as a composite of this door — its lock
+    furniture, the hinge knuckles and the viewer when chosen — with the
+    refresh; the unit clauses for them restated in a group of their own (plus
+    VERSION 27, no `latch` field, `lt=` silent), and the audit's refresh
+    check as a block of its own. `step.pz.l` and `g.pirzul.h` back to naming
+    what is drawn. A7 names the latch as standard again; A22 closed;
+    `ASK-PERETZ` §0k removed.
+  · **Gates:** node --check, npm run build, npm test 9,440,757 passed / 0
+    failed; sheets — 0 bare moved (the `shot` family, the stamps and the
+    links only); `collide -- all` 1,646 designs clean, `-- boxes` clean; the
+    audit's per-view loop at 1280 and 320 and the פרזול block clean.
+
 - **28.9 — עילי (`ilai`), A NEW LOCKSET, INCLUDED.** The owner's son, with three
   photographs of installed doors: *"here is a new handle, it is very similar to
   rotem, it is also in the price, i want you to call it 'עילי'"*. In the app on

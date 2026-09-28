@@ -103,29 +103,24 @@ const cases = [];
    carry both, so every grip × lockset × window is swept with the bow off and
    on. The bow is drawn first and the bar placed against it — this is where a
    real getBBox says whether the two bodies ever touch. */
-/* ⚠ AND BAR × LATCH, SINCE 27.9.2026: the swing bar lock's keeper stands at
-   the head of the closing edge, which is where a long bar's top end goes, so
-   every grip × lockset × window is swept with the latch on too (bow off). */
-let bowCases = 0, latchCases = 0;
+let bowCases = 0;
 for (const h of HANDLES) for (const k of LOCKSETS) for (const w of WINDOWS)
   for (const sz of SWEEP_SIZES) for (const hd of ['right-in', 'left-in'])
-  for (const [gb, lt] of [['nograb', 'nolatch'], ['grab', 'nolatch'], ['nograb', 'latch']]) {
+  for (const gb of ['nograb', 'grab']) {
     const st = {
       colour: 'rb-0097d', window: w.id, grille: 'none',
       handle: h.id, lockset: k.id, detail: 'plain',
-      size: sz, handing: hd, grab: gb, latch: lt,
+      size: sz, handing: hd, grab: gb,
     };
     /* Only designs the rules allow: a collision inside a combination the site
        already refuses is not a bug, it is the refusal working. */
     const c = conflicts(st);
-    if (c.handle[h.id] || c.lockset[k.id] || c.window[w.id] || c.grab[gb] || c.latch[lt]) continue;
+    if (c.handle[h.id] || c.lockset[k.id] || c.window[w.id] || c.grab[gb]) continue;
     cases.push(st);
     if (gb === 'grab') bowCases++;
-    if (lt === 'latch') latchCases++;
   }
-console.log(`  (${cases.length} base designs, ${bowCases} of them carrying the bow, ${latchCases} the latch)`);
+console.log(`  (${cases.length} base designs, ${bowCases} of them carrying the bow)`);
 if (!bowCases) { console.error('  ✗ no swept design carries the bow — bar × bow is unmeasured'); process.exit(1); }
-if (!latchCases) { console.error('  ✗ no swept design carries the latch — bar × latch is unmeasured'); process.exit(1); }
 if (deep) {
   /* Every face detail against every window, on both sizes and both handings.
      The fixture pairs the bar with the CYLINDER: it used to say `coral`, and
@@ -136,20 +131,17 @@ if (deep) {
   let added = 0;
   for (const d of DETAILS) for (const w of WINDOWS)
     for (const sz of SWEEP_SIZES) for (const hd of ['right-in', 'left-in'])
-    for (const [gb, lt] of [['nograb', 'nolatch'], ['grab', 'nolatch'], ['nograb', 'latch']]) {
+    for (const gb of ['nograb', 'grab']) {
       /* The bow too (26.9.2026): its home is a different place on every face
          — the plate's field, the pair's rail, the set's band — so every face
          is swept with it, beside the Idan. */
-      /* And the swing bar lock (27.9.2026), on every face: its keeper is at
-         the head of the closing edge, where the Greek set's cornice and a
-         window's casing are the things that could be in its way. */
       const st = {
         colour: 'rb-0097d', window: w.id, grille: 'none',
         handle: 'idan', lockset: 'cylinder', detail: d.id,
-        size: sz, handing: hd, grab: gb, latch: lt,
+        size: sz, handing: hd, grab: gb,
       };
       const c = conflicts(st);
-      if (c.detail[d.id] || c.handle.idan || c.window[w.id] || c.grab[gb] || c.latch[lt]) continue;
+      if (c.detail[d.id] || c.handle.idan || c.window[w.id] || c.grab[gb]) continue;
       cases.push(st);
       added++;
     }
@@ -271,12 +263,6 @@ if (boxes) {
     for (const h of handles) if (h !== 'none') read({ ...base, handle: h }, '[data-hw="handle"]', 'grip ' + h);
     /* The bow, its own field since 26.9.2026, drawn in its own wrapper. */
     read({ ...base, grab: 'grab' }, '[data-hw="bow"]', 'grip grab');
-    /* The swing bar lock, 27.9.2026: a latch state must FIND it (§5.15) —
-       and on both handings and on the דלת וחצי, whose plate is on the fixed
-       leaf across the mullion, so its declared reach is a different number. */
-    read({ ...base, latch: 'latch' }, '[data-hw="latch"]', 'latch right-in');
-    read({ ...base, latch: 'latch', handing: 'left-in' }, '[data-hw="latch"]', 'latch left-in');
-    read({ ...base, latch: 'latch', size: 'half' }, '[data-hw="latch"]', 'latch half');
     for (const k of locksets) read({ ...base, lockset: k }, '[data-hw="lockset"]', 'lock ' + k);
 
     /* How far inboard from the CLOSING EDGE does anything BOLTED reach? That
@@ -407,11 +393,7 @@ if (boxes) {
    are: `-- boxes` puts the drawn bow inside its declaration, and the pair sweep
    below puts a bar and a bow side by side in real getBBox. Filtered here BY
    KIND, so a moulding kind added later is still compared. */
-/* ⚠ AND THE LATCH'S KEEPER, 27.9.2026, for the same reason: a declared
-   footprint (the keeper plus the arm over the leaf), measured by `-- boxes`
-   and swept by real getBBox below, not a moulding. Filtered BY KIND. */
-const obstacleCases = cases.map(st => ({ st,
-  want: faceObstacles(st).filter(o => o.kind !== 'bow' && o.kind !== 'latch') }));
+const obstacleCases = cases.map(st => ({ st, want: faceObstacles(st).filter(o => o.kind !== 'bow') }));
 
 const drift = await p.evaluate(rows => {
   const host = document.getElementById('stage');
@@ -516,13 +498,6 @@ const hits = await p.evaluate(({ cases, allowed }) => {
        Removed rather than skipped: nothing here draws, and a thing that cannot
        be touched has no business in a collision test. */
     for (const g of svg.querySelectorAll('[data-relight]')) g.remove();
-    /* ⚠ A LATCH STATE THAT DRAWS NO LATCH IS A FAULT, NOT A CLEAN DESIGN
-       (§5.15, 27.9.2026): the sweep below would find nothing of it to
-       overlap and call the design clean. */
-    if (st.latch === 'latch' && !svg.querySelector('[data-hw="latch"]')) {
-      out.push({ pair: 'latch not drawn', ox: 0, oy: 0,
-                 st: `${st.handle}+${st.lockset}/${st.window}/${st.size}/${st.handing}` });
-    }
     /* ⚠ AND THE GRIP'S TOUCH PAD AND FOCUS RING USED TO BE STRIPPED HERE AND
        AT TWO PLACES ABOVE. Both are gone from the drawing on 18.9.2026 with
        the drag itself, so all three selectors matched nothing — and a selector

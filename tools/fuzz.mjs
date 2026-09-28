@@ -32,7 +32,7 @@
 import { chromium } from 'playwright';
 import { assertFreshBundle } from './fresh.mjs';
 import { BELLS, BOWS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES, HANDLE_LENS,
-         LATCHES, LOCKSETS, MASHKOFS, PEEPHOLES, PIRZUL, SIZES, SPECIAL_LOCKS, STRIPE_SLOTS,
+         LOCKSETS, MASHKOFS, PEEPHOLES, PIRZUL, SIZES, SPECIAL_LOCKS, STRIPE_SLOTS,
          unpackStripes, WINDOWS }
   from '../js/catalog.js';
 import { conflicts, repair } from '../js/rules.js';
@@ -119,8 +119,6 @@ console.log(`seed ${SEED}\n\nA. ${CASES} random designs, all nine axes at once`)
       handleFinish: pick(HANDLE_FINISHES).id,
       handleLen: pick(HANDLE_LENS),
       grab:    pick(BOWS).id,
-      /* The swing bar lock, 27.9.2026 — drawn from the day it is a field. */
-      latch:   pick(LATCHES).id,
       ...unpackStripes(Math.floor(r() * STRIPE_SLOTS)),
     };
     /* ⚠ AND THE BOW WAS LEFT OUT THE SAME WAY — 26.9.2026, the day it became a

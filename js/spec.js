@@ -46,7 +46,7 @@ import { L, T, withLang } from './copy.js';
 import {
   byId, colourCode, COLOURS, DETAILS, glassRows, glazedPanels, GRILLES, grillePlacement,
   gripTakesFinish, handleLength, HANDINGS, HANDLES, HANDLE_FINISHES, isGlazed, LOCKSETS,
-  MASHKOFS, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BELLS, BOWS, PEEPHOLES, LATCHES,
+  MASHKOFS, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BELLS, BOWS, PEEPHOLES,
 } from './catalog.js';
 
 /**
@@ -216,17 +216,6 @@ export function specRows(state) {
   }
   if (ep.id !== 'nopeep') {
     rows.push({ key: 'peephole', label: T('row.peephole'), id: ep.id, value: L(ep) });
-  }
-  /* ⚠ THE SWING BAR LOCK, 27.9.2026 — named only when chosen, like the bell
-     and the viewer, and named WITH ITS UNPRICED STATE while Peretz has not
-     priced it (`priceTBD`): the total the order quotes does not include it,
-     and an order that listed it bare would read as though it did. The one
-     statement, so the message, the A4 sheet, the summary's picture and the
-     drawing's name all say it. */
-  const lt = byId(LATCHES, state.latch || 'nolatch');
-  if (lt && lt.id !== 'nolatch') {
-    rows.push({ key: 'latch', label: T('row.latch'), id: lt.id,
-                value: lt.priceTBD ? `${L(lt)} (${T('row.priceTBD')})` : L(lt) });
   }
   if (dt.id !== 'plain') {
     rows.push({ key: 'detail', label: T('row.detail'), id: dt.id,

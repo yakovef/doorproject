@@ -56,7 +56,7 @@ import { byId, DETAILS, glassRows, GRILLES, HANDLES, isGlazed, leafGlazed, LOCKS
          PEEPHOLES, STRIPE_MAX, WINDOWS }
   from './catalog.js';
 import { bowFits, gripFitsAnywhere,
-         bellFits, latchFits, panelUnderGlass,
+         bellFits, panelUnderGlass,
          peepholeFits } from './renderer.js';
 
 /* ⚠ IS A VIEWER ON THE DOOR — the one question, asked of the state the way the
@@ -254,8 +254,6 @@ export function conflicts(state) {
                    computation as `peepholeFits`; the whole argument, and why
                    the fitting is not simply moved, is over it. */
                 peephole: {}, bell: {},
-                /* The swing bar lock, 27.9.2026 — `latchFits`. */
-                latch: {},
                 /* The horizontal bow, a field of its own since 26.9.2026. */
                 grab: {},
                 /* ⚠ A STRING, NOT A MAP OF IDS, because the stripes are no
@@ -403,12 +401,6 @@ export function conflicts(state) {
     if (viewerOn(st) && !peepholeFits(st)) out.peephole[p.id] = T('why.peepWindow');
   }
   if (!bellFits(state))     out.bell.bell     = T('why.bellWindow');
-  /* ⚠ THE SWING BAR LOCK'S KEEPER IS BOLTED THROUGH THE LEAF, 27.9.2026 — so
-     it needs solid leaf at the head of the closing edge, asked of the drawing's
-     own geometry (`latchFits`). No door in today's range fails it (measured,
-     and asserted in npm test); the entry is what makes a window moved towards
-     that edge grey the tile rather than bolt the keeper to glass. */
-  if (!latchFits({ ...state, latch: 'latch' })) out.latch.latch = T('why.latchNoRoom');
   if (onLeaf) out.stripes = T('why.stripesWindow');
   else if (byId(DETAILS, state.detail).panel) out.stripes = T('why.stripesPanel');
   if (lined) {
@@ -729,7 +721,6 @@ const SAID = {
   faceGone:      'fix.faceGone',
   peepGone:      'fix.peepGone',
   bellGone:      'fix.bellGone',
-  latchGone:     'fix.latchGone',
   peepWindow:    'fix.peepWindow',
   /* `needPanel` and `ownPull` are gone with the two rules they announced —
      the forced bottom panel and the pull a face brought with it. Both rules
@@ -904,14 +895,6 @@ export function repair(state, intent = null) {
       if (peepBad) { s.peephole = 'nopeep'; change('peephole', SAID.peepGone); }
       if (bellBad) { s.bell = 'nobell'; change('bell', SAID.bellGone); }
     }
-  }
-  /* The swing bar lock yields to whatever stands where its keeper goes,
-     whichever was tapped: the thing in the way is a window or a face, the
-     dearer and the more visible to lose, and there is nowhere else to put a
-     keeper that is fitted at the closing edge by definition. (Never fires in
-     today's range — see `latchFits`.) */
-  if (s.latch === 'latch' && !latchFits(s)) {
-    s.latch = 'nolatch'; change('latch', SAID.latchGone);
   }
 
   const lined = isLineWork(s);
