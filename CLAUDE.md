@@ -141,6 +141,34 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   handle branch into `claude/door-builder-website-plan-rgg7gu` and push both,
   then report what changed with a picture. It does not touch **"Don't deploy"**,
   which still stands, nor the rules in §1.
+- **They place the page's furniture themselves, and move it themselves.** The
+  language picker and undo/redo in the wall (circles on a screenshot, 28.8);
+  the price card at the DOOR'S top-right corner (27.9, *"it looks bad under the
+  lamp, move to near the door, at the up right corner"* — his own 28.8 circle
+  under the lamp, moved by him); the handing card taken off the summary (27.9,
+  *"remove the thing that says to change the direction of the door"* — the
+  order keeps `handingWords()`); the swing bar lock at the head of the lock
+  side (27.9). A placement they made is theirs: measure it and say what it
+  costs, do not relitigate it.
+- **Decisions taken FOR them in the big round (27.9), each named so they can
+  reverse it in a line:**
+  · the handle-finish group also shows when only a פעמון is on the door — it
+    takes the finish on Peretz's 20.9 word, and hiding the group would strand
+    it (`finishHasSubject`);
+  · the navigator COLUMN is the desktop's; a phone keeps its fixed row in the
+    same ink (a 56 px column on a 320 px screen leaves no room for two tiles);
+  · the summary's pictures carry the option's short name, and the colour's is
+    its CODE — what Peretz orders paint by;
+  · the lever-beside-a-bar popup became the yes/no dialog (Peretz asked for a
+    popup saying they cannot be together; a yes/no still says it, and the new
+    rule wants the choice);
+  · the arrows beside the door SKIP refused options rather than opening the
+    dialog (browsing should not ask).
+  Settled with them in chat, not ours: where the new "ask before removing"
+  rule meets Peretz's refusal — a pull handle or bow with no room beside the
+  window or the face — **Peretz's rule stands**, refused with its reason and
+  no dialog offering to take the window away; and the swing bar lock is an
+  option on the פרזול step with its price to follow (A22).
 
 ---
 
@@ -150,24 +178,23 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
-- **27.9** The swing bar lock and the פרזול tiles (7 of 8): *"add 'סגר בטחון'
-  to the pirzul section … and in the pirzul icons show the lever the person
-  chose, the bar lock if chosen, the pins … the peephole if chosen."*
-  `LATCHES`, `lt=`, one bit, `VERSION` 26; price to follow (`null` +
-  `priceTBD`, A22 — "מחיר בהמשך", "—", "(מחיר יימסר)", out of the total);
-  drawn at the head of the closing edge in `#nickel` (published dimensions,
-  no photograph; fitted inside in reality — asked); the פרזול tiles a
-  composite of this door. Sheets: 0 bare moved, as predicted. Long form:
+- **27.9** The record (8 of 8): §0a — the placements they make themselves and
+  the five decisions taken for them; §0c's gates; §3's flow; §5.28–29; §9's
+  wall table and breakdown window re-measured (unchanged by the band). The
+  big round is closed: `npm test` 0 failed, the audit clean. Long form:
   `HISTORY.md`.
+- **27.9** The swing bar lock and the פרזול tiles (7 of 8): `LATCHES`, `lt=`,
+  one bit, `VERSION` 26; price to follow (`null` + `priceTBD`, A22 — "מחיר
+  בהמשך", "—", "(מחיר יימסר)", out of the total); drawn at the head of the
+  closing edge in `#nickel` (published dimensions; fitted inside in reality —
+  asked, §0k); each פרזול tile is this door's metal. 0 bare sheets moved, as
+  predicted. Long form: `HISTORY.md`.
 - **27.9** The summary as pictures (6 of 8): *"show the icons of all the
-  things the person chose in each section instead of the text, clicking one
-  takes them to that section."* One button per spec row, the step tile's own
-  glyph at 56 px (the colour as its swatch) and the option's short name under
-  it (the colour's code — ours, §0a), "label: value" its accessible name; at
-  every width (the 700 px swap with the one-line run is gone, `#summary` is
-  visually hidden everywhere). `#spec` is no longer `aria-hidden` — it had held
-  buttons since 14.9. Whole above the pinned send at 1280×720: 4 of 8 (was 3).
-  Long form: `HISTORY.md`.
+  things the person chose … clicking one takes them to that section."* A
+  button per spec row, the tile's own glyph (the colour its swatch) and the
+  short name (the colour's code — ours, §0a), "label: value" its name, at every
+  width; `#spec` no longer `aria-hidden` (§5.29). 1280×720: 4 of 8 tiles whole
+  above the send (was 3). Long form: `HISTORY.md`.
 - **27.9** The confirm dialog (5 of 8): *"…a window to pop up before you remove
   the other thing … a red button that says yes and a black that says no."*
   `#confirm` replaces `#clash`; `displacedBy` (pure, `rules.js`) on a dry run
@@ -175,35 +202,27 @@ lines here. Dates are the day of the change.
   6.57:1. Peretz's refusals (handle/bow against window or face) stand. The
   fuzzer answers yes and no. Long form: `HISTORY.md`.
 - **27.9** The band above the door and the arrows (4 of 8): the step's name
-  big over the door with its chosen option under it, the panel's `<h2>`
-  visually hidden; the leaf at 1280/1440/1920 is 426.2/550.2/562.4 against
-  421.0/550.3/563.3 before the round (asserted ≥ −4); phones lose 21.6 px of
-  door to the band's line. Two arrows step the first group, skipping refused
-  options; with none free a dialog, the door byte-identical. Long form:
-  `HISTORY.md`.
-- **27.9** The navigator as a dark column (3 of 8): *"vertical and on the left
-  of the place where you choose options … a black rectangle … the section that
-  i am in will turn white and be square … a checkmark"* on steps chosen or
-  skipped. 56 px ink column on the panel's inline-end edge above 1100, the
-  phone row dressed the same; live = light square; checks = `visited` (steps
-  left by a gesture, session only). `--rail-band` no longer counts a column.
-  Long form: `HISTORY.md`.
+  big over the door, its chosen option under it; the leaf at 1280/1440/1920
+  426.2/550.2/562.4 against 421.0/550.3/563.3 before the round (asserted ≥ −4);
+  phones give the band 21.6 px of door. Two arrows step the first group,
+  skipping refused options; with none free, a dialog and no change. Long
+  form: `HISTORY.md`.
+- **27.9** The navigator as a dark column (3 of 8): *"a black rectangle …
+  the section that i am in will turn white and be square … a checkmark."* A
+  56 px ink column on the panel's inline-end edge above 1100, the phone row
+  dressed the same; live = a light square; checks = `visited` (steps left by
+  a gesture, session only). Long form: `HISTORY.md`.
 - **27.9** The price card at the door's top-right corner (2 of 8): *"it looks
   bad under the lamp, move to near the door, at the up right corner"* — his own
-  28.8 placement, moved by him. `--frame-top`/`--frame-right`/`--hud-b` from
-  `fitStage`, read off the frame's settled geometry (its 6 px entrance put the
-  card 2 px high); physical right in every language. The audit's card sweep
-  keeps its three clauses and gains the anchor as a fourth. Breakdown at
-  1920×918 10 → 13 of 13 rows. Long form: `HISTORY.md`.
-- **27.9** Copy and small chrome, the first of the big round's eight commits
-  (the owner's son's eleven notes): **עצבו** את הדלת שלכם, one line, the lede
-  gone (title 99 → 34 px at 1280×720, leaf 421 → 468 px — the band of commit 4
-  spends it); the gallery opener on `--accent` with ink (5.62:1, asserted);
-  the summary's send full-width 56 px "הזמינו את הדלת דרך נציג" with the
-  telephone under it from `PHONE_DISPLAY`; the handing card gone (the order
-  keeps `handingWords()`); undo/redo 52 px and a floppy save (`HUD_ICON`);
-  the handle finish shown only with a bar, bow or bell (`finishHasSubject`,
-  held to the price). Long form: `HISTORY.md`.
+  28.8 placement, moved by him. Anchored on the frame's SETTLED geometry (its
+  6 px entrance put the card 2 px high); physical right in every language.
+  Breakdown at 1920×918 10 → 13 of 13 rows. Long form: `HISTORY.md`.
+- **27.9** Copy and small chrome (1 of 8, the owner's son's eleven notes):
+  **עצבו** את הדלת שלכם on one line, the lede gone (leaf 421 → 468 px at
+  1280×720, which the band spends); the gallery opener on `--accent`; the
+  summary's send full-width "הזמינו את הדלת דרך נציג" over the telephone; the
+  handing card gone; undo/redo 52 px and a save; the finish group only with a
+  bar, bow or bell. Long form: `HISTORY.md`.
 - **27.9** The Rotem INTO THE APP (*"yes put it in and fix the coral and curved"*),
   with its lever as photographed (reach 114, root 19 past), and the Coral 128 →
   133 and curved lever 106 → 109 — their "parallax" shrink ran the wrong way; the
@@ -218,7 +237,7 @@ lines here. Dates are the day of the change.
   kept. ⚠ Found doing it: the Coral's and curved lever's parallax ran the WRONG way (§9).
 ---
 
-## 0c. Where it stands today — 26.9.2026
+## 0c. Where it stands today — 27.9.2026
 
 **The prices are real and the site is not deployed — deliberately.** Peretz
 gave the numbers on 26.8; `PLACEHOLDER` is `false`. Not deployed on the
@@ -345,14 +364,14 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | 9,118,821 assertions, **0 failed** on the Rotem merged with the big round's first two commits (27.9); the Rotem alone read 9,118,785 — +25 over 9,118,760, of which two are the new photo citations checked to exist and the rest the buildable set moving with four re-measured footprints (not traced per group). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 27.9 |
-| `npm run audit` | on the big round's commit 4 (27.9): **five faults on the first run, every one an exemption moving** with the band above the door — the landscape block's two came out (the question is in the sticky block, 45 of 45 steps), `extra1` left the phone wall-ink exemption, the short-and-wide answer exemption shrank to the glass step — and ONE reading named with its number: the widest double at 1152×800, `Русский` 43 px² (he) / 15 (ru) (commit 1's interim 314/284, recorded on `db529d6` by the Rotem session, is what the band gave back most of). The restated blocks re-ran clean; the next full run is after commit 7. Clean at all eight `VIEWS` on the Rotem commit `a74ec6b`. ⚠ It was **red for one commit** on 27.9 (8 faults) when the trio change stranded two assertions — §5.27 | 27.9 |
-| `npm run collide` | `all` (1,508 designs — 1,338 base, 552 of them with the bow, plus 170 face-detail) and `boxes` clean on the Rotem (27.9: coral/square `in` 140, levertaper 116, plate 47/114/161, each re-measured) | 27.9 |
-| `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, nothing broke (the Rotem commit) | 27.9 |
-| `npm run latency` | **227 ms** worst door against a 600 ms gate — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · 531 · 656 for default · sidelight+ironwork · the heaviest (27.9: the default door carries the Rotem, and its redrawn plate is 7 elements more than the waisted one's 261). Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 27.9 |
+| `npm test` | **9,318,240 assertions, 0 failed** at the end of the big round (27.9, commits 7 and 8 — the latch's field doubled every sweep that walks the catalogue, +199,323 over commit 6). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 27.9 |
+| `npm run audit` | **no faults** at every viewport on the big round's commit 7 (27.9), its latch block among them. The round's two other full runs: commit 4, five faults on the first run, every one an exemption moving with the band above the door (the landscape block's two came out, `extra1` left the phone wall-ink exemption, the short-and-wide exemption shrank to the glass step) and ONE reading named with its number — the widest double at 1152×800, `Русский` 43 px² (he) / 15 (ru), still named; commit 5, ten faults with one cause — the undo walk tapping behind the new modal — restated and re-run clean. ⚠ It was **red for one commit** on 27.9 (8 faults) when the trio change stranded two assertions — §5.27 | 27.9 |
+| `npm run collide` | `all` (2,384 designs — 2,124 base, 552 with the bow, 786 with the swing bar lock, plus 260 face-detail) and `boxes` clean on the big round's commit 7 (27.9: the latch drawn 60/14/48 against its declared 62/16/50, 82/84 on the דלת וחצי; a latch state that draws none is a fault) | 27.9 |
+| `npm run fuzz` | 30,000 designs over every field (the latch among them), 1,800 clicks, 141 of them met the confirm dialog — 65 yes, 76 no, the door unchanged after every no — nothing broke (the big round's commit 7) | 27.9 |
+| `npm run latency` | **217 ms** worst door against a 600 ms gate (the big round's commit 7) — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · 531 · 656 for default · sidelight+ironwork · the heaviest, unchanged through the round. Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 27.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
-| `npm run sheets` | the bare sheet files and 6 `lockset` sheets byte-stable across commits that do not touch the drawing. ⚠ The Rotem (27.9) moved 33, every one ONLY in a lever-sized patch at lock height: 10 `against-` by 231 px at their edge (they set no lockset, so they carry the default Rotem), 8 `corpus-`, 6 `recreate-`, `lockset-coral`, `lockset-plate` and 7 `shot`. The big round's first two commits, merged on top, moved `.stamps.json` and the `shot` sheets only | 27.9 |
+| `npm run sheets` | the bare sheet files and 6 `lockset` sheets byte-stable across commits that do not touch the drawing. ⚠ The Rotem (27.9) moved 33, every one ONLY in a lever-sized patch at lock height: 10 `against-` by 231 px at their edge (they set no lockset, so they carry the default Rotem), 8 `corpus-`, 6 `recreate-`, `lockset-coral`, `lockset-plate` and 7 `shot`. The big round (27.9), run once after its commit 7 with the prediction written first: **0 bare and 0 lockset moved**, as predicted — the 12 `shot` sheets, `.stamps.json` and `corpus-links.md` (v=26, `lt=`) only | 27.9 |
 
 ⚠ **When a bare sheet moves on a commit that could not have moved it, find out
 what did** — that is how chrome painted across every sheet was found once. And
@@ -375,7 +394,9 @@ Chromium here can die under raster pressure (§7). Establish it each run.
 expensive one is **A13** — which of our two windows is his "tall" — ₪500 on
 most glazed orders, resting on nothing but the shape of two Hebrew names.
 One place where he contradicts his own doors is recorded, not resolved: he says
-there is no ברזל מחושל, and it is on ten of his installed doors.
+there is no ברזל מחושל, and it is on ten of his installed doors. One product
+is on the site with no price at all, on purpose: the swing bar lock (27.9, A22,
+§0k) — "מחיר בהמשך" on its tile and out of the total until he names one.
 
 ### Not built, on purpose
 
@@ -822,6 +843,13 @@ for the same half of the leaf and `repair` trades between them.
   (its button, the bar's arrows, the rail, the skip, a summary row) — never
   derived from the door, never in the state, the URL or the code; a reload
   empties it. The connector, the fill and `is-done` went with the ink.
+- **The band, the arrows and the dialog** (27.9): above the door the live
+  step's name and its first group's answer (`.stage__band`, written by
+  `markSteps`), two arrows beside it moving that group to the next free
+  option — both in §0c's chrome — and every tap that would take something
+  else away asks first (`#confirm`, `planChoice`/`displacedBy`, §3 Rules).
+  The summary shows the PICTURES of what was chosen, one button per spec row
+  back to its step, at every width (§0c; `#summary` stays, visually hidden).
 - A bare load opens step 01; a shared link or a code opens the summary (T11).
 - Every step has a `<details>` explainer (`exp.<step>.q/.a`) and every group a
   `hint` (T15).
@@ -1227,6 +1255,23 @@ door is buildable; the drawn keyhole is where the photograph puts it.
     changes nothing — so it moved to the stripes, the one field where a
     deliberate different value is reachable.
 
+28. **A GATE ADDED TO THE PAGE, AND EVERY WALK THAT DID NOT KNOW IT WAS
+    THERE (27.9).** The confirm dialog made a tap that takes something away
+    WAIT for an answer, behind a modal that makes the rest of the page inert.
+    Sixteen per-view faults and ten in the undo walk followed, every one a
+    walk tapping through a repair as it always had and then timing out or
+    finding nothing changed — correct page, stale instrument. ⚠ **A new gate
+    in the page is a change to every instrument that drives the page**: each
+    walk answers it (`yes()`) AND asserts it was asked, so the gate cannot
+    later vanish unnoticed; the fuzzer answers both ways and counts both.
+29. **A CONTROL MADE REAL IN ONE LAYER AND ERASED IN ANOTHER (14.9 → 27.9).**
+    The summary's rows became `<button>`s on 14.9, tested as buttons (tag,
+    size, name, target) — inside a `#spec` still `aria-hidden="true"`, which
+    announces a focusable control as nothing. Every check read the DOM; none
+    read what a screen reader is given. Found only by rewriting the block.
+    ⚠ **When an element becomes interactive, re-read every attribute of every
+    ancestor that was written when it was not.**
+
 ⚠ **And one assertion was counting PROSE.** `render(st).match(/data-pane/g)`
 counted the attribute's name inside XML comments too, and twenty-five
 assertions failed about nothing. It is `/\sdata-pane="/` now. **Prose is not
@@ -1580,8 +1625,10 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 - **On a phone the wall's controls cannot stand beside the four biggest
   doors** (14.9; four since 27.9 — the band above the door takes its line out of
   the stage, the door is 21.6 px shorter, and `extra1` cleared). Ink on
-  `#frame` on `extra2`, `half`, `halfextra1`, `halfextra2`, worst 494/466 px²
-  (he/ru) on the widest double, where `Русский` is charcoal on a charcoal leaf;
+  `#frame` on `extra2`, `half`, `halfextra1`, `halfextra2` — worst px² of glyph
+  he/ru, re-measured at the end of the round (27.9): extra2 81/0, half 9/0,
+  halfextra1 194/74, halfextra2 494/466, where `Русский` is charcoal on a
+  charcoal leaf;
   the two arrows beside the door are measured with the rest. Gated for
   `standard` and `extra1` everywhere and every door ≥ 1152 px — with ONE named
   reading since 27.9: the widest double at 1152×800, `Русский` 43 px² (he) / 15
@@ -1616,7 +1663,10 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   whole in the column, before → after: 1280×720 10 → 10 (capped by the box's
   46vh now, not by the room under it), 1366×768 7 → 10, 1100×800 8 → 11,
   1440×900 12 → 12, 1920×918 10 → 13. (The "~5 rows at 1280×720" this line
-  carried was stale: it read 10 at the commit before the move.) Raising the
+  carried was stale: it read 10 at the commit before the move.) Re-measured at
+  the end of the round (27.9), after the band above the door moved the frame:
+  the same five figures, and the same with the swing bar lock's row added (a
+  fourteen-row door — the window, not the column, is the limit). Raising the
   46vh cap where the room allows, or two columns, is unmeasured.
 - **A short-and-wide screen shows the question and little answer** (13.9): a
   phone on its side (844×390) and a laptop at 200% zoom (640×360) leave 75–92 px
@@ -1656,7 +1706,9 @@ Section numbers here are that file's. Ask **1a** first (A13, which window is
 and a fixed half — the drawing on three sizes, A18); **1g** (the rose's size);
 **0j** (26.9: whether a glazed trio exists — to the owner's son; whether a glazed
 pair is the ₪3,800 alone, A20; that the square window moved 131 mm down);
-**0a2** (the ₪300 bell: ring, electric push, or both); **0a5** (a gold פרזול's
+**0k** (27.9: the swing bar lock's price, A22 — shown as "to follow" until he
+names it — a photograph, and whether a fitting mounted inside should be drawn
+on the outside view at all); **0a2** (the ₪300 bell: ring, electric push, or both); **0a5** (a gold פרזול's
 keyhole); **1b** (a picture of the curved lever, the Idan's stock length, a
 picture of the digital viewer); **1c** (the wide-margin three-panel doors); **2** (ברזל
 מחושל on ten doors he says do not carry it); **3** (warranty term, permission to

@@ -26,6 +26,47 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE BIG ROUND, 8 OF 8: THE RECORD.** The round's own last
+  instruction: §0a gains the placements the owner's son makes himself and the
+  decisions taken for him; the record is corrected where the round made it
+  false; the working prompt is deleted.
+  · **§0a.** "They place the page's furniture themselves, and move it
+    themselves" — the wall's controls (28.8), the price at the door's
+    top-right corner and the handing card off the summary (both 27.9, both
+    his), the latch at the head of the lock side. "Decisions taken FOR them"
+    — the finish group with a bell alone, the navigator column desktop-only,
+    the colour's short name its code, the lever-beside-a-bar popup as yes/no,
+    the arrows skipping refused options — each named so it can be reversed in
+    a line; and what was settled with them in chat: Peretz's refusal stands
+    where the new "ask first" rule meets it, and the latch is an option with
+    its price to follow.
+  · **§0c** dated 27.9; its gate table carries the round's readings — `npm
+    test` 9,318,240 / 0 failed, the audit clean at commit 7 (and why commits 4
+    and 5 were not on their first runs), `collide` 2,384 designs, fuzz with
+    141 dialogs answered both ways, latency 217 ms with the element counts
+    unchanged, the sheets as predicted. The blocked-on-a-human lists gain
+    §0k (the latch's price, a photograph, whether a fitting mounted inside
+    belongs on the outside view).
+  · **§3 The flow** points at the band, the arrows, the dialog and the
+    summary's pictures, each described where it lives.
+  · **§5.28** a gate added to the page is a change to every instrument that
+    drives it (the modal and the 26 walk faults); **§5.29** a control made
+    real in one layer and erased in another (buttons inside an `aria-hidden`
+    box for thirteen days).
+  · **§9 re-measured.** The wall table (worst px² of glyph, he/ru): extra2
+    81/0, half 9/0, halfextra1 194/74, halfextra2 494/466 — the four doors it
+    names, and the one named reading at 1152×800 (43/15) still named. The
+    desktop breakdown window on a thirteen-row door: 1280×720 10, 1366×768
+    10, 1100×800 11, 1440×900 12, 1920×918 13 — the figures commit 2
+    measured, unchanged by the band, and unchanged with the latch's row (a
+    fourteen-row door).
+  · **§0b.** The round's eight entries held to the file's own six-line rule
+    (four of them ran to seven or nine).
+  · `PROMPT.md` deleted, as the brief said; it was never committed.
+  · **Gates:** node --check, npm run build, npm test 9,318,240 passed / 0
+    failed. No page change, so the audit, the sheets and the slow run of
+    commit 7 stand.
+
 - **27.9 — THE BIG ROUND, 7 OF 8: THE SWING BAR LOCK, AND THE פרזול TILES
   SHOW THIS DOOR'S METAL — `VERSION` 26.** The owner's son: *"add 'סגר בטחון'
   to the pirzul section — a swing bar lock, at the top of the door's side,
