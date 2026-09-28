@@ -2,15 +2,15 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { BELLS, BOWS, LATCHES, glassRows, PEEPHOLES, STRIPE_SLOTS, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, finishHasSubject, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
+import { BELLS, BOWS, glassRows, PEEPHOLES, STRIPE_SLOTS, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, finishHasSubject, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
 import { contrast, lighten, scaleTone, silhouette } from '../js/colour.js';
 import { SECTION_ICON, sectionIcon, SPEC_ICON, specIcon } from '../js/icons.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
-import { breakdownRows, formatAgorot, pendingParts, priceAgorot, priceLabel, priceParts, shekels, tileAgorot } from '../js/price.js';
+import { breakdownRows, formatAgorot, priceAgorot, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
   bellGlyph, bowGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
-  bellFits, bowFeet, bowFits, bowHome, bowPlacement, LATCH, latchFits, latchGlyph, locksetGlyph, mashkofGlyph, panelUnderGlass, spawnIndexOf, spawnSpots, peepholeFits,
+  bellFits, bowFeet, bowFits, bowHome, bowPlacement, locksetGlyph, mashkofGlyph, panelUnderGlass, spawnIndexOf, spawnSpots, peepholeFits,
   peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph, stripesGlyph, TRIO_RAIL,
   windowGlyph,
 } from '../js/renderer.js';
@@ -63,16 +63,13 @@ const base = { colour: 'rb-7126d', window: 'none', grille: 'none',
                /* The horizontal bow, 26.9.2026 — added with the field, and the
                   check below that every DEFAULTS key is here said so first. */
                grab: 'nograb',
-               /* The swing bar lock, 27.9.2026 — the same way, and the check
-                  below failed first. */
-               latch: 'nolatch',
                detail: 'plain', size: 'standard', handing: 'right-in' };
 
 /** The keys a design is made of, in one place, so a new one cannot be forgotten
  *  by half the round-trip checks below. */
 const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle',
               'lockset', 'speciallock', 'bell', 'peephole', 'mashkof', 'pirzul',
-              'handleLen', 'handleFinish', 'grab', 'latch', 'detail'];
+              'handleLen', 'handleFinish', 'grab', 'detail'];
 
 /* ⚠ THE GUARD THAT WOULD HAVE CAUGHT TWO STALE FIXTURES, AND IT COST NOTHING.
    `base` and `everyState`'s stem are both descriptions of "a door" written by
@@ -237,7 +234,7 @@ group('short code round-trip');
     grille: GRILLES, handle: HANDLES, lockset: LOCKSETS, detail: DETAILS,
     speciallock: SPECIAL_LOCKS, mashkof: MASHKOFS, pirzul: PIRZUL, handleLen: HANDLE_LENS,
     stripes: { length: STRIPE_SLOTS }, bell: BELLS, peephole: PEEPHOLES,
-    handleFinish: HANDLE_FINISHES, grab: BOWS, latch: LATCHES,
+    handleFinish: HANDLE_FINISHES, grab: BOWS,
   };
   for (const field of Object.keys(BITS)) {
     if (field === 'version') continue;
@@ -5097,7 +5094,7 @@ group('the horizontal bow is its own field on the face step — 26.9.2026');
     const VARY = {
       size: Object.keys(SIZES), handle: ids(HANDLES), handleLen: HANDLE_LENS, lockset: ids(LOCKSETS),
       detail: ids(DETAILS), window: ids(WINDOWS), handing: ids(HANDINGS), bell: ids(BELLS),
-      peephole: ids(PEEPHOLES), speciallock: ids(SPECIAL_LOCKS), grab: ids(BOWS), latch: ids(LATCHES),
+      peephole: ids(PEEPHOLES), speciallock: ids(SPECIAL_LOCKS), grab: ids(BOWS),
       colour: ids(COLOURS).slice(0, 3), grille: ids(GRILLES).slice(0, 4), mashkof: ids(MASHKOFS),
       pirzul: ids(PIRZUL), handleFinish: ids(HANDLE_FINISHES),
       stripeDir: ['none', 'h', 'v'], stripeCount: [0, 1, 3], stripeTight: [false, true],
@@ -5122,131 +5119,28 @@ group('the horizontal bow is its own field on the face step — 26.9.2026');
   }
 }
 
-group('the swing bar lock (סגר בטחון) on the פרזול step, its price to follow — 27.9.2026');
+group('the פרזול tiles are a composite of this door — 27.9.2026');
 {
-  /* The owner's son: *"add 'סגר בטחון' to the pirzul section — a swing bar
-     lock, at the top of the door's side, mounted on the mashkof and the door,
-     affected by the pirzul."* Peretz has not priced it. */
-  const on = { ...DEFAULTS, latch: 'latch' };
-
-  /* ── the wire format ── one bit at the end, VERSION 26, the code no longer.
-     Falsified by giving the latch six bits (the character clause). */
-  ok(VERSION === 26, `VERSION is ${VERSION}: the latch's appended bit shifts every field and needs 26`);
-  ok(BITS.latch === 1 && Object.keys(BITS).at(-1) === 'latch',
-     'the latch is not one bit at the END of the pack order');
-  {
-    const payload = Object.values(BITS).reduce((a, b) => a + b, 0);
-    ok(Math.ceil((payload - BITS.latch + 4) / 5) === CODE_LEN && Math.ceil((payload + 4) / 5) === CODE_LEN,
-       `the latch's bit cost a character: ${Math.ceil((payload + 4) / 5)} with it, the default door encodes to ${CODE_LEN}`);
-  }
-  ok(encodeCode(on).length === encodeCode(DEFAULTS).length, 'a code with the latch is not the length of every other code');
-  for (const lt of LATCHES) {
-    const st = repair({ ...DEFAULTS, latch: lt.id }).state;
-    ok(fromQuery(toQuery(st)).state.latch === lt.id, `a link lost the latch ${lt.id}`);
-    const c = decodeCode(encodeCode(st));
-    ok(c && c.latch === lt.id, `a code lost the latch ${lt.id}`);
-  }
-  ok(toQuery(on).includes('lt=latch'), 'the latch rides in lt=');
-  ok(!fromQuery('?lt=latch').notice, '?lt=latch raised a notice');
-  ok(fromQuery('?lt=bolt').notice === 'option-unknown', 'an invented lt= is not refused with its notice');
-  ok(fromQuery('?c=rb-9016d').state.latch === 'nolatch', 'a link from before the latch (no lt=) opens with one');
-
-  /* ── the money: a THIRD state, never ₪0 and never כלול ──
-     Falsified by pricing it 0 in prices.js with the flag kept (the load
-     guard throws — the whole run stops), and by `tileAgorot` returning the
-     part (the tile clause: it reads כלול). */
-  for (const list of [LATCHES, BELLS, BOWS, PEEPHOLES, COLOURS, WINDOWS, GRILLES, DETAILS, LOCKSETS, PIRZUL, SPECIAL_LOCKS]) {
-    for (const o of list) {
-      ok((o.delta === null) === !!o.priceTBD,
-         `${o.id}: delta ${o.delta} and priceTBD ${!!o.priceTBD} — only an entry marked priceTBD may wait for its figure, and it must`);
-    }
-  }
-  ok(priceAgorot(on) === priceAgorot(DEFAULTS), 'the latch moved the total — a price nobody gave is in it');
-  ok(JSON.stringify(pendingParts(on)) === '["latch"]' && pendingParts(DEFAULTS).length === 0,
-     `pendingParts says ${JSON.stringify(pendingParts(on))} with the latch and ${JSON.stringify(pendingParts(DEFAULTS))} without`);
-  ok(tileAgorot('latch', on) === null, `the latch tile's price is ${tileAgorot('latch', on)}, not null (to follow)`);
-  ok(priceLabel(tileAgorot('latch', on)) === T('price.tbd') && T('price.tbd') !== T('price.included'),
-     `the latch tile prints "${priceLabel(tileAgorot('latch', on))}" — it must say the price is to follow, never כלול`);
-  ok(priceLabel(0) === T('price.included'), 'priceLabel(0) is no longer כלול — the null case swallowed the zero one');
-  {
-    const rows = breakdownRows(on);
-    const last = rows.at(-1);
-    ok(last.key === 'latch' && last.agorot === null,
-       `the breakdown ends ${JSON.stringify(last)} — the latch is a row with no figure`);
-    const sum = rows.filter(r => r.agorot !== null).reduce((t, r) => t + r.agorot, 0);
-    ok(sum === priceAgorot(on), `the breakdown's figures add to ${sum} and the total is ${priceAgorot(on)}`);
-    ok(!breakdownRows(DEFAULTS).some(r => r.key === 'latch'), 'a door with no latch has a latch row in its breakdown');
-  }
-
-  /* ── the order says it, and says the price is to follow ── */
-  {
-    const lines = specLines(on);
-    ok(lines.includes('סגר בטחון: סגר בטחון (מחיר יימסר)'),
-       `the order's latch line is not "סגר בטחון: סגר בטחון (מחיר יימסר)": ${lines.filter(l => /סגר/.test(l)).join(' | ') || '(none)'}`);
-    ok(!specLines(DEFAULTS).some(l => /סגר בטחון/.test(l)), 'a door with no latch names one in its order');
-    globalThis.window = globalThis.window
-      || { location: { href: 'https://dlatotmagen.example/index.html', protocol: 'https:' } };
-    const { message } = await import('../js/share.js');
-    ok(message(on).includes('סגר בטחון (מחיר יימסר)'), 'the WhatsApp message does not carry the latch and its unpriced state');
-  }
-
-  /* ── the drawing ── in the פרזול's metal, both bolted parts marked, the
-     keeper at the head of the closing edge on either handing, the plate across
-     the mullion on a דלת וחצי. Falsified by drawing it in #lockUnit (the metal
-     clause) and by putting the keeper on the hinge side (the handing clause). */
-  for (const handing of ['right-in', 'left-in']) {
-    const svg = render({ ...on, handing });
-    const g = svg.match(/<g data-hw="latch"[\s\S]*?\n    <\/g>/);
-    ok(g, `${handing}: a latch state draws no [data-hw="latch"]`);
-    if (!g) continue;
-    ok(/url\(#nickel\)/.test(g[0]) && !/lockUnit/.test(g[0]),
-       `${handing}: the latch is not in the פרזול's metal (#nickel)`);
-    ok(/data-mount="latch-keeper"/.test(g[0]) && /data-mount="latch-plate"/.test(g[0]),
-       `${handing}: the latch's keeper and plate are not both marked data-mount — collide cannot hold them off glass`);
-    const cx = Number(g[0].match(/data-cx="([\d.]+)"/)[1]);
-    const lockX = Number((svg.match(/data-hw="lockset"[^>]*data-cx="([\d.]+)"/) || [])[1]);
-    ok(Number.isFinite(lockX) && Math.abs(cx - lockX) < 120,
-       `${handing}: the keeper stands at x ${cx} and the lock furniture at ${lockX} — it is not on the lock side`);
-  }
-  ok(!/data-hw="latch"/.test(render(DEFAULTS)), 'a door with no latch draws one');
-
-  /* ── the rule: geometric, and today true everywhere — measured ──
-     Falsified by moving the keeper 200 mm inboard (LATCH.keeperIn): the Greek
-     set's cornice and the panels refuse it. */
-  {
-    let n = 0, refused = [];
-    for (const size of Object.keys(SIZES)) for (const w of WINDOWS) for (const d of DETAILS) for (const h of HANDINGS) {
-      const st = { ...on, size, window: w.id, detail: d.id, handing: h.id };
-      n++;
-      if (!latchFits(st) || conflicts(st).latch.latch) refused.push(`${size}/${w.id}/${d.id}/${h.id}`);
-    }
-    ok(n >= 100 && !refused.length,
-       `the latch is refused on ${refused.length} of ${n} doors (${refused.slice(0, 3).join(', ')}) — it was measured clear of every window and moulding`);
-    const kinds = faceObstacles(on).map(o => o.kind);
-    ok(kinds.includes('latch') && !faceObstacles(DEFAULTS).some(o => o.kind === 'latch'),
-       `the obstacle list with the latch holds ${kinds.join(',')} — the keeper must be on it, and only when chosen`);
-    ok(repair(on).state.latch === 'latch' && !repair(on).changed?.includes?.('latch'),
-       'repair takes the latch off a door it fits');
-  }
-
-  /* ── the tile and the פרזול's composite tiles ──
-     Falsified by drawing the old Coral-only glyph (the lockset clause) and by
-     leaving the latch out of the composite (the latch clause). */
-  ok(latchGlyph({ id: 'latch' }) !== latchGlyph({ id: 'nolatch' }), 'the latch and no-latch tiles are one picture');
-  {
-    const pz = PIRZUL[0];
-    const a = pirzulGlyph(pz, { ...DEFAULTS, lockset: 'plate' });
-    const b = pirzulGlyph(pz, { ...DEFAULTS, lockset: 'coral' });
-    ok(a !== b, 'the פרזול tile draws the same thing for the Rotem and the Coral — it is not the door\'s lock furniture');
-    ok(/data-pz="latch"/.test(pirzulGlyph(pz, on)) && !/data-pz="latch"/.test(pirzulGlyph(pz, DEFAULTS)),
-       'the פרזול tile does not show the latch exactly when the door has one');
-    ok(/data-pz="viewer"/.test(pirzulGlyph(pz, { ...DEFAULTS, peephole: 'peep' }))
-       && !/data-pz="viewer"/.test(pirzulGlyph(pz, DEFAULTS)),
-       'the פרזול tile does not show the viewer exactly when the door has one');
-    ok(/data-pz="hinge"/.test(a), 'the פרזול tile does not show the hinges it recolours');
-    const tiles = PIRZUL.map(p => pirzulGlyph(p, on).replace(/pzg-[\w-]+/g, 'ID'));
-    ok(new Set(tiles).size === PIRZUL.length, 'two פרזול finishes draw the same tile on the same door');
-  }
+  /* The owner's son: *"in the pirzul icons show the lever the person chose,
+     … the pins … the peephole if chosen."* (The swing bar lock was part of
+     this group for a day; withdrawn 28.9 — and the version it cost is burnt:
+     VERSION 27, `lt=` retired.) Falsified 27.9 by drawing the old Coral-only
+     glyph (the lockset clause). */
+  ok(VERSION === 27, `VERSION is ${VERSION}: the latch's bit left the layout, and 26 is never reused`);
+  ok(!('latch' in DEFAULTS) && !('latch' in BITS), 'the withdrawn latch is still a field');
+  ok(!fromQuery('?lt=latch').notice && !('latch' in fromQuery('?lt=latch').state),
+     'a link from the latch\'s day raises a notice or carries the field — lt= is retired, silently');
+  const pz = PIRZUL[0];
+  const a = pirzulGlyph(pz, { ...DEFAULTS, lockset: 'plate' });
+  const b = pirzulGlyph(pz, { ...DEFAULTS, lockset: 'coral' });
+  ok(a !== b, 'the פרזול tile draws the same thing for the Rotem and the Coral — it is not the door\'s lock furniture');
+  ok(/data-pz="viewer"/.test(pirzulGlyph(pz, { ...DEFAULTS, peephole: 'peep' }))
+     && !/data-pz="viewer"/.test(pirzulGlyph(pz, DEFAULTS)),
+     'the פרזול tile does not show the viewer exactly when the door has one');
+  ok(/data-pz="hinge"/.test(a), 'the פרזול tile does not show the hinges it recolours');
+  ok(!/data-pz="latch"/.test(pirzulGlyph(pz, { ...DEFAULTS, latch: 'latch' })), 'the פרזול tile still draws the withdrawn latch');
+  const tiles = PIRZUL.map(p => pirzulGlyph(p, DEFAULTS).replace(/pzg-[\w-]+/g, 'ID'));
+  ok(new Set(tiles).size === PIRZUL.length, 'two פרזול finishes draw the same tile on the same door');
 }
 
 group('a grip never draws lock furniture');
@@ -5787,7 +5681,6 @@ group('a handle the customer moved reaches the order');
     bell:        other(BELLS, DEFAULTS.bell),
     peephole:    other(PEEPHOLES, DEFAULTS.peephole),
     grab:        other(BOWS, DEFAULTS.grab),
-    latch:       other(LATCHES, DEFAULTS.latch),
     mashkof:     other(MASHKOFS, DEFAULTS.mashkof),
     pirzul:      other(PIRZUL, DEFAULTS.pirzul),
     handleFinish: other(HANDLE_FINISHES, DEFAULTS.handleFinish),

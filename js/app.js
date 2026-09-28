@@ -29,7 +29,7 @@
 
 import {
   BELLS, BOWS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS, finishHasSubject,
-  GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LATCHES, LOCKSETS, MASHKOFS,
+  GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LOCKSETS, MASHKOFS,
   mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, BUILD_A,
   PEEPHOLES, PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_A, STRIPE_MAX, WINDOWS,
 } from './catalog.js';
@@ -37,7 +37,7 @@ import { breakdownRows, deltaLabel, formatAgorot, priceAgorot, priceLabel, price
   from './price.js';
 import {
   describe, detailGlyph, grilleGlyph, handleGlyph, locksetGlyph,
-  bellGlyph, bowGlyph, handleFinishGlyph, copyOf, latchGlyph, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
+  bellGlyph, bowGlyph, handleFinishGlyph, copyOf, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
   panelUnderGlass, specialLockGlyph, stripesGlyph,
   windowGlyph,
 } from './renderer.js';
@@ -220,14 +220,14 @@ const GROUPS = [
      not, and one it reaches in two finishes of four — is stated for a
      customer in `exp.pz.a` and for us in `js/spec.js`. */
   /* ⚠ A COMPOSITE OF THIS DOOR SINCE 27.9.2026 (the owner's son: *"in the
-     pirzul icons show the lever the person chose, the bar lock if chosen, the
-     pins … the peephole if chosen"*): each tile draws the door's own lock
-     furniture, hinges, latch and viewer in its metal, so `composite` names
-     the fields it depends on and `retintOptions` redraws the four when they
-     move — the tiles, never the panel. */
+     pirzul icons show the lever the person chose … the pins … the peephole
+     if chosen"*): each tile draws the door's own lock furniture, hinges and
+     viewer in its metal, so `composite` names the fields it depends on and
+     `retintOptions` redraws the four when they move — the tiles, never the
+     panel. (The swing bar lock was in it for a day; withdrawn 28.9.) */
   { key: 'pirzul', title: 'g.pirzul', in: 'pz', kind: 'hw', list: () => PIRZUL,
     glyph: o => pirzulGlyph(o, state), hint: 'g.pirzul.h',
-    composite: st => `${st.lockset}|${st.latch}|${st.peephole}` },
+    composite: st => `${st.lockset}|${st.peephole}` },
 
   /* ⚠ THE עינית, 30.8.2026, ON THE פרזול STEP. Peretz asked for it by name.
      It is neither a lock nor a grip, so it does not belong on `lock` or
@@ -239,12 +239,6 @@ const GROUPS = [
   { key: 'peephole', title: 'g.peephole', in: 'pz', kind: 'hw', list: () => PEEPHOLES,
     glyph: peepholeGlyph, hint: 'g.peephole.h' },
 
-  /* ⚠ THE SWING BAR LOCK, 27.9.2026, ON THE פרזול STEP — the owner's son:
-     *"add 'סגר בטחון' to the pirzul section."* Lock furniture the פרזול
-     recolours, beside the viewer, on the same argument. Its price is to
-     follow (`priceTBD`): its tile says so. */
-  { key: 'latch', title: 'g.latch', in: 'pz', kind: 'hw', list: () => LATCHES,
-    glyph: latchGlyph, hint: 'g.latch.h' },
 
   { key: 'size', title: 'g.size', in: 'fit', kind: 'tile', list: () => Object.values(SIZES),
     /* `delta: z => z.base - SIZES.standard.base` used to live here, and it was
@@ -1542,7 +1536,7 @@ const BREAKDOWN_KEY = {
   detail: 'bd.detail', window: 'bd.window', grille: 'bd.grille',
   handle: 'bd.handle', grab: 'bd.grab', lockset: 'bd.lockset', speciallock: 'bd.speciallock',
   pirzul: 'bd.pirzul', stripes: 'bd.stripes', round: 'bd.round',
-  bell: 'bd.bell', peephole: 'bd.peephole', latch: 'bd.latch',
+  bell: 'bd.bell', peephole: 'bd.peephole',
 };
 
 /**
@@ -1559,8 +1553,7 @@ function renderBreakdown(state) {
   const rows = breakdownRows(state);
   body.innerHTML = rows.map(r =>
       `<tr><th scope="row">${BREAKDOWN_KEY[r.key] ? T(BREAKDOWN_KEY[r.key]) : r.key}</th>`
-    /* `null` is a price to follow (the swing bar lock): a dash, not ₪0. */
-    + `<td>${r.agorot === null ? '—' : formatAgorot(r.agorot)}</td></tr>`).join('')
+    + `<td>${formatAgorot(r.agorot)}</td></tr>`).join('')
     + `<tr class="bd__total"><th scope="row">${T('price.total')}</th>`
     + `<td>${formatAgorot(priceAgorot(state))}</td></tr>`;
 }
