@@ -540,6 +540,24 @@ export const PEEPHOLE = {
   'peep-digital': 390, // עינית דיגיטלית — Peretz, 20.9.2026
 };
 
+/* ── סגר בטחון — the swing bar lock ────────────────────────────────
+   27.9.2026, the owner's son: *"add 'סגר בטחון' to the pirzul section — a
+   swing bar lock, at the top of the door's side, mounted on the mashkof and
+   the door, affected by the pirzul."* Peretz named the fitting on 26.8 — it is
+   in his list of what the פרזול recolours (below) — and has never priced it.
+   ⚠ `null` IS NOT ₪0 AND NOT A PLACEHOLDER. ₪0 would print כלול on the tile
+   and state that the latch is included, which nobody has said; a guessed
+   figure would put an invented number in an order. `null` is a third state,
+   and `priceInto` accepts it only on an entry marked `priceTBD: true`: the
+   tile says "מחיר בהמשך", the breakdown row "—", the order "(מחיר יימסר)",
+   and the total does not include it. CLAUDE.md §9 assumption A22;
+   `ASK-PERETZ.md` asks for the figure and a photograph. When he answers, the
+   figure goes here and the `priceTBD` flag comes off the catalogue entry. */
+export const LATCH = {
+  nolatch: 0,        // ללא
+  latch:   null,     // סגר בטחון — price to follow (A22)
+};
+
 /* ── פרזול — the finish of the lock furniture ─────────────────────────
    Peretz: "pirzul: color: black +300, bronze +500, gold +900". It changes the
    ידית, the צירים, the עינית and the סגר ביטחון, and since 30.8 the keyhole

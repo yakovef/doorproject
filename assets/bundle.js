@@ -186,10 +186,11 @@
        leaves the two qualified cases to `exp.pz.a` — the metal strips, which
        follow only a NON-nickel פרזול, and the פעמון, which has two metals of
        the four and says so on its own tile. */
+    /* And the swing bar lock since 27.9.2026, chosen on this step. */
     "step.pz.l": [
-      "הגוון של הידית, חור המנעול, הצירים והעינית. לא משנה את גוון ידית המשיכה ולא את המנעול הנוסף.",
-      "The tone of the lever, the keyhole, the hinges and the viewer. It changes neither the pull handle nor the additional lock.",
-      "Оттенок нажимной ручки, замочной скважины, петель и глазка. Ручку-скобу и дополнительный замок не меняет."
+      "הגוון של הידית, חור המנעול, הצירים, העינית וסגר הבטחון. לא משנה את גוון ידית המשיכה ולא את המנעול הנוסף.",
+      "The tone of the lever, the keyhole, the hinges, the viewer and the swing bar lock. It changes neither the pull handle nor the additional lock.",
+      "Оттенок нажимной ручки, замочной скважины, петель, глазка и ограничителя. Ручку-скобу и дополнительный замок не меняет."
     ],
     "step.sum.t": ["סיכום", "Your door", "Итог"],
     "step.sum.s": ["הדלת שלכם, והמחיר", "The door you built, and the price", "Собранная дверь и цена"],
@@ -247,10 +248,18 @@
     "g.pirzul": ["פרזול", "Hardware finish", "Отделка фурнитуры"],
     "g.bell": ["פעמון", "Doorbell", "Звонок"],
     "g.peephole": ["עינית", "Peephole", "Глазок"],
+    "g.latch": ["סגר בטחון", "Swing bar lock", "Дверной ограничитель"],
     "g.pirzul.h": [
-      "הגוון של הידית, חור המנעול, הצירים והעינית.",
-      "The tone of the lever, the keyhole, the hinges and the viewer.",
-      "Оттенок ручки, замочной скважины, петель и глазка."
+      "הגוון של הידית, חור המנעול, הצירים, העינית וסגר הבטחון.",
+      "The tone of the lever, the keyhole, the hinges, the viewer and the swing bar lock.",
+      "Оттенок ручки, замочной скважины, петель, глазка и ограничителя."
+    ],
+    /* The swing bar lock's hint, 27.9.2026: where it goes and what colours it,
+       and nothing about money — the tile says the price is to follow. */
+    "g.latch.h": [
+      "בראש הדלת, בצד הנעילה — על המשקוף ועל הכנף. בגוון הפרזול.",
+      "At the top of the door, on the lock side — on the frame and the leaf. In the hardware finish.",
+      "Вверху двери, со стороны замка — на коробке и полотне. В отделке фурнитуры."
     ],
     /* ⚠ THIS DESCRIBED THE FITTING THE DRAWING NO LONGER HAD. It said "a bell
        push" for as long as the renderer drew one; the owner's three photographs
@@ -534,6 +543,9 @@
     "price.breakdown": ["פירוט המחיר", "What the price is made of", "Из чего складывается цена"],
     "price.total": ["סה״כ", "Total", "Итого"],
     "price.included": ["כלול", "Included", "Включено"],
+    /* A price Peretz has not given yet (27.9.2026, the swing bar lock): never
+       כלול, which would say it is included, and never ₪0. */
+    "price.tbd": ["מחיר בהמשך", "Price to follow", "Цена позже"],
     "bd.door": ["הדלת", "The door", "Дверь"],
     "bd.cylinder": ["צילינדר", "Cylinder", "Цилиндр"],
     "bd.lock": ["מנגנון נעילה", "Locking mechanism", "Механизм запирания"],
@@ -562,6 +574,7 @@
        `bd.*` here is written out the same way. */
     "bd.bell": ["פעמון", "Doorbell", "Звонок"],
     "bd.peephole": ["עינית", "Peephole", "Глазок"],
+    "bd.latch": ["סגר בטחון", "Swing bar lock", "Дверной ограничитель"],
     "bd.round": ["עיגול", "Rounding", "Округление"],
     /* ── sending it ───────────────────────────────────────────────── */
     "send.label": ["שליחת הדלת", "Send your door", "Отправка двери"],
@@ -852,6 +865,7 @@
        they describe, so the number and the rule cannot drift apart. */
     "fix.peepGone": ["הסרנו את העינית — החלון תופס בדיוק את מקומה", "We removed the peephole — the window sits exactly where it goes", "Мы убрали глазок — окно занимает как раз его место"],
     "fix.bellGone": ["הסרנו את הפעמון — החלון תופס את מקומו במרכז הדלת", "We removed the doorbell — the window sits where it goes, on the centre of the door", "Мы убрали звонок — окно занимает его место по центру двери"],
+    "fix.latchGone": ["הסרנו את סגר הבטחון — אין לו כנף מלאה בראש הדלת", "We removed the swing bar lock — there is no solid leaf at the top of the door for it", "Мы убрали ограничитель — вверху двери нет для него сплошного полотна"],
     "fix.stripesCapped": ["פסים אנכיים יורדים ל-6 — יותר מזה לא נכנס לרוחב הדלת", "Vertical stripes cap at 6 — more than that will not fit across the door", "Вертикальных полос максимум 6 — больше по ширине двери не помещается"],
     "why.peepWindow": [
       "החלון תופס את מקום העינית",
@@ -862,6 +876,11 @@
       "החלון תופס את מקום הפעמון",
       "The window sits where the doorbell goes",
       "Окно занимает место звонка"
+    ],
+    "why.latchNoRoom": [
+      "אין כנף מלאה בראש הדלת, בצד הנעילה",
+      "There is no solid leaf at the top of the lock side",
+      "Вверху со стороны замка нет сплошного полотна"
     ],
     "why.gripOffDoor": ["הידית חורגת מהדלת", "The handle runs off the door", "Ручка выходит за пределы двери"],
     "why.gripReach": [
@@ -960,6 +979,9 @@
     "row.speciallock": ["מנעול מיוחד", "Extra lock", "Дополнительный замок"],
     "row.bell": ["פעמון", "Doorbell", "Звонок"],
     "row.peephole": ["עינית", "Peephole", "Глазок"],
+    "row.latch": ["סגר בטחון", "Swing bar lock", "Дверной ограничитель"],
+    /* After an unpriced item in the order: the total above does not include it. */
+    "row.priceTBD": ["מחיר יימסר", "price to follow", "цена будет сообщена"],
     "row.detail": ["עיצוב", "Face", "Полотно"],
     "row.stripes": ["פסים", "Strips", "Полосы"],
     "row.size": ["מידה", "Size", "Размер"],
@@ -1243,6 +1265,12 @@
     // עינית — included; see the note above and A7
     "peep-digital": 390
     // עינית דיגיטלית — Peretz, 20.9.2026
+  };
+  var LATCH = {
+    nolatch: 0,
+    // ללא
+    latch: null
+    // סגר בטחון — price to follow (A22)
   };
   var PIRZUL = {
     "pz-nickel": 0,
@@ -1683,7 +1711,8 @@
        black inlay stripe, not a backplate. Either RB sells two products under
        the name or this label is on the wrong row. `photo: null` rather than a
        citation of those files, because citing them would assert the very thing
-       that is in doubt. `ASK-PERETZ.md` §1f asks.
+       that is in doubt. `ASK-PERETZ.md` §1f asked (the row is in its answered
+       table since 27.9).
        ✅ ANSWERED 27.9.2026 by the owner's son, with three photographs of
        installed doors: *"here is 3 doors with the rotem handle"* — this row, the
        lever on its backplate. What RB calls its striped bar is RB's business;
@@ -1963,6 +1992,17 @@
       en: "Digital peephole",
       ru: "Цифровой глазок",
       digital: true,
+      photo: null
+    }
+  ];
+  var LATCHES = [
+    { id: "nolatch", he: "ללא", en: "None", ru: "Нет" },
+    {
+      id: "latch",
+      he: "סגר בטחון",
+      en: "Swing bar lock",
+      ru: "Дверной ограничитель",
+      priceTBD: true,
       photo: null
     }
   ];
@@ -2642,6 +2682,17 @@
       if (!Object.prototype.hasOwnProperty.call(table, o.id)) {
         throw new Error(`prices.js has no ${what} price for "${o.id}" — every option needs one, or it silently costs nothing`);
       }
+      if (table[o.id] === null) {
+        if (!o.priceTBD) {
+          throw new Error(`prices.js prices ${what} "${o.id}" as null, and only an entry marked priceTBD may wait for its figure`);
+        }
+        o[key] = null;
+        seen.add(o.id);
+        continue;
+      }
+      if (o.priceTBD) {
+        throw new Error(`${what} "${o.id}" is marked priceTBD and prices.js gives it a figure — take the flag off the catalogue entry`);
+      }
       o[key] = agorot(table[o.id]);
       seen.add(o.id);
     }
@@ -2746,6 +2797,7 @@
   priceInto("bell", BELLS, BELL, "delta");
   priceInto("bow", BOWS, BOW, "delta");
   priceInto("peephole", PEEPHOLES, PEEPHOLE, "delta");
+  priceInto("latch", LATCHES, LATCH, "delta");
   for (const [id, shekels] of Object.entries(DETAIL_GLAZED)) {
     const o = DETAILS.find((d) => d.id === id);
     if (!o) {
@@ -2824,6 +2876,13 @@
          ₪500. Nothing on a door with no bell. */
       bell: byId(BELLS, state2.bell).delta + (state2.bell !== "nobell" ? finishExtra(state2) : 0),
       peephole: byId(PEEPHOLES, state2.peephole).delta,
+      /* ⚠ THE SWING BAR LOCK, 27.9.2026, AND ITS PRICE IS TO FOLLOW. Its delta
+         is `null` (see `LATCH` in prices.js), which adds nothing here — the
+         total is what is KNOWN — and `pendingParts` below names it, so the
+         tile, the breakdown and the order each say the figure is still to
+         come rather than letting a 0 read as "included". In the פרזול's metal,
+         which is priced on the פרזול's own row: no per-object surcharge. */
+      latch: byId(LATCHES, state2.latch || "nolatch").delta || 0,
       /* A grille needs a window to sit in — and so does worked glass, which is
          in the same list now. Neither can be charged on a solid door: the
          configurator must never take money for something the drawing does not
@@ -2849,6 +2908,12 @@
       grille: byId(GRILLES, state2.grille).delta * paneCount(state2)
     };
   }
+  function pendingParts(state2) {
+    const out = [];
+    const lt = byId(LATCHES, state2.latch || "nolatch");
+    if (lt && lt.delta === null) out.push("latch");
+    return out;
+  }
   function priceAgorot(state2) {
     let total = 0;
     for (const part of Object.values(priceParts(state2))) total += part;
@@ -2857,6 +2922,7 @@
   function tileAgorot(groupKey, state2) {
     if (groupKey === "size") return priceAgorot(state2);
     if (groupKey === "handleFinish") return byId(HANDLE_FINISHES, state2.handleFinish).delta;
+    if (pendingParts(state2).includes(groupKey)) return null;
     const parts = priceParts(state2);
     return Object.prototype.hasOwnProperty.call(parts, groupKey) ? parts[groupKey] : void 0;
   }
@@ -2876,6 +2942,7 @@
     }
     const round = priceAgorot(state2) - sum;
     if (round) rows.push({ key: "round", agorot: round });
+    for (const key of pendingParts(state2)) rows.push({ key, agorot: null });
     return rows;
   }
   var SHEKEL = "₪";
@@ -2887,6 +2954,7 @@
   });
   var formatAgorot = (a) => (a < 0 ? "−" : "") + SHEKEL + fmt.format(Math.abs(a) / 100);
   function priceLabel(agorot2) {
+    if (agorot2 === null) return T("price.tbd");
     if (!agorot2) return T("price.included");
     return formatAgorot(agorot2);
   }
@@ -2976,6 +3044,15 @@
     }
     if (ep.id !== "nopeep") {
       rows.push({ key: "peephole", label: T("row.peephole"), id: ep.id, value: L(ep) });
+    }
+    const lt = byId(LATCHES, state2.latch || "nolatch");
+    if (lt && lt.id !== "nolatch") {
+      rows.push({
+        key: "latch",
+        label: T("row.latch"),
+        id: lt.id,
+        value: lt.priceTBD ? `${L(lt)} (${T("row.priceTBD")})` : L(lt)
+      });
     }
     if (dt.id !== "plain") {
       rows.push({
@@ -3318,6 +3395,24 @@ ${stops}
     up: KNOCKER_R * 1.124,
     down: KNOCKER_R * 1.02
   };
+  var LATCH2 = {
+    drop: 150,
+    keeperIn: 30,
+    gap: 4,
+    keeper: { w: 28, h: 80 },
+    plate: { w: 26, h: 96 },
+    knob: 7,
+    arm: 16
+  };
+  function latchKeeperBox(state2, leafW) {
+    const w = LATCH2.keeperIn + LATCH2.keeper.w / 2;
+    return {
+      x: hingeLeftOf(state2) ? leafW - w : 0,
+      y: LATCH2.drop - LATCH2.keeper.h / 2,
+      w,
+      h: LATCH2.keeper.h
+    };
+  }
   var KEYWAY_BACKSET = 63;
   var LOCK_R = 33;
   var LEVER_ROSETTE = 31.5;
@@ -5193,6 +5288,12 @@ ${stops}
               anything. Both are explained where they are drawn. */
     ""}${state2.peephole !== "nopeep" ? byId(PEEPHOLES, state2.peephole).digital ? peepholeDigital(mainX + leafW / 2, y(PEEPHOLE_AFF)) : peephole(mainX + leafW / 2, y(PEEPHOLE_AFF)) : ""}
     ${state2.bell === "bell" ? bellKnocker(mainX + leafW / 2, y(KNOCKER_AFF)) : ""}
+    ${state2.latch === "latch" ? latchArt(
+      hingeOnLeft ? mainX1 : mainX,
+      hingeOnLeft ? 1 : -1,
+      y0 + LATCH2.drop,
+      sideW ? MULLION : 0
+    ) : ""}
   </g>
 
   <!-- ── THE SCONCES REACH THE DOOR ───────────────────────────────
@@ -5571,6 +5672,9 @@ ${body}
     if (state2.grab === "grab" && state2.handle !== BOW_AS_GRIP) {
       out.push({ kind: "bow", band: 0, ...bowBox(state2, leafW, leafH) });
     }
+    if (state2.latch === "latch") {
+      out.push({ kind: "latch", band: 0, ...latchKeeperBox(state2, leafW) });
+    }
     return out;
   }
   var faceObstacles = memo(function faceObstacles2(state2) {
@@ -5617,7 +5721,7 @@ ${body}
     }
     out.push(...fittingBoxes(state2, leafW, leafH));
     return out;
-  }, (st) => `${st.size}|${st.detail}|${st.window}|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}|${st.handing}|${st.handle === BOW_AS_GRIP}`);
+  }, (st) => `${st.size}|${st.detail}|${st.window}|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}|${st.latch}|${st.handing}|${st.handle === BOW_AS_GRIP}`);
   function peepholeFits(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
@@ -5635,6 +5739,13 @@ ${body}
     const PAINT = 8;
     const cx = leafW / 2, cy = leafH - KNOCKER_AFF;
     return !openings.some((o) => cx + KNOCKER_REACH.x + PAINT > o.x && cx - KNOCKER_REACH.x - PAINT < o.x + o.w && cy + KNOCKER_REACH.down + PAINT > o.top && cy - KNOCKER_REACH.up - PAINT < o.top + o.h);
+  }
+  function latchFits(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const leafW = size.w - REBATE * 2;
+    const k = latchKeeperBox(state2, leafW);
+    const PAINT = 8;
+    return !faceObstacles({ ...state2, latch: "nolatch" }).filter((o) => o.kind !== "fitting" && o.kind !== "bow" && o.kind !== "latch").some((o) => k.x - PAINT < o.x + o.w && k.x + k.w + PAINT > o.x && k.y - PAINT < o.y + o.h && k.y + k.h + PAINT > o.y);
   }
   function panelUnderGlass(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
@@ -5675,7 +5786,7 @@ ${body}
     }
     return null;
   }
-  var homeKey = (st) => `${st.size}|${st.handle}|${st.handleLen}|${st.lockset}|${st.detail}|${st.window}|${st.handing}|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}`;
+  var homeKey = (st) => `${st.size}|${st.handle}|${st.handleLen}|${st.lockset}|${st.detail}|${st.window}|${st.handing}|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}|${st.latch}`;
   var HOME_CACHE = /* @__PURE__ */ new Map();
   function gripHome(state2) {
     const key = homeKey(state2);
@@ -8046,6 +8157,43 @@ ${body}
               fill="#fff" fill-opacity=".34"/>
     </g>`;
   };
+  var latchArt = (edge, out, cy, past) => {
+    const n1 = (v) => v.toFixed(1);
+    const L2 = LATCH2;
+    const kx = edge - out * L2.keeperIn;
+    const px = edge + out * (past + L2.gap + L2.plate.w / 2);
+    const armX0 = Math.min(kx, px) - (out > 0 ? L2.knob * 1.8 : 0);
+    const armX1 = Math.max(kx, px) + (out < 0 ? L2.knob * 1.8 : 0);
+    const reachOut = Math.abs(px - kx) + L2.plate.w / 2;
+    const sh = 3;
+    return `
+    <g data-hw="latch" data-owner="latch" data-kind="latch"
+       data-cx="${n1(kx)}" data-cy="${n1(cy)}"
+       data-out="${Math.ceil(reachOut + 2)}" data-in="${Math.ceil(L2.keeper.w / 2 + 2)}"
+       data-vy="${Math.ceil(Math.max(L2.keeper.h, L2.plate.h) / 2 + 2)}">
+      <rect x="${n1(kx - L2.keeper.w / 2 + sh)}" y="${n1(cy - L2.keeper.h / 2 + sh)}"
+            width="${L2.keeper.w}" height="${L2.keeper.h}" rx="4" fill="#000" opacity=".22"
+            filter="url(#hwShadow)"/>
+      <rect x="${n1(armX0 + sh)}" y="${n1(cy - L2.arm / 2 + sh)}"
+            width="${n1(armX1 - armX0)}" height="${L2.arm}" rx="${L2.arm / 2}" fill="#000"
+            opacity=".22" filter="url(#hwShadow)"/>
+      <rect data-mount="latch-keeper" x="${n1(kx - L2.keeper.w / 2)}" y="${n1(cy - L2.keeper.h / 2)}"
+            width="${L2.keeper.w}" height="${L2.keeper.h}" rx="4"
+            fill="url(#nickel)" stroke="#000" stroke-opacity=".26"/>
+      <rect data-mount="latch-plate" x="${n1(px - L2.plate.w / 2)}" y="${n1(cy - L2.plate.h / 2)}"
+            width="${L2.plate.w}" height="${L2.plate.h}" rx="4"
+            fill="url(#nickel)" stroke="#000" stroke-opacity=".26"/>
+      ${[-1, 1].map((k) => `<circle cx="${n1(px)}" cy="${n1(cy + k * L2.plate.h * 0.36)}" r="2.6"
+              fill="#000" fill-opacity=".35"/>`).join("")}
+      <rect x="${n1(armX0)}" y="${n1(cy - L2.arm / 2)}" width="${n1(armX1 - armX0)}"
+            height="${L2.arm}" rx="${L2.arm / 2}"
+            fill="url(#nickel)" stroke="#000" stroke-opacity=".32"/>
+      <circle cx="${n1(px)}" cy="${n1(cy)}" r="${L2.arm * 0.42}" fill="url(#nickel)"
+              stroke="#000" stroke-opacity=".3"/>
+      <circle cx="${n1(kx)}" cy="${n1(cy)}" r="${L2.knob}" fill="url(#nickel)"
+              stroke="#000" stroke-opacity=".35"/>
+    </g>`;
+  };
   var bellKnocker = (cx, cy) => {
     const R = KNOCKER_R;
     const RING = R * 0.78;
@@ -8482,22 +8630,43 @@ ${body}
   </svg>`;
   }
   var locksetGlyph = handleGlyph;
-  function pirzulGlyph(pz) {
+  function pirzulGlyph(pz, state2 = {}) {
     const t = FINISH_TONES[pz.tone] || FINISH_TONES.steel;
+    const id = `pzg-${pz.id}`;
+    const lockset = byId(LOCKSETS, state2.lockset || "plate") || byId(LOCKSETS, "plate");
+    const make = FITTING_GLYPH[lockset.style] || FITTING_GLYPH.lever;
+    const { box, art } = make(lockset);
+    const [bx0, by0, bx1, by1] = box;
+    const latch = state2.latch === "latch";
+    const viewer = state2.peephole && state2.peephole !== "nopeep";
+    const top = latch ? -58 : -86;
     return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
     <defs>
-      <linearGradient id="pzg-${pz.id}" x1="0.1" y1="0" x2="0.9" y2="1">
+      <linearGradient id="${id}" x1="0.1" y1="0" x2="0.9" y2="1">
         <stop offset="0" stop-color="${t[0]}"/><stop offset="0.38" stop-color="${t[2]}"/>
         <stop offset="0.7" stop-color="${t[3]}"/><stop offset="1" stop-color="${t[5]}"/>
       </linearGradient>
     </defs>
-    <circle cx="0" cy="-26" r="30" fill="url(#pzg-${pz.id})"
-            stroke="#000" stroke-opacity=".18"/>
-    <path d="M -4 -40 L 46 -34 Q 54 -32 54 -25 Q 54 -18 46 -17 L -4 -12 Z"
-          fill="url(#pzg-${pz.id})" stroke="#000" stroke-opacity=".18"/>
-    <circle cx="0" cy="42" r="19" fill="url(#pzg-${pz.id})"
-            stroke="#000" stroke-opacity=".18"/>
-    <rect x="-4.5" y="36" width="9" height="13" rx="2" fill="#000" fill-opacity=".5"/>
+    <g fill="url(#${id})" stroke="#000" stroke-opacity=".18" data-pz="lock">
+      <svg x="-68" y="${top}" width="104" height="${88 - top}"
+           viewBox="${bx0} ${by0} ${bx1 - bx0} ${by1 - by0}" preserveAspectRatio="xMidYMid meet"
+           overflow="visible">${art}</svg>
+    </g>
+    <g fill="url(#${id})" stroke="#000" stroke-opacity=".22" data-pz="hinge">
+      <rect x="38" y="-30" width="18" height="30" rx="5"/>
+      <rect x="38" y="4" width="18" height="30" rx="5"/>
+      <rect x="45" y="-36" width="4" height="76" rx="2" fill="#000" fill-opacity=".28" stroke="none"/>
+    </g>
+    ${latch ? `<g fill="url(#${id})" stroke="#000" stroke-opacity=".22" data-pz="latch">
+      <rect x="-56" y="-88" width="18" height="30" rx="4"/>
+      <rect x="34" y="-90" width="18" height="34" rx="4"/>
+      <rect x="-52" y="-78" width="100" height="11" rx="5.5"/>
+      <circle cx="-47" cy="-72.5" r="7"/>
+    </g>` : ""}
+    ${viewer ? `<g data-pz="viewer">
+      <circle cx="47" cy="66" r="13" fill="url(#${id})" stroke="#000" stroke-opacity=".26"/>
+      <circle cx="47" cy="66" r="6.5" fill="#000" fill-opacity=".58"/>
+    </g>` : ""}
   </svg>`;
   }
   function handleFinishGlyph(hf) {
@@ -8559,6 +8728,20 @@ ${body}
     <circle cx="0" cy="-44" r="17"/>
     <circle cx="0" cy="-44" r="7" fill="#fff" opacity=".9"/>`
     }[x.id] || "";
+    return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">${art}</g>
+  </svg>`;
+  }
+  function latchGlyph(x) {
+    const parts = `
+    <rect x="-56" y="-32" width="30" height="64" rx="6"/>
+    <rect x="26" y="-48" width="28" height="96" rx="6"/>
+    <rect x="-54" y="-9" width="104" height="18" rx="9"/>`;
+    const art = x.id === "nolatch" ? `<g fill="none" stroke="currentColor" stroke-width="5" opacity=".3">${parts}</g>
+    <path d="M-40 40 L40 -40" stroke="currentColor" stroke-width="7" opacity=".45"/>` : `<g stroke="currentColor" stroke-opacity=".5" stroke-width="3">${parts}</g>
+    <circle cx="-41" cy="0" r="11" fill="#fff" stroke="currentColor" stroke-width="5"/>
+    <circle cx="40" cy="0" r="6" fill="#fff"/>
+    <circle cx="40" cy="-34" r="4.5" fill="#fff"/><circle cx="40" cy="34" r="4.5" fill="#fff"/>`;
     return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">${art}</g>
   </svg>`;
@@ -8783,6 +8966,8 @@ ${body}
          the fitting is not simply moved, is over it. */
       peephole: {},
       bell: {},
+      /* The swing bar lock, 27.9.2026 — `latchFits`. */
+      latch: {},
       /* The horizontal bow, a field of its own since 26.9.2026. */
       grab: {},
       /* ⚠ A STRING, NOT A MAP OF IDS, because the stripes are no
@@ -8816,6 +9001,7 @@ ${body}
       if (viewerOn(st) && !peepholeFits(st)) out.peephole[p.id] = T("why.peepWindow");
     }
     if (!bellFits(state2)) out.bell.bell = T("why.bellWindow");
+    if (!latchFits({ ...state2, latch: "latch" })) out.latch.latch = T("why.latchNoRoom");
     if (onLeaf) out.stripes = T("why.stripesWindow");
     else if (byId(DETAILS, state2.detail).panel) out.stripes = T("why.stripesPanel");
     if (lined) {
@@ -8909,6 +9095,7 @@ ${body}
     faceGone: "fix.faceGone",
     peepGone: "fix.peepGone",
     bellGone: "fix.bellGone",
+    latchGone: "fix.latchGone",
     peepWindow: "fix.peepWindow",
     /* `needPanel` and `ownPull` are gone with the two rules they announced —
        the forced bottom panel and the pull a face brought with it. Both rules
@@ -8970,6 +9157,10 @@ ${body}
           change("bell", SAID.bellGone);
         }
       }
+    }
+    if (s.latch === "latch" && !latchFits(s)) {
+      s.latch = "nolatch";
+      change("latch", SAID.latchGone);
     }
     const lined = isLineWork(s);
     if (lined && byId(DETAILS, s.detail).panel) {
@@ -9109,7 +9300,7 @@ ${body}
   var checkBadge = () => `<svg class="steps__vg" viewBox="0 0 24 24" aria-hidden="true">${CHECK_BADGE}</svg>`;
 
   // js/url-state.js
-  var VERSION = 25;
+  var VERSION = 26;
   var DEFAULTS = {
     /* ⚠ 7126D, NOT THE ANTHRACITE, AND THE REASON IS THE OPENING PRICE.
        Peretz priced colour on 30.8.2026: 9016T, 9001T and 7126D are in the
@@ -9150,6 +9341,9 @@ ${body}
     /* The horizontal bow, a piece of the face since 26.9.2026 — off, like every
        other thing the customer adds. */
     grab: "nograb",
+    /* The swing bar lock, 27.9.2026 — off, like every other fitting the
+       customer adds. */
+    latch: "nolatch",
     mashkof: "mk-std",
     pirzul: "pz-nickel",
     /* ⚠ THE PULL HANDLE'S FINISH, 20.9.2026 — nickel until the customer picks,
@@ -9185,6 +9379,7 @@ ${body}
     p.set("bl", state2.bell);
     p.set("ey", state2.peephole);
     p.set("gb", state2.grab);
+    p.set("lt", state2.latch);
     p.set("hl", String(state2.handleLen));
     p.set("sp", String(packStripes(state2)));
     p.set("d", state2.detail);
@@ -9215,6 +9410,7 @@ ${body}
       "bl",
       "ey",
       "gb",
+      "lt",
       "code",
       "bare",
       "sheet",
@@ -9276,6 +9472,7 @@ ${body}
     take("bell", "bl", BELLS);
     take("peephole", "ey", PEEPHOLES);
     take("grab", "gb", BOWS);
+    take("latch", "lt", LATCHES);
     const rawStripes = p.get("sp");
     if (rawStripes != null) {
       const v = Number(rawStripes);
@@ -9323,7 +9520,10 @@ ${body}
        the pack order like the bell before it. Payload 54;
        `TOTAL_BITS` reserves the check nibble before rounding
        and stays at 60, so the code stays twelve characters. */
-    grab: 1
+    grab: 1,
+    /* The swing bar lock, 27.9.2026: one bit, appended the
+       same way. Payload 55; `TOTAL_BITS` stays at 60. */
+    latch: 1
   };
   var PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
   var CHECK_MIN = 4;
@@ -9364,7 +9564,8 @@ ${body}
       [Math.max(0, BELLS.findIndex((x) => x.id === state2.bell)), BITS.bell],
       [Math.max(0, PEEPHOLES.findIndex((x) => x.id === state2.peephole)), BITS.peephole],
       [Math.max(0, HANDLE_FINISHES.findIndex((x) => x.id === state2.handleFinish)), BITS.handleFinish],
-      [Math.max(0, BOWS.findIndex((x) => x.id === state2.grab)), BITS.grab]
+      [Math.max(0, BOWS.findIndex((x) => x.id === state2.grab)), BITS.grab],
+      [Math.max(0, LATCHES.findIndex((x) => x.id === state2.latch)), BITS.latch]
     ];
     let bits = 0n;
     for (const [value, width] of parts) {
@@ -9412,7 +9613,8 @@ ${body}
     const peep = PEEPHOLES[read(BITS.peephole)];
     const hf = HANDLE_FINISHES[read(BITS.handleFinish)];
     const bow = BOWS[read(BITS.grab)];
-    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul || hLen === void 0 || !bell || !peep || !hf || !bow) return null;
+    const latch = LATCHES[read(BITS.latch)];
+    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul || hLen === void 0 || !bell || !peep || !hf || !bow || !latch) return null;
     return {
       colour: colour.id,
       size,
@@ -9429,6 +9631,7 @@ ${body}
       peephole: peep.id,
       handleFinish: hf.id,
       grab: bow.id,
+      latch: latch.id,
       handleLen: hLen,
       ...unpackStripes(sp)
     };
@@ -9821,14 +10024,21 @@ ${body}
        stripes."* The list as it now stands — six things it reaches, two it does
        not, and one it reaches in two finishes of four — is stated for a
        customer in `exp.pz.a` and for us in `js/spec.js`. */
+    /* ⚠ A COMPOSITE OF THIS DOOR SINCE 27.9.2026 (the owner's son: *"in the
+       pirzul icons show the lever the person chose, the bar lock if chosen, the
+       pins … the peephole if chosen"*): each tile draws the door's own lock
+       furniture, hinges, latch and viewer in its metal, so `composite` names
+       the fields it depends on and `retintOptions` redraws the four when they
+       move — the tiles, never the panel. */
     {
       key: "pirzul",
       title: "g.pirzul",
       in: "pz",
       kind: "hw",
       list: () => PIRZUL2,
-      glyph: pirzulGlyph,
-      hint: "g.pirzul.h"
+      glyph: (o) => pirzulGlyph(o, state),
+      hint: "g.pirzul.h",
+      composite: (st) => `${st.lockset}|${st.latch}|${st.peephole}`
     },
     /* ⚠ THE עינית, 30.8.2026, ON THE פרזול STEP. Peretz asked for it by name.
        It is neither a lock nor a grip, so it does not belong on `lock` or
@@ -9845,6 +10055,19 @@ ${body}
       list: () => PEEPHOLES,
       glyph: peepholeGlyph,
       hint: "g.peephole.h"
+    },
+    /* ⚠ THE SWING BAR LOCK, 27.9.2026, ON THE פרזול STEP — the owner's son:
+       *"add 'סגר בטחון' to the pirzul section."* Lock furniture the פרזול
+       recolours, beside the viewer, on the same argument. Its price is to
+       follow (`priceTBD`): its tile says so. */
+    {
+      key: "latch",
+      title: "g.latch",
+      in: "pz",
+      kind: "hw",
+      list: () => LATCHES,
+      glyph: latchGlyph,
+      hint: "g.latch.h"
     },
     {
       key: "size",
@@ -10454,17 +10677,30 @@ ${body}
     stripes: "bd.stripes",
     round: "bd.round",
     bell: "bd.bell",
-    peephole: "bd.peephole"
+    peephole: "bd.peephole",
+    latch: "bd.latch"
   };
   function renderBreakdown(state2) {
     const body = $("#breakdown-body");
     if (!body) return;
     const rows = breakdownRows(state2);
-    body.innerHTML = rows.map((r) => `<tr><th scope="row">${BREAKDOWN_KEY[r.key] ? T(BREAKDOWN_KEY[r.key]) : r.key}</th><td>${formatAgorot(r.agorot)}</td></tr>`).join("") + `<tr class="bd__total"><th scope="row">${T("price.total")}</th><td>${formatAgorot(priceAgorot(state2))}</td></tr>`;
+    body.innerHTML = rows.map((r) => `<tr><th scope="row">${BREAKDOWN_KEY[r.key] ? T(BREAKDOWN_KEY[r.key]) : r.key}</th><td>${r.agorot === null ? "—" : formatAgorot(r.agorot)}</td></tr>`).join("") + `<tr class="bd__total"><th scope="row">${T("price.total")}</th><td>${formatAgorot(priceAgorot(state2))}</td></tr>`;
   }
   function retintOptions(state2) {
     const hex = byId(COLOURS, state2.colour).hex;
     for (const g of GROUPS) {
+      if (g.composite) {
+        const host2 = document.querySelector(`.field[data-group="${g.key}"]`);
+        const key = g.composite(state2);
+        if (!host2 || host2.dataset.comp === key) continue;
+        host2.dataset.comp = key;
+        for (const b of host2.querySelectorAll("[data-id]")) {
+          const o = g.list().find((x) => x.id === b.dataset.id);
+          const art = b.querySelector(".tile__art");
+          if (o && art) art.innerHTML = g.glyph(o);
+        }
+        continue;
+      }
       if (!g.tinted) continue;
       const host = document.querySelector(`.field[data-group="${g.key}"]`);
       if (!host || host.dataset.paint === hex) continue;

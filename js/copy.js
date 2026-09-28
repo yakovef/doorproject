@@ -334,9 +334,10 @@ export const UI = {
      leaves the two qualified cases to `exp.pz.a` — the metal strips, which
      follow only a NON-nickel פרזול, and the פעמון, which has two metals of
      the four and says so on its own tile. */
-  'step.pz.l':        ['הגוון של הידית, חור המנעול, הצירים והעינית. לא משנה את גוון ידית המשיכה ולא את המנעול הנוסף.',
-                       'The tone of the lever, the keyhole, the hinges and the viewer. It changes neither the pull handle nor the additional lock.',
-                       'Оттенок нажимной ручки, замочной скважины, петель и глазка. Ручку-скобу и дополнительный замок не меняет.'],
+  /* And the swing bar lock since 27.9.2026, chosen on this step. */
+  'step.pz.l':        ['הגוון של הידית, חור המנעול, הצירים, העינית וסגר הבטחון. לא משנה את גוון ידית המשיכה ולא את המנעול הנוסף.',
+                       'The tone of the lever, the keyhole, the hinges, the viewer and the swing bar lock. It changes neither the pull handle nor the additional lock.',
+                       'Оттенок нажимной ручки, замочной скважины, петель, глазка и ограничителя. Ручку-скобу и дополнительный замок не меняет.'],
   'step.sum.t':       ['סיכום', 'Your door', 'Итог'],
   'step.sum.s':       ['הדלת שלכם, והמחיר', 'The door you built, and the price', 'Собранная дверь и цена'],
   'step.sum.l':       ['בדקו שהכול נכון, ושלחו לנו את הדלת.',
@@ -383,9 +384,15 @@ export const UI = {
   'g.pirzul':         ['פרזול', 'Hardware finish', 'Отделка фурнитуры'],
   'g.bell':           ['פעמון', 'Doorbell', 'Звонок'],
   'g.peephole':       ['עינית', 'Peephole', 'Глазок'],
-  'g.pirzul.h':       ['הגוון של הידית, חור המנעול, הצירים והעינית.',
-                       'The tone of the lever, the keyhole, the hinges and the viewer.',
-                       'Оттенок ручки, замочной скважины, петель и глазка.'],
+  'g.latch':          ['סגר בטחון', 'Swing bar lock', 'Дверной ограничитель'],
+  'g.pirzul.h':       ['הגוון של הידית, חור המנעול, הצירים, העינית וסגר הבטחון.',
+                       'The tone of the lever, the keyhole, the hinges, the viewer and the swing bar lock.',
+                       'Оттенок ручки, замочной скважины, петель, глазка и ограничителя.'],
+  /* The swing bar lock's hint, 27.9.2026: where it goes and what colours it,
+     and nothing about money — the tile says the price is to follow. */
+  'g.latch.h':        ['בראש הדלת, בצד הנעילה — על המשקוף ועל הכנף. בגוון הפרזול.',
+                       'At the top of the door, on the lock side — on the frame and the leaf. In the hardware finish.',
+                       'Вверху двери, со стороны замка — на коробке и полотне. В отделке фурнитуры.'],
   /* ⚠ THIS DESCRIBED THE FITTING THE DRAWING NO LONGER HAD. It said "a bell
      push" for as long as the renderer drew one; the owner's three photographs
      replaced that with a ring knocker on 30.8 and this line did not follow —
@@ -642,6 +649,9 @@ export const UI = {
   'price.breakdown':  ['פירוט המחיר', 'What the price is made of', 'Из чего складывается цена'],
   'price.total':      ['סה״כ', 'Total', 'Итого'],
   'price.included':   ['כלול', 'Included', 'Включено'],
+  /* A price Peretz has not given yet (27.9.2026, the swing bar lock): never
+     כלול, which would say it is included, and never ₪0. */
+  'price.tbd':        ['מחיר בהמשך', 'Price to follow', 'Цена позже'],
   'bd.door':          ['הדלת', 'The door', 'Дверь'],
   'bd.cylinder':      ['צילינדר', 'Cylinder', 'Цилиндр'],
   'bd.lock':          ['מנגנון נעילה', 'Locking mechanism', 'Механизм запирания'],
@@ -670,6 +680,7 @@ export const UI = {
      `bd.*` here is written out the same way. */
   'bd.bell':          ['פעמון', 'Doorbell', 'Звонок'],
   'bd.peephole':      ['עינית', 'Peephole', 'Глазок'],
+  'bd.latch':         ['סגר בטחון', 'Swing bar lock', 'Дверной ограничитель'],
   'bd.round':         ['עיגול', 'Rounding', 'Округление'],
 
   /* ── sending it ───────────────────────────────────────────────── */
@@ -919,12 +930,15 @@ export const UI = {
      they describe, so the number and the rule cannot drift apart. */
   'fix.peepGone':        ['הסרנו את העינית — החלון תופס בדיוק את מקומה', 'We removed the peephole — the window sits exactly where it goes', 'Мы убрали глазок — окно занимает как раз его место'],
   'fix.bellGone':        ['הסרנו את הפעמון — החלון תופס את מקומו במרכז הדלת', 'We removed the doorbell — the window sits where it goes, on the centre of the door', 'Мы убрали звонок — окно занимает его место по центру двери'],
+  'fix.latchGone':       ['הסרנו את סגר הבטחון — אין לו כנף מלאה בראש הדלת', 'We removed the swing bar lock — there is no solid leaf at the top of the door for it', 'Мы убрали ограничитель — вверху двери нет для него сплошного полотна'],
   'fix.stripesCapped':   ['פסים אנכיים יורדים ל-6 — יותר מזה לא נכנס לרוחב הדלת', 'Vertical stripes cap at 6 — more than that will not fit across the door', 'Вертикальных полос максимум 6 — больше по ширине двери не помещается'],
 
   'why.peepWindow':   ['החלון תופס את מקום העינית', 'The window sits where the peephole goes',
                        'Окно занимает место глазка'],
   'why.bellWindow':   ['החלון תופס את מקום הפעמון', 'The window sits where the doorbell goes',
                        'Окно занимает место звонка'],
+  'why.latchNoRoom':  ['אין כנף מלאה בראש הדלת, בצד הנעילה', 'There is no solid leaf at the top of the lock side',
+                       'Вверху со стороны замка нет сплошного полотна'],
   'why.gripOffDoor':  ['הידית חורגת מהדלת', 'The handle runs off the door', 'Ручка выходит за пределы двери'],
   'why.gripReach':    ['הידית גבוהה או נמוכה מדי לשימוש', 'Too high or too low to use comfortably',
                        'Слишком высоко или слишком низко'],
@@ -994,6 +1008,9 @@ export const UI = {
   'row.speciallock':  ['מנעול מיוחד', 'Extra lock', 'Дополнительный замок'],
   'row.bell':         ['פעמון', 'Doorbell', 'Звонок'],
   'row.peephole':     ['עינית', 'Peephole', 'Глазок'],
+  'row.latch':        ['סגר בטחון', 'Swing bar lock', 'Дверной ограничитель'],
+  /* After an unpriced item in the order: the total above does not include it. */
+  'row.priceTBD':     ['מחיר יימסר', 'price to follow', 'цена будет сообщена'],
   'row.detail':       ['עיצוב', 'Face', 'Полотно'],
   'row.stripes':      ['פסים', 'Strips', 'Полосы'],
   'row.size':         ['מידה', 'Size', 'Размер'],

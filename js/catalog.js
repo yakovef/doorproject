@@ -24,7 +24,8 @@ import { agorot, PLACEHOLDER as PRICES_ARE_PLACEHOLDER,
          HANDLE as HANDLE_PRICE, HANDLE_BAND, HANDLE_FINISH as HANDLE_FINISH_PRICE,
          LOCKSET as LOCKSET_PRICE, STRIPE,
          SPECIAL_LOCK as SPECIAL_LOCK_PRICE,
-         BELL as BELL_PRICE, BOW as BOW_PRICE, PEEPHOLE as PEEPHOLE_PRICE } from './prices.js';
+         BELL as BELL_PRICE, BOW as BOW_PRICE, PEEPHOLE as PEEPHOLE_PRICE,
+         LATCH as LATCH_PRICE } from './prices.js';
 
 /* Re-exported so nothing else has to know the flag moved. It belongs beside
    the figures it describes — flipping it is the last edit of the evening the
@@ -704,7 +705,8 @@ export const LOCKSETS = [
      black inlay stripe, not a backplate. Either RB sells two products under
      the name or this label is on the wrong row. `photo: null` rather than a
      citation of those files, because citing them would assert the very thing
-     that is in doubt. `ASK-PERETZ.md` §1f asks.
+     that is in doubt. `ASK-PERETZ.md` §1f asked (the row is in its answered
+     table since 27.9).
      ✅ ANSWERED 27.9.2026 by the owner's son, with three photographs of
      installed doors: *"here is 3 doors with the rotem handle"* — this row, the
      lever on its backplate. What RB calls its striped bar is RB's business;
@@ -1105,6 +1107,25 @@ export const PEEPHOLES = [
      the optical viewer stands and is refused by the same `peepholeFits`. */
   { id: 'peep-digital', he: 'עינית דיגיטלית', en: 'Digital peephole', ru: 'Цифровой глазок',
     digital: true, photo: null },
+];
+
+/* ── סגר בטחון — THE SWING BAR LOCK, 27.9.2026 ─────────────────────
+   The owner's son: *"add 'סגר בטחון' to the pirzul section — a swing bar lock,
+   at the top of the door's side, mounted on the mashkof and the door,
+   affected by the pirzul."* Peretz's own 26.8 list of what the פרזול
+   recolours already named it (*"the ידית, the צירים, the עינית and the סגר
+   ביטחון"*), so it is lock furniture and takes the פרזול's metal, not the
+   pull handle's finish.
+   On the template of the פעמון (30.8) and the bow: a list of its own, off by
+   default, `lt=`, one bit appended at the end of the code (VERSION 26).
+   ⚠ `priceTBD`: he has not priced it, and `LATCH.latch` in prices.js is
+   `null` — see the note there for the three places that say so and why ₪0
+   would be a false claim. `photo: null` — no photograph; `latchArt` in the
+   renderer says what is sourced and what is convention. */
+export const LATCHES = [
+  { id: 'nolatch', he: 'ללא',       en: 'None',           ru: 'Нет' },
+  { id: 'latch',   he: 'סגר בטחון', en: 'Swing bar lock', ru: 'Дверной ограничитель',
+    priceTBD: true, photo: null },
 ];
 
 /* ── WITHDRAWN: the glass as its own choice ──────────────────────────
@@ -2193,6 +2214,25 @@ function priceInto(what, list, table, key) {
       throw new Error(`prices.js has no ${what} price for "${o.id}" — every option `
                     + 'needs one, or it silently costs nothing');
     }
+    /* ⚠ `null` — PRICE TO FOLLOW — ONLY WHERE THE CATALOGUE SAYS SO (27.9.2026,
+       the swing bar lock). Anywhere else a null is a missing figure dressed as
+       a present one, and it would add as 0 in silence; it throws. Where the
+       entry is marked `priceTBD`, the option carries `null` and every reader
+       of money shows it as what it is (`priceLabel`, `breakdownRows`, the
+       order's row in spec.js). */
+    if (table[o.id] === null) {
+      if (!o.priceTBD) {
+        throw new Error(`prices.js prices ${what} "${o.id}" as null, and only an entry `
+                      + 'marked priceTBD may wait for its figure');
+      }
+      o[key] = null;
+      seen.add(o.id);
+      continue;
+    }
+    if (o.priceTBD) {
+      throw new Error(`${what} "${o.id}" is marked priceTBD and prices.js gives it a `
+                    + 'figure — take the flag off the catalogue entry');
+    }
     o[key] = agorot(table[o.id]);
     seen.add(o.id);
   }
@@ -2395,6 +2435,7 @@ priceInto('pirzul',  PIRZUL,               PIRZUL_PRICE,  'delta');
 priceInto('bell',    BELLS,                BELL_PRICE,    'delta');
 priceInto('bow',     BOWS,                 BOW_PRICE,     'delta');
 priceInto('peephole', PEEPHOLES,           PEEPHOLE_PRICE, 'delta');
+priceInto('latch',   LATCHES,              LATCH_PRICE,   'delta');
 
 /* ⚠ THE CLASSICAL SET COSTS LESS ON A GLAZED DOOR, and this is the only place
    in the catalogue where an option has two prices. See `DETAIL_GLAZED` in

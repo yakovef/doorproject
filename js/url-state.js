@@ -20,7 +20,7 @@
  * length was THEN; only this header was claiming a present tense.
  */
 
-import { BELLS, BOWS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES,
+import { BELLS, BOWS, COLOURS, LATCHES, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES,
          HANDLE_LEGACY, HANDLE_LENS, LOCKSETS,
          MASHKOFS, packStripes, PEEPHOLES, PIRZUL, SIZE_ALIAS, SIZES, SPECIAL_LOCKS,
          STRIPE_MAX, STRIPE_LEGACY, STRIPE_SLOTS, unpackStripes, WINDOWS } from './catalog.js';
@@ -280,7 +280,14 @@ import { repair } from './rules.js';
    53 -> 54 and the code stays twelve characters.
    The `?...=` query form is not indexed: `n=grab` and `n=dee` MIGRATE onto the
    new field in `fromQuery` with no notice, never onto a bar. */
-export const VERSION = 25;
+/* ⚠ 26: 27.9.2026. The swing bar lock (סגר בטחון) is a new one-bit field
+   `latch` appended at the END of the pack order (`LATCHES`, `lt=`). Nothing
+   moved index — but the code packs its first field highest, so an appended
+   field shifts every field before it one bit up, and a v25 code read under
+   this layout would be a different door. Payload 54 -> 55; `TOTAL_BITS`
+   stays 60 and the code twelve characters. The `?...=` form is not indexed:
+   a v25 link opens as itself, with no latch. */
+export const VERSION = 26;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -368,6 +375,9 @@ export const DEFAULTS = {
   /* The horizontal bow, a piece of the face since 26.9.2026 — off, like every
      other thing the customer adds. */
   grab: 'nograb',
+  /* The swing bar lock, 27.9.2026 — off, like every other fitting the
+     customer adds. */
+  latch: 'nolatch',
   mashkof: 'mk-std',
   pirzul:  'pz-nickel',
   /* ⚠ THE PULL HANDLE'S FINISH, 20.9.2026 — nickel until the customer picks,
@@ -450,6 +460,9 @@ export function toQuery(state) {
      handle until today; checked free in `KNOWN` and `RETIRED` before it was
      taken. */
   p.set('gb', state.grab);
+  /* `lt` — the swing bar lock, 27.9.2026, a new parameter; checked free in
+     `KNOWN` and `RETIRED` before it was taken. */
+  p.set('lt', state.latch);
   p.set('hl', String(state.handleLen));
   /* ⚠ ONE PARAMETER FOR THREE PROPERTIES, the same ordinal the code packs.
      Three separate parameters could carry `sd=h&sc=0` or `sd=none&sc=7` — a
@@ -515,7 +528,7 @@ export function fromQuery(search) {
      language is a fact about the reader, which is also why it is not in the
      short code (see `js/copy.js`). */
   const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'hf', 'hl', 'sp',
-                           'd', 's', 'h', 'bl', 'ey', 'gb',
+                           'd', 's', 'h', 'bl', 'ey', 'gb', 'lt',
                            'code', 'bare', 'sheet', 'lang']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
      still. Withdrawing an option is OUR change and not the customer's mistake,
@@ -682,6 +695,7 @@ export function fromQuery(search) {
   take('bell', 'bl', BELLS);
   take('peephole', 'ey', PEEPHOLES);
   take('grab', 'gb', BOWS);
+  take('latch', 'lt', LATCHES);
   /* ⚠ A NUMBER, SO `take` CANNOT DO IT — `take` resolves an id against a list
      and reports an unknown one. A length is neither: it is one of eight
      values, and anything else is a link we cannot read. Refused with the same
@@ -919,7 +933,8 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    (three entries, two bits); `peephole` is two bits for its third entry;
    `mashkof` is three bits for its eight. Nothing is tightened to pay for
    them — `handle` stays four bits over five entries because Peretz has five
-   more RB products he has not named yet (ASK-PERETZ §1f), and a field at its
+   more RB products he has not named yet (ASK-PERETZ §1f then; its answered
+   table since 27.9), and a field at its
    ceiling is what the 14.9 lockset overflow was about. Payload 53. */
 export const BITS = { version: 5, colour: 5, size: 3, handing: 2, window: 2,
                       grille: 4, handle: 4, lockset: 4, detail: 3,
@@ -929,7 +944,10 @@ export const BITS = { version: 5, colour: 5, size: 3, handing: 2, window: 2,
                          the pack order like the bell before it. Payload 54;
                          `TOTAL_BITS` reserves the check nibble before rounding
                          and stays at 60, so the code stays twelve characters. */
-                      grab: 1 };
+                      grab: 1,
+                      /* The swing bar lock, 27.9.2026: one bit, appended the
+                         same way. Payload 55; `TOTAL_BITS` stays at 60. */
+                      latch: 1 };
 /* The payload does not divide by 5, so the code carries the next multiple up
    and the top bits are always zero. Rounding UP is the only safe direction:
    truncating would drop the low bits of the last field. Both numbers are
@@ -1047,6 +1065,7 @@ export function encodeCode(state) {
     [Math.max(0, PEEPHOLES.findIndex(x => x.id === state.peephole)), BITS.peephole],
     [Math.max(0, HANDLE_FINISHES.findIndex(x => x.id === state.handleFinish)), BITS.handleFinish],
     [Math.max(0, BOWS.findIndex(x => x.id === state.grab)), BITS.grab],
+    [Math.max(0, LATCHES.findIndex(x => x.id === state.latch)), BITS.latch],
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -1116,6 +1135,7 @@ export function decodeCode(code) {
   const peep    = PEEPHOLES[read(BITS.peephole)];
   const hf      = HANDLE_FINISHES[read(BITS.handleFinish)];
   const bow     = BOWS[read(BITS.grab)];
+  const latch   = LATCHES[read(BITS.latch)];
   /* ⚠ `hLen === undefined`, NOT `!hLen`. Zero is a VALID value — it is the
      "as the model comes" default and the commonest length in the range — and
      `!0` is true, so a truthiness guard refused every code for an untouched
@@ -1123,13 +1143,14 @@ export function decodeCode(code) {
      "not found"; this one is a number and needed its own test. */
   if (!colour || !size || !handing || !window || !grille || !handle || !lockset
       || !detail || !special || !mashkof || !pirzul || hLen === undefined
-      || !bell || !peep || !hf || !bow) return null;
+      || !bell || !peep || !hf || !bow || !latch) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
     speciallock: special.id, mashkof: mashkof.id, pirzul: pirzul.id,
     bell: bell.id, peephole: peep.id, handleFinish: hf.id, grab: bow.id,
+    latch: latch.id,
     handleLen: hLen, ...unpackStripes(sp),
   };
 }

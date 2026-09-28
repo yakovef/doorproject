@@ -29,7 +29,7 @@
 
 import {
   BELLS, BOWS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS, finishHasSubject,
-  GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LOCKSETS, MASHKOFS,
+  GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LATCHES, LOCKSETS, MASHKOFS,
   mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, BUILD_A,
   PEEPHOLES, PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_A, STRIPE_MAX, WINDOWS,
 } from './catalog.js';
@@ -37,7 +37,7 @@ import { breakdownRows, deltaLabel, formatAgorot, priceAgorot, priceLabel, price
   from './price.js';
 import {
   describe, detailGlyph, grilleGlyph, handleGlyph, locksetGlyph,
-  bellGlyph, bowGlyph, handleFinishGlyph, copyOf, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
+  bellGlyph, bowGlyph, handleFinishGlyph, copyOf, latchGlyph, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
   panelUnderGlass, specialLockGlyph, stripesGlyph,
   windowGlyph,
 } from './renderer.js';
@@ -219,8 +219,15 @@ const GROUPS = [
      stripes."* The list as it now stands — six things it reaches, two it does
      not, and one it reaches in two finishes of four — is stated for a
      customer in `exp.pz.a` and for us in `js/spec.js`. */
+  /* ⚠ A COMPOSITE OF THIS DOOR SINCE 27.9.2026 (the owner's son: *"in the
+     pirzul icons show the lever the person chose, the bar lock if chosen, the
+     pins … the peephole if chosen"*): each tile draws the door's own lock
+     furniture, hinges, latch and viewer in its metal, so `composite` names
+     the fields it depends on and `retintOptions` redraws the four when they
+     move — the tiles, never the panel. */
   { key: 'pirzul', title: 'g.pirzul', in: 'pz', kind: 'hw', list: () => PIRZUL,
-    glyph: pirzulGlyph, hint: 'g.pirzul.h' },
+    glyph: o => pirzulGlyph(o, state), hint: 'g.pirzul.h',
+    composite: st => `${st.lockset}|${st.latch}|${st.peephole}` },
 
   /* ⚠ THE עינית, 30.8.2026, ON THE פרזול STEP. Peretz asked for it by name.
      It is neither a lock nor a grip, so it does not belong on `lock` or
@@ -231,6 +238,13 @@ const GROUPS = [
      the pull handle's finish now and stands on `grip` — see above.) */
   { key: 'peephole', title: 'g.peephole', in: 'pz', kind: 'hw', list: () => PEEPHOLES,
     glyph: peepholeGlyph, hint: 'g.peephole.h' },
+
+  /* ⚠ THE SWING BAR LOCK, 27.9.2026, ON THE פרזול STEP — the owner's son:
+     *"add 'סגר בטחון' to the pirzul section."* Lock furniture the פרזול
+     recolours, beside the viewer, on the same argument. Its price is to
+     follow (`priceTBD`): its tile says so. */
+  { key: 'latch', title: 'g.latch', in: 'pz', kind: 'hw', list: () => LATCHES,
+    glyph: latchGlyph, hint: 'g.latch.h' },
 
   { key: 'size', title: 'g.size', in: 'fit', kind: 'tile', list: () => Object.values(SIZES),
     /* `delta: z => z.base - SIZES.standard.base` used to live here, and it was
@@ -1528,7 +1542,7 @@ const BREAKDOWN_KEY = {
   detail: 'bd.detail', window: 'bd.window', grille: 'bd.grille',
   handle: 'bd.handle', grab: 'bd.grab', lockset: 'bd.lockset', speciallock: 'bd.speciallock',
   pirzul: 'bd.pirzul', stripes: 'bd.stripes', round: 'bd.round',
-  bell: 'bd.bell', peephole: 'bd.peephole',
+  bell: 'bd.bell', peephole: 'bd.peephole', latch: 'bd.latch',
 };
 
 /**
@@ -1545,7 +1559,8 @@ function renderBreakdown(state) {
   const rows = breakdownRows(state);
   body.innerHTML = rows.map(r =>
       `<tr><th scope="row">${BREAKDOWN_KEY[r.key] ? T(BREAKDOWN_KEY[r.key]) : r.key}</th>`
-    + `<td>${formatAgorot(r.agorot)}</td></tr>`).join('')
+    /* `null` is a price to follow (the swing bar lock): a dash, not ₪0. */
+    + `<td>${r.agorot === null ? '—' : formatAgorot(r.agorot)}</td></tr>`).join('')
     + `<tr class="bd__total"><th scope="row">${T('price.total')}</th>`
     + `<td>${formatAgorot(priceAgorot(state))}</td></tr>`;
 }
@@ -1558,6 +1573,20 @@ function renderBreakdown(state) {
 function retintOptions(state) {
   const hex = byId(COLOURS, state.colour).hex;
   for (const g of GROUPS) {
+    /* A composite tile (the פרזול's, 27.9.2026) is a picture of this door:
+       redrawn whole when a field it draws has moved. */
+    if (g.composite) {
+      const host = document.querySelector(`.field[data-group="${g.key}"]`);
+      const key = g.composite(state);
+      if (!host || host.dataset.comp === key) continue;
+      host.dataset.comp = key;
+      for (const b of host.querySelectorAll('[data-id]')) {
+        const o = g.list().find(x => x.id === b.dataset.id);
+        const art = b.querySelector('.tile__art');
+        if (o && art) art.innerHTML = g.glyph(o);
+      }
+      continue;
+    }
     if (!g.tinted) continue;
     const host = document.querySelector(`.field[data-group="${g.key}"]`);
     if (!host || host.dataset.paint === hex) continue;

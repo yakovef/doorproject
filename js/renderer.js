@@ -820,6 +820,34 @@ const peepholeR = state =>
 const KNOCKER_R    = 66;
 const KNOCKER_REACH = { x: KNOCKER_R * 0.86, up: KNOCKER_R * 1.124,
                         down: KNOCKER_R * 1.02 };
+/* ── סגר בטחון — THE SWING BAR LOCK, 27.9.2026 ─────────────────────────
+   The owner's son: *"a swing bar lock, at the top of the door's side, mounted
+   on the mashkof and the door, affected by the pirzul."* ⚠ NO PHOTOGRAPH, and
+   these are PUBLISHED DIMENSIONS of the common product, not a measurement off
+   one of Peretz's doors: a frame plate about 26 x 96 mm carrying the hinged
+   arm, a keeper about 28 x 80 mm with a knob the arm drops over. The position
+   is his word — the head of the lock side — not a photograph's either:
+     drop       keeper centre below the leaf's head (mm)
+     keeperIn   keeper centre inboard of the closing edge
+     gap        the plate's inner edge off the leaf's edge (or the mullion)
+   ⚠ AND ON THESE DOORS IT IS FITTED INSIDE. They open inwards, so a swing bar
+   is on the inside face, like the hinges this file stopped drawing because
+   the street never sees them. It is drawn here because the owner's son asked
+   to see what he is buying; `ASK-PERETZ.md` asks whether the outside view
+   should show it, with the price. Every reader — `latchArt`, `fittingBoxes`,
+   `latchFits`, the declared footprint on the art — reads THIS table. */
+export const LATCH = {
+  drop: 150, keeperIn: 30, gap: 4,
+  keeper: { w: 28, h: 80 }, plate: { w: 26, h: 96 }, knob: 7, arm: 16,
+};
+/** The keeper's box on the leaf, leaf-local (x from the leaf's left edge, y
+ *  from its head) — the part of the latch a foot on the face could land on.
+ *  The plate is on the frame or the fixed leaf, off this leaf. */
+function latchKeeperBox(state, leafW) {
+  const w = LATCH.keeperIn + LATCH.keeper.w / 2;
+  return { x: hingeLeftOf(state) ? leafW - w : 0, y: LATCH.drop - LATCH.keeper.h / 2,
+           w, h: LATCH.keeper.h };
+}
 /* Hinge heights, 0.144 / 0.504 / 0.857 H, kept as a note rather than as code.
    These doors open inwards, so from the street the hinges are hidden in the
    rebate: every outside photograph on the works page shows a leaf with none on
@@ -3491,6 +3519,10 @@ export function render(state) {
     ${state.bell === 'bell'
         ? bellKnocker(mainX + leafW / 2, y(KNOCKER_AFF))
         : ''}
+    ${state.latch === 'latch'
+        ? latchArt(hingeOnLeft ? mainX1 : mainX, hingeOnLeft ? 1 : -1,
+                   y0 + LATCH.drop, sideW ? MULLION : 0)
+        : ''}
   </g>
 
   <!-- ── THE SCONCES REACH THE DOOR ───────────────────────────────
@@ -4549,6 +4581,13 @@ function fittingBoxes(state, leafW, leafH) {
   if (state.grab === 'grab' && state.handle !== BOW_AS_GRIP) {
     out.push({ kind: 'bow', band: 0, ...bowBox(state, leafW, leafH) });
   }
+  /* The swing bar lock's keeper, 27.9.2026: at the head of the closing edge,
+     from the edge to the keeper's inboard side — nothing placed on the face
+     may stand on it. Its own kind, so `collide` can tell a declared footprint
+     from a drawn moulding (as it does the bow's). */
+  if (state.latch === 'latch') {
+    out.push({ kind: 'latch', band: 0, ...latchKeeperBox(state, leafW) });
+  }
   return out;
 }
 
@@ -4642,7 +4681,7 @@ export const faceObstacles = memo(function faceObstacles(state) {
      the answer for every door after it. */
   /* ⚠ AND BY THE BOW AND THE HANDING, 26.9.2026: the bow's box is an obstacle
      now, and it sits on the side of the leaf away from the closing edge. */
-}, st => `${st.size}|${st.detail}|${st.window}|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}|${st.handing}|${st.handle === BOW_AS_GRIP}`);
+}, st => `${st.size}|${st.detail}|${st.window}|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}|${st.latch}|${st.handing}|${st.handle === BOW_AS_GRIP}`);
 
 /**
  * Is there room under the glazing for the panel the customer is paying for?
@@ -4789,6 +4828,31 @@ export function bellFits(state) {
 }
 
 /**
+ * ⚠ THE SWING BAR LOCK'S KEEPER MUST STAND ON SOLID LEAF — 27.9.2026, the
+ * `peepholeFits` shape and for the same reason: it is bolted THROUGH the leaf,
+ * and nothing can be bolted to glass or into a moulding's run. Geometric, not
+ * a list: the keeper's box against every window, panel and moulding
+ * `faceObstacles` holds for this door.
+ * ⚠ TODAY IT IS TRUE OF EVERY DOOR IN THE RANGE, and that is measured, not
+ * assumed: the keeper reaches 44 mm in from the closing edge, and no window
+ * or moulding comes nearer that edge than `MOUNT_REACH` — the Greek set's
+ * cornice, the nearest thing at the head, starts at 0.145 of the leaf. `npm
+ * test` sweeps every size, window and face and asserts it. It is written
+ * anyway so that a window moved towards the edge, or a keeper re-measured,
+ * greys the tile instead of bolting the latch to glass.
+ */
+export function latchFits(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const leafW = size.w - REBATE * 2;
+  const k = latchKeeperBox(state, leafW);
+  const PAINT = 8;                        // the peephole's bead, judged alike
+  return !faceObstacles({ ...state, latch: 'nolatch' })
+    .filter(o => o.kind !== 'fitting' && o.kind !== 'bow' && o.kind !== 'latch')
+    .some(o => k.x - PAINT < o.x + o.w && k.x + k.w + PAINT > o.x
+            && k.y - PAINT < o.y + o.h && k.y + k.h + PAINT > o.y);
+}
+
+/**
  * Does this face's panel work beside this window — and if not, why not?
  * `null` when it does, when the leaf is solid, or when there is no panel;
  * otherwise `{ why, by }`:
@@ -4901,10 +4965,12 @@ export const panelFits = state => !panelUnderGlass(state);
    `handleLen` 0, was handed the short bar's cached home, and the reverse order
    gave a different answer — a refusal or an acceptance decided by which door
    the session happened to ask about first. The key is now every field the
-   placement reads, and the bow, whose box is an obstacle to the bar. */
+   placement reads, and the bow, whose box is an obstacle to the bar — and,
+   since 27.9.2026, the swing bar lock, whose keeper `faceObstacles` carries
+   at the head of the closing edge. */
 const homeKey = st =>
   `${st.size}|${st.handle}|${st.handleLen}|${st.lockset}|${st.detail}|${st.window}|${st.handing}`
-  + `|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}`;
+  + `|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}|${st.latch}`;
 const HOME_CACHE = new Map();
 
 export function gripHome(state) {
@@ -10062,6 +10128,61 @@ const peepholeDigital = (cx, cy) => {
 };
 
 /**
+ * ── סגר בטחון, THE SWING BAR LOCK — 27.9.2026 ─────────────────────────
+ *
+ * A keeper on the leaf and a plate across the gap carrying the arm, closed:
+ * the arm lies over the keeper's knob. `edge` is the leaf's closing edge,
+ * `out` the direction from it to what the plate is fixed to (+1 right), `cy`
+ * the keeper's centre, `past` how far that thing starts beyond the edge — 0
+ * on a single leaf (the frame), the mullion on a דלת וחצי (the fixed leaf).
+ *
+ * ⚠ NO PHOTOGRAPH — the published dimensions and the owner's son's position,
+ * in `LATCH`, which also says why a fitting that is fitted INSIDE is drawn on
+ * this outside view at all. In the פרזול's metal (`#nickel`, which the finish
+ * recolours, like the viewer's ring), because Peretz's own list of what the
+ * פרזול changes names the סגר ביטחון. Both bolted parts carry `data-mount`,
+ * so `collide` asserts neither lands on glass; the group declares its
+ * footprint about the keeper for `collide -- boxes`.
+ */
+const latchArt = (edge, out, cy, past) => {
+  const n1 = v => v.toFixed(1);
+  const L = LATCH;
+  const kx = edge - out * L.keeperIn;                         // keeper centre
+  const px = edge + out * (past + L.gap + L.plate.w / 2);     // plate centre
+  const armX0 = Math.min(kx, px) - (out > 0 ? L.knob * 1.8 : 0);
+  const armX1 = Math.max(kx, px) + (out < 0 ? L.knob * 1.8 : 0);
+  const reachOut = Math.abs(px - kx) + L.plate.w / 2;
+  const sh = 3;                                               // its shadow's offset
+  return `
+    <g data-hw="latch" data-owner="latch" data-kind="latch"
+       data-cx="${n1(kx)}" data-cy="${n1(cy)}"
+       data-out="${Math.ceil(reachOut + 2)}" data-in="${Math.ceil(L.keeper.w / 2 + 2)}"
+       data-vy="${Math.ceil(Math.max(L.keeper.h, L.plate.h) / 2 + 2)}">
+      <rect x="${n1(kx - L.keeper.w / 2 + sh)}" y="${n1(cy - L.keeper.h / 2 + sh)}"
+            width="${L.keeper.w}" height="${L.keeper.h}" rx="4" fill="#000" opacity=".22"
+            filter="url(#hwShadow)"/>
+      <rect x="${n1(armX0 + sh)}" y="${n1(cy - L.arm / 2 + sh)}"
+            width="${n1(armX1 - armX0)}" height="${L.arm}" rx="${L.arm / 2}" fill="#000"
+            opacity=".22" filter="url(#hwShadow)"/>
+      <rect data-mount="latch-keeper" x="${n1(kx - L.keeper.w / 2)}" y="${n1(cy - L.keeper.h / 2)}"
+            width="${L.keeper.w}" height="${L.keeper.h}" rx="4"
+            fill="url(#nickel)" stroke="#000" stroke-opacity=".26"/>
+      <rect data-mount="latch-plate" x="${n1(px - L.plate.w / 2)}" y="${n1(cy - L.plate.h / 2)}"
+            width="${L.plate.w}" height="${L.plate.h}" rx="4"
+            fill="url(#nickel)" stroke="#000" stroke-opacity=".26"/>
+      ${[-1, 1].map(k => `<circle cx="${n1(px)}" cy="${n1(cy + k * L.plate.h * 0.36)}" r="2.6"
+              fill="#000" fill-opacity=".35"/>`).join('')}
+      <rect x="${n1(armX0)}" y="${n1(cy - L.arm / 2)}" width="${n1(armX1 - armX0)}"
+            height="${L.arm}" rx="${L.arm / 2}"
+            fill="url(#nickel)" stroke="#000" stroke-opacity=".32"/>
+      <circle cx="${n1(px)}" cy="${n1(cy)}" r="${L.arm * 0.42}" fill="url(#nickel)"
+              stroke="#000" stroke-opacity=".3"/>
+      <circle cx="${n1(kx)}" cy="${n1(cy)}" r="${L.knob}" fill="url(#nickel)"
+              stroke="#000" stroke-opacity=".35"/>
+    </g>`;
+};
+
+/**
  * ── THE פעמון ─────────────────────────────────────────────────────────
  *
  * Peretz, 30.8.2026: *"the bell on the doors is 300, take images of it and add
@@ -10731,27 +10852,60 @@ export const locksetGlyph = handleGlyph;
 /**
  * פרזול — the finish, drawn as the thing it recolours.
  *
- * A lever on its rose, in the metal itself, because a customer choosing a
- * finish is choosing what the handle will look like and a bare swatch of
- * colour would not say that. The ramp is the same `FINISH_TONES` the door
- * uses, so the tile and the drawing cannot disagree about what "ברונזה" is.
+ * ⚠ A COMPOSITE OF THIS DOOR SINCE 27.9.2026 — the owner's son: *"in the
+ * pirzul icons show the lever the person chose, the bar lock if chosen, the
+ * pins holding the door on the mashkof, the peephole if chosen — everything
+ * the pirzul changes."* It drew a Coral on its rose whatever the door carried.
+ * Now each tile is the door's own lock furniture (`FITTING_GLYPH` of the
+ * chosen lockset, the silhouette its own tile draws), a pair of hinge
+ * knuckles (the "pins" — the door does not draw its hinges, they are in the
+ * rebate of a door opening inwards, but they take this finish and the tile
+ * may show them), the swing bar lock when chosen and the viewer when chosen,
+ * every piece in THIS tile's metal. `app.js` redraws the four when the lock
+ * furniture, the latch or the viewer changes (`composite`), never the panel.
+ * The ramp is the same `FINISH_TONES` the door uses, so the tile and the
+ * drawing cannot disagree about what "ברונזה" is.
+ * ⚠ Called with no door (a test, a sheet), it draws the arrival door's lock
+ * furniture, the Rotem, and the hinges — nothing optional.
  */
-export function pirzulGlyph(pz) {
+export function pirzulGlyph(pz, state = {}) {
   const t = FINISH_TONES[pz.tone] || FINISH_TONES.steel;
+  const id = `pzg-${pz.id}`;
+  const lockset = byId(LOCKSETS, state.lockset || 'plate') || byId(LOCKSETS, 'plate');
+  const make = FITTING_GLYPH[lockset.style] || FITTING_GLYPH.lever;
+  const { box, art } = make(lockset);
+  const [bx0, by0, bx1, by1] = box;
+  const latch = state.latch === 'latch';
+  const viewer = state.peephole && state.peephole !== 'nopeep';
+  /* The lock furniture takes the left of the tile, below the latch's band. */
+  const top = latch ? -58 : -86;
   return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
     <defs>
-      <linearGradient id="pzg-${pz.id}" x1="0.1" y1="0" x2="0.9" y2="1">
+      <linearGradient id="${id}" x1="0.1" y1="0" x2="0.9" y2="1">
         <stop offset="0" stop-color="${t[0]}"/><stop offset="0.38" stop-color="${t[2]}"/>
         <stop offset="0.7" stop-color="${t[3]}"/><stop offset="1" stop-color="${t[5]}"/>
       </linearGradient>
     </defs>
-    <circle cx="0" cy="-26" r="30" fill="url(#pzg-${pz.id})"
-            stroke="#000" stroke-opacity=".18"/>
-    <path d="M -4 -40 L 46 -34 Q 54 -32 54 -25 Q 54 -18 46 -17 L -4 -12 Z"
-          fill="url(#pzg-${pz.id})" stroke="#000" stroke-opacity=".18"/>
-    <circle cx="0" cy="42" r="19" fill="url(#pzg-${pz.id})"
-            stroke="#000" stroke-opacity=".18"/>
-    <rect x="-4.5" y="36" width="9" height="13" rx="2" fill="#000" fill-opacity=".5"/>
+    <g fill="url(#${id})" stroke="#000" stroke-opacity=".18" data-pz="lock">
+      <svg x="-68" y="${top}" width="104" height="${88 - top}"
+           viewBox="${bx0} ${by0} ${bx1 - bx0} ${by1 - by0}" preserveAspectRatio="xMidYMid meet"
+           overflow="visible">${art}</svg>
+    </g>
+    <g fill="url(#${id})" stroke="#000" stroke-opacity=".22" data-pz="hinge">
+      <rect x="38" y="-30" width="18" height="30" rx="5"/>
+      <rect x="38" y="4" width="18" height="30" rx="5"/>
+      <rect x="45" y="-36" width="4" height="76" rx="2" fill="#000" fill-opacity=".28" stroke="none"/>
+    </g>
+    ${latch ? `<g fill="url(#${id})" stroke="#000" stroke-opacity=".22" data-pz="latch">
+      <rect x="-56" y="-88" width="18" height="30" rx="4"/>
+      <rect x="34" y="-90" width="18" height="34" rx="4"/>
+      <rect x="-52" y="-78" width="100" height="11" rx="5.5"/>
+      <circle cx="-47" cy="-72.5" r="7"/>
+    </g>` : ''}
+    ${viewer ? `<g data-pz="viewer">
+      <circle cx="47" cy="66" r="13" fill="url(#${id})" stroke="#000" stroke-opacity=".26"/>
+      <circle cx="47" cy="66" r="6.5" fill="#000" fill-opacity=".58"/>
+    </g>` : ''}
   </svg>`;
 }
 
@@ -10961,6 +11115,33 @@ export function bellGlyph(x) {
     <circle cx="0" cy="-44" r="17"/>
     <circle cx="0" cy="-44" r="7" fill="#fff" opacity=".9"/>`,
   }[x.id] || '';
+  return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">${art}</g>
+  </svg>`;
+}
+
+/**
+ * The swing bar lock's tile, 27.9.2026 — the same three parts the door draws
+ * (`latchArt`): the keeper with its knob, the plate, and the arm lying across
+ * from one to the other. `nolatch` is that outline struck through, so it is
+ * not the bell's struck ring or the viewer's struck eye.
+ */
+export function latchGlyph(x) {
+  /* The keeper shorter than the plate, as on the door, the arm lying from the
+     plate's pivot over the keeper's knob — and the knob and the plate's two
+     screws picked out in white, so the three bodies read as a fitting and not
+     as a letter H. */
+  const parts = `
+    <rect x="-56" y="-32" width="30" height="64" rx="6"/>
+    <rect x="26" y="-48" width="28" height="96" rx="6"/>
+    <rect x="-54" y="-9" width="104" height="18" rx="9"/>`;
+  const art = x.id === 'nolatch'
+    ? `<g fill="none" stroke="currentColor" stroke-width="5" opacity=".3">${parts}</g>
+    <path d="M-40 40 L40 -40" stroke="currentColor" stroke-width="7" opacity=".45"/>`
+    : `<g stroke="currentColor" stroke-opacity=".5" stroke-width="3">${parts}</g>
+    <circle cx="-41" cy="0" r="11" fill="#fff" stroke="currentColor" stroke-width="5"/>
+    <circle cx="40" cy="0" r="6" fill="#fff"/>
+    <circle cx="40" cy="-34" r="4.5" fill="#fff"/><circle cx="40" cy="34" r="4.5" fill="#fff"/>`;
   return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">${art}</g>
   </svg>`;

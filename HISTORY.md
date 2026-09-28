@@ -26,6 +26,122 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE BIG ROUND, 7 OF 8: THE SWING BAR LOCK, AND THE פרזול TILES
+  SHOW THIS DOOR'S METAL — `VERSION` 26.** The owner's son: *"add 'סגר בטחון'
+  to the pirzul section — a swing bar lock, at the top of the door's side,
+  mounted on the mashkof and the door, affected by the pirzul. And in the
+  pirzul icons show the lever the person chose, the bar lock if chosen, the
+  pins holding the door on the mashkof, the peephole if chosen — everything
+  the pirzul changes."* Settled in chat: an option on the פרזול step, price to
+  follow.
+  · **The field**, on the doorbell's and the bow's template: `LATCHES`
+    (`nolatch`, `latch` — סגר בטחון / Swing bar lock / Дверной ограничитель,
+    `priceTBD`, `photo: null`), `DEFAULTS.latch: 'nolatch'`, `lt=` (checked
+    free in `KNOWN` and `RETIRED`), one bit appended at the END of the pack
+    order. The code packs its first field highest, so an appended field moves
+    every other one bit up: `VERSION` 25 → 26 with the reason in the file;
+    payload 54 → 55, `TOTAL_BITS` 60, the code twelve characters (asserted
+    off the encoder, and that the latch's bit costs no character). A v25
+    `?...=` link opens as itself, with no latch. `npm test`'s capacity check
+    (`FIELD_LIST`), the price fixture, `KEYS`, the placement key's
+    completeness sweep (`VARY`) and the message's `ALT_FOR` each FAILED first
+    on the new field — the guards the last three fields left behind — and
+    each names it now.
+  · **The money: a third state.** `LATCH.latch` is `null` in prices.js.
+    `priceInto` takes a `null` only on an entry marked `priceTBD`, and throws
+    both ways (a null without the flag; the flag with a figure). `priceParts`
+    adds nothing for it and `pendingParts(state)` names it — the one
+    statement of "not in the total yet". `tileAgorot` returns `null`,
+    `priceLabel(null)` prints "מחיר בהמשך" (never כלול, which would say it is
+    included; never ₪0); `breakdownRows` ends with `{ latch, null }`, printed
+    "—", after the rounding so the figures above still add to the total; the
+    spec row reads "סגר בטחון (מחיר יימסר)", so the order, the A4 sheet, the
+    summary's picture and the drawing's name all say it. A22 in §9; A7 lost
+    "and the security latch" (it was assumed standard until the owner's son
+    made it a choice).
+  · **The drawing** (no photograph — published dimensions of the common
+    product and his position, one table, `LATCH`): a keeper 28 × 80 on the
+    leaf, its centre 30 mm in from the closing edge and 150 mm below the head;
+    a plate 26 × 96 on the frame 4 mm past the leaf's edge — on a דלת וחצי on
+    the fixed leaf, across the mullion; the arm lying from the plate's pivot
+    over the keeper's knob; all in `#nickel`, the פרזול's metal, both bolted
+    parts `data-mount`. ⚠ These doors open inwards, so a swing bar is fitted
+    INSIDE, like the hinges the drawing stopped showing for that reason: it
+    is drawn because he asked to see it, and `ASK-PERETZ.md` §0k asks with
+    the price. The keeper is an obstacle (`fittingBoxes`, kind `latch`, in the
+    `faceObstacles` memo key and in `homeKey`), so nothing placed on the face
+    stands on it.
+  · **The rule, geometric, and measured true everywhere.** `latchFits` — the
+    `peepholeFits` shape — holds the keeper's box, with the peephole's 8 mm
+    bead, against every window, panel and moulding `faceObstacles` carries.
+    Nothing in the range comes within it: the keeper reaches 44 mm in, and no
+    window or moulding comes nearer the closing edge than `MOUNT_REACH`; the
+    Greek set's cornice starts at 0.145 of the leaf. Swept in `npm test` over
+    every size × window × face × handing (144 doors) and 192 stripe states:
+    0 refused. `conflicts.latch` and a repair (the latch yields) exist so that
+    a window moved towards that edge greys the tile instead of bolting the
+    keeper to glass.
+  · **The פרזול tiles.** `pirzulGlyph(pz, state)` drew a Coral whatever the
+    door carried. Each tile is now this door: its lock furniture
+    (`FITTING_GLYPH` of the chosen lockset), a pair of hinge knuckles (the
+    "pins" — the door does not draw its hinges, they are in the rebate, but
+    the tile may show them), the latch when chosen, the viewer when chosen,
+    all in that tile's metal. The group carries `composite` (the fields it
+    draws), and `retintOptions` redraws the four tiles when they move — never
+    the panel. The latch's own tile is the keeper, the plate and the arm, the
+    knob and the plate's screws in white (the first cut read as the letter H).
+    `step.pz.l`, `g.pirzul.h` and §3's "what the פרזול reaches" gain the
+    latch; `exp.pz.a` already named it (Peretz's 26.8 list).
+  · **Units:** a group of its own — the wire format; every option's `null`
+    iff `priceTBD` across eleven lists; the total unmoved; `pendingParts`; the
+    tile's label; the breakdown row and its sum; the order line and the
+    WhatsApp message; the drawing on both handings (in `#nickel`, both mounts,
+    on the lock side); `latchFits` over the range; the keeper on the obstacle
+    list only when chosen; the tiles. **Falsified:** six bits for the latch —
+    2 (the END clause, the character clause); `tileAgorot` returning the part
+    — 2 (null, and "prints כלול"); `LATCH.latch` 0 with the flag kept — the
+    load guard throws and the run stops; the keeper in `#lockUnit` — 2; the
+    latch on the hinge side — 2; the keeper 200 mm inboard — the rule clause
+    (refused on 56 of 144 doors, the panels and the Greek set) and the two
+    side clauses; the פרזול tile ignoring the lockset — 1; leaving the latch
+    out of it — 1.
+  · **Audit:** a block of its own, he and ru — the tile's "מחיר בהמשך", the
+    tap landing in the code and the drawing, the price unmoved, the breakdown's
+    "—", the order's "(מחיר יימסר)", the summary's picture, and the פרזול tiles
+    showing the viewer, then the latch, then the Coral once chosen.
+    **Falsified:** the tile through the old `!agorot` branch — 2 ("prints
+    כלול" in he and ru); `composite` dropped — 4 (the latch not shown, the old
+    lock furniture kept). **The full audit: no faults** at every viewport,
+    the latch block among them; the wall chrome and the price card read as
+    they did at commit 4.
+  · **collide:** the base sweep carries the latch beside every grip ×
+    lockset × window (786 designs) and the deep sweep on every face; a latch
+    state that draws no `[data-hw="latch"]` is a fault (§5.15; falsified by
+    not drawing it — 786). `-- all`: 2,384 designs, nothing overlaps,
+    `faceObstacles` agrees with the drawing. `-- boxes`: the latch drawn out
+    60 / in 14 / vy 48 against its declared 62 / 16 / 50 on both handings, 82
+    against 84 on the דלת וחצי; every fitting inside its declaration;
+    `MOUNT_REACH` 121 covers the deepest bolted lock furniture (111).
+  · **Sheets, predicted in writing before the run:** 0 bare and 0 lockset
+    sheets move (no gallery door and no fixture carries a latch); the 12 shot
+    sheets move (noise); corpus-links.md changes on all 30 rows (v=26,
+    lt=nolatch) and nothing else. **Held** — `npm run corpus` had already
+    re-rendered the corpus family byte-identical while rewriting the links,
+    and `npm run sheets` moved the 12 shot sheets and the stamps only.
+  · **fuzz:** 30,000 random designs over every field, the latch now among them, repaired
+    and round-tripped (10,000 drawn); 60 click walks, 1,800 clicks, 141 met the
+    confirm dialog — 65 answered yes, 76 no, the door unchanged after every
+    no; nothing broke. · **latency:** 121 / 182 / 217 ms at 6× throttle against the 600 ms
+    gate, element counts unchanged at 268 / 531 / 656 (none of the three
+    doors carries a latch).
+  · **Gates:** node --check, npm run build, npm test 9,318,240 passed / 0 failed (the sheets are fresh; 199,323
+    more than commit 6, the latch doubling the sweeps that walk every field).
+  · **Not done, on purpose:** a guessed price (A22 is a ledger line, not a
+    number); a SPEC_ICON mark for the latch (the summary draws its tile glyph,
+    as for the bell and the viewer, which have none either); a second
+    position for the latch (his word is the head of the lock side); hiding it
+    from the outside view before Peretz answers §0k.
+
 - **27.9 — THE BIG ROUND, 6 OF 8: THE SUMMARY SHOWS THE PICTURES OF WHAT WAS
   CHOSEN.** The owner's son: *"at the end page … show the icons of all the
   things the person chose in each section instead of the text, clicking one

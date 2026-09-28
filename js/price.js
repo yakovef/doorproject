@@ -8,7 +8,7 @@
  */
 
 import { T } from './copy.js';
-import { BELLS, BOWS, BUILD_A, byId, COLOURS, DETAILS, GRILLES, gripTakesFinish, HANDLES,
+import { BELLS, BOWS, BUILD_A, LATCHES, byId, COLOURS, DETAILS, GRILLES, gripTakesFinish, HANDLES,
          HANDLE_BAND, HANDLE_FINISHES, isGlazed, PEEPHOLES,
          handleLength, MASHKOF_WIDER_A, MASHKOFS, paneCount,
          LOCKSETS, PIRZUL, SIZES, SPECIAL_LOCKS, stripePrice,
@@ -228,6 +228,13 @@ export function priceParts(state) {
     bell:    byId(BELLS, state.bell).delta
              + (state.bell !== 'nobell' ? finishExtra(state) : 0),
     peephole: byId(PEEPHOLES, state.peephole).delta,
+    /* ⚠ THE SWING BAR LOCK, 27.9.2026, AND ITS PRICE IS TO FOLLOW. Its delta
+       is `null` (see `LATCH` in prices.js), which adds nothing here — the
+       total is what is KNOWN — and `pendingParts` below names it, so the
+       tile, the breakdown and the order each say the figure is still to
+       come rather than letting a 0 read as "included". In the פרזול's metal,
+       which is priced on the פרזול's own row: no per-object surcharge. */
+    latch:   byId(LATCHES, state.latch || 'nolatch').delta || 0,
     /* A grille needs a window to sit in — and so does worked glass, which is
        in the same list now. Neither can be charged on a solid door: the
        configurator must never take money for something the drawing does not
@@ -252,6 +259,19 @@ export function priceParts(state) {
        the same list, so the figure and the picture cannot disagree. */
     grille:  byId(GRILLES, state.grille).delta * paneCount(state),
   };
+}
+
+/**
+ * THE PARTS OF THIS DOOR WHOSE PRICE IS STILL TO COME — keys of `priceParts`
+ * whose chosen option carries `null` (27.9.2026: the swing bar lock, until
+ * Peretz prices it). Empty on every door without one. The one statement of
+ * "not in the total yet", read by the breakdown, the tile and the order.
+ */
+export function pendingParts(state) {
+  const out = [];
+  const lt = byId(LATCHES, state.latch || 'nolatch');
+  if (lt && lt.delta === null) out.push('latch');
+  return out;
 }
 
 /** Total in agorot, gross (VAT included). */
@@ -296,6 +316,8 @@ export function tileAgorot(groupKey, state) {
      bar and a bell, which is a delta and not a price (see `priceParts` on why
      the tiles stopped printing deltas). */
   if (groupKey === 'handleFinish') return byId(HANDLE_FINISHES, state.handleFinish).delta;
+  /* ⚠ AND A PRICE TO FOLLOW IS `null`, NOT 0 — 0 prints כלול. */
+  if (pendingParts(state).includes(groupKey)) return null;
   const parts = priceParts(state);
   return Object.prototype.hasOwnProperty.call(parts, groupKey)
     ? parts[groupKey] : undefined;
@@ -337,6 +359,9 @@ export function breakdownRows(state) {
   }
   const round = priceAgorot(state) - sum;
   if (round) rows.push({ key: 'round', agorot: round });
+  /* A price to follow is a row with no figure (`agorot: null`, printed "—"),
+     after the rounding so the rows above it still add up to the total. */
+  for (const key of pendingParts(state)) rows.push({ key, agorot: null });
   return rows;
 }
 
@@ -405,6 +430,8 @@ export const shekels = a => Math.round(a / 100);
  * in the catalogue produces one today.
  */
 export function priceLabel(agorot) {
+  /* `null` is a price to follow (27.9.2026) — never כלול. */
+  if (agorot === null) return T('price.tbd');
   if (!agorot) return T('price.included');
   return formatAgorot(agorot);
 }

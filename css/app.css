@@ -4193,7 +4193,9 @@ html.is-live.is-untouched .wa__ask { display: inline; }
 #stage[data-changed="handle"] [data-hw="handle"],
 #stage[data-changed="handleLen"] [data-hw="handle"],
 /* The horizontal bow, 26.9.2026 — its own field, offered the same way. */
-#stage[data-changed="grab"] [data-hw="bow"] {
+#stage[data-changed="grab"] [data-hw="bow"],
+/* The swing bar lock, 27.9.2026. */
+#stage[data-changed="latch"] [data-hw="latch"] {
   animation: offerUp .28s var(--ease-fit) both;
 }
 @keyframes offerUp { from { opacity: 0; transform: translateX(6px); } }
@@ -4203,6 +4205,8 @@ html.is-live.is-untouched .wa__ask { display: inline; }
 #stage[data-changed="pirzul"] [data-hw="lock"],
 #stage[data-changed="lockset"] [data-hw="lock"],
 #stage[data-changed="speciallock"] [data-hw="lock"],
+/* The swing bar lock is lock furniture: it re-plates with the פרזול. */
+#stage[data-changed="pirzul"] [data-hw="latch"],
 /* The pull handle's finish, 20.9.2026: it repaints the bar AND the bell, and
    they change together the way the lock furniture does under the פרזול. */
 #stage[data-changed="handleFinish"] [data-hw="handle"],
