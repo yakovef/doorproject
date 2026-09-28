@@ -26,6 +26,35 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — THE DIGITAL VIEWER, DRAWN OFF ITS PHOTOGRAPH.** The owner's son sent
+  a product photograph of a digital door viewer: *"make the digital peephole
+  look like this."* Kept as `research/viewer/digital.png` and cited from
+  `PEEPHOLES` (`photo:`), `prices.js` and `peepholeDigital`; `ASK-PERETZ.md`
+  1b's third question (*"יש לך תמונה של העינית הדיגיטלית?"*) is closed.
+  · **Read off the photograph at 3×, in fractions of the bezel's side S:** a
+    rounded-square bezel (corners 0.36 S) round a ROUND black face 0.905 S
+    across — so the bezel is a sliver at mid-edge and heavy at the corners; the
+    lens at (0, −0.29) r 0.075; two lights at (±0.24, −0.215) r 0.035; a sensor
+    ring at the centre r 0.08; a second sensor dot at (0.316, 0.03); the bell
+    button a pill at (0, 0.29), 0.23 × 0.115 S with a white bell. The maker's
+    badge between lens and ring is left off — a brand, not a feature, and under
+    a millimetre of ink at door scale.
+  · **Corrected by comparison, not by eye alone:** the first draft drew the face
+    as a rounded square (corners 0.44) and it read square beside the photo; the
+    lens was 0.069 and small; the bell unreadable. All three changed.
+  · **Unchanged on purpose:** the SIZE (`PEEPHOLE_DIGITAL_R` 27, the sourced 54
+    mm) — the photograph has no scale, so every rule reading the viewer's reach
+    reads the same constant; the bezel's metal (`#nickel`, which the פרזול
+    recolours — the photo's bright chrome is one finish of it, and the lever
+    beside it is the same ramp); the face is the unit's own black plastic and
+    follows nothing.
+  · **The tile** (`peepholeGlyph`) matches: a lighter bezel, the round face, lens
+    high, two lights, the bell pill low.
+  · **Gates:** test 9,646,600 / 0; `collide -- boxes` — every fitting inside
+    what it declares; audit in the commit message. Sheets: 0 bare, 0 lockset —
+    no comparison fixture carries a digital viewer; stamps and `shot` only.
+    §0b's oldest entries (the band above the door, 4 of 8; the confirm dialog,
+    5 of 8; the summary as pictures, 6 of 8) moved here to keep it near forty lines.
 - **28.9 — כדור על אורך (`knobplate`) REDRAWN OFF ONE PHOTOGRAPH.** The owner's
   son: *"i only have one image of this but i want it in, this is the 'knob on
   backplate' handle i want you to refine it."* Same product, id, name and price
@@ -1590,6 +1619,18 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** The summary as pictures (6 of 8): *"show the icons of all the
+  things the person chose … clicking one takes them to that section."* A
+  button per spec row, the tile's own glyph (the colour its swatch) and the
+  short name (the colour's code — ours, §0a), "label: value" its name, at every
+  width; `#spec` no longer `aria-hidden` (§5.29). 1280×720: 4 of 8 tiles whole
+  above the send (was 3). Long form: `HISTORY.md`.
+- **27.9** The confirm dialog (5 of 8): *"…a window to pop up before you remove
+  the other thing … a red button that says yes and a black that says no."*
+  `#confirm` replaces `#clash`; `displacedBy` (pure, `rules.js`) on a dry run
+  of the tap decides; the sentence is the spec rows' values; `--danger`
+  6.57:1. Peretz's refusals (handle/bow against window or face) stand. The
+  fuzzer answers yes and no. Long form: `HISTORY.md`.
 - **27.9** The band above the door and the arrows (4 of 8): the step's name
   big over the door, its chosen option under it; the leaf at 1280/1440/1920
   426.2/550.2/562.4 against 421.0/550.3/563.3 before the round (asserted ≥ −4);

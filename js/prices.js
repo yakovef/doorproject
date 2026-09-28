@@ -535,8 +535,8 @@ export const BOW = {
 
 /* ⚠ A DIGITAL PEEPHOLE, +390, 20.9.2026 — Peretz: *"einit digital +390."* A
    third option beside the included optical viewer, not a replacement for it.
-   It has no photograph yet; see `peepholeDigital` in the renderer for what is
-   sourced and what is convention. */
+   Drawn off its photograph since 28.9.2026 (`research/viewer/digital.png`); see
+   `peepholeDigital` in the renderer. */
 export const PEEPHOLE = {
   nopeep: 0,         // ללא
   peep:   0,         // עינית — included; see the note above and A7

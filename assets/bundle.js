@@ -1982,16 +1982,18 @@
     /* ⚠ A DIGITAL VIEWER, +390, 20.9.2026 — Peretz: *"einit digital +390."*
        APPENDED, so `peep` keeps its index; `BITS.peephole` still had to go 1 → 2,
        which is a layout change and is inside `VERSION` 23 with the rest.
-       No photograph yet — `peepholeDigital` in the renderer says what is sourced
-       and what is convention — and `ASK-PERETZ.md` asks for one. It stands where
-       the optical viewer stands and is refused by the same `peepholeFits`. */
+       Drawn off its photograph since 28.9.2026 — the owner's son sent the product,
+       *"make the digital peephole look like this"* (`peepholeDigital` has what
+       was read off it). The photograph has no scale, so the SIZE is still the
+       sourced one. It stands where the optical viewer stands and is refused by
+       the same `peepholeFits`. */
     {
       id: "peep-digital",
       he: "עינית דיגיטלית",
       en: "Digital peephole",
       ru: "Цифровой глазок",
       digital: true,
-      photo: null
+      photo: "research/viewer/digital.png"
     }
   ];
   var GRILLES = [
@@ -8300,20 +8302,35 @@ ${plate.defs}${plate.body}
   };
   var peepholeDigital = (cx, cy) => {
     const R = PEEPHOLE_DIGITAL_R;
+    const S = R * 2;
     const n1 = (v) => v.toFixed(1);
+    const n2 = (v) => v.toFixed(2);
+    const X = (f) => n2(cx + f * S), Y = (f) => n2(cy + f * S), L2 = (f) => n2(f * S);
+    const F = 0.905;
+    const u = S / 70;
+    const bx = cx, by = cy + 0.29 * S;
+    const bell = `M${n2(bx - 3 * u)} ${n2(by + 2 * u)}C${n2(bx - 3 * u)} ${n2(by + 0.6 * u)} ${n2(bx - 2.2 * u)} ${n2(by + 0.3 * u)} ${n2(bx - 2.2 * u)} ${n2(by - 1.1 * u)}A${n2(2.2 * u)} ${n2(2.2 * u)} 0 0 1 ${n2(bx + 2.2 * u)} ${n2(by - 1.1 * u)}C${n2(bx + 2.2 * u)} ${n2(by + 0.3 * u)} ${n2(bx + 3 * u)} ${n2(by + 0.6 * u)} ${n2(bx + 3 * u)} ${n2(by + 2 * u)}Z`;
     return `
     <g data-hw="peephole" data-owner="peephole" data-kind="peephole" data-digital="1"
        data-cx="${cx}" data-cy="${cy}" data-r="${R}">
       <rect x="${n1(cx - R * 0.95)}" y="${n1(cy - R * 0.95 + R * 0.16)}"
-            width="${n1(R * 1.9)}" height="${n1(R * 1.9)}" rx="${n1(R * 0.34)}"
+            width="${n1(R * 1.9)}" height="${n1(R * 1.9)}" rx="${n1(S * 0.36)}"
             fill="#000" opacity="0.18"/>
-      <rect x="${cx - R}" y="${cy - R}" width="${R * 2}" height="${R * 2}" rx="${n1(R * 0.34)}"
+      <rect x="${cx - R}" y="${cy - R}" width="${S}" height="${S}" rx="${n1(S * 0.36)}"
             fill="url(#nickel)" stroke="#000" stroke-opacity=".26"/>
-      ${/* the lens: a dark disc with the sensor's darker centre and one highlight */
-    ""}<circle cx="${cx}" cy="${cy}" r="${n1(R * 0.56)}" fill="#000" fill-opacity=".62"/>
-      <circle cx="${cx}" cy="${cy}" r="${n1(R * 0.3)}" fill="#000" fill-opacity=".55"/>
-      <circle cx="${n1(cx - R * 0.16)}" cy="${n1(cy - R * 0.18)}" r="${n1(R * 0.12)}"
-              fill="#fff" fill-opacity=".34"/>
+      <circle cx="${X(0)}" cy="${Y(0)}" r="${L2(F / 2)}" fill="#111111"/>
+      <circle cx="${X(0)}" cy="${Y(-0.29)}" r="${L2(0.075)}" fill="#0d0d0f"
+              stroke="#3a3c40" stroke-width="${L2(0.01)}"/>
+      <circle cx="${X(-0.024)}" cy="${Y(-0.31)}" r="${L2(0.024)}" fill="#fff" fill-opacity=".5"/>
+      <circle cx="${X(-0.24)}" cy="${Y(-0.215)}" r="${L2(0.035)}" fill="#9d9e9a"/>
+      <circle cx="${X(0.24)}" cy="${Y(-0.215)}" r="${L2(0.035)}" fill="#9d9e9a"/>
+      <circle cx="${X(0)}" cy="${Y(0)}" r="${L2(0.08)}" fill="none"
+              stroke="#2c2d30" stroke-width="${L2(0.012)}"/>
+      <circle cx="${X(0.316)}" cy="${Y(0.03)}" r="${L2(0.017)}" fill="#26272a"/>
+      <rect x="${X(-0.115)}" y="${Y(0.29 - 0.0575)}" width="${L2(0.23)}" height="${L2(0.115)}"
+            rx="${L2(0.05)}" fill="#202124"/>
+      <path d="${bell}" fill="#fff" fill-opacity=".9"/>
+      <circle cx="${n2(bx)}" cy="${n2(by + 2.9 * u)}" r="${n2(0.8 * u)}" fill="#fff" fill-opacity=".9"/>
     </g>`;
   };
   var bellKnocker = (cx, cy) => {
@@ -8904,14 +8921,20 @@ ${plate.defs}${plate.body}
     <circle cx="0" cy="0" r="40"/>
     <circle cx="0" cy="0" r="21" fill="#fff" opacity=".92"/>
     <circle cx="-7" cy="-8" r="8" opacity=".55"/>`,
-      /* The digital viewer: the rounded-square bezel the leaf draws, with a lens
-         in it — so it cannot be mistaken for the round optical eye above or for
-         the ring on a boss the bell tile draws. */
+      /* The digital viewer, off its photograph (28.9): the bezel lighter than
+         the black face inside it, the lens high, two lights beside it and the
+         bell button low — the lens and the bell are what tell it from the round
+         optical eye above and from the ring on a boss the bell tile draws. */
       "peep-digital": `
-    <rect x="-46" y="-46" width="92" height="92" rx="16"/>
-    <circle cx="0" cy="0" r="24" fill="#fff" opacity=".92"/>
-    <circle cx="0" cy="0" r="12" opacity=".75"/>
-    <circle cx="-5" cy="-6" r="4" fill="#fff" opacity=".9"/>`
+    <rect x="-48" y="-48" width="96" height="96" rx="30" opacity=".38"/>
+    <circle cx="0" cy="0" r="43.5"/>
+    <circle cx="0" cy="-28" r="8" fill="#fff" opacity=".92"/>
+    <circle cx="0" cy="-28" r="3.6"/>
+    <circle cx="-23" cy="-21" r="3.6" fill="#fff" opacity=".8"/>
+    <circle cx="23" cy="-21" r="3.6" fill="#fff" opacity=".8"/>
+    <circle cx="0" cy="0" r="8" fill="none" stroke="#fff" stroke-width="2" opacity=".45"/>
+    <rect x="-12" y="22.5" width="24" height="12" rx="5" fill="#fff" opacity=".22"/>
+    <path d="M-4 31.5c0-1.6 1-2 1-4a3 3 0 0 1 6 0c0 2 1 2.4 1 4Z" fill="#fff"/>`
     }[x.id] || "";
     return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">${art}</g>

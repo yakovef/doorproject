@@ -178,6 +178,11 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** The digital viewer drawn off the owner's son's photograph (*"make the
+  digital peephole look like this"*, `research/viewer/digital.png`): round black
+  face in a rounded-square bezel, lens, two lights, sensor ring, bell button; the
+  maker's badge left off. Bezel `#nickel` (follows the פרזול), face constant; size
+  still 54 mm (no scale). 0 bare sheets. Long form: `HISTORY.md`.
 - **28.9** **כדור על אורך** (`knobplate`) redrawn off ONE photograph (*"i only
   have one image of this but i want it in … refine it"*): a waisted plate 90 ×
   216 (waist 70 at 0.54 — the עילי's family, 8 mm narrower), a 54 mm knob on a
@@ -206,18 +211,7 @@ lines here. Dates are the day of the change.
   closing edge in `#nickel` (published dimensions; fitted inside in reality —
   asked, §0k); each פרזול tile is this door's metal. 0 bare sheets moved, as
   predicted. Long form: `HISTORY.md`.
-- **27.9** The summary as pictures (6 of 8): *"show the icons of all the
-  things the person chose … clicking one takes them to that section."* A
-  button per spec row, the tile's own glyph (the colour its swatch) and the
-  short name (the colour's code — ours, §0a), "label: value" its name, at every
-  width; `#spec` no longer `aria-hidden` (§5.29). 1280×720: 4 of 8 tiles whole
-  above the send (was 3). Long form: `HISTORY.md`.
-- **27.9** The confirm dialog (5 of 8): *"…a window to pop up before you remove
-  the other thing … a red button that says yes and a black that says no."*
-  `#confirm` replaces `#clash`; `displacedBy` (pure, `rules.js`) on a dry run
-  of the tap decides; the sentence is the spec rows' values; `--danger`
-  6.57:1. Peretz's refusals (handle/bow against window or face) stand. The
-  fuzzer answers yes and no. Long form: `HISTORY.md`.
+
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -940,8 +934,9 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
 - **`BELLS` and `PEEPHOLES`** — fittings on the face (`bl=`, `ey=`). The bell is
   a 132 mm **ring knocker on the centre line** (`KNOCKER_AFF` 1470), the
   peephole directly above it; the bell sits on the pull-handle step and takes
-  the handle's finish. The digital viewer is drawn from published dimensions
-  (`photo: null`). **Every viewer is refused beside a window** (`viewerOn`,
+  the handle's finish. The digital viewer is drawn off the owner's son's
+  photograph (`research/viewer/digital.png`, 28.9): round black face, lens,
+  two lights, bell button; its SIZE is still the sourced 54 mm (no scale). **Every viewer is refused beside a window** (`viewerOn`,
   27.9 — the rules had named `'peep'` only). Two LISTS, not a multi-select: the withdrawn add-ons were a
   bitmask under the retired `a=`.
 - ~~**`LATCHES` — the swing bar lock (סגר בטחון)**~~ — in the site 27.9 (the
