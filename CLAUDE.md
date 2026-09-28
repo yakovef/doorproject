@@ -178,6 +178,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** **כדור על אורך** (`knobplate`) redrawn off ONE photograph (*"i only
+  have one image of this but i want it in … refine it"*): a waisted plate 90 ×
+  216 (waist 70 at 0.54 — the עילי's family, 8 mm narrower), a 54 mm knob on a
+  62 mm rose at 0.287, the Rotem's egg. Was a 96 × 300 stadium. Footprint 53/48/
+  198 → 48/48/157; `satinPlate` shared with עילי (its render byte-identical).
+  `KEYWAY_BACKSET` 63 kept though no longer "derived" (max is now 58).
 - **28.9** **עילי** (`ilai`), a new lockset, INCLUDED (*"very similar to rotem, it
   is also in the price, i want you to call it 'עילי'"*): the waisted backplate —
   220 tall, 91 at head and foot, 78 at a waist 0.54 down, a slim 14 mm bar under
@@ -207,12 +213,6 @@ lines here. Dates are the day of the change.
   of the tap decides; the sentence is the spec rows' values; `--danger`
   6.57:1. Peretz's refusals (handle/bow against window or face) stand. The
   fuzzer answers yes and no. Long form: `HISTORY.md`.
-- **27.9** The band above the door and the arrows (4 of 8): the step's name
-  big over the door, its chosen option under it; the leaf at 1280/1440/1920
-  426.2/550.2/562.4 against 421.0/550.3/563.3 before the round (asserted ≥ −4);
-  phones give the band 21.6 px of door. Two arrows step the first group,
-  skipping refused options; with none free, a dialog and no change. Long
-  form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -922,6 +922,13 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
   and the tile (`ilaiOutline`, `ilaiBar`, `ilaiNeck`). ⚠ The records call both
   plates "lever-plate", so `tools/corpus.mjs` gives a backplate to the lockset
   whose `doors` CITES it (the עילי cites d004 d022 d029 d106 d108), never a guess.
+  **The כדור על אורך (`knobplate`) is measured too since 28.9** off ONE
+  photograph (`research/handles/knobplate/`): the עילי's family of plate on its
+  own numbers — 216 tall, 90 at a domed head and foot, 70 at a waist 0.54 down
+  (`KNOBPLATE`, `knobPlateOutline`) — a 54 mm knob on a 62 mm rose 0.287 down,
+  lit from above with a bright equator (`knobBall`, the פרזול's), and the
+  Rotem's egg; the key slot is under the builder's film there and is placed as
+  the Rotem's. The two waisted plates share `satinPlate`, not their outlines.
   ⚠ **Every lever is drawn AS PHOTOGRAPHED** — Coral 133, curved 109, Rotem 114, עילי 107
   from spindle to tip — because the camera's parallax on a proud lever could
   not be sized from these photographs (§9).
@@ -958,7 +965,7 @@ before it picks a fill.**
 | gradients | owner |
 |---|---|
 | `gripHard` `gripSoft` | the pull bar and the bow, in the handle finish (`hf=`) |
-| `nickel` `nickelSoft` `plateFace` `domeKnob` `rotemFace` `rotemLever` | the פרזול — nickel is its **own** warm ramp, `FINISH_TONES.nickel` (27.9, measured off the Coral doors: 20% darker than `steel`, hue ≈40°); `steel` stays the pull bar's nickel, the extra locks' and the derivation reference. `domeKnob` (the כדור's ball) through `domeRamp` since 26.9, the measured dome kept literal on nickel |
+| `nickel` `nickelSoft` `plateFace` `domeKnob` `rotemFace` `rotemLever` `knobBall` | the פרזול — nickel is its **own** warm ramp, `FINISH_TONES.nickel` (27.9, measured off the Coral doors: 20% darker than `steel`, hue ≈40°); `steel` stays the pull bar's nickel, the extra locks' and the derivation reference. `domeKnob` (the כדור's ball) through `domeRamp` since 26.9, the measured dome kept literal on nickel |
 | `lockUnit` `lockUnitFace` `lockUnitSoft` `mirrorKnob` | the bought-in extra locks and the ספיר — a constant steel |
 | `euroSteel` `euroRim` | the cylinder, following the פרזול at its own stand-off (`cylinderRamp`) — derived on nickel too since 27.9, so every finish's plug stands 2–16% off its plate |
 | `bellMetal` | the פעמון, following the pull handle's finish (`bellRamp` keeps Peretz's older *"nickel and gold only"* beside the instruction that overruled it) |

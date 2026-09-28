@@ -26,6 +26,50 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — כדור על אורך (`knobplate`) REDRAWN OFF ONE PHOTOGRAPH.** The owner's
+  son: *"i only have one image of this but i want it in, this is the 'knob on
+  backplate' handle i want you to refine it."* Same product, id, name and price
+  (+₪200); the drawing had been a 96 x 300 stadium with a 58 mm knob and a black
+  keyhole, drawn from the name — a third taller than the fitting.
+  · **Read** off edge profiles on `research/handles/knobplate/door-1.jpg`, scaled
+    by the leaf's height at the plate's column (0.667 px/mm, 1.5 mm a pixel),
+    mirrored (hinged right). Satin on a dark door, so edges held where the
+    עילי's bronze-on-cream had not. The foot's rolled rim faces down and reads
+    darker than the door: the plate ends at the contact line, 8 mm below where
+    the bright face stops — read wrongly first, corrected before drawing.
+  · **Plate** (`KNOBPLATE`, `knobPlateOutline`): 216 tall (crowns -62 / 154 off
+    the spindle), 90 at head and foot, 70.2 at the waist; the head bows 4.5 past
+    its corners, the foot 5.5, corners r 12. A cubic pair fits the 36 half-width
+    readings to 0.46 mm RMS (worst 1.4), narrowest at 0.54. The עילי's family
+    (220 tall, narrowest at 0.54) but 8 mm narrower at the waist on photographs
+    read the same way — so its own outline, and the SATIN shared: `satinPlate`
+    extracted from `ilaiHandle`, the עילי's render byte-identical before and
+    after (four states diffed).
+  · **Knob**: a circle fitted to its outline gives a rose 59-64 across and a ball
+    ~54 in front of it, centred 0.287 down the plate. Drawn as a 62 rose in the
+    plate's satin and a 54 ball on a new `knobBall` ramp (hwTone, so it follows
+    the פרזול; `knobLimb` darkens the rim). The Cadoor's `domeKnob`, tried
+    first, is a ring round an off-centre highlight and read as a CUP on a round
+    knob; the photograph shows a ball lit from above with a bright equator and a
+    darker lower half.
+  · **Key**: the Rotem's egg (`euroEgg`), 26 x 47 at 99. The slot is under the
+    builder's blue film and was NOT read; it sits at the centre of the egg's
+    round top, where the Rotem's measured slot sits (89).
+  · **Footprint** by `npm run collide -- boxes`: drawn 46 / 46 / 155, declared
+    48 / 48 / 157 (the plate family's +2). Was 53 / 48 / 198.
+  · **`KEYWAY_BACKSET` stays 63 and is no longer "derived"**: its comment said
+    63 was the largest `out + 10` in the plate family, and that was the
+    knob-plate's 53. The family now peaks at 58 (עילי and knob-plate). Lowering
+    it moves every door's keyhole; kept, and the comment says so. `MOUNT_REACH`'s
+    note named the knob-plate's 111 mm as the deepest mount — it is the עילי's
+    109 now; the sentence no longer carries a figure that goes stale.
+  · Plate ÷ paint 1.78 in the photograph, 1.86 ours on nickel. The photograph's
+    champagne tint (R-B +46 against nickel's +21) is a finish, not the drawing.
+    The knob's outline sits 1 mm off the plate's centre toward the closing edge,
+    where the full camera model would put it 5-9 mm: one more reading that the
+    model overstates, from one door.
+  · `photo:` cited in the catalogue. Sheet: `research/handles/knobplate/
+    sheet-photo-before-now.webp`.
 - **28.9 — עילי (`ilai`), A NEW LOCKSET, INCLUDED.** The owner's son, with three
   photographs of installed doors: *"here is a new handle, it is very similar to
   rotem, it is also in the price, i want you to call it 'עילי'"*. In the app on
@@ -1512,6 +1556,12 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** The band above the door and the arrows (4 of 8): the step's name
+  big over the door, its chosen option under it; the leaf at 1280/1440/1920
+  426.2/550.2/562.4 against 421.0/550.3/563.3 before the round (asserted ≥ −4);
+  phones give the band 21.6 px of door. Two arrows step the first group,
+  skipping refused options; with none free, a dialog and no change. Long
+  form: `HISTORY.md`.
 - **27.9** The navigator as a dark column (3 of 8): *"a black rectangle …
   the section that i am in will turn white and be square … a checkmark."* A
   56 px ink column on the panel's inline-end edge above 1100, the phone row

@@ -742,9 +742,12 @@ export const LOCKSETS = [
      resolves to `sapir`, the nearest lever left in the range. */
   /* Knob on a long backplate — the bronze fitting on d092, named three times
      across the luxury tier. A different object from a knob on a rose: the
-     plate carries the keyway too, so it locks like the Rotem backplate. */
+     plate carries the keyway too, so it locks like the Rotem backplate.
+     Drawn off its own photograph since 28.9.2026 (the owner's son: *"i only
+     have one image of this but i want it in"*): a waisted plate 90 x 216, a
+     54 mm knob on a 62 mm rose, the Rotem's egg round the key. */
   { id: 'knobplate', he: 'כדור על אורך', en: 'Knob on backplate', ru: 'Шар на планке',
-    style: 'knobplate', lock: true, doors: ['d092'], photo: null },
+    style: 'knobplate', lock: true, doors: ['d092'], photo: 'research/handles/knobplate/door-1.jpg' },
 
   /* ── added in round five, from the hardware contact sheets ──────────
      Every one of these was already on Peretz's doors; none of them was in the

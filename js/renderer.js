@@ -892,7 +892,14 @@ const LOCK_BACKSET_GRIP = 49;  // 0.057 W — where it goes when a bar shares th
  * knobplate 63, square 51, digital 38 — because on those the keyway is part of
  * the plate and cannot be placed independently of it. Any smaller and a
  * knob-on-backplate hangs off the closing edge; any larger and every door's
- * lock sits further in than it needs to. So the plate family sits AT the
+ * lock sits further in than it needs to.
+ * ⚠ AND SINCE 28.9.2026 THE DERIVATION NO LONGER BINDS IT. The knob-on-backplate
+ * was redrawn off a photograph at 90 wide (it was a 96-wide stadium, `out` 53),
+ * so the family reads plate 57, ilai 58, knobplate 58, square 51, digital 38 —
+ * 58 at most. 63 is KEPT: lowering it moves the keyhole on every door, it is
+ * the nearer of the two to the corpus median below, and nothing hangs off the
+ * edge at 63. A range decision, not a tidy-up; recorded so the next reader
+ * does not take "derived" for a live claim. So the plate family sits AT the
  * keyway backset and the loose-escutcheon family has its keyway drawn there
  * regardless of where its lever went.
  *
@@ -1288,6 +1295,39 @@ const ILAI = {
      from +12 to -18 then down to the bar by -31; door 1 -20 over -35..+5;
      door 2 a diagonal from (-5, -25) down to (-28, -8). */
   arch: [-10, 31, -19, 6],   // the band reads 5-7 mm on all three
+};
+/* כדור על אורך (id `knobplate`) — a knob on a long plate that carries the
+   keyway too. Drawn off ONE photograph since 28.9.2026, the owner's son: *"i
+   only have one image of this but i want it in, this is the 'knob on backplate'
+   handle i want you to refine it"* (research/handles/knobplate/door-1.jpg, a
+   satin door hinged right, mirrored to read). Scaled by the leaf's HEIGHT at the
+   plate's column (1367 px over 2050 mm, 0.667 px/mm, 1.5 mm a pixel) and read
+   off edge profiles, which held here: satin on a dark door. mm from the knob's
+   spindle, y down. d092, the bronze gallery door it was drawn from before,
+   carries the same plate: at its own 3.8 mm a pixel (leaf 543 px) it reads 219
+   x 91, the knob 0.30 down, the egg's centre 102 below the knob.
+   Until 28.9 it was a 96 x 300 stadium, a 58 mm knob and a black keyhole —
+   drawn from a name, a third taller than the fitting. */
+const KNOBPLATE = {
+  top: -62,       // the head's crown (edge profile, 1.5 mm pixels)
+  foot: 154,      // the foot's crown, the OUTER edge of its rolled lower rim,
+                  // which faces down and reads darker than the door — so 216 tall
+  domeT: 4.5,     // the head bows 4.5 past its corners, the foot 5.5
+  domeB: 5.5,
+  corner: 12,
+  /* the half-width down the plate, every 5 mm: 45 at -46, 42.8 at -31, 40.6 at
+     -16, 38.4 at 4, 36.4 at 19, 35.1 flat from 29 to 64, 37.3 at 89, 40.1 at
+     109, 43.9 at 129, 45 at 134. A cubic pair fits all 36 readings to 0.46 mm
+     RMS, the worst 1.4 — inside a photograph's pixel. Narrowest at 54, 0.54 of
+     the height: where the עילי's is, and 7 mm narrower than the עילי's 78. */
+  head: 45, waist: 35.1, waistAt: 54, base: 45,
+  rose: 31,       // the knob's rose: a circle fitted to its outline, 59-64 across
+  ball: 27,       // the knob in front of it, 54 across, its lower half darker
+  bezel: [26, 47, 99],  // the key's egg: 26 wide at its widest, 47 tall (77-124), centre 99 below
+  /* the key slot is under the builder's blue film on this door and cannot be
+     read; it is set where the Rotem's is measured, at the centre of the egg's
+     round top (101 - 21 + 13 = 93, read 93.5) — 99 - 23.5 + 13 = 89 here */
+  plug: 89,
 };
 /* ⚠ THE LEVER IS AS PHOTOGRAPHED, WITH NO PARALLAX TERM — AND THAT IS A
    DECISION, NOT AN OVERSIGHT. The blade stands ~55 mm proud, and from a camera
@@ -2438,6 +2478,25 @@ export function render(state) {
       <stop offset="0.80" stop-color="${hwTone[2]}"/>
       <stop offset="1"    stop-color="${hwTone[3]}"/>
     </linearGradient>
+    <!-- THE כדור על אורך'S KNOB (28.9), on hwTone so it follows the פרזול:
+         lit from above, a hard bright band at its equator over a darker lower
+         half, the bottom darkest — what its one photograph shows. knobLimb
+         darkens the rim so it reads as a ball: the Cadoor's domeKnob, a ring
+         round an off-centre highlight, read as a CUP on a round knob. -->
+    <linearGradient id="knobBall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="${hwTone[1]}"/>
+      <stop offset="0.30" stop-color="${hwTone[0]}"/>
+      <stop offset="0.44" stop-color="${hwTone[0]}"/>
+      <stop offset="0.48" stop-color="${hwTone[6]}"/>
+      <stop offset="0.53" stop-color="${hwTone[1]}"/>
+      <stop offset="0.64" stop-color="${hwTone[2]}"/>
+      <stop offset="1"    stop-color="${hwTone[3]}"/>
+    </linearGradient>
+    <radialGradient id="knobLimb" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0"    stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.66" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.42"/>
+    </radialGradient>
 
     <!-- WARNING: THE GRIP'S OWN PAIR, AND WHY THERE HAS TO BE A SECOND SET.
          One gradient cannot serve two masters: grabHandle is a PULL HANDLE
@@ -6659,11 +6718,13 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g', ornW = null) {
    ⚠ THIS SAID "the deepest is the Cadoor rose at 121 mm. 126 leaves five for
    the drawing's own strokes", and neither half is true today — the constant is
    121, not 126, so there is no five; and `npm run collide -- boxes` reads the
-   deepest at 111 mm, on the knobplate's backplate rather than on the Cadoor's
-   rose. Both figures moved under a sentence nobody came back to, which is §6's
-   standing complaint about numbers written into prose. **121 is deliberately
-   NOT lowered to 111**: it is what a window's architrave must clear, so
-   shrinking it lets a light come 10 mm nearer the ironmongery and changes what
+   deepest at 109 mm, on the עילי's backplate rather than on the Cadoor's
+   rose (111 on the knob-plate's 96-wide stadium until it was redrawn,
+   28.9). Both figures moved under a sentence nobody came back to, which is
+   §6's standing complaint about numbers written into prose. **121 is
+   deliberately NOT lowered to the measured deepest**: it is what a window's
+   architrave must clear, so shrinking it lets a light come nearer the
+   ironmongery and changes what
    the catalogue can build — a range decision, not a tidy-up. It is held above
    the measured maximum, which is the safe direction, and the tool prints the
    margin on every run.
@@ -8528,7 +8589,10 @@ function handleFootprint(handle, leafH, panelled = false) {
        one with the backplate. Do not "fix" that by adding one. */
     case 'cadoor':  return { out: 41, in: 41, vy: 48 };
     case 'sapir':   return { out: 36, in: 74, vy: 43 };
-    case 'knobplate': return { out: 53, in: 48, vy: 198 };
+    /* The כדור על אורך, re-measured 28.9 off its redrawn plate (90 x 216, off
+       one photograph): drawn out 46 / in 46 / vy 155, declared with the plate
+       family's +2. Was 53 / 48 / 198, the 96 x 300 stadium's. */
+    case 'knobplate': return { out: 48, in: 48, vy: 157 };
     case 'cylinder': return { out: LOCK_R + 8, in: LOCK_R + 8, vy: LOCK_R + 8 };
     case 'digital': return { out: 28, in: 33, vy: 145 };
     case 'square':  return { out: 41, in: 140, vy: 149 };   // the Coral's lever: 135 -> 140 on 27.9
@@ -9398,6 +9462,43 @@ function plateHandle(cx, cy, dir) {
     </g>`;
 }
 
+/* A satin backplate — the עילי's and the כדור על אורך's, the Rotem's metal
+   (`rotemFace`, following the פרזול): a short soft shadow (the plate stands ~8
+   mm proud), the face falling gently from a lit head, and a rolled edge lit on
+   the head and the key light's side, darker opposite. One routine for both
+   plates, so the two can differ only in the outlines their photographs gave
+   them (28.9). `p` keeps each product's gradient ids its own. */
+function satinPlate(outline, p, u) {
+  return {
+    defs: `      <linearGradient id="${p}Face-${u}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="#fff" stop-opacity="0.12"/>
+        <stop offset="0.45" stop-color="#fff" stop-opacity="0"/>
+        <stop offset="1"    stop-color="#000" stop-opacity="0.10"/>
+      </linearGradient>
+      <!-- the rolled edge: lit along the head and down the key light's side -->
+      <linearGradient id="${p}Rim-${u}" x1="0" y1="0" x2="1" y2="0.35">
+        <stop offset="0"    stop-color="#fff" stop-opacity="0.72"/>
+        <stop offset="0.40" stop-color="#fff" stop-opacity="0.40"/>
+        <stop offset="0.75" stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+`,
+    body: `      <!-- the plate stands ~8 mm proud: a short, soft shadow -->
+      <path d="${outline}" transform="translate(2 5)"
+            fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
+
+      <!-- the plate: the Rotem's satin, its rolled edge lit on the head and
+           the key light's side, darker opposite -->
+      <path data-mount="backplate" d="${outline}" fill="url(#rotemFace)"/>
+      <path d="${outline}" fill="#000" opacity="0.14"/>
+      <path d="${outline}" fill="url(#${p}Face-${u})"/>
+      <path d="${outline}" fill="none" stroke="#000" stroke-opacity="0.34" stroke-width="1.4"
+            transform="translate(0.9 0.7)"/>
+      <path d="${outline}" fill="none" stroke="url(#${p}Rim-${u})" stroke-width="2.4"
+            transform="translate(-0.7 -0.6)"/>
+`,
+  };
+}
+
 /* The עילי's outline: a domed head and foot, four rounded corners, and sides
    concave all the way down to a waist at 0.54 of the height. Read by the door
    and the tile alike, so the two cannot drift apart. */
@@ -9466,6 +9567,7 @@ function ilaiHandle(cx, cy, dir) {
   const at = t => cx + dir * t;
   const u = Math.round(cx) + '-' + Math.round(cy);
   const outline = ilaiOutline(cx, cy);
+  const plate = satinPlate(outline, 'ilai', u);
   const hd = ILAI.depth / 2;
   const arch = ilaiNeck(cx, cy, dir);
   const band2 = (fr, bw, a) => {
@@ -9480,35 +9582,11 @@ function ilaiHandle(cx, cy, dir) {
         <stop offset="0.5" stop-color="#fff" stop-opacity="1"/>
         <stop offset="1"   stop-color="#fff" stop-opacity="0"/>
       </linearGradient>
-      <linearGradient id="ilaiFace-${u}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0"    stop-color="#fff" stop-opacity="0.12"/>
-        <stop offset="0.45" stop-color="#fff" stop-opacity="0"/>
-        <stop offset="1"    stop-color="#000" stop-opacity="0.10"/>
-      </linearGradient>
-      <!-- the rolled edge: lit along the head and down the key light's side -->
-      <linearGradient id="ilaiRim-${u}" x1="0" y1="0" x2="1" y2="0.35">
-        <stop offset="0"    stop-color="#fff" stop-opacity="0.72"/>
-        <stop offset="0.40" stop-color="#fff" stop-opacity="0.40"/>
-        <stop offset="0.75" stop-color="#fff" stop-opacity="0"/>
-      </linearGradient>
-      <filter id="ilaiShadow-${u}" x="-20%" y="-150%" width="140%" height="400%">
+${plate.defs}      <filter id="ilaiShadow-${u}" x="-20%" y="-150%" width="140%" height="400%">
         <feGaussianBlur stdDeviation="7"/>
       </filter>
 
-      <!-- the plate stands ~8 mm proud: a short, soft shadow -->
-      <path d="${outline}" transform="translate(2 5)"
-            fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
-
-      <!-- the plate: the Rotem's satin, its rolled edge lit on the head and
-           the key light's side, darker opposite -->
-      <path data-mount="backplate" d="${outline}" fill="url(#rotemFace)"/>
-      <path d="${outline}" fill="#000" opacity="0.14"/>
-      <path d="${outline}" fill="url(#ilaiFace-${u})"/>
-      <path d="${outline}" fill="none" stroke="#000" stroke-opacity="0.34" stroke-width="1.4"
-            transform="translate(0.9 0.7)"/>
-      <path d="${outline}" fill="none" stroke="url(#ilaiRim-${u})" stroke-width="2.4"
-            transform="translate(-0.7 -0.6)"/>
-
+${plate.body}
       ${euroEgg(cx, cy, ILAI.bezel, ILAI.plug)}
 
       <!-- the lever's shadow: it stands ~55 mm proud -->
@@ -9592,11 +9670,6 @@ function almogLever(cx, cy, dir) {
  * were substituting a bare round knob, which loses the whole fitting.
  */
 function knobPlate(cx, cy, dir) {
-  const W = 96, H = 300, r = 30;
-  const x = cx - W / 2, y = cy - H * 0.34;
-  const d = `M ${x} ${y + r} Q ${x} ${y} ${x + W / 2} ${y} Q ${x + W} ${y} ${x + W} ${y + r}
-             L ${x + W} ${y + H - r} Q ${x + W} ${y + H} ${x + W / 2} ${y + H}
-             Q ${x} ${y + H} ${x} ${y + H - r} Z`;
   /* ⚠ `data-hw="lockset-art"`, NOT `"handle"`. This is a LOCKSET — a knob on a
      plate — and it was the only lockset in the catalogue tagging itself as the
      pull grip, where `digitalLock` and `squarePlates` beside it both say
@@ -9610,25 +9683,64 @@ function knobPlate(cx, cy, dir) {
      exist. 1,730 of the buildable designs, every one of them this lockset.
      The suite asserted the mirror of this — that a grip never draws lock
      furniture — and only the mirror. */
+  const f = n => n.toFixed(2);
+  const u = Math.round(cx) + '-' + Math.round(cy);
+  const plate = satinPlate(knobPlateOutline(cx, cy), 'kp', u);
+  const R = KNOBPLATE.rose, r = KNOBPLATE.ball;
   return `
     <g data-hw="lockset-art" data-style="knobplate">
-      <path d="${d}" fill="#000" opacity="0.26" transform="translate(5 6)"
-            filter="url(#hwShadow)"/>
-      <path data-mount="backplate" d="${d}" fill="url(#nickel)"/>
-      <path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="2"
-            vector-effect="non-scaling-stroke"/>
-      <!-- the knob, standing off the plate -->
-      <ellipse cx="${cx}" cy="${cy + 6}" rx="30" ry="27" fill="#000" opacity="0.30"/>
-      <circle cx="${cx}" cy="${cy}" r="29" fill="url(#nickelSoft)"/>
-      <circle cx="${cx - 8}" cy="${cy - 9}" r="11" fill="#fff" opacity="0.30"/>
-      <circle cx="${cx}" cy="${cy}" r="29" fill="none" stroke="#000"
-              stroke-opacity="0.28" stroke-width="2" vector-effect="non-scaling-stroke"/>
-      <!-- and the keyway low on the same plate, which is the point of it.
-           Street face only: from indoors this fitting shows a thumbturn, and
-           drawing a keyhole there would say the door locks with a key from
-           the inside, which it does not. -->
-      ${keyway(cx, y + H * 0.78)}
+${plate.defs}${plate.body}
+      <!-- and the keyway low on the same plate, which is the point of it: the
+           egg the Rotem and the עילי carry. Street face only: from indoors this
+           fitting shows a thumbturn, and drawing a keyhole there would say the
+           door locks with a key from the inside, which it does not. -->
+      ${euroEgg(cx, cy, KNOBPLATE.bezel, KNOBPLATE.plug)}
+
+      <!-- the knob stands ~55 mm proud: its shadow falls on the plate below -->
+      <circle cx="${f(cx + 3)}" cy="${f(cy + 9)}" r="${r}" fill="#000" opacity="0.36"
+              filter="url(#hwShadow)"/>
+      <!-- the rose it turns on: the plate's satin, a dark step round it, lit
+           along the key light's side -->
+      <circle cx="${f(cx)}" cy="${f(cy)}" r="${R}" fill="url(#rotemFace)"/>
+      <circle cx="${f(cx)}" cy="${f(cy)}" r="${R}" fill="none" stroke="#000"
+              stroke-opacity="0.40" stroke-width="1.6" transform="translate(0.6 0.8)"/>
+      <path d="${arcPath(cx, cy, R - 1.4, 150, 300)}" fill="none"
+            stroke="#fff" stroke-opacity="0.45" stroke-width="1.4"/>
+      <!-- the knob: a ball lit from above, a bright band at its equator over
+           a darker lower half (knobBall, the פרזול's), its rim darkened so it
+           reads round, one soft highlight toward the key light -->
+      <circle data-part="ball" cx="${f(cx)}" cy="${f(cy)}" r="${r}" fill="url(#knobBall)"/>
+      <circle cx="${f(cx)}" cy="${f(cy)}" r="${r}" fill="url(#knobLimb)"/>
+      <ellipse cx="${f(cx - r * 0.30)}" cy="${f(cy - r * 0.46)}" rx="${f(r * 0.34)}" ry="${f(r * 0.17)}"
+               fill="#fff" opacity="0.50" transform="rotate(-24 ${f(cx - r * 0.30)} ${f(cy - r * 0.46)})"/>
+      <circle cx="${f(cx)}" cy="${f(cy)}" r="${r}" fill="none" stroke="#000"
+              stroke-opacity="0.26" stroke-width="1.2"/>
     </g>`;
+}
+
+/* The כדור על אורך's outline: a domed head and foot, four rounded corners and
+   sides concave all the way down to a waist at 0.54 of the height — the
+   עילי's construction on its own measured numbers. Read by the door and the
+   tile alike. */
+function knobPlateOutline(cx, cy) {
+  const f = n => n.toFixed(2);
+  const K = KNOBPLATE, rc = K.corner;
+  const T = cy + K.top, B = cy + K.foot;
+  const hT = K.head, hW = K.waist, yW = cy + K.waistAt, hB = K.base;
+  const yTs = T + K.domeT, yBs = B - K.domeB;
+  return `M ${f(cx)} ${f(T)}
+    Q ${f(cx + (hT - rc) * 0.55)} ${f(T)} ${f(cx + hT - rc)} ${f(yTs)}
+    A ${rc} ${rc} 0 0 1 ${f(cx + hT)} ${f(yTs + rc)}
+    C ${f(cx + hT - 2)} ${f(cy - 30)} ${f(cx + hW)} ${f(cy)} ${f(cx + hW)} ${f(yW)}
+    C ${f(cx + hW)} ${f(cy + 84)} ${f(cx + hB - 2)} ${f(cy + 120)} ${f(cx + hB)} ${f(yBs - rc)}
+    A ${rc} ${rc} 0 0 1 ${f(cx + hB - rc)} ${f(yBs)}
+    Q ${f(cx + (hB - rc) * 0.55)} ${f(B)} ${f(cx)} ${f(B)}
+    Q ${f(cx - (hB - rc) * 0.55)} ${f(B)} ${f(cx - hB + rc)} ${f(yBs)}
+    A ${rc} ${rc} 0 0 1 ${f(cx - hB)} ${f(yBs - rc)}
+    C ${f(cx - hB + 2)} ${f(cy + 120)} ${f(cx - hW)} ${f(cy + 84)} ${f(cx - hW)} ${f(yW)}
+    C ${f(cx - hW)} ${f(cy)} ${f(cx - hT + 2)} ${f(cy - 30)} ${f(cx - hT)} ${f(yTs + rc)}
+    A ${rc} ${rc} 0 0 1 ${f(cx - hT + rc)} ${f(yTs)}
+    Q ${f(cx - (hT - rc) * 0.55)} ${f(T)} ${f(cx)} ${f(T)} Z`;
 }
 
 /**
@@ -10891,12 +11003,21 @@ const FITTING_GLYPH = {
           fill="var(--paper, #EFEDE8)"/>` };
   },
 
-  // Knob on a long backplate — the plate carries the keyway too.
-  knobplate: () => ({ box: [-58, -118, 58, 214], art: `
-    <rect x="-48" y="-102" width="96" height="300" rx="30"/>
-    <circle cx="0" cy="0" r="30" fill="var(--paper, #EFEDE8)"/>
-    <circle cx="0" cy="0" r="21"/>
-    <circle cx="0" cy="120" r="12" fill="var(--paper, #EFEDE8)"/>` }),
+  // כדור על אורך: the waisted plate, the knob on its rose, the egg — the
+  // door's own outline (knobPlateOutline) and numbers (28.9; until then a
+  // 96 x 300 stadium, a third taller than the fitting).
+  knobplate: () => {
+    const R = KNOBPLATE.rose, r = KNOBPLATE.ball;
+    const [bw, bh, bc] = KNOBPLATE.bezel, e1 = bw / 2 * 0.8, e2 = e1 * 0.59;
+    const c1 = bc - bh / 2 + bw / 2, c2 = bc + bh / 2 - bw / 2 * 0.59;
+    return { box: [-(KNOBPLATE.head + 16), KNOBPLATE.top - 16, KNOBPLATE.head + 16, KNOBPLATE.foot + 16], art: `
+    <path d="${knobPlateOutline(0, 0)}"/>
+    <circle cx="0" cy="0" r="${R}" fill="var(--paper, #EFEDE8)"/>
+    <circle cx="0" cy="0" r="${r - 3}"/>
+    <path d="M ${-e1} ${c1} A ${e1} ${e1} 0 0 1 ${e1} ${c1} L ${e2.toFixed(2)} ${c2.toFixed(2)}
+             A ${e2.toFixed(2)} ${e2.toFixed(2)} 0 0 1 ${-e2.toFixed(2)} ${c2.toFixed(2)} Z"
+          fill="var(--paper, #EFEDE8)"/>` };
+  },
 
   /* The smart lock: a slim black slab with a reader window near the top, a
      round thumb-turn, and the key override at the foot. Measured off d087 at

@@ -4449,6 +4449,24 @@ group('the finish reaches every piece of metal');
        !== looks(render({ ...base, lockset: 'knobplate' }), 'data-style="knobplate"'),
        'the knob-on-backplate has stopped following the פרזול — it is a different '
        + 'product from the cadoor and d092 photographs it in bronze');
+    /* And its KNOB by name (28.9): the group check above would pass on the
+       plate alone moving, and the ball has its own ramp (`knobBall`) since the
+       knob-plate was redrawn off its photograph. §5.8: an assertion names the
+       object, not the document. */
+    {
+      const ballLooks = svg => {
+        const el = /<[a-z]+ data-part="ball"[^>]*>/.exec(grabDeep(svg, 'data-style="knobplate"') || '');
+        const id = el && (/fill="url\(#([A-Za-z0-9_-]+)\)"/.exec(el[0]) || [])[1];
+        const g = id && new RegExp(`<(linear|radial)Gradient id="${id}"[^>]*>([\\s\\S]*?)</\\1Gradient>`).exec(svg);
+        return g ? (g[2].match(/stop-color="[^"]+"/g) || []).join(',') : null;
+      };
+      const st = { ...base, lockset: 'knobplate' };
+      ok(ballLooks(render(st)), 'the knob-on-backplate\'s ball or its gradient was not found — this check is dead');
+      for (const pz of ['pz-black', 'pz-bronze', 'pz-gold']) {
+        ok(ballLooks(render({ ...st, pirzul: pz })) !== ballLooks(render(st)),
+           `the פרזול "${pz}" does not reach the knob-on-backplate's ball`);
+      }
+    }
 
     /* ── AND THE עינית FOLLOWS IT ON ALL FOUR, WHICH IT DID NOT ─────────
        Peretz's own list of what the פרזול recolours has the עינית in it by
