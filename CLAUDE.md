@@ -150,6 +150,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The confirm dialog (5 of 8): *"…a window to pop up before you remove
+  the other thing … a red button that says yes and a black that says no."*
+  `#confirm` replaces `#clash`; `displacedBy` (pure, `rules.js`) on a dry run
+  of the tap decides; the sentence is the spec rows' values; `--danger`
+  6.57:1. Peretz's refusals (handle/bow against window or face) stand. The
+  fuzzer answers yes and no. Long form: `HISTORY.md`.
 - **27.9** The band above the door and the arrows (4 of 8): the step's name
   big over the door with its chosen option under it, the panel's `<h2>`
   visually hidden; the leaf at 1280/1440/1920 is 426.2/550.2/562.4 against
@@ -821,10 +827,22 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
   `SAID.locksetSwapped`), the handle second, glass and face never.
   `gripObstacle(state, id)` is the one statement of what stands in a bar's way
   (`null` · `lock` · `window` · `face` · `door` · `bow`); `bowObstacle(state)`
-  is the bow's (`null` · `lock` · `window` · `face` · `door`). A greyed handle names its
-  obstacle; a lever that would displace the bar opens `<dialog id="clash">`,
-  and both taps return before `repair`. Every other greyed tile performs its
-  repair on a tap.
+  is the bow's (`null` · `lock` · `window` · `face` · `door`). A greyed handle
+  or bow names its obstacle and changes nothing — Peretz's refusal (20.9, 24.9)
+  stands, no dialog offers to remove the window or the face.
+- ⚠ **A tap that would take something else away ASKS FIRST** (27.9, the
+  owner's son: *"…i want a window to pop up before you remove the other thing
+  … a red button that says yes and a black that says no"*). `choose` dry-runs
+  the tap (`planChoice`: `repair` plus the give-back memory) and asks
+  `displacedBy` (`rules.js`, pure) which of the customer's other choices it
+  would move — a THING, not a "none"; additions (a grille bringing its window)
+  and the bar's length clamp do not count. Any, and `<dialog id="confirm">`
+  asks *"{x}? זה יסיר את {y}"*, `y` the spec rows' values; Yes (`--danger`
+  red) commits the same plan, No (ink), Escape and the backdrop change
+  nothing. The lever against a bar asks too now (it was a one-button
+  "cannot be together"); the stripes control goes through it; the arrows'
+  "nothing else fits" is its one-button form. Links and codes still repair
+  silently with the notice.
 - ⚠ **`faceWorked` takes a STATE**; `detailWorked` takes a DETAILS entry
   (§5.24).
 
@@ -1256,7 +1274,11 @@ are not in `VIEWS`:
   head corner (27.9), inside the picture, never on `#frame`, its breakdown
   centred on it.
 - **repairs** — a real repair at every viewport, every sentence on screen, its
-  box covering no option; an undo that moves the price names a spec row.
+  box covering no option; an undo that moves the price names a spec row; a tap
+  that would take something away asks first (the Coral against a bar and a
+  peephole on glass: yes/no, red and ink, no/Escape change nothing, yes does
+  exactly the tap), while a pull handle or bow against the window stays
+  refused with its reason.
 - **the summary** — spec before explainer (as an ORDER, not a row count); the
   table above 700 px and the line below, exactly one drawn; no handing card
   (removed 27.9 — the order keeps `handingWords()`) and, under the green send,

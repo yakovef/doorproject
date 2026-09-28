@@ -71,6 +71,12 @@
   --accent-ink: #7E6134;
   --wa:         #1EA95A;
   --warn:       #A4442E;
+  /* ⚠ THE "YES" THAT TAKES SOMETHING AWAY — 27.9.2026, the owner's son: *"a
+     red button that says yes and a black that says no."* A red of its own
+     rather than `--warn` (which is the colour of a sentence, not of a button):
+     white text on it measures 6.57:1, asserted in `npm test` the way
+     `--accent-ink` is. */
+  --danger:     #B42318;
 
   --sp: 4px;
 
@@ -2868,14 +2874,16 @@ button.spec__row:focus-visible {
    nothing until it is opened and the opener is inside the panel, which is
    hidden already — but anything added to the page joins this list the same
    day, which is the rule that stopped a headline faking a 5.2% regression. */
-/* ── the lever-against-bar dialog ─────────────────────────────
-   `choose` opens it instead of repairing (js/app.js, 20.9.2026). A card the
-   width of a sentence, the gallery's own surface and backdrop, one pill
-   button at the tap floor. No animation on purpose: nothing for `.is-bare`
-   or `prefers-reduced-motion` to kill (T9, T13), and a modal that appears
-   at once is the honest shape for "no". Centred by the UA's own dialog
-   rules, like `.works`. */
-.clash {
+/* ── the confirm dialog — 27.9.2026 ──────────────────────────────
+   It replaced the lever-against-bar dialog of 20.9 (`.clash`): the same card —
+   the width of a sentence, the gallery's surface and backdrop, centred by the
+   UA's own dialog rules — with two forms. Yes/no for a tap that would take
+   something away: yes the `--danger` red with white text, no the ink pill
+   (*"a red button that says yes and a black that says no"*). One button for an
+   arrow with nowhere to go. No animation: nothing for `.is-bare` or
+   `prefers-reduced-motion` to kill (T9, T13), and a modal that appears at once
+   is the honest shape for a question. */
+.confirm {
   inline-size: min(420px, 92vw);
   padding: 22px 22px 18px;
   border: 1px solid transparent; border-radius: var(--r-card);
@@ -2884,12 +2892,18 @@ button.spec__row:focus-visible {
   color: var(--ink);
   box-shadow: var(--shadow-card);
 }
-.clash::backdrop { background: rgb(23 23 21 / .55); }
-.clash__p { margin: 0 0 16px; font-size: 1rem; line-height: 1.5; }
-/* A `.btn` with nothing to fill it is the solid ink pill (28.8); 44 px on
-   both axes because it is the only control in the dialog. */
-.clash__ok { min-block-size: 44px; min-inline-size: 44px; margin-inline-start: auto; }
-.is-bare .works, .is-bare .works-open, .is-bare .clash { display: none; }
+.confirm::backdrop { background: rgb(23 23 21 / .55); }
+.confirm__p { margin: 0 0 16px; font-size: 1rem; line-height: 1.5; }
+.confirm__row { display: flex; justify-content: flex-end; gap: 10px; }
+/* 44 px on both axes, the floor. `.btn` is defined further down this file,
+   so the dialog's own class goes in front (higher specificity) rather than
+   trusting source order (§8). */
+.confirm .confirm__yes, .confirm .confirm__no, .confirm .confirm__ok {
+  min-block-size: 44px; min-inline-size: 72px;
+}
+.confirm .confirm__yes { background: var(--danger); color: #fff; border-color: var(--danger); }
+.confirm .confirm__no, .confirm .confirm__ok { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.is-bare .works, .is-bare .works-open, .is-bare .confirm { display: none; }
 
 /* ── swatches ─────────────────────────────────────────────── */
 

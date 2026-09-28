@@ -664,14 +664,18 @@
     "works.open": ["התחילו מדגמים מוכנים", "Start from ready designs", "Начните с готовых образцов"],
     "works.count": ["{0} שהתקנו", "{0} we have fitted", "{0}, которые мы установили"],
     "works.noun": ["דלת|דלתות", "door|doors", "дверь|двери|дверей"],
-    /* The one dialog in the flow besides the gallery: a lever tapped against
-       the pull handle already on the door. One sentence, one button, and the
-       door unchanged when it closes — see `openClash` in `js/app.js`. */
-    "dlg.leverBar": [
-      "ידית זו וידית המשיכה שבחרתם לא יכולות להיות יחד באותה דלת",
-      "This lever and the pull handle you chose cannot be on the same door",
-      "Эта ручка и выбранная вами ручка-скоба не могут быть на одной двери"
-    ],
+    /* ⚠ `dlg.leverBar` — "this lever and the pull handle you chose cannot be on
+       the same door", the one-button dialog of 20.9 — CAME OUT ON 27.9.2026: the
+       lever against the bar asks yes/no now, like every tap that would take
+       something away (below). Named here so it is not brought back under the old
+       key by accident.
+       THE CONFIRM DIALOG'S SENTENCE — the owner's son: *"'do you want to put x,
+       this action will cause the removal of y' — fewer words if you can."* `{0}`
+       is the option tapped, `{1}` what goes, as the spec rows' values joined
+       with ' · ' (`confirmSentence` in app.js) — no option or price is typed. */
+    "dlg.confirm": ["{0}? זה יסיר את {1}", "{0}? This removes {1}", "{0}? Будет удалено: {1}"],
+    "dlg.yes": ["כן", "Yes", "Да"],
+    "dlg.no": ["לא", "No", "Нет"],
     /* An arrow with nowhere to go (27.9.2026, the owner's son: *"if none is
        compatible, a window: 'there is no compatible x with your build'"*). `{0}`
        is the group's own title; "אפשרות" carries the gender so no title has to
@@ -772,8 +776,8 @@
     "why.noRoomWithWindow": ["אין מקום לידית שבחרתם עם החלון הזה", "No room for the handle you chose with this window", "С этим окном нет места для выбранной ручки"],
     /* Three reasons for one rule, 20.9.2026 — Peretz: the window and the panels
        stay, the lever goes. A greyed HANDLE names what stands in its way and that
-       it stays; a greyed LOCKSET names the bar, and `choose` opens `dlg.leverBar`
-       over it instead of repairing. `why.noRoomGripLock` ("no room between the
+       it stays; a greyed LOCKSET names the bar — and since 27.9 its tap asks
+       yes/no (the confirm dialog) rather than opening `dlg.leverBar`. `why.noRoomGripLock` ("no room between the
        grip and the lock") left with the rule that said it from both sides. */
     /* ⚠ THE SUBJECT FIRST. `.tile__why` is one clipped line under a tile
        (§9: "the clipped word is the one carrying the meaning"), and the first
@@ -8916,6 +8920,13 @@ ${body}
   };
   var WHY_UNDER_GLASS = { top: "why.winTakesTop", plate: "why.winPlate", room: "why.noRoomBelow" };
   var BOW_WHY = { window: "why.bowWindow", face: "why.bowFace", door: "why.bowDoor" };
+  var NOTHING = /^(none|no[a-z]*)$/;
+  var OWNED = { stripes: ["stripeDir", "stripeCount", "stripeTight"], handle: ["handle", "handleLen"] };
+  var NOT_A_LOSS = /* @__PURE__ */ new Set(["handleLen", "stripeTight"]);
+  function displacedBy(before, after, tapped, restored2 = []) {
+    const own = new Set(OWNED[tapped] || [tapped]);
+    return Object.keys(after).filter((k) => !own.has(k) && !restored2.includes(k) && !NOT_A_LOSS.has(k) && typeof after[k] !== "object" && before[k] !== after[k] && !(typeof before[k] === "string" && NOTHING.test(before[k])) && !(typeof before[k] === "number" && before[k] === 0));
+  }
   function repair(state2, intent = null) {
     let s = { ...state2 };
     const changed = [];
@@ -10055,7 +10066,16 @@ ${body}
       box.hidden = open;
     });
     $("#works-close").addEventListener("click", closeWorks);
-    $("#clash-ok").addEventListener("click", closeClash);
+    $("#confirm-yes").addEventListener("click", () => closeConfirm("yes"));
+    $("#confirm-no").addEventListener("click", () => closeConfirm("no"));
+    $("#confirm-ok").addEventListener("click", () => closeConfirm("no"));
+    $("#confirm").addEventListener("cancel", (ev) => {
+      ev.preventDefault();
+      closeConfirm("no");
+    });
+    $("#confirm").addEventListener("click", (ev) => {
+      if (ev.target === ev.currentTarget) closeConfirm("no");
+    });
     const barNext = document.querySelector(".quote__next");
     if (barNext) barNext.addEventListener("click", () => stepBy(1));
     const barBack = document.querySelector(".quote__back");
@@ -10183,19 +10203,36 @@ ${body}
     if (typeof d.close === "function") d.close();
     else d.removeAttribute("open");
   }
-  function openClash(text = T("dlg.leverBar")) {
-    const d = $("#clash");
+  var onYes = null;
+  function showDialog(text, two) {
+    const d = $("#confirm");
     if (!d) return;
-    const p = d.querySelector("#clash-p");
-    if (p) p.textContent = text;
-    if (typeof d.showModal === "function") d.showModal();
-    else d.setAttribute("open", "");
+    d.querySelector("#confirm-p").textContent = text;
+    d.querySelector("#confirm-yes").hidden = !two;
+    d.querySelector("#confirm-no").hidden = !two;
+    d.querySelector("#confirm-ok").hidden = two;
+    if (typeof d.showModal === "function") {
+      if (!d.open) d.showModal();
+    } else d.setAttribute("open", "");
+    (two ? d.querySelector("#confirm-no") : d.querySelector("#confirm-ok")).focus();
   }
-  function closeClash() {
-    const d = $("#clash");
+  function askConfirm(text, yes) {
+    onYes = yes;
+    showDialog(text, true);
+  }
+  function tellOne(text) {
+    onYes = null;
+    showDialog(text, false);
+  }
+  function closeConfirm(answer) {
+    const d = $("#confirm");
     if (!d) return;
-    if (typeof d.close === "function") d.close();
-    else d.removeAttribute("open");
+    const run = answer === "yes" ? onYes : null;
+    onYes = null;
+    if (typeof d.close === "function") {
+      if (d.open) d.close();
+    } else d.removeAttribute("open");
+    if (run) run();
   }
   function buildSheet() {
     const host = $("#sheet");
@@ -10609,14 +10646,14 @@ ${body}
       b.addEventListener("click", () => {
         const d = b.dataset.dir;
         noteEngaged();
-        const { state: fixed, said } = repair({
-          ...state,
+        const p = planChoice("stripes", {
           stripeDir: d,
           stripeCount: d === "none" ? 0 : Math.max(1, state.stripeCount || 2),
           stripeTight: d === "v" ? false : state.stripeTight
-        }, "stripes");
-        set(fixed);
-        toast(said.join(" · "));
+        });
+        const name = b.querySelector("span")?.textContent || d;
+        if (p.lost.length) askConfirm(confirmSentence(name, p.lost), () => commitChoice("stripes", p));
+        else commitChoice("stripes", p);
       });
     }
     for (const b of box.querySelectorAll("[data-n]")) {
@@ -10747,7 +10784,7 @@ ${body}
       }
     }
     const title = T(g.title);
-    openClash(T("dlg.noFit", lang() === "en" ? title.toLowerCase() : title));
+    tellOne(T("dlg.noFit", lang() === "en" ? title.toLowerCase() : title));
   }
   function leaveTo(key) {
     if (key !== liveStep && STEP_KEYS().includes(key)) visited.add(liveStep);
@@ -10897,11 +10934,10 @@ ${body}
   }
   function choose(g, id) {
     noteEngaged();
-    if ((g.key === "handle" || g.key === "lockset" || g.key === "grab") && id !== state[g.key]) {
+    if ((g.key === "handle" || g.key === "grab") && id !== state[g.key]) {
       const why = conflicts(state)[g.key][id];
       if (why) {
-        if (g.key === "lockset") openClash();
-        else toast(why);
+        toast(why);
         return;
       }
     }
@@ -10912,8 +10948,16 @@ ${body}
         return;
       }
     }
-    const want = { ...state, [g.key]: id };
-    const memo2 = displaced.get(g.key);
+    const p = planChoice(g.key, { [g.key]: id });
+    if (p.lost.length) {
+      askConfirm(confirmSentence(optionName(g, id), p.lost), () => commitChoice(g.key, p));
+      return;
+    }
+    commitChoice(g.key, p);
+  }
+  function planChoice(key, change) {
+    const want = { ...state, ...change };
+    const memo2 = displaced.get(key);
     const back = [];
     if (memo2) {
       for (const [k, m] of Object.entries(memo2)) {
@@ -10923,19 +10967,33 @@ ${body}
         }
       }
     }
-    const { state: fixed, said } = repair(want, g.key);
+    const { state: fixed, said } = repair(want, key);
     const stood = back.filter((k) => fixed[k] === memo2[k].was);
+    return { fixed, said, stood, memo: memo2, lost: displacedBy(state, fixed, key, stood) };
+  }
+  function commitChoice(key, { fixed, said, stood, memo: memo2 }) {
     for (const k of stood) delete memo2[k];
     for (const k of Object.keys(fixed)) {
-      if (k === g.key || stood.includes(k)) continue;
+      if (k === key || stood.includes(k)) continue;
       if (typeof fixed[k] === "object" || typeof state[k] === "object") continue;
       if (state[k] === fixed[k]) continue;
-      if (!displaced.has(g.key)) displaced.set(g.key, {});
-      displaced.get(g.key)[k] = { was: state[k], became: fixed[k] };
+      if (!displaced.has(key)) displaced.set(key, {});
+      displaced.get(key)[k] = { was: state[k], became: fixed[k] };
     }
     set(fixed);
     if (stood.length) said.unshift(T("fix.back"));
     toast(said.join(" · "));
+  }
+  var ROW_OF = { stripeDir: "stripes", stripeCount: "stripes", stripeTight: "stripes", handleLen: "handle" };
+  function confirmSentence(what, lost) {
+    const rows = specRows(state);
+    const keys = [...new Set(lost.map((k) => ROW_OF[k] || k))];
+    const named = keys.map((k) => rows.find((r) => r.key === k)).filter(Boolean).map((r) => r.value);
+    return T("dlg.confirm", what, named.length ? named.join(" · ") : keys.join(", "));
+  }
+  function optionName(g, id) {
+    const o = g.list().find((x) => x.id === id);
+    return o ? L(o) : id;
   }
   var HISTORY_MAX = 100;
   var history_ = [];

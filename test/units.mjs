@@ -16,7 +16,7 @@ import {
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
-import { bowObstacle, conflicts, detailWorked, fallbackLockset, gripObstacle, repair } from '../js/rules.js';
+import { bowObstacle, conflicts, detailWorked, displacedBy, fallbackLockset, gripObstacle, repair } from '../js/rules.js';
 import { describeSentence, handingWords, specLines, specRows, summaryLine } from '../js/spec.js';
 import { WORKS } from '../js/works.js';
 import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, isUntouched, toQuery, VERSION } from '../js/url-state.js';
@@ -5403,6 +5403,14 @@ group('the accent is spent only where it means "this one is chosen"');
   ok(contrast('#7E6134', '#FFFFFF') >= 4.5,
      'var(--accent-ink) no longer measures 4.5:1 on white, and it is the token '
    + 'every readable accent uses');
+  /* ⚠ AND THE CONFIRM DIALOG'S RED "YES" CARRIES WHITE TEXT — 27.9.2026. Read
+     from `:root`, so an edit to the token is measured, not remembered. */
+  {
+    const danger = (/--danger:\s*(#[0-9A-Fa-f]{6})/.exec(css) || [])[1];
+    ok(danger, 'css/app.css defines no --danger token — the confirm dialog\'s "yes" has no colour to check');
+    if (danger) ok(contrast('#FFFFFF', danger) >= 4.5,
+      `white on --danger (${danger}) is ${contrast('#FFFFFF', danger).toFixed(2)}:1, under the 4.5:1 its label needs`);
+  }
   /* ⚠ AND WHERE THE ACCENT IS A GROUND, WHAT STANDS ON IT IS READ — 27.9.2026.
      The gallery opener is tan now, and its two lines of text are the only text
      on the page set on the accent. Read out of the stylesheet — the rule's own
@@ -6442,6 +6450,66 @@ group('ironwork is counted, and the drawing agrees with the bill');
    it, Peretz's 20.9 does) would hide a choice the order charges for; one that
    counted the channel (painted with the door) would offer one that does
    nothing. §5.15: both halves must be seen, or the sweep has no subject. */
+/* ── A TAP THAT WOULD TAKE SOMETHING AWAY ASKS FIRST — 27.9.2026 ──────────
+   The owner's son: *"for all things that are not compatible i want a window to
+   pop up before you remove the other thing."* The page dry-runs `repair` for a
+   tap and opens the confirm dialog when `displacedBy` names any other choice
+   it would move. The page half is the audit's; this holds the predicate on the
+   raw states, over the scope the round names, both ways where there are two:
+     asks — a viewer or a bell on a glazed door, a window on a door with a
+     viewer or a bell, a face with stripes on, stripes with panels on, the tall
+     slot with panels on, the lever against a bar (the bar goes), a pull handle
+     whose only obstacle is the lever (the lever is swapped);
+     does not — a grille on a solid door (it ADDS the window), a finish, a
+     length clamped by a new size, a colour, a free face.
+   Each case is first asserted to arrive as its name says (§5.15) — the fixture
+   that arrives repaired is a check with no subject — and every "asks" case
+   names what it takes. And beside it (§5.22): a refused tap, whose repair
+   does not keep the option at all, is not a question the dialog can ask. */
+group('a tap that would take something away asks first');
+{
+  const plan = (base, change, key) => {
+    const s = repair({ ...DEFAULTS, ...base }).state;
+    const r = repair({ ...s, ...change }, key).state;
+    return { s, r, lost: displacedBy(s, r, key) };
+  };
+  const ASKS = [
+    ['a peephole on a glazed door', { window: 'rect' }, { peephole: 'peep' }, 'peephole', 'window'],
+    ['the digital viewer on a glazed door', { window: 'rect' }, { peephole: 'digital' }, 'peephole', 'window'],
+    ['the square window beside a peephole', { peephole: 'peep' }, { window: 'rect' }, 'window', 'peephole'],
+    ['a doorbell on a glazed door', { window: 'rect' }, { bell: 'bell' }, 'bell', 'window'],
+    ['the square window beside a doorbell', { bell: 'bell' }, { window: 'rect' }, 'window', 'bell'],
+    ['two panels over stripes', { stripeDir: 'h', stripeCount: 3 }, { detail: 'panel2' }, 'detail', 'stripeCount'],
+    ['stripes over two panels', { detail: 'panel2' }, { stripeDir: 'h', stripeCount: 2 }, 'stripes', 'detail'],
+    ['the tall slot over two panels', { detail: 'panel2' }, { window: 'strip' }, 'window', 'detail'],
+    ['the Coral against an Idan beside the slot', { window: 'strip', handle: 'idan', lockset: 'cylinder' }, { lockset: 'coral' }, 'lockset', 'handle'],
+    ['an Idan against the Coral beside the slot', { window: 'strip', lockset: 'coral' }, { handle: 'idan' }, 'handle', 'lockset'],
+  ];
+  for (const [name, base, change, key, goes] of ASKS) {
+    const { s, r, lost } = plan(base, change, key);
+    for (const [k, v] of Object.entries(base)) ok(s[k] === v, `${name}: the fixture arrived with ${k}=${s[k]}, not ${v} — this case has no subject`);
+    for (const [k, v] of Object.entries(change)) ok(r[k] === v, `${name}: the tap did not keep ${k}=${v} — a refused tap is not a question`);
+    ok(lost.includes(goes), `${name}: the tap takes ${goes} (${s[goes]} → ${r[goes]}) and the dialog would not ask — displacedBy says [${lost}]`);
+  }
+  const QUIET = [
+    ['a grille on a solid door (it adds the window)', {}, { grille: 'scroll' }, 'grille'],
+    ['a gold finish with a bar and a bell', { handle: 'idan', bell: 'bell' }, { handleFinish: 'hf-gold' }, 'handleFinish'],
+    ['a bar shortened by a smaller size', { size: 'extra2', handle: 'idan', handleLen: 2000 }, { size: 'standard' }, 'size'],
+    ['a new colour', {}, { colour: 'rb-9016d' }, 'colour'],
+    ['two panels on a plain door', {}, { detail: 'panel2' }, 'detail'],
+  ];
+  for (const [name, base, change, key] of QUIET) {
+    const { lost } = plan(base, change, key);
+    ok(lost.length === 0, `${name}: nothing is taken away and the dialog would ask about [${lost}]`);
+  }
+  /* §5.22 — the refusal beside the question: a face beside the tall slot
+     does not stick (the window stays, 26.9), so it is refused with its reason
+     and never asked. */
+  const { s: f0, r: f1 } = plan({ window: 'strip' }, { detail: 'panel2' }, 'detail');
+  ok(f0.window === 'strip' && f1.detail !== 'panel2',
+     'a face beside the tall slot now sticks — the refusal the page keeps for it has lost its reason');
+}
+
 group('the handle finish is offered exactly where it costs something');
 {
   const paid = HANDLE_FINISHES.filter(f => f.delta > 0);

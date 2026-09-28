@@ -745,12 +745,18 @@ export const UI = {
   'works.open':       ['התחילו מדגמים מוכנים', 'Start from ready designs', 'Начните с готовых образцов'],
   'works.count':      ['{0} שהתקנו', '{0} we have fitted', '{0}, которые мы установили'],
   'works.noun':       ['דלת|דלתות', 'door|doors', 'дверь|двери|дверей'],
-  /* The one dialog in the flow besides the gallery: a lever tapped against
-     the pull handle already on the door. One sentence, one button, and the
-     door unchanged when it closes — see `openClash` in `js/app.js`. */
-  'dlg.leverBar':     ['ידית זו וידית המשיכה שבחרתם לא יכולות להיות יחד באותה דלת',
-                       'This lever and the pull handle you chose cannot be on the same door',
-                       'Эта ручка и выбранная вами ручка-скоба не могут быть на одной двери'],
+  /* ⚠ `dlg.leverBar` — "this lever and the pull handle you chose cannot be on
+     the same door", the one-button dialog of 20.9 — CAME OUT ON 27.9.2026: the
+     lever against the bar asks yes/no now, like every tap that would take
+     something away (below). Named here so it is not brought back under the old
+     key by accident.
+     THE CONFIRM DIALOG'S SENTENCE — the owner's son: *"'do you want to put x,
+     this action will cause the removal of y' — fewer words if you can."* `{0}`
+     is the option tapped, `{1}` what goes, as the spec rows' values joined
+     with ' · ' (`confirmSentence` in app.js) — no option or price is typed. */
+  'dlg.confirm':      ['{0}? זה יסיר את {1}', '{0}? This removes {1}', '{0}? Будет удалено: {1}'],
+  'dlg.yes':          ['כן', 'Yes', 'Да'],
+  'dlg.no':           ['לא', 'No', 'Нет'],
   /* An arrow with nowhere to go (27.9.2026, the owner's son: *"if none is
      compatible, a window: 'there is no compatible x with your build'"*). `{0}`
      is the group's own title; "אפשרות" carries the gender so no title has to
@@ -837,8 +843,8 @@ export const UI = {
   'why.noRoomWithWindow': ['אין מקום לידית שבחרתם עם החלון הזה', 'No room for the handle you chose with this window', 'С этим окном нет места для выбранной ручки'],
   /* Three reasons for one rule, 20.9.2026 — Peretz: the window and the panels
      stay, the lever goes. A greyed HANDLE names what stands in its way and that
-     it stays; a greyed LOCKSET names the bar, and `choose` opens `dlg.leverBar`
-     over it instead of repairing. `why.noRoomGripLock` ("no room between the
+     it stays; a greyed LOCKSET names the bar — and since 27.9 its tap asks
+     yes/no (the confirm dialog) rather than opening `dlg.leverBar`. `why.noRoomGripLock` ("no room between the
      grip and the lock") left with the rule that said it from both sides. */
   /* ⚠ THE SUBJECT FIRST. `.tile__why` is one clipped line under a tile
      (§9: "the clipped word is the one carrying the meaning"), and the first

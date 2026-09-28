@@ -123,6 +123,24 @@ for (const v of VIEWS) {
   await p.waitForTimeout(400);
   console.log(`\n${v.name}  ${v.w}x${v.h}`);
 
+  /* ⚠ THE CONFIRM DIALOG (27.9.2026) stands in front of every tap that would
+     take something else away. The blocks below whose SUBJECT is what such a
+     tap does — the give-back memory, the stripe trade, the multi-sentence
+     toast and where it lands — answer it YES, which commits exactly the tap
+     they were written about. `yes()` returns whether it was asked, and each
+     of those blocks asserts that it WAS before judging what followed (§5.27:
+     a clause about a transition asserts the transition first). */
+  const yes = async () => {
+    const asked = await p.evaluate(() => {
+      const d = document.querySelector('#confirm');
+      if (!d || !d.open || document.querySelector('#confirm-yes').hidden) return false;
+      document.querySelector('#confirm-yes').click();
+      return true;
+    });
+    if (asked) await p.waitForTimeout(320);
+    return asked;
+  };
+
   /* ⚠ COMPARE LIKE WITH LIKE. Everything below checks the RENDERED page
      against `specRows`/`summaryLine` called here in Node, and those two now
      answer in whatever language is current — which in Node is Hebrew and in
@@ -649,12 +667,15 @@ for (const v of VIEWS) {
      dropping the `state[k] === m.became` guard (clause 3), or by seeding
      `displaced` from the query (clause 4). */
   {
+    /* Each tap answers the confirm dialog YES (the memory is about what a
+       displacing tap gives back) and returns whether it was asked. */
     const tap = async (group, id) => {
       await p.evaluate(([g, i]) => {
         const e = document.querySelector(`.field[data-group="${g}"] [data-id="${i}"]`);
         if (e) e.click();
       }, [group, id]);
       await p.waitForTimeout(320);
+      return yes();
     };
     /* The direction pills are not tiles and carry no `data-id`; a blocked one is
        `aria-disabled` and Playwright refuses it, so this clicks it outright (§8). */
@@ -664,6 +685,7 @@ for (const v of VIEWS) {
         if (e) e.click();
       }, dir);
       await p.waitForTimeout(320);
+      return yes();
     };
     const now = () => p.evaluate(() => ({
       face: (document.querySelector('.field[data-group="detail"] [aria-checked="true"]')
@@ -704,7 +726,9 @@ for (const v of VIEWS) {
     }
     for (const face of ['panel3', 'panel2']) {
       await fresh(`?d=${face}&w=none&n=none&k=coral&lang=he`);
-      await tap('window', 'strip');
+      if (!(await tap('window', 'strip'))) {
+        fault(v.name, `the tall slot over ${face} took the face without asking — the confirm dialog did not open`);
+      }
       const took = await now();
       await tap('window', 'none');
       const gave = await now();
@@ -835,6 +859,9 @@ for (const v of VIEWS) {
       }
       await p.evaluate(() => document.querySelector('.stripes__dirs .pill[data-dir="h"]').click());
       await p.waitForTimeout(350);
+      /* ⚠ SINCE 27.9.2026 THE TRADE ASKS FIRST — the confirm dialog names the
+         panel it would take; YES commits the trade this clause is about. */
+      if (!(await yes())) fault(v.name, 'a blocked stripe pill traded the panel without asking — the confirm dialog did not open');
       const after = await p.evaluate(() => ({
         face: (document.querySelector('.field[data-group="detail"] [aria-checked="true"]')
                || {}).dataset?.id,
@@ -897,6 +924,9 @@ for (const v of VIEWS) {
       return true;
     });
     await p.waitForTimeout(300);
+    /* ⚠ SINCE 27.9.2026 IT ASKS FIRST (the bell and the peephole would go);
+       YES commits the tap whose sentences this check reads. */
+    if (tap && !(await yes())) fault(v.name, 'the square window took the bell and the peephole without asking');
     const shown = await p.evaluate(() => {
       const el = document.querySelector('#toast');
       return el && !el.hidden ? el.textContent.trim() : null;
@@ -941,6 +971,7 @@ for (const v of VIEWS) {
           `disabled` (§8), which is what lets the tap say anything at all.
        2. the same door with an Idan on it. The Coral's tile is greyed and
           names the bar; tapping it opens `#clash` with `dlg.leverBar` on
+          (⚠ until 27.9.2026 — it asks yes/no in `#confirm` now; see fixture 2)
           screen, whole in the viewport, focus INSIDE it, and the code and the
           price unchanged; Escape closes it and the door is the same; the OK
           button closes it too. In Russian as well, because the sentence is
@@ -960,11 +991,19 @@ for (const v of VIEWS) {
       await p.evaluate(st => document.querySelector(`.steps__step[data-step="${st}"]`)?.click(), step);
       await p.waitForTimeout(300);
     };
+    /* ⚠ `#confirm`, SINCE 27.9.2026 — it replaced `#clash`. Two forms: yes/no
+       (`#confirm-yes` on the --danger red, `#confirm-no` on ink) for a tap
+       that would take something away, one button for an arrow with nowhere
+       to go. The colours are read as COMPUTED, so the red and the ink the
+       owner's son asked for are what the page paints, not what the sheet says. */
     const read = () => p.evaluate(() => {
       const t = document.querySelector('#toast');
-      const d = document.querySelector('#clash');
-      const pr = d && d.open ? d.querySelector('#clash-p') : null;
+      const d = document.querySelector('#confirm');
+      const pr = d && d.open ? d.querySelector('#confirm-p') : null;
       const r = d && d.open ? d.getBoundingClientRect() : null;
+      const btn = id => { const e = d && d.querySelector(id); if (!e || e.hidden) return null;
+        const cs = getComputedStyle(e), b = e.getBoundingClientRect();
+        return { bg: cs.backgroundColor, fg: cs.color, w: Math.round(b.width), h: Math.round(b.height) }; };
       return {
         code: (document.querySelector('#code')?.textContent || '').trim(),
         price: (document.querySelector('[data-price]')?.textContent || '').trim(),
@@ -974,8 +1013,14 @@ for (const v of VIEWS) {
         shown: !!(pr && pr.checkVisibility()),
         whole: !!(r && r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight),
         focusIn: !!(d && d.open && d.contains(document.activeElement)),
+        yes: d && d.open ? btn('#confirm-yes') : null,
+        no: d && d.open ? btn('#confirm-no') : null,
       };
     });
+    const rgb = c => (c.match(/\d+/g) || []).slice(0, 3).map(Number);
+    const lumi = c => { const [r, g, b2] = rgb(c).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b2; };
+    const ratio = (a, c) => { const [x, y] = [lumi(a), lumi(c)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
     const tile = (group, id) => p.evaluate(([g, i]) => {
       const e = document.querySelector(`.field[data-group="${g}"] [data-id="${i}"]`);
       if (!e) return null;
@@ -1021,11 +1066,18 @@ for (const v of VIEWS) {
         if (s2 && s2.window !== 'strip') fault(v.name, 'tapping the greyed bow took the WINDOW away');
         if (s2 && s2.grab !== 'nograb') fault(v.name, 'tapping the greyed bow put a bow on the door');
         if (after.toast !== want) fault(v.name, `the tap on the greyed bow said "${after.toast}" and the tile says "${want}"`);
-        if (after.open) fault(v.name, 'the bow opened the lever dialog');
+        if (after.open) fault(v.name, 'the bow opened the confirm dialog — its refusal is Peretz\'s and is not a question');
       }
     }
 
-    /* 2 · the lever against the bar. */
+    /* 2 · the lever against the bar — ⚠ RESTATED 27.9.2026, SAME SUBJECT (a
+       lever tapped against the bar in its way). It opened a one-button "they
+       cannot be together" and changed nothing; the owner's son's newer rule
+       wants the choice (*"a window to pop up before you remove the other
+       thing"*), so it asks yes/no NAMING THE BAR: Escape and No leave the door
+       byte-identical, and Yes puts the Coral on and takes the bar off, and the
+       toast says so. The tile is still greyed and still names the bar. He and
+       ru, the sentence built from the page's own rows. */
     for (const lang of ['he', 'ru']) {
       await load(`?w=strip&d=plain&n=idan&k=cylinder&s=standard&lang=${lang}`);
       const b0 = await read();
@@ -1037,7 +1089,7 @@ for (const v of VIEWS) {
       }
       await goStep('lock');
       const want = withLang(lang, () => T('why.leverBar'));
-      const sentence = withLang(lang, () => T('dlg.leverBar'));
+      const handleRow = withLang(lang, () => specRows(st).find(r => r.key === 'handle'));
       const t = await tile('lockset', 'coral');
       const before = await read();
       if (!t) { fault(v.name, `${lang}: no Coral tile on the lock step — the check has no subject`); continue; }
@@ -1048,12 +1100,20 @@ for (const v of VIEWS) {
       const open = await read();
       if (!open.open) fault(v.name, `${lang}: tapping the greyed Coral opened no dialog`);
       else {
-        if (!open.shown || open.sentence !== sentence) {
-          fault(v.name, `${lang}: the dialog says "${open.sentence}"${open.shown ? '' : ' (not visible)'}, `
-            + `expected "${sentence}"`);
+        if (!open.shown || !handleRow || !open.sentence.includes(handleRow.value)) {
+          fault(v.name, `${lang}: the dialog says "${open.sentence}"${open.shown ? '' : ' (not visible)'} — `
+            + `it should name the bar that goes ("${handleRow?.value}")`);
         }
-        if (!open.whole) fault(v.name, `${lang}: the lever dialog is not whole on screen`);
-        if (!open.focusIn) fault(v.name, `${lang}: focus is not inside the lever dialog — it is not modal`);
+        if (!open.whole) fault(v.name, `${lang}: the confirm dialog is not whole on screen`);
+        if (!open.focusIn) fault(v.name, `${lang}: focus is not inside the confirm dialog — it is not modal`);
+        if (!open.yes || !open.no) fault(v.name, `${lang}: the confirm dialog shows ${open.yes ? '' : 'no "yes" '}${open.no ? '' : 'no "no"'} — it is a yes/no question`);
+        else {
+          const [r, g2, b3] = rgb(open.yes.bg);
+          if (!(r > 120 && g2 < 80 && b3 < 80)) fault(v.name, `${lang}: "yes" is painted ${open.yes.bg} — the owner's son asked for red`);
+          if (ratio(open.yes.fg, open.yes.bg) < 4.5) fault(v.name, `${lang}: "yes" is ${ratio(open.yes.fg, open.yes.bg).toFixed(2)}:1 on its red`);
+          if (lumi(open.no.bg) > 0.05) fault(v.name, `${lang}: "no" is painted ${open.no.bg} — the owner's son asked for black`);
+          if (Math.min(open.yes.w, open.yes.h, open.no.w, open.no.h) < 44) fault(v.name, `${lang}: a confirm button is under 44 px`);
+        }
       }
       if (open.code !== before.code || open.price !== before.price) {
         fault(v.name, `${lang}: the dialog opened AND the door changed: ${before.code} → ${open.code}`);
@@ -1061,21 +1121,62 @@ for (const v of VIEWS) {
       await p.keyboard.press('Escape');
       await p.waitForTimeout(200);
       const closed = await read();
-      if (closed.open) fault(v.name, `${lang}: Escape does not close the lever dialog`);
-      if (closed.code !== before.code) fault(v.name, `${lang}: the door changed on closing the dialog: ${before.code} → ${closed.code}`);
-      const st2 = decodeCode(closed.code);
-      if (st2 && (st2.handle !== 'idan' || st2.lockset !== 'cylinder')) {
-        fault(v.name, `${lang}: after the dialog the door carries ${st2.handle}/${st2.lockset} — the bar or the lever moved`);
-      }
-      /* And the button. */
+      if (closed.open) fault(v.name, `${lang}: Escape does not close the confirm dialog`);
+      if (closed.code !== before.code) fault(v.name, `${lang}: the door changed on Escape: ${before.code} → ${closed.code}`);
+      /* No */
       await tap('lockset', 'coral');
-      const again = await read();
-      if (!again.open) fault(v.name, `${lang}: the dialog did not open a second time`);
-      await p.evaluate(() => document.querySelector('#clash-ok')?.click());
+      if (!(await read()).open) fault(v.name, `${lang}: the dialog did not open a second time`);
+      await p.evaluate(() => document.querySelector('#confirm-no')?.click());
       await p.waitForTimeout(200);
-      const done = await read();
-      if (done.open) fault(v.name, `${lang}: the OK button does not close the lever dialog`);
-      if (done.code !== before.code) fault(v.name, `${lang}: the door changed on OK: ${before.code} → ${done.code}`);
+      const no = await read();
+      if (no.open) fault(v.name, `${lang}: "no" does not close the confirm dialog`);
+      if (no.code !== before.code) fault(v.name, `${lang}: the door changed on "no": ${before.code} → ${no.code}`);
+      const st2 = decodeCode(no.code);
+      if (st2 && (st2.handle !== 'idan' || st2.lockset !== 'cylinder')) {
+        fault(v.name, `${lang}: after "no" the door carries ${st2.handle}/${st2.lockset} — the bar or the lever moved`);
+      }
+      /* Yes */
+      await tap('lockset', 'coral');
+      await p.evaluate(() => document.querySelector('#confirm-yes')?.click());
+      await p.waitForTimeout(350);
+      const yes = await read();
+      const st3 = decodeCode(yes.code);
+      if (yes.open) fault(v.name, `${lang}: "yes" does not close the confirm dialog`);
+      if (!st3 || st3.lockset !== 'coral' || st3.handle !== 'none') {
+        fault(v.name, `${lang}: after "yes" the door carries ${st3?.handle}/${st3?.lockset} — the Coral on and the bar off is what was asked`);
+      }
+      if (!yes.toast) fault(v.name, `${lang}: "yes" took the bar off and nothing said so`);
+    }
+
+    /* 3 · a peephole on a glazed door — the owner's son's own example (*"things
+       like a peephole can't remove a window with one click"*). It asks, naming
+       the window; "no" keeps the window; "yes" removes it. The falsification
+       this round names: with the dialog bypassed the tap removes the window
+       with no question. */
+    {
+      await load('?w=rect&d=plain&s=standard&lang=he');
+      const c0 = await read();
+      const s0 = decodeCode(c0.code);
+      if (!s0 || s0.window !== 'rect' || s0.peephole === 'peep') {
+        fault(v.name, `the peephole-on-glass fixture arrived as window ${s0?.window}, peephole ${s0?.peephole} — no subject`);
+      } else {
+        await goStep('pz');
+        await tap('peephole', 'peep');
+        const q = await read();
+        const winRow = withLang('he', () => specRows(s0).find(r => r.key === 'window'));
+        if (!q.open) fault(v.name, 'a peephole tapped on a glazed door opened no dialog — one click took the window');
+        else if (!winRow || !q.sentence.includes(winRow.value)) fault(v.name, `the peephole's question "${q.sentence}" does not name the window`);
+        if (q.code !== c0.code) fault(v.name, `the peephole's question opened AND the door changed: ${c0.code} → ${q.code}`);
+        await p.evaluate(() => document.querySelector('#confirm-no')?.click());
+        await p.waitForTimeout(200);
+        const n2 = await read();
+        if (decodeCode(n2.code)?.window !== 'rect') fault(v.name, 'after "no" the window is gone');
+        await tap('peephole', 'peep');
+        await p.evaluate(() => document.querySelector('#confirm-yes')?.click());
+        await p.waitForTimeout(350);
+        const y2 = decodeCode((await read()).code);
+        if (!y2 || y2.window !== 'none' || y2.peephole !== 'peep') fault(v.name, `after "yes" the door is window ${y2?.window}, peephole ${y2?.peephole} — the viewer on and the window off was asked`);
+      }
     }
     await p.goto('file://' + process.cwd() + '/index.html');
     await p.waitForSelector('#stage svg');
@@ -1323,6 +1424,9 @@ for (const v of VIEWS) {
     const onGlass = await p.evaluate(() => !!document.querySelector('.sect:not([hidden]) [data-id="rect"]'));
     const tapped = onGlass && await tap('rect');
     await p.waitForTimeout(320);
+    /* the confirm dialog first (27.9.2026): the window takes the bell and the
+       peephole; YES commits the repair whose toast this places */
+    if (tapped && !(await yes())) fault(v.name, 'the square window took the bell and the peephole without asking');
     const m = tapped ? await p.evaluate(() => {
       const toast = document.querySelector('#toast');
       if (!toast || toast.hidden || getComputedStyle(toast).opacity === '0') return { noToast: true };
@@ -2112,7 +2216,7 @@ for (const v of VIEWS) {
          page behind it is inert — so the NEXT `p.click` on a rail circle
          would time out against the backdrop. Closed here; what the dialog
          does is asserted in its own block below, on a fixture built for it. */
-      await p.evaluate(() => { const d = document.querySelector('#clash'); if (d && d.open) d.close(); });
+      await p.evaluate(() => { const d = document.querySelector('#confirm'); if (d && d.open) document.querySelector(d.querySelector('#confirm-no:not([hidden])') ? '#confirm-no' : '#confirm-ok')?.click(); });
 
       const s = await p.evaluate(() => {
         const doc = document.documentElement;
@@ -4794,16 +4898,31 @@ for (const v of VIEWS) {
         /* Walk FORWARD with the button, choosing on each step — a rail click
            would build a different history and this check is about what the
            customer who walked the guide gets back. */
+        /* ⚠ ONE GROUP AT A TIME, AND "YES" WHEN ASKED — 27.9.2026. Since the
+           confirm dialog a tap that would take something away opens a modal
+           and waits; this walk tapped every group of a step in one breath and
+           then pressed the way on, which the modal made inert — a 30 s
+           timeout at 320 in Hebrew, and the check never reached an undo. The
+           customer this check is about answered "yes": they chose it. */
         for (let i = 0; i < 6; i++) {
-          await p.evaluate(() => {
-            const live = document.querySelector('.sect.is-live');
-            if (!live) return;
-            for (const g of live.querySelectorAll('[role="radiogroup"]')) {
+          const groups = await p.evaluate(() =>
+            document.querySelectorAll('.sect.is-live [role="radiogroup"]').length);
+          for (let gi = 0; gi < groups; gi++) {
+            await p.evaluate(n => {
+              const g = document.querySelectorAll('.sect.is-live [role="radiogroup"]')[n];
+              if (!g) return;
               const o = [...g.querySelectorAll('[role="radio"]')]
                 .filter(x => x.getAttribute('aria-disabled') !== 'true' && !x.hidden);
               if (o.length) o[o.length - 1].click();
-            }
-          });
+            }, gi);
+            await p.waitForTimeout(80);
+            await p.evaluate(() => {
+              const d = document.querySelector('#confirm');
+              if (!d || !d.open) return;
+              const y = document.querySelector('#confirm-yes');
+              (y && !y.hidden ? y : document.querySelector('#confirm-ok')).click();
+            });
+          }
           await p.waitForTimeout(320);
           let moved = false;
           for (const h of await p.$$('.sect.is-live .sect__next, .quote__next')) {
@@ -5387,7 +5506,7 @@ for (const v of VIEWS) {
               const a = await p.evaluate(snap);
               await p.mouse.click(t.cx, t.cy);
               await p.waitForTimeout(320);
-              await p.evaluate(() => { const d = document.querySelector('#clash'); if (d && d.open) d.close(); });
+              await p.evaluate(() => { const d = document.querySelector('#confirm'); if (d && d.open) document.querySelector(d.querySelector('#confirm-no:not([hidden])') ? '#confirm-no' : '#confirm-ok')?.click(); });
               const z = await p.evaluate(snap);
               clicks++;
               if (z.sh !== a.sh) { changed++; continue; }

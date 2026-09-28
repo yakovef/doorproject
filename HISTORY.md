@@ -26,6 +26,84 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE BIG ROUND, 5 OF 8: A TAP THAT WOULD TAKE SOMETHING AWAY ASKS
+  FIRST.** The owner's son: *"when the user wants to choose something that
+  will remove something else that he chose, i want a window to pop up before
+  you remove the other thing … with a red button that says yes and a black
+  that says no"*, and of the sentence: *"x? this action will cause the removal
+  of y — fewer words if you can."*
+  · **What decides.** `choose` no longer repairs and then tells: it dry-runs
+    the tap (`planChoice` — `repair` plus the give-back memory of 14.9, the
+    same plan `commitChoice` will commit) and asks `displacedBy(before, after,
+    tapped, restored)` in `js/rules.js`, pure, which of the customer's OTHER
+    choices the plan would move. A loss is a field whose old value was a
+    THING (`/^(none|no[a-z]*)$/` is nothing): a grille that brings its window
+    adds, it does not take; the bar's length clamp (`handleLen`) and the
+    stripes' spacing (`stripeTight`) follow their product and are never a
+    loss; the tapped group's own fields (`OWNED`: the stripes' three, the
+    handle and its length) are the tap. Nothing moved → the tap commits as it
+    always did.
+  · **The dialog.** `<dialog id="confirm">` replaces `#clash`: *"{x}? זה יסיר
+    את {y}"* (en *"{x}? This removes {y}"*, ru *"{x}? Будет удалено: {y}"*),
+    `{x}` the option's name, `{y}` the spec rows' VALUES of what goes, joined
+    with ' · ' (`confirmSentence`, `ROW_OF`) — no option or price typed; the
+    first draft read "label (value)" and nested brackets ("חלון (חלון מלבני
+    (עם פאנל תחתון))"), and he asked for fewer words. **Yes** on `--danger`
+    `#B42318` (white on it 6.57:1, asserted ≥ 4.5; the unit's falsification at
+    `#E0605A`, 3.51:1, failed it), **No** in ink; focus lands on No; No,
+    Escape and the backdrop change nothing; Yes commits the plan it asked
+    about. The one-button form (`tellOne`, `#confirm-ok`) is the arrows'
+    "nothing else fits" and the refusals that have no yes.
+  · **What does not ask.** Peretz's refusals stand: a pull handle or a bow
+    that the window or the face stands in the way of is REFUSED with its
+    reason (20.9, 24.9) and no dialog offers to take the window away; the
+    detail against the window likewise. Links and codes still repair silently
+    with the notice — nobody tapped. The lever against a bar asks now (it was
+    a one-button "they cannot be together" — ours, §0a: a yes/no is what was
+    asked for, and the lever is a choice the customer can make); the stripes
+    control goes through `planChoice` too.
+  · **Units.** A group, "a tap that would take something away asks first":
+    ten taps that must ask (the bell, the peephole and the digital viewer on
+    glass; the square window beside a bell and beside a peephole; the Idan
+    against the Coral and back; stripes over two panels and back; the tall
+    slot over panels), one that must not (a grille on a solid door), and the
+    `--danger` contrast. **Falsified:** `displacedBy` returning nothing — 10
+    failed; counting additions as losses — 1 (the grille); `--danger` at
+    `#E0605A` — 1.
+  · **Audit.** Two fixtures in the per-view loop: the greyed Coral against a
+    bar (he and ru) and a peephole on a glazed door — the dialog opens, the
+    door is unchanged while it is open, No/Escape leave it unchanged, it
+    opens again, Yes does exactly the tap. The blocks that tap through a
+    repair (the give-back memory, the stripe trade, the multi-sentence toast,
+    the toast's placement) answer through a `yes()` helper and assert they
+    WERE asked — the first run gave 16 faults, every one a block expecting the
+    repair to land on the tap. **Falsified:** `askConfirm` calling its yes at
+    once (no dialog) — every dialog clause fired at 1280 in both languages:
+    the Coral's "opened no dialog", "changed on no", "changed on Escape",
+    "did not open a second time"; the peephole's "opened no dialog — one
+    click took the window"; the stripe pill's "traded the panel without
+    asking".
+  · **The full audit's first run: 10 faults, one cause.** "An undo says what
+    came back" walked forward tapping EVERY group of a step in one breath and
+    then pressing the way on — a modal now open made the page inert, and the
+    click timed out at 30 s in all eight shape × language cases (so 0 undos
+    measured, and its two "lost its subject" clauses fired too, as they
+    should). Restated: one group at a time, answering yes (the customer this
+    check is about chose it); re-run: 24 undos across 4 shapes in two
+    languages, every one named what came back, no toast on a tile, the price
+    or the send. Every other block and every view clean.
+  · **Fuzz.** The click walks answer the dialog by a coin; "no" must leave the
+    code byte-identical, and a run that never answered one of the two ways is
+    a fault.
+  · **Gates:** node --check, npm run build, npm test 9,118,907 passed / 5
+    failed — the five sheet-staleness rows (shot, recreate, corpus, against,
+    lockset), allowed on an intermediate commit. Sheets: nothing drawn moved
+    (bare hides the dialog).
+  · **Not done, on purpose:** a dialog for a link or a code (nobody tapped);
+    offering to remove the window from a refused pull handle (Peretz's refusal
+    stands — his rule over the pop-up where they meet); asking on the arrows
+    (browsing should not ask — they skip refused options, commit 4).
+
 - **27.9 — THE BIG ROUND, 4 OF 8: THE BAND ABOVE THE DOOR, AND THE ARROWS.**
   The owner's son: *"the middle of the screen: the white strip with the main
   text smaller and less tall … above the door the name of the section we are

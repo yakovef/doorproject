@@ -41,7 +41,7 @@ import {
   panelUnderGlass, specialLockGlyph, stripesGlyph,
   windowGlyph,
 } from './renderer.js';
-import { conflicts, repair } from './rules.js';
+import { conflicts, displacedBy, repair } from './rules.js';
 /* The navigator's circles and the summary's row marks. They live in their own
    file because a `const` in here can only be read by the browser, and two
    pictures that share a shape can only be found by rasterising them — see the
@@ -574,7 +574,14 @@ function init() {
     box.hidden = open;
   });
   $('#works-close').addEventListener('click', closeWorks);
-  $('#clash-ok').addEventListener('click', closeClash);
+  /* The confirm dialog's three buttons, its Escape and its backdrop. A click
+     whose target is the <dialog> itself landed on the backdrop, outside the
+     content box — the same "no". */
+  $('#confirm-yes').addEventListener('click', () => closeConfirm('yes'));
+  $('#confirm-no').addEventListener('click', () => closeConfirm('no'));
+  $('#confirm-ok').addEventListener('click', () => closeConfirm('no'));
+  $('#confirm').addEventListener('cancel', ev => { ev.preventDefault(); closeConfirm('no'); });
+  $('#confirm').addEventListener('click', ev => { if (ev.target === ev.currentTarget) closeConfirm('no'); });
 
   /* ⚠ THE QUOTE BAR'S WAY ON IS WIRED ONCE, HERE, AND NOT IN `buildPanel`.
      Every other `.sect__next` is built with its step and gets its listener in
@@ -962,28 +969,40 @@ function closeWorks() {
   else d.removeAttribute('open');
 }
 
-/* The lever-against-bar dialog — `choose` above. Same `showModal` guard as
-   the gallery's, for the same reason: it traps focus, closes on Escape and
-   makes the page inert, and an old browser without it must not take the
-   configurator down inside a click handler. Nothing here touches `state`:
-   the door a customer sees behind the backdrop is the door they keep. */
-function openClash(text = T('dlg.leverBar')) {
-  const d = $('#clash');
+/* ── THE CONFIRM DIALOG — 27.9.2026 ──────────────────────────────────
+ * One `<dialog id="confirm">`, two forms. It replaced `#clash`, the one-button
+ * "this lever and the pull handle cannot be together" (20.9).
+ *   · YES / NO (`askConfirm`) — a tap that would take something else away:
+ *     *"a red button that says yes and a black that says no"*. Yes runs the
+ *     tap's own commit; No, Escape and the backdrop close it and nothing else
+ *     happens — the door behind the backdrop is the door they keep.
+ *   · ONE BUTTON (`tellOne`) — an arrow with nowhere to go.
+ * `showModal` behind the same guard as the gallery's (focus trapped, Escape
+ * closes, the page inert; an old browser without it must not take the
+ * configurator down inside a click handler). No animation: nothing for T9 or
+ * T13 to kill. Focus lands on "no", the choice that changes nothing. */
+let onYes = null;
+function showDialog(text, two) {
+  const d = $('#confirm');
   if (!d) return;
-  /* One dialog, two sentences since 27.9.2026: the lever against the bar, and
-     an arrow with nowhere to go (`arrowStep`). Written every time it opens, so
-     the last sentence shown never lingers into the next. */
-  const p = d.querySelector('#clash-p');
-  if (p) p.textContent = text;
-  if (typeof d.showModal === 'function') d.showModal();
+  d.querySelector('#confirm-p').textContent = text;
+  d.querySelector('#confirm-yes').hidden = !two;
+  d.querySelector('#confirm-no').hidden = !two;
+  d.querySelector('#confirm-ok').hidden = two;
+  if (typeof d.showModal === 'function') { if (!d.open) d.showModal(); }
   else d.setAttribute('open', '');
+  (two ? d.querySelector('#confirm-no') : d.querySelector('#confirm-ok')).focus();
 }
-
-function closeClash() {
-  const d = $('#clash');
+function askConfirm(text, yes) { onYes = yes; showDialog(text, true); }
+function tellOne(text) { onYes = null; showDialog(text, false); }
+function closeConfirm(answer) {
+  const d = $('#confirm');
   if (!d) return;
-  if (typeof d.close === 'function') d.close();
+  const run = answer === 'yes' ? onYes : null;
+  onYes = null;
+  if (typeof d.close === 'function') { if (d.open) d.close(); }
   else d.removeAttribute('open');
+  if (run) run();
 }
 
 /* ── THE ORDER AS A DOCUMENT ──────────────────────────────────────────
@@ -1863,15 +1882,21 @@ function buildStripes(host) {
      It was nearly unreachable while a blocked door showed no pills at all —
      which is how it stayed hidden — and this round makes the blocked tap the
      normal way to trade a panel for stripes, so it has to speak. */
+  /* ⚠ AND SINCE 27.9.2026 IT ASKS FIRST, like every tile (the confirm dialog):
+     a stripe pill on a panelled door would clear the panels, so the same dry
+     run and the same dialog stand in front of it. It goes through
+     `planChoice`/`commitChoice` under the `stripes` intent, so the give-back
+     memory treats the stripes as one control, as `repair` does. */
   for (const b of box.querySelectorAll('[data-dir]')) {
     b.addEventListener('click', () => {
       const d = b.dataset.dir;
       noteEngaged();
-      const { state: fixed, said } = repair({ ...state, stripeDir: d,
+      const p = planChoice('stripes', { stripeDir: d,
                    stripeCount: d === 'none' ? 0 : Math.max(1, state.stripeCount || 2),
-                   stripeTight: d === 'v' ? false : state.stripeTight }, 'stripes');
-      set(fixed);
-      toast(said.join(' · '));
+                   stripeTight: d === 'v' ? false : state.stripeTight });
+      const name = b.querySelector('span')?.textContent || d;
+      if (p.lost.length) askConfirm(confirmSentence(name, p.lost), () => commitChoice('stripes', p));
+      else commitChoice('stripes', p);
     });
   }
   for (const b of box.querySelectorAll('[data-n]')) {
@@ -2260,7 +2285,7 @@ function arrowStep(dir) {
     if (o.id !== state[g.key] && !blocked[o.id]) { choose(g, o.id); return; }
   }
   const title = T(g.title);
-  openClash(T('dlg.noFit', lang() === 'en' ? title.toLowerCase() : title));
+  tellOne(T('dlg.noFit', lang() === 'en' ? title.toLowerCase() : title));
 }
 
 /** Leave the live step for another by a gesture: the step left is `visited`
@@ -2579,12 +2604,18 @@ function choose(g, id) {
   /* ⚠ AND THE BOW, 26.9.2026: greyed only for what outranks it — the window
      or the face — and its tap says so and changes nothing. A bow tap never
      moves the window, the face or the stripes. */
-  if ((g.key === 'handle' || g.key === 'lockset' || g.key === 'grab') && id !== state[g.key]) {
+  /* ⚠ AND SINCE 27.9.2026 THE LEVER AGAINST THE BAR IS NOT REFUSED — IT ASKS.
+     Peretz asked for a popup saying the two cannot be together; the owner's
+     son's newer rule wants the choice (*"a window to pop up before you remove
+     the other thing"*), and a yes/no still says they cannot be together. So
+     a greyed lever falls through to the dry run below: `repair` with the
+     lockset intent keeps the lever and drops the bar, and the confirm dialog
+     names the bar first. Ours to have decided (CLAUDE.md §0a). The pull
+     handle and the bow keep Peretz's refusal: what stands in their way is the
+     window or the face, and those never yield to a handle (20.9, 24.9). */
+  if ((g.key === 'handle' || g.key === 'grab') && id !== state[g.key]) {
     const why = conflicts(state)[g.key][id];
-    if (why) {
-      if (g.key === 'lockset') openClash(); else toast(why);
-      return;
-    }
+    if (why) { toast(why); return; }
   }
   /* ⚠ AND A FACE GREYED FOR THE WINDOW CHANGES NOTHING — 26.9.2026. The owner's
      son: *"the window needs to stay on and not be removed"*. Tapping a face the
@@ -2599,11 +2630,37 @@ function choose(g, id) {
     const why = conflicts(state).detail[id];
     if (why) { toast(why); return; }
   }
+  const p = planChoice(g.key, { [g.key]: id });
+  /* ⚠ ASK BEFORE TAKING ANYTHING AWAY — 27.9.2026, the owner's son: *"things
+     like a peephole can't remove a window with one click, for all things that
+     are not compatible i want a window to pop up before you remove the other
+     thing … a red button that says yes and a black that says no."* The dry run
+     above is exactly what the tap would do; `displacedBy` says which of the
+     customer's OTHER choices it would move, and any at all opens the confirm
+     dialog, named off the spec rows (`confirmSentence`). Yes commits the same
+     plan — toast, give-back memory and all; No, Escape and the backdrop leave
+     the door byte-identical. A tap that only ADDS (a grille brings its window)
+     or only changes the tapped control commits as before. */
+  if (p.lost.length) {
+    askConfirm(confirmSentence(optionName(g, id), p.lost), () => commitChoice(g.key, p));
+    return;
+  }
+  commitChoice(g.key, p);
+}
+
+/**
+ * The dry run of a tap: the state the page would move to, the sentences the
+ * repair would say, what the give-back memory would restore — and what of the
+ * customer's other choices it would take (`lost`). Nothing here touches
+ * `state`, the memory or the page; `commitChoice` does, and only on the path
+ * the customer chose (a tap with nothing to lose, or Yes).
+ */
+function planChoice(key, change) {
   /* `said` comes back from the repair itself, one sentence per change, because
      the branch that made the change is the only place that knows why it did.
      It used to be looked up afterwards from the group name, which is right
      only while a group has one reason to move. */
-  const want = { ...state, [g.key]: id };
+  const want = { ...state, ...change };
 
   /* ⚠ GIVE BACK WHAT THIS FIELD TOOK AWAY, BEFORE ASKING THE RULES. See
      `displaced`. Everything this group displaced earlier is offered back, but
@@ -2611,7 +2668,7 @@ function choose(g, id) {
      customer who has since chosen a face on purpose keeps it. The proposal
      then goes through `repair` like any other and is kept only if it survives,
      so nothing here can build a door the rules refuse. */
-  const memo = displaced.get(g.key);
+  const memo = displaced.get(key);
   const back = [];
   if (memo) {
     for (const [k, m] of Object.entries(memo)) {
@@ -2619,11 +2676,17 @@ function choose(g, id) {
     }
   }
 
-  const { state: fixed, said } = repair(want, g.key);
+  const { state: fixed, said } = repair(want, key);
 
   /* Only the ones that actually stood. A restored value the rules moved again
      is not something to tell the customer about — they never asked for it. */
   const stood = back.filter(k => fixed[k] === memo[k].was);
+  return { fixed, said, stood, memo, lost: displacedBy(state, fixed, key, stood) };
+}
+
+/** Apply a planned tap: the give-back memory, the state, the toast. The ONE
+ *  place a tap changes the door — reached with nothing to lose, or on Yes. */
+function commitChoice(key, { fixed, said, stood, memo }) {
   for (const k of stood) delete memo[k];
 
   /* ⚠ RECORDED BY DIFFING THE STATE, NOT FROM `changed`, AND THAT WAS A REAL
@@ -2639,11 +2702,11 @@ function choose(g, id) {
      are never `===` — and the field the customer touched is skipped because
      they chose that. */
   for (const k of Object.keys(fixed)) {
-    if (k === g.key || stood.includes(k)) continue;
+    if (k === key || stood.includes(k)) continue;
     if (typeof fixed[k] === 'object' || typeof state[k] === 'object') continue;
     if (state[k] === fixed[k]) continue;
-    if (!displaced.has(g.key)) displaced.set(g.key, {});
-    displaced.get(g.key)[k] = { was: state[k], became: fixed[k] };
+    if (!displaced.has(key)) displaced.set(key, {});
+    displaced.get(key)[k] = { was: state[k], became: fixed[k] };
   }
   set(fixed);
   if (stood.length) said.unshift(T('fix.back'));
@@ -2664,6 +2727,30 @@ function choose(g, id) {
      two ways: in full to somebody opening a link, and a third of the way to
      the customer at the moment they are choosing. */
   toast(said.join(' · '));
+}
+
+/**
+ * The confirm dialog's one sentence — *"'do you want to put x, this action
+ * will cause the removal of y' — fewer words if you can"*: "{x}? זה יסיר את
+ * {y}". `y` is the spec rows of what goes, by their values, read off
+ * `specRows` of the door as it stands — the undo toast's mechanism (`restored`)
+ * — so nothing is typed here and a field added later names itself. A field
+ * with no row of its own is named by the row it is shown on.
+ */
+const ROW_OF = { stripeDir: 'stripes', stripeCount: 'stripes', stripeTight: 'stripes', handleLen: 'handle' };
+function confirmSentence(what, lost) {
+  const rows = specRows(state);
+  const keys = [...new Set(lost.map(k => ROW_OF[k] || k))];
+  /* The row's VALUE alone — it names the thing ("חלון מלבני (עם פאנל תחתון)",
+     "עידן · ניקל · 100 ס״מ", "שני פאנלים"); "label (value)" read "חלון (חלון
+     מלבני (…))", and he asked for fewer words. */
+  const named = keys.map(k => rows.find(r => r.key === k)).filter(Boolean).map(r => r.value);
+  return T('dlg.confirm', what, named.length ? named.join(' · ') : keys.join(', '));
+}
+/** The name of the option a tap is for, as its tile says it. */
+function optionName(g, id) {
+  const o = g.list().find(x => x.id === id);
+  return o ? L(o) : id;
 }
 
 /**

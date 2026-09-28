@@ -203,7 +203,7 @@ console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real brow
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   const CODE = new RegExp(`^DM-[0-9A-Z]{${encodeCode(DEFAULTS).length - 3}}$`);
   const r = rng(SEED ^ 0x5EED);
-  let clicks = 0, dialogs = 0;
+  let clicks = 0, dialogs = 0, saidYes = 0, saidNo = 0;
 
   for (let wk = 0; wk < WALKS; wk++) {
     const v = VIEWS[wk % VIEWS.length];
@@ -235,6 +235,7 @@ console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real brow
          does then is exactly what this is here to fuzz. */
       const hit = await p.$(`.field[data-group="${t.group}"] [data-id="${t.id}"]`);
       if (!hit) continue;                       // a group can re-render its list
+      const before = await p.evaluate(() => document.getElementById('code').textContent);
       await hit.evaluate(el => el.click());
       await p.waitForTimeout(12);
       clicks++;
@@ -244,11 +245,31 @@ console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real brow
          lands on the door and not on the backdrop; counted so a walk that
          never met one is distinguishable from one where the dialog stopped
          opening. */
-      if (await p.evaluate(() => {
-        const d = document.querySelector('#clash');
-        if (!d || !d.open) return false;
-        d.close(); return true;
-      })) dialogs++;
+      /* ⚠ AND SINCE 27.9.2026 IT IS A QUESTION — `#confirm`, yes/no, in front
+         of every tap that would take something else away (and one button for
+         an arrow with nowhere to go). Answered the way a person answers it:
+         "no" on half, "yes" on half, by the walk's own seeded coin, and both
+         are counted — a walk that only ever said no would never reach the
+         doors the dialog lets through. After "no" the door must be exactly the
+         door before the tap (asserted with the rest below, off `s1`). */
+      const answer = r() < 0.5 ? 'no' : 'yes';
+      const asked = await p.evaluate(a => {
+        const d = document.querySelector('#confirm');
+        if (!d || !d.open) return null;
+        const two = !document.querySelector('#confirm-yes').hidden;
+        document.querySelector(two ? `#confirm-${a}` : '#confirm-ok').click();
+        return two ? a : 'ok';
+      }, answer);
+      if (asked) dialogs++;
+      if (asked === 'yes') saidYes++;
+      if (asked === 'no' || asked === 'ok') {
+        saidNo++;
+        await p.waitForTimeout(12);
+        const same = await p.evaluate(() => document.getElementById('code').textContent);
+        if (same !== before) {
+          fault('"no" to the confirm dialog changed the door', `walk ${wk}, after ${trail.at(-1)}: ${before} → ${same}`);
+        }
+      }
 
       const s2 = await p.evaluate(() => {
         const doc = document.documentElement;
@@ -338,7 +359,9 @@ console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real brow
     await p.close();
   }
   await b.close();
-  console.log(`  ${clicks} clicks, ${dialogs} of them on a lever the bar refused (the dialog)`);
+  console.log(`  ${clicks} clicks, ${dialogs} of them met the confirm dialog — ${saidYes} answered yes, `
+    + `${saidNo} no (the door unchanged after every no)`);
+  if (!saidYes || !saidNo) fault('the confirm dialog was answered one way only', `yes ${saidYes}, no ${saidNo} — one half was never exercised`);
 }
 
 console.log(faults

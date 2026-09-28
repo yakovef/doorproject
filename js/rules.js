@@ -740,6 +740,38 @@ const WHY_UNDER_GLASS = { top: 'why.winTakesTop', plate: 'why.winPlate', room: '
 const BOW_WHY = { window: 'why.bowWindow', face: 'why.bowFace', door: 'why.bowDoor' };
 
 /**
+ * ⚠ WHAT A TAP WOULD TAKE AWAY FROM THE CUSTOMER — 27.9.2026.
+ *
+ * The owner's son: *"things like a peephole can't remove a window with one
+ * click, for all things that are not compatible i want a window to pop up
+ * before you remove the other thing … 'do you want to put x, this action will
+ * cause the removal of y' … a red button that says yes and a black that says
+ * no."* The page dry-runs `repair` for the tap and asks this which of the
+ * customer's OTHER choices the repair would change; any at all, and the confirm
+ * dialog asks first (`js/app.js`, `choose`). Pure, so `npm test` can hold it.
+ *
+ * Counted: a field other than the one tapped (and the fields that belong to
+ * the same control — a stripe tap owns direction, count and tightness; a pull
+ * handle owns its length) whose value moves, and whose old value was a THING —
+ * not one of the lists' "none" entries. So removing a window, a viewer, a
+ * bell, panels, stripes or a bar counts, and so does swapping the Coral for the
+ * cylinder (the lever the customer chose goes); ADDING a window for a grille
+ * does not (nothing is taken), and neither does the bar's length shortening to
+ * fit a new size (`handleLen` — a clamp the toast already names, not a removal).
+ * `restored` are fields the page's own give-back memory put back on purpose.
+ */
+const NOTHING = /^(none|no[a-z]*)$/;
+const OWNED = { stripes: ['stripeDir', 'stripeCount', 'stripeTight'], handle: ['handle', 'handleLen'] };
+const NOT_A_LOSS = new Set(['handleLen', 'stripeTight']);
+export function displacedBy(before, after, tapped, restored = []) {
+  const own = new Set(OWNED[tapped] || [tapped]);
+  return Object.keys(after).filter(k => !own.has(k) && !restored.includes(k) && !NOT_A_LOSS.has(k)
+    && typeof after[k] !== 'object' && before[k] !== after[k]
+    && !(typeof before[k] === 'string' && NOTHING.test(before[k]))
+    && !(typeof before[k] === 'number' && before[k] === 0));
+}
+
+/**
  * Move a design to the nearest buildable one, and say what changed.
  *
  * Returns { state, changed: [ 'grille' | ... ], said: [ sentence, ... ] } —
