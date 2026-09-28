@@ -178,6 +178,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** **עילי** (`ilai`), a new lockset, INCLUDED (*"very similar to rotem, it
+  is also in the price, i want you to call it 'עילי'"*): the waisted backplate —
+  220 tall, 91 at head and foot, 78 at a waist 0.54 down, a slim 14 mm bar under
+  an arched neck, the Rotem's egg and satin — measured off three doors. It is the
+  plate the Rotem was drawn as until 27.9; the five gallery doors carrying it
+  (d004 d022 d029 d106 d108) are cited and refit to it. Appended: no VERSION.
 - **27.9** The record (8 of 8): §0a — the placements they make themselves and
   the five decisions taken for them; §0c's gates; §3's flow; §5.28–29; §9's
   wall table and breakdown window re-measured (unchanged by the band). The
@@ -207,34 +213,6 @@ lines here. Dates are the day of the change.
   phones give the band 21.6 px of door. Two arrows step the first group,
   skipping refused options; with none free, a dialog and no change. Long
   form: `HISTORY.md`.
-- **27.9** The navigator as a dark column (3 of 8): *"a black rectangle …
-  the section that i am in will turn white and be square … a checkmark."* A
-  56 px ink column on the panel's inline-end edge above 1100, the phone row
-  dressed the same; live = a light square; checks = `visited` (steps left by
-  a gesture, session only). Long form: `HISTORY.md`.
-- **27.9** The price card at the door's top-right corner (2 of 8): *"it looks
-  bad under the lamp, move to near the door, at the up right corner"* — his own
-  28.8 placement, moved by him. Anchored on the frame's SETTLED geometry (its
-  6 px entrance put the card 2 px high); physical right in every language.
-  Breakdown at 1920×918 10 → 13 of 13 rows. Long form: `HISTORY.md`.
-- **27.9** Copy and small chrome (1 of 8, the owner's son's eleven notes):
-  **עצבו** את הדלת שלכם on one line, the lede gone (leaf 421 → 468 px at
-  1280×720, which the band spends); the gallery opener on `--accent`; the
-  summary's send full-width "הזמינו את הדלת דרך נציג" over the telephone; the
-  handing card gone; undo/redo 52 px and a save; the finish group only with a
-  bar, bow or bell. Long form: `HISTORY.md`.
-- **27.9** The Rotem INTO THE APP (*"yes put it in and fix the coral and curved"*),
-  with its lever as photographed (reach 114, root 19 past), and the Coral 128 →
-  133 and curved lever 106 → 109 — their "parallax" shrink ran the wrong way; the
-  full correction's size did not hold up, so all three are drawn as photographed.
-  Tile redrawn from `PLATE`; footprints re-measured; the blind-fitting gate 2 → 0.
-  ⚠ Standing instruction: put things in the app without asking (§0a).
-- **27.9** The Rotem — the DEFAULT lockset — measured off three installed doors,
-  a PROPOSAL with the app untouched (`research/handles/rotem/`): a flat head,
-  straight sides and a foot 1.16× deeper than a semicircle (we drew a waisted
-  plate), 88.5 × 224 (was 90 × 240), satin not chrome, an egg-shaped key rim with
-  no black keyhole, an even 23 mm strap with a dark bend at its root; reach 119
-  kept. ⚠ Found doing it: the Coral's and curved lever's parallax ran the WRONG way (§9).
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -936,7 +914,15 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
   raised egg round the key instead of a black keyhole, and an even
   `LEVER_BLADE` strap with a dark bend at its root. `PLATE` is read by the door
   and the tile alike.
-  ⚠ **Every lever is drawn AS PHOTOGRAPHED** — Coral 133, curved 109, Rotem 114
+  **עילי (`ilai`, 28.9, included) is the WAISTED backplate** the Rotem was drawn
+  as until 27.9 (`research/handles/ilai/`): 220 tall, 91 wide at a domed head and
+  foot, 78 at a waist 0.54 down, a slim 14 mm bar (tip 16) under an arched NECK
+  that leaves the plate 19 mm above the bar and turns down onto it, the Rotem's
+  egg (`euroEgg`, one routine for both) and its satin. `ILAI` is read by the door
+  and the tile (`ilaiOutline`, `ilaiBar`, `ilaiNeck`). ⚠ The records call both
+  plates "lever-plate", so `tools/corpus.mjs` gives a backplate to the lockset
+  whose `doors` CITES it (the עילי cites d004 d022 d029 d106 d108), never a guess.
+  ⚠ **Every lever is drawn AS PHOTOGRAPHED** — Coral 133, curved 109, Rotem 114, עילי 107
   from spindle to tip — because the camera's parallax on a proud lever could
   not be sized from these photographs (§9).
 - **`SPECIAL_LOCKS`** — a second lock beside the first, at eye level
@@ -994,7 +980,7 @@ at least once, always silently.
 | blade depth | **23 mm**, a measurement since 27.9 (was 0.377 of the rose) | four installed Coral doors: 23 / 23 / 22 on a 63 rose; RB's 0.377 was an angled shot |
 | the tip | **a semicircle** | RB, and the four doors |
 | the root | **a semicircle on the spindle**, ~10 mm past it | the four doors; RB 0.38 of the rose radius |
-| reach, spindle → tip | Coral **133**, curved **109**, Rotem **114** — as photographed (27.9) | the four / three / three installed doors; the camera's parallax is left in (§9) |
+| reach, spindle → tip | Coral **133**, curved **109**, Rotem **114**, עילי **107** — as photographed (27.9, 28.9) | the four / three / three / three installed doors; the camera's parallax is left in (§9) |
 | lever → keyway | **105 mm** | the ten lever-rose corpus records (the four Coral doors read 102); RB's 88.8 is a catalogue LAYOUT |
 | rose | **63 mm**, both levers | 62.5–66 on seven installed doors (27.9) |
 | escutcheon | the Coral's **70** (covered); every other **66** | the four doors 66.5–72.5; the curved doors 67–71 |
@@ -1583,15 +1569,10 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   Rotem was redrawn off three installed doors. (Re-read that day: the tile's
   plate had been `PLATE` all along, 90 × 240; the "166 × 340" it was measured
   against was `handleFootprint`'s box round lever and plate together.)
-- **Five gallery doors carry a backplate that is not the Rotem** (27.9, seen on
-  `screenshots/lockset-plate.png` once the Rotem was redrawn): d004, d022, d029,
-  d106 and d108 have a WAISTED plate with a domed head and a curved lever — the
-  shape `plateHandle` drew until 27.9, which is where the old drawing came from.
-  Only d003 is the Rotem the owner's son photographed (flat head, straight
-  sides, straight strap). `tools/corpus.mjs` files every backplate under `plate`
-  because the catalogue has one; those five now show the Rotem. Whether the
-  waisted one is a product Peretz sells — a new lockset, with its name and
-  price — is a question for the owner's son, not a shape to invent.
+- ✅ ~~**Five gallery doors carry a backplate that is not the Rotem** (27.9).~~
+  **CLOSED 28.9**: it is a product, **עילי**, included — the owner's son sent
+  three doors of it and named it. d004 d022 d029 d106 d108 are cited by it and
+  `npm run corpus` refits them (`js/works.js` moved on exactly those five rows).
 - **How far a photograph moves a lever is not settled — so all three are drawn
   as photographed** (27.9). A lever stands 55–60 mm proud; photographed from the
   door's middle it lands farther from the camera's axis, so it reads SHORT from

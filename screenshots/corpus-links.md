@@ -6,13 +6,13 @@
 | דלת | מחיר בגלריה | הקישור |
 |---|---|---|
 | d003 | ₪3195 | `?v=26&c=rb-7110d&w=none&g=none&n=none&k=plate&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=left-in` |
-| d004 | ₪3195 | `?v=26&c=rb-7080d&w=none&g=none&n=none&k=plate&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=1&d=plain&s=standard&h=right-in` |
+| d004 | ₪3195 | `?v=26&c=rb-7080d&w=none&g=none&n=none&k=ilai&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=1&d=plain&s=standard&h=right-in` |
 | d012 | ₪3450 | `?v=26&c=rb-7080d&w=none&g=none&n=none&k=plate&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=left-in` |
 | d015 | ₪3500 | `?v=26&c=rb-9005d&w=none&g=none&n=none&k=coral&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=right-in` |
 | d016 | ₪3545 | `?v=26&c=rb-0096d&w=none&g=none&n=none&k=coral&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=1&d=plain&s=standard&h=right-in` |
-| d022 | ₪3650 | `?v=26&c=rb-rb09d&w=none&g=none&n=none&k=plate&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=right-in` |
+| d022 | ₪3650 | `?v=26&c=rb-rb09d&w=none&g=none&n=none&k=ilai&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=right-in` |
 | d026 | ₪3750 | `?v=26&c=rb-7080d&w=none&g=none&n=none&k=coral&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=right-in` |
-| d029 | ₪3800 | `?v=26&c=rb-rb09d&w=none&g=none&n=none&k=plate&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=left-in` |
+| d029 | ₪3800 | `?v=26&c=rb-rb09d&w=none&g=none&n=none&k=ilai&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=left-in` |
 | d030 | ₪3850 | `?v=26&c=rb-0096d&w=none&g=none&n=none&k=cadoor&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=1&d=plain&s=standard&h=left-in` |
 | d031 | ₪4050 | `?v=26&c=rb-7110d&w=none&g=none&n=none&k=cadoor&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=1&d=plain&s=standard&h=right-in` |
 | d034 | ₪4300 | `?v=26&c=rb-0096d&w=none&g=none&n=nitzan&k=cylinder&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=19&d=plain&s=standard&h=right-in` |
@@ -28,8 +28,8 @@
 | d092 | ₪6950 | `?v=26&c=rb-6219d&w=rect&g=none&n=none&k=knobplate&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=left-in` |
 | d097 | ₪7500 | `?v=26&c=rb-7080d&w=rect&g=scroll&n=none&k=coral&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=left-in` |
 | d099 | ₪7500 | `?v=26&c=rb-7126d&w=rect&g=scroll&n=none&k=coral&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=right-in` |
-| d106 | ₪8500 | `?v=26&c=rb-7080d&w=rect&g=circles-light&n=none&k=plate&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=left-in` |
-| d108 | ₪8800 | `?v=26&c=rb-7080d&w=rect&g=none&n=none&k=plate&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=right-in` |
+| d106 | ₪8500 | `?v=26&c=rb-7080d&w=rect&g=circles-light&n=none&k=ilai&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=left-in` |
+| d108 | ₪8800 | `?v=26&c=rb-7080d&w=rect&g=none&n=none&k=ilai&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=right-in` |
 | d113 | ₪9500 | `?v=26&c=rb-7080d&w=strip&g=grid&n=idan&k=digital&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-black&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=right-in` |
 | d116 | ₪13900 | `?v=26&c=rb-7080d&w=rect&g=scroll&n=none&k=coral&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-nickel&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=right-in` |
 | d122 | ₪13900 | `?v=26&c=rb-7240d&w=rect&g=grid&n=idan&k=cylinder&x=nospecial&m=mk-std&pz=pz-nickel&hf=hf-black&bl=nobell&ey=nopeep&gb=nograb&lt=nolatch&hl=0&sp=0&d=plain&s=standard&h=right-in` |

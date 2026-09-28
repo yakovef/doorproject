@@ -1255,6 +1255,40 @@ const PLATE = {
   root: 19,       // the lever's round root ends this far PAST the spindle: 21 / 18 / 19
   bend: 9,        // its dark bend runs from the root end to this far on the tip side: 9 / 6 / 12
 };
+/* עילי (id `ilai`) — the WAISTED backplate. The owner's son, 28.9.2026, with
+   three photographs of installed doors (research/handles/ilai/): *"here is a new
+   handle, it is very similar to rotem, it is also in the price, i want you to
+   call it 'עילי'"*. It is the plate `plateHandle` drew until 27.9 — the five
+   gallery doors d004 d022 d029 d106 d108 carry it — now drawn off its own
+   photographs. Each crop was scaled by its leaf's HEIGHT at the plate's column
+   (0.624 / 0.542 / 0.584 px/mm) and read off millimetre-ruled crops; edge
+   profiles failed on bronze-on-cream and satin-on-grey. Door 2 is sheared by
+   the camera's angle and gave only heights. mm from the lever BAR's centre line
+   at the plate's centre, y down — the same origin as `PLATE`. */
+const ILAI = {
+  top: -75.5,     // the head's crown: -73.8 / -76 / -77
+  foot: 144.5,    // the foot's crown: 153.8 / 136 / 143.8 — so 220 tall, the mean of three
+  dome: 4,        // head and foot each bow this far past their corners
+  corner: 12,     // the four corners' radius
+  /* the half-width down the plate, doors 1 and 3 at 25 mm steps:
+       -55: 45.5  -30: 43.2  -5: 42  20: 39.6  45: 38.9  70: 39.4
+        95: 41.4  120: 43.75  140: 45
+     a curve concave all the way, narrowest at 45 mm (0.54 of the height) */
+  head: 45.5, waist: 38.9, waistAt: 45, base: 45.5,
+  bezel: [29, 47, 93],  // the key's egg: 29 / 27 / 30 wide, 47.5 / 44 / 48.5 tall, centre 96 / 83 / 92 below
+  plug: 79,       // the key slot: 85 / 75 / 77.5 below
+  reach: 107,     // spindle -> tip, as photographed: 109 / 107 / 106 (see the note below PLATE)
+  root: 18,       // the bar's round root ends this far past the spindle (door 3; hidden on 1 and 2)
+  depth: 14,      // the bar: 14 / 13 / 15 — thinner than the Rotem's strap
+  tip: 16,        // the tip swells a little: ~1.2x the bar on all three
+  /* the NECK: it leaves the plate ABOVE the bar, runs level toward the tip and
+     curves down into the bar's top, a dark hollow under it — [where it leaves
+     the plate (t, past the spindle is negative), where it lands on the bar,
+     its height above the bar's centre line, its band]. Door 3: level at -19
+     from +12 to -18 then down to the bar by -31; door 1 -20 over -35..+5;
+     door 2 a diagonal from (-5, -25) down to (-28, -8). */
+  arch: [-10, 31, -19, 6],   // the band reads 5-7 mm on all three
+};
 /* ⚠ THE LEVER IS AS PHOTOGRAPHED, WITH NO PARALLAX TERM — AND THAT IS A
    DECISION, NOT AN OVERSIGHT. The blade stands ~55 mm proud, and from a camera
    ~1.9 m in front of the door's middle (a phone's 1x lens, the door filling
@@ -8478,6 +8512,7 @@ function handleFootprint(handle, leafH, panelled = false) {
        lever 114 as photographed): drawn out 45 / in 114 / vy 159, declared
        with the margins it always carried (+2, 0, +2). Was 47 / 119 / 170. */
     case 'plate':   return { out: 47, in: 114, vy: 161 };
+    case 'ilai':    return { out: 48, in: 107, vy: 147 };
     case 'almog':   return { out: 42, in: 220, vy: 42 };
     /* ⚠ `out` WAS 78 AND THE DRAWING REACHES 41. Reported from outside as
        *"you can also see that this circle handle is off place"*, and it was:
@@ -8794,6 +8829,7 @@ const LOCK_ART = {
   lever:   (h, g) => lever(g.cx, g.cy, g.dir),
   levertaper: (h, g) => leverTaper(g.cx, g.cy, g.dir),
   plate:   (h, g) => plateHandle(g.cx, g.cy, g.dir),
+  ilai:    (h, g) => ilaiHandle(g.cx, g.cy, g.dir),
   almog:   (h, g) => almogLever(g.cx, g.cy, g.dir),
   cadoor:  (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
   knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir),
@@ -9216,6 +9252,35 @@ function pullBar(cx, cy, handle, leafH, panelled) {
     </g>`;
 }
 
+/* The euro opening under a backplate lever — the Rotem's and the עילי's alike:
+   a raised egg-shaped rim, narrowing downward and lit along its top; a thin dark
+   gap; the cylinder's face; a dark slot across the plug near its top. `bezel` is
+   the rim's [width, height, centre below the spindle], `plug` the slot's depth
+   below it, both measured per product. One routine for both plates, so the two
+   keyholes can differ only in the sizes their photographs gave them (27.9). */
+function euroEgg(cx, cy, [bw, bh, bc], plug) {
+  const f = n => n.toFixed(2);
+  const eR = bw / 2, eTop = cy + bc - bh / 2, eBot = cy + bc + bh / 2;
+  const eR2 = eR * 0.59;                                // the narrow end
+  const egg = (s, dy = 0) => {
+    const R1 = eR * s, R2 = eR2 * s;
+    const c1 = eTop + eR + dy, c2 = eBot - eR2 + dy;
+    return `M ${f(cx - R1)} ${f(c1)} A ${f(R1)} ${f(R1)} 0 0 1 ${f(cx + R1)} ${f(c1)}
+      L ${f(cx + R2)} ${f(c2)} A ${f(R2)} ${f(R2)} 0 0 1 ${f(cx - R2)} ${f(c2)} Z`;
+  };
+  const ky = cy + plug;
+  return `<!-- the euro opening: a raised rim lit along its top, a thin dark gap,
+           the cylinder's face, and its key slot -->
+      <path d="${egg(1)}" fill="none" stroke="#000" stroke-opacity="0.26" stroke-width="1.2"
+            transform="translate(0.5 0.8)"/>
+      <path d="${egg(0.86)}" fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="2.4"/>
+      <path d="${egg(0.70, 0.5)}" fill="#000" opacity="0.26"/>
+      <g data-hw="keyway">
+        <path d="${egg(0.62, 0.7)}" fill="url(#euroSteel)"/>
+        <rect x="${f(cx - 5)}" y="${f(ky - 1.1)}" width="10" height="2.2" rx="1" fill="#121417" opacity="0.85"/>
+      </g>`;
+}
+
 /**
  * The Rotem — lever and cylinder on one backplate, the DEFAULT lockset.
  *
@@ -9274,19 +9339,6 @@ function plateHandle(cx, cy, dir) {
                   fill="url(#rotemBand-${u})" opacity="${a}"/>`;
   };
 
-  /* the key: a raised egg-shaped rim round the euro opening, the cylinder's
-     face filling it, a dark slot across the plug near its top */
-  const [bw, bh, bc] = PLATE.bezel;
-  const eR = bw / 2, eTop = cy + bc - bh / 2, eBot = cy + bc + bh / 2;
-  const eR2 = eR * 0.59;                                // the narrow end
-  const egg = (s, dy = 0) => {
-    const R1 = eR * s, R2 = eR2 * s;
-    const c1 = eTop + eR + dy, c2 = eBot - eR2 + dy;
-    const yT = c1 - R1, yB = c2 + R2;
-    return `M ${f(cx - R1)} ${f(c1)} A ${f(R1)} ${f(R1)} 0 0 1 ${f(cx + R1)} ${f(c1)}
-      L ${f(cx + R2)} ${f(c2)} A ${f(R2)} ${f(R2)} 0 0 1 ${f(cx - R2)} ${f(c2)} Z`;
-  };
-  const ky = cy + PLATE.plug;
 
   return `
     <g>
@@ -9325,16 +9377,7 @@ function plateHandle(cx, cy, dir) {
       <path d="${outline}" fill="none" stroke="url(#rotemRim-${u})" stroke-width="1.3"
             transform="translate(-0.5 -0.4)"/>
 
-      <!-- the euro opening: a raised rim lit along its top, a thin dark gap,
-           the cylinder's face, and its key slot -->
-      <path d="${egg(1)}" fill="none" stroke="#000" stroke-opacity="0.26" stroke-width="1.2"
-            transform="translate(0.5 0.8)"/>
-      <path d="${egg(0.86)}" fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="2.4"/>
-      <path d="${egg(0.70, 0.5)}" fill="#000" opacity="0.26"/>
-      <g data-hw="keyway">
-        <path d="${egg(0.62, 0.7)}" fill="url(#euroSteel)"/>
-        <rect x="${f(cx - 5)}" y="${f(ky - 1.1)}" width="10" height="2.2" rx="1" fill="#121417" opacity="0.85"/>
-      </g>
+      ${euroEgg(cx, cy, PLATE.bezel, PLATE.plug)}
 
       <!-- the lever's shadow: it stands ~55 mm proud -->
       <path d="${blade(t0 + 6, L, T, B)}" transform="translate(4 15)"
@@ -9352,6 +9395,141 @@ function plateHandle(cx, cy, dir) {
       <path d="${blade(t0, PLATE.bend, T + 1.2, B - 1.2, hd * 0.8)}" fill="#000" opacity="0.72"/>
       <path d="${arcPath(at(t0), cy, hd - 1.2, dir > 0 ? 110 : 290, dir > 0 ? 250 : 70)}" fill="none"
             stroke="#fff" stroke-opacity="0.22" stroke-width="1.2"/>
+    </g>`;
+}
+
+/* The עילי's outline: a domed head and foot, four rounded corners, and sides
+   concave all the way down to a waist at 0.54 of the height. Read by the door
+   and the tile alike, so the two cannot drift apart. */
+function ilaiOutline(cx, cy) {
+  const f = n => n.toFixed(2);
+  const T = cy + ILAI.top, B = cy + ILAI.foot, rc = ILAI.corner;
+  const hT = ILAI.head, hW = ILAI.waist, yW = cy + ILAI.waistAt, hB = ILAI.base;
+  const yTs = T + ILAI.dome, yBs = B - ILAI.dome;
+  return `M ${f(cx)} ${f(T)}
+    Q ${f(cx + (hT - rc) * 0.55)} ${f(T)} ${f(cx + hT - rc)} ${f(yTs)}
+    A ${rc} ${rc} 0 0 1 ${f(cx + hT)} ${f(yTs + rc)}
+    C ${f(cx + hT - 2)} ${f(cy - 20)} ${f(cx + hW)} ${f(cy + 20)} ${f(cx + hW)} ${f(yW)}
+    C ${f(cx + hW)} ${f(cy + 70)} ${f(cx + hB - 1)} ${f(cy + 105)} ${f(cx + hB)} ${f(yBs - rc)}
+    A ${rc} ${rc} 0 0 1 ${f(cx + hB - rc)} ${f(yBs)}
+    Q ${f(cx + (hB - rc) * 0.55)} ${f(B)} ${f(cx)} ${f(B)}
+    Q ${f(cx - (hB - rc) * 0.55)} ${f(B)} ${f(cx - hB + rc)} ${f(yBs)}
+    A ${rc} ${rc} 0 0 1 ${f(cx - hB)} ${f(yBs - rc)}
+    C ${f(cx - hB + 1)} ${f(cy + 105)} ${f(cx - hW)} ${f(cy + 70)} ${f(cx - hW)} ${f(yW)}
+    C ${f(cx - hW)} ${f(cy + 20)} ${f(cx - hT + 2)} ${f(cy - 20)} ${f(cx - hT)} ${f(yTs + rc)}
+    A ${rc} ${rc} 0 0 1 ${f(cx - hT + rc)} ${f(yTs)}
+    Q ${f(cx - (hT - rc) * 0.55)} ${f(T)} ${f(cx)} ${f(T)} Z`;
+}
+
+/* The עילי's lever bar: a round root past the spindle, level to the last 25
+   mm, then swelling into a round tip. `dir` is the side it points to. */
+function ilaiBar(cx, cy, dir, grow = 0) {
+  const f = n => n.toFixed(2);
+  const at = t => cx + dir * t;
+  const hd = ILAI.depth / 2 + grow, ht = ILAI.tip / 2 + grow;
+  const L = ILAI.reach, r0 = -ILAI.root + hd, sw = dir > 0 ? 1 : 0;
+  return `M ${f(at(r0))} ${f(cy - hd)} L ${f(at(L - 25))} ${f(cy - hd)}
+    Q ${f(at(L - 10))} ${f(cy - hd)} ${f(at(L - ht))} ${f(cy - ht)}
+    A ${f(ht)} ${f(ht)} 0 0 ${sw} ${f(at(L - ht))} ${f(cy + ht)}
+    Q ${f(at(L - 10))} ${f(cy + hd)} ${f(at(L - 25))} ${f(cy + hd)}
+    L ${f(at(r0))} ${f(cy + hd)}
+    A ${f(hd)} ${f(hd)} 0 0 ${sw} ${f(at(r0))} ${f(cy - hd)} Z`;
+}
+
+/* The עילי's neck, as a centre line: level from where it leaves the plate,
+   then a quarter turn down onto the bar's top. The door strokes it; the tile
+   too, so both carry the one curve. */
+function ilaiNeck(cx, cy, dir) {
+  const f = n => n.toFixed(2);
+  const at = t => cx + dir * t;
+  const [a0, a1, rise, band] = ILAI.arch;
+  const yN = cy + rise + band / 2, yB = cy - ILAI.depth / 2 + 0.5;
+  const k = (a1 - a0) * 0.35;                         // the level run before the turn
+  return `M ${f(at(a0))} ${f(yN)} L ${f(at(a0 + k))} ${f(yN)}
+    C ${f(at(a0 + k + 12))} ${f(yN)} ${f(at(a1))} ${f(yN + 3)} ${f(at(a1))} ${f(yB)}`;
+}
+
+/**
+ * עילי — the waisted backplate with a lever whose neck arches over its bar.
+ *
+ * What the three installed doors show (research/handles/ilai/): a plate with a
+ * domed head and foot and sides concave all the way down (77 mm at the waist
+ * against 91 at head and foot); a slim bar, 14 deep, level to a slightly
+ * swollen round tip; over the bar just behind the spindle an ARCH, the neck,
+ * with a dark hollow under it; the same egg round the key as the Rotem's. The
+ * metal is the Rotem's satin — the same פרזול, the same gradients.
+ *
+ * `cy` is the bar's centre line, 0.343 down the plate, as `PLATE`'s is.
+ */
+function ilaiHandle(cx, cy, dir) {
+  const f = n => n.toFixed(2);
+  const at = t => cx + dir * t;
+  const u = Math.round(cx) + '-' + Math.round(cy);
+  const outline = ilaiOutline(cx, cy);
+  const hd = ILAI.depth / 2;
+  const arch = ilaiNeck(cx, cy, dir);
+  const band2 = (fr, bw, a) => {
+    const x = at(ILAI.reach * fr) - bw / 2;
+    return `<rect x="${f(x)}" y="${f(cy - hd + ILAI.depth * 0.12)}" width="${bw}" height="${f(ILAI.depth * 0.76)}"
+                  fill="url(#ilaiBand-${u})" opacity="${a}"/>`;
+  };
+  return `
+    <g>
+      <linearGradient id="ilaiBand-${u}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"   stop-color="#fff" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#fff" stop-opacity="1"/>
+        <stop offset="1"   stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="ilaiFace-${u}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="#fff" stop-opacity="0.12"/>
+        <stop offset="0.45" stop-color="#fff" stop-opacity="0"/>
+        <stop offset="1"    stop-color="#000" stop-opacity="0.10"/>
+      </linearGradient>
+      <!-- the rolled edge: lit along the head and down the key light's side -->
+      <linearGradient id="ilaiRim-${u}" x1="0" y1="0" x2="1" y2="0.35">
+        <stop offset="0"    stop-color="#fff" stop-opacity="0.72"/>
+        <stop offset="0.40" stop-color="#fff" stop-opacity="0.40"/>
+        <stop offset="0.75" stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="ilaiShadow-${u}" x="-20%" y="-150%" width="140%" height="400%">
+        <feGaussianBlur stdDeviation="7"/>
+      </filter>
+
+      <!-- the plate stands ~8 mm proud: a short, soft shadow -->
+      <path d="${outline}" transform="translate(2 5)"
+            fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
+
+      <!-- the plate: the Rotem's satin, its rolled edge lit on the head and
+           the key light's side, darker opposite -->
+      <path data-mount="backplate" d="${outline}" fill="url(#rotemFace)"/>
+      <path d="${outline}" fill="#000" opacity="0.14"/>
+      <path d="${outline}" fill="url(#ilaiFace-${u})"/>
+      <path d="${outline}" fill="none" stroke="#000" stroke-opacity="0.34" stroke-width="1.4"
+            transform="translate(0.9 0.7)"/>
+      <path d="${outline}" fill="none" stroke="url(#ilaiRim-${u})" stroke-width="2.4"
+            transform="translate(-0.7 -0.6)"/>
+
+      ${euroEgg(cx, cy, ILAI.bezel, ILAI.plug)}
+
+      <!-- the lever's shadow: it stands ~55 mm proud -->
+      <path d="${ilaiBar(cx, cy, dir)}" transform="translate(4 15)"
+            fill="#000" opacity="0.30" filter="url(#ilaiShadow-${u})"/>
+
+      <!-- the neck: a dark hollow under a band that leaves the plate above the
+           bar and curves down into it -->
+      <path d="${arch} L ${f(at(ILAI.arch[0]))} ${f(cy - hd)} Z" fill="#000" opacity="0.46"/>
+      <path d="${arch}" fill="none" stroke="url(#rotemLever)" stroke-width="${ILAI.arch[3]}" stroke-linecap="round"/>
+      <path d="${arch}" fill="none" stroke="#fff" stroke-opacity="0.50" stroke-width="1.2"
+            transform="translate(0 -1.5)"/>
+
+      <!-- the bar: a slim satin strap, lit along its top, rolled away under -->
+      <path d="${ilaiBar(cx, cy, dir)}" fill="url(#rotemLever)"/>
+      <path d="M ${f(at(-ILAI.root + hd + 1))} ${f(cy - hd + 1.2)} L ${f(at(ILAI.reach - 12))} ${f(cy - hd + 1.2)}"
+            stroke="#fff" stroke-opacity="0.42" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M ${f(at(-ILAI.root + hd + 1))} ${f(cy + hd - 1.4)} L ${f(at(ILAI.reach - 12))} ${f(cy + hd - 1.4)}"
+            stroke="#000" stroke-opacity="0.22" stroke-width="2" stroke-linecap="round"/>
+      ${band2(0.55, 20, 0.40)}
+      ${band2(0.82, 10, 0.32)}
     </g>`;
 }
 
@@ -10691,6 +10869,23 @@ const FITTING_GLYPH = {
              A ${k} ${k} 0 0 1 ${r} ${top + k} L ${r} ${yF.toFixed(2)}
              A ${r} ${fy.toFixed(2)} 0 0 1 ${-r} ${yF.toFixed(2)} Z"/>
     <rect x="${-L}" y="${-hd}" width="${L + PLATE.root}" height="${LEVER_BLADE}" rx="${hd}"/>
+    <path d="M ${-e1} ${c1} A ${e1} ${e1} 0 0 1 ${e1} ${c1} L ${e2.toFixed(2)} ${c2.toFixed(2)}
+             A ${e2.toFixed(2)} ${e2.toFixed(2)} 0 0 1 ${-e2.toFixed(2)} ${c2.toFixed(2)} Z"
+          fill="var(--paper, #EFEDE8)"/>` };
+  },
+
+  // עילי: the waisted plate, the slim bar with its arch, the egg — the door's
+  // own outline (ilaiOutline) and numbers, so the tile cannot drift from it.
+  ilai: () => {
+    const hd = ILAI.depth / 2, L = ILAI.reach;
+    const band = ILAI.arch[3];
+    const [bw, bh, bc] = ILAI.bezel, e1 = bw / 2 * 0.8, e2 = e1 * 0.59;
+    const c1 = bc - bh / 2 + bw / 2, c2 = bc + bh / 2 - bw / 2 * 0.59;
+    return { box: [-(L + 18), ILAI.top - 16, ILAI.base + 16, ILAI.foot + 16], art: `
+    <path d="${ilaiOutline(0, 0)}"/>
+    <path d="${ilaiBar(0, 0, -1)}"/>
+    <path d="${ilaiNeck(0, 0, -1)}" fill="none"
+          stroke="currentColor" stroke-width="${band}" stroke-linecap="round"/>
     <path d="M ${-e1} ${c1} A ${e1} ${e1} 0 0 1 ${e1} ${c1} L ${e2.toFixed(2)} ${c2.toFixed(2)}
              A ${e2.toFixed(2)} ${e2.toFixed(2)} 0 0 1 ${-e2.toFixed(2)} ${c2.toFixed(2)} Z"
           fill="var(--paper, #EFEDE8)"/>` };

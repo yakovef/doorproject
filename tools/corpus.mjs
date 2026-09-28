@@ -271,7 +271,16 @@ function locksetOf(rec) {
   if (t === 'knob' && /long|backplate|same backplate/.test(k))
     return { id: 'knobplate', residual: 0, note: k };
   if (t === 'knob') return { id: 'cadoor', residual: 0, note: k || 'knob' };
-  if (/plate|backplate/.test(k)) return { id: 'plate', residual: 0, note: k };
+  /* ⚠ TWO BACKPLATE LEVERS SINCE 28.9.2026 — the Rotem and the עילי — and the
+     records call both "lever-plate" / "keyhole-in-plate". What tells them apart
+     is the photograph, and the catalogue already says which doors show the
+     עילי (`doors`). So a backplate a lockset CITES is that lockset, and every
+     other backplate stays the Rotem: the citation, never a guess. */
+  if (/plate|backplate/.test(k)) {
+    const cited = LOCKSETS.find(l => l.lever && l.lock && (l.doors || []).includes(rec.id));
+    return cited ? { id: cited.id, residual: 0, note: `${k} — ${cited.id}, the catalogue cites this door` }
+                 : { id: 'plate', residual: 0, note: k };
+  }
   /* A round escutcheon beside a PULL BAR is a cylinder and nothing else: eight
      of the ten installed bar doors carry exactly that and not one has a lever.
      Beside a lever it is the lever's own rose. */

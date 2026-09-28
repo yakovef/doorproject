@@ -480,6 +480,9 @@ export const LOCKSET = {
      asked for on 14.9 by pointing at a drawing. Its id is still a placeholder
      (see the catalogue entry) and its NAME is still his to give. */
   'lever-taper': 200, // ידית מתעקלת  — Peretz, 20.9.2026
+  /* the owner's son, 28.9.2026: *"it is also in the price"* — included, as the
+     Rotem is. */
+  ilai:      0,      // עילי          — included
 };
 
 /* ── the extra lock ───────────────────────────────────────────────────

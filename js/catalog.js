@@ -820,6 +820,19 @@ export const LOCKSETS = [
   { id: 'lever-taper', he: 'ידית מתעקלת', en: 'Curved lever',
     ru: 'Изогнутая ручка',
     style: 'levertaper', lever: true, photo: 'research/handles/curved/door-1.jpg' },
+  /* עילי — the waisted backplate, 28.9.2026. The owner's son: *"here is a new
+     handle, it is very similar to rotem, it is also in the price, i want you to
+     call it 'עילי'"*. Measured off three installed doors (research/handles/ilai/).
+     ⚠ APPENDED, so it costs no VERSION: `lockset` holds 16 in its four bits and
+     this is the tenth (T7 measures it). The id is permanent, as every id here.
+     `doors` names the five gallery doors whose photographs show this plate —
+     waisted, domed, the lever's neck arched over its bar — and not the Rotem's:
+     `npm run corpus` reads the citation to tell the two apart, because the
+     records call both "lever-plate". */
+  { id: 'ilai', he: 'עילי', en: 'Ilai', ru: 'Илай',
+    style: 'ilai', lock: true, lever: true,
+    doors: ['d004', 'd022', 'd029', 'd106', 'd108'],
+    photo: 'research/handles/ilai/door-1.jpg' },
 ];
 
 /**

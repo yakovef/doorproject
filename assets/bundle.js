@@ -1235,8 +1235,12 @@
        one +200"* — his son confirmed the weird one is this, the curved lever he
        asked for on 14.9 by pointing at a drawing. Its id is still a placeholder
        (see the catalogue entry) and its NAME is still his to give. */
-    "lever-taper": 200
+    "lever-taper": 200,
     // ידית מתעקלת  — Peretz, 20.9.2026
+    /* the owner's son, 28.9.2026: *"it is also in the price"* — included, as the
+       Rotem is. */
+    ilai: 0
+    // עילי          — included
   };
   var SPECIAL_LOCK = {
     nospecial: 0,
@@ -1871,6 +1875,26 @@
       style: "levertaper",
       lever: true,
       photo: "research/handles/curved/door-1.jpg"
+    },
+    /* עילי — the waisted backplate, 28.9.2026. The owner's son: *"here is a new
+       handle, it is very similar to rotem, it is also in the price, i want you to
+       call it 'עילי'"*. Measured off three installed doors (research/handles/ilai/).
+       ⚠ APPENDED, so it costs no VERSION: `lockset` holds 16 in its four bits and
+       this is the tenth (T7 measures it). The id is permanent, as every id here.
+       `doors` names the five gallery doors whose photographs show this plate —
+       waisted, domed, the lever's neck arched over its bar — and not the Rotem's:
+       `npm run corpus` reads the citation to tell the two apart, because the
+       records call both "lever-plate". */
+    {
+      id: "ilai",
+      he: "עילי",
+      en: "Ilai",
+      ru: "Илай",
+      style: "ilai",
+      lock: true,
+      lever: true,
+      doors: ["d004", "d022", "d029", "d106", "d108"],
+      photo: "research/handles/ilai/door-1.jpg"
     }
   ];
   var PIRZUL2 = [
@@ -3480,6 +3504,44 @@ ${stops}
     // the lever's round root ends this far PAST the spindle: 21 / 18 / 19
     bend: 9
     // its dark bend runs from the root end to this far on the tip side: 9 / 6 / 12
+  };
+  var ILAI = {
+    top: -75.5,
+    // the head's crown: -73.8 / -76 / -77
+    foot: 144.5,
+    // the foot's crown: 153.8 / 136 / 143.8 — so 220 tall, the mean of three
+    dome: 4,
+    // head and foot each bow this far past their corners
+    corner: 12,
+    // the four corners' radius
+    /* the half-width down the plate, doors 1 and 3 at 25 mm steps:
+         -55: 45.5  -30: 43.2  -5: 42  20: 39.6  45: 38.9  70: 39.4
+          95: 41.4  120: 43.75  140: 45
+       a curve concave all the way, narrowest at 45 mm (0.54 of the height) */
+    head: 45.5,
+    waist: 38.9,
+    waistAt: 45,
+    base: 45.5,
+    bezel: [29, 47, 93],
+    // the key's egg: 29 / 27 / 30 wide, 47.5 / 44 / 48.5 tall, centre 96 / 83 / 92 below
+    plug: 79,
+    // the key slot: 85 / 75 / 77.5 below
+    reach: 107,
+    // spindle -> tip, as photographed: 109 / 107 / 106 (see the note below PLATE)
+    root: 18,
+    // the bar's round root ends this far past the spindle (door 3; hidden on 1 and 2)
+    depth: 14,
+    // the bar: 14 / 13 / 15 — thinner than the Rotem's strap
+    tip: 16,
+    // the tip swells a little: ~1.2x the bar on all three
+    /* the NECK: it leaves the plate ABOVE the bar, runs level toward the tip and
+       curves down into the bar's top, a dark hollow under it — [where it leaves
+       the plate (t, past the spindle is negative), where it lands on the bar,
+       its height above the bar's centre line, its band]. Door 3: level at -19
+       from +12 to -18 then down to the bar by -31; door 1 -20 over -35..+5;
+       door 2 a diagonal from (-5, -25) down to (-28, -8). */
+    arch: [-10, 31, -19, 6]
+    // the band reads 5-7 mm on all three
   };
   var PAD = { x: 70, top: 110, bottom: 300 };
   var SCENE = 8e3;
@@ -7332,6 +7394,8 @@ ${body}
          with the margins it always carried (+2, 0, +2). Was 47 / 119 / 170. */
       case "plate":
         return { out: 47, in: 114, vy: 161 };
+      case "ilai":
+        return { out: 48, in: 107, vy: 147 };
       case "almog":
         return { out: 42, in: 220, vy: 42 };
       /* ⚠ `out` WAS 78 AND THE DRAWING REACHES 41. Reported from outside as
@@ -7419,6 +7483,7 @@ ${body}
     lever: (h, g) => lever(g.cx, g.cy, g.dir),
     levertaper: (h, g) => leverTaper(g.cx, g.cy, g.dir),
     plate: (h, g) => plateHandle(g.cx, g.cy, g.dir),
+    ilai: (h, g) => ilaiHandle(g.cx, g.cy, g.dir),
     almog: (h, g) => almogLever(g.cx, g.cy, g.dir),
     cadoor: (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
     knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir),
@@ -7600,6 +7665,28 @@ ${body}
             fill="url(#barFall)"/>
     </g>`;
   }
+  function euroEgg(cx, cy, [bw, bh, bc], plug) {
+    const f = (n) => n.toFixed(2);
+    const eR = bw / 2, eTop = cy + bc - bh / 2, eBot = cy + bc + bh / 2;
+    const eR2 = eR * 0.59;
+    const egg = (s, dy = 0) => {
+      const R1 = eR * s, R2 = eR2 * s;
+      const c1 = eTop + eR + dy, c2 = eBot - eR2 + dy;
+      return `M ${f(cx - R1)} ${f(c1)} A ${f(R1)} ${f(R1)} 0 0 1 ${f(cx + R1)} ${f(c1)}
+      L ${f(cx + R2)} ${f(c2)} A ${f(R2)} ${f(R2)} 0 0 1 ${f(cx - R2)} ${f(c2)} Z`;
+    };
+    const ky = cy + plug;
+    return `<!-- the euro opening: a raised rim lit along its top, a thin dark gap,
+           the cylinder's face, and its key slot -->
+      <path d="${egg(1)}" fill="none" stroke="#000" stroke-opacity="0.26" stroke-width="1.2"
+            transform="translate(0.5 0.8)"/>
+      <path d="${egg(0.86)}" fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="2.4"/>
+      <path d="${egg(0.7, 0.5)}" fill="#000" opacity="0.26"/>
+      <g data-hw="keyway">
+        <path d="${egg(0.62, 0.7)}" fill="url(#euroSteel)"/>
+        <rect x="${f(cx - 5)}" y="${f(ky - 1.1)}" width="10" height="2.2" rx="1" fill="#121417" opacity="0.85"/>
+      </g>`;
+  }
   function plateHandle(cx, cy, dir) {
     const w = PLATE.w, h = PLATE.h, r = w / 2;
     const top = cy - h * PLATE.lever, bot = top + h;
@@ -7626,22 +7713,11 @@ ${body}
       A ${f(rr)} ${f(rr)} 0 0 ${sw} ${f(at(a))} ${f(yT)} Z`;
     };
     const body = blade(t0, L2, T2, B);
-    const band = (fr, bw2, a) => {
-      const x = at(L2 * fr) - bw2 / 2;
-      return `<rect x="${f(x)}" y="${f(T2 + D * 0.1)}" width="${bw2}" height="${f(D * 0.8)}"
+    const band = (fr, bw, a) => {
+      const x = at(L2 * fr) - bw / 2;
+      return `<rect x="${f(x)}" y="${f(T2 + D * 0.1)}" width="${bw}" height="${f(D * 0.8)}"
                   fill="url(#rotemBand-${u})" opacity="${a}"/>`;
     };
-    const [bw, bh, bc] = PLATE.bezel;
-    const eR = bw / 2, eTop = cy + bc - bh / 2, eBot = cy + bc + bh / 2;
-    const eR2 = eR * 0.59;
-    const egg = (s, dy = 0) => {
-      const R1 = eR * s, R2 = eR2 * s;
-      const c1 = eTop + eR + dy, c2 = eBot - eR2 + dy;
-      const yT = c1 - R1, yB = c2 + R2;
-      return `M ${f(cx - R1)} ${f(c1)} A ${f(R1)} ${f(R1)} 0 0 1 ${f(cx + R1)} ${f(c1)}
-      L ${f(cx + R2)} ${f(c2)} A ${f(R2)} ${f(R2)} 0 0 1 ${f(cx - R2)} ${f(c2)} Z`;
-    };
-    const ky = cy + PLATE.plug;
     return `
     <g>
       <linearGradient id="rotemBand-${u}" x1="0" y1="0" x2="1" y2="0">
@@ -7679,16 +7755,7 @@ ${body}
       <path d="${outline}" fill="none" stroke="url(#rotemRim-${u})" stroke-width="1.3"
             transform="translate(-0.5 -0.4)"/>
 
-      <!-- the euro opening: a raised rim lit along its top, a thin dark gap,
-           the cylinder's face, and its key slot -->
-      <path d="${egg(1)}" fill="none" stroke="#000" stroke-opacity="0.26" stroke-width="1.2"
-            transform="translate(0.5 0.8)"/>
-      <path d="${egg(0.86)}" fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="2.4"/>
-      <path d="${egg(0.7, 0.5)}" fill="#000" opacity="0.26"/>
-      <g data-hw="keyway">
-        <path d="${egg(0.62, 0.7)}" fill="url(#euroSteel)"/>
-        <rect x="${f(cx - 5)}" y="${f(ky - 1.1)}" width="10" height="2.2" rx="1" fill="#121417" opacity="0.85"/>
-      </g>
+      ${euroEgg(cx, cy, PLATE.bezel, PLATE.plug)}
 
       <!-- the lever's shadow: it stands ~55 mm proud -->
       <path d="${blade(t0 + 6, L2, T2, B)}" transform="translate(4 15)"
@@ -7706,6 +7773,117 @@ ${body}
       <path d="${blade(t0, PLATE.bend, T2 + 1.2, B - 1.2, hd * 0.8)}" fill="#000" opacity="0.72"/>
       <path d="${arcPath(at(t0), cy, hd - 1.2, dir > 0 ? 110 : 290, dir > 0 ? 250 : 70)}" fill="none"
             stroke="#fff" stroke-opacity="0.22" stroke-width="1.2"/>
+    </g>`;
+  }
+  function ilaiOutline(cx, cy) {
+    const f = (n) => n.toFixed(2);
+    const T2 = cy + ILAI.top, B = cy + ILAI.foot, rc = ILAI.corner;
+    const hT = ILAI.head, hW = ILAI.waist, yW = cy + ILAI.waistAt, hB = ILAI.base;
+    const yTs = T2 + ILAI.dome, yBs = B - ILAI.dome;
+    return `M ${f(cx)} ${f(T2)}
+    Q ${f(cx + (hT - rc) * 0.55)} ${f(T2)} ${f(cx + hT - rc)} ${f(yTs)}
+    A ${rc} ${rc} 0 0 1 ${f(cx + hT)} ${f(yTs + rc)}
+    C ${f(cx + hT - 2)} ${f(cy - 20)} ${f(cx + hW)} ${f(cy + 20)} ${f(cx + hW)} ${f(yW)}
+    C ${f(cx + hW)} ${f(cy + 70)} ${f(cx + hB - 1)} ${f(cy + 105)} ${f(cx + hB)} ${f(yBs - rc)}
+    A ${rc} ${rc} 0 0 1 ${f(cx + hB - rc)} ${f(yBs)}
+    Q ${f(cx + (hB - rc) * 0.55)} ${f(B)} ${f(cx)} ${f(B)}
+    Q ${f(cx - (hB - rc) * 0.55)} ${f(B)} ${f(cx - hB + rc)} ${f(yBs)}
+    A ${rc} ${rc} 0 0 1 ${f(cx - hB)} ${f(yBs - rc)}
+    C ${f(cx - hB + 1)} ${f(cy + 105)} ${f(cx - hW)} ${f(cy + 70)} ${f(cx - hW)} ${f(yW)}
+    C ${f(cx - hW)} ${f(cy + 20)} ${f(cx - hT + 2)} ${f(cy - 20)} ${f(cx - hT)} ${f(yTs + rc)}
+    A ${rc} ${rc} 0 0 1 ${f(cx - hT + rc)} ${f(yTs)}
+    Q ${f(cx - (hT - rc) * 0.55)} ${f(T2)} ${f(cx)} ${f(T2)} Z`;
+  }
+  function ilaiBar(cx, cy, dir, grow = 0) {
+    const f = (n) => n.toFixed(2);
+    const at = (t) => cx + dir * t;
+    const hd = ILAI.depth / 2 + grow, ht = ILAI.tip / 2 + grow;
+    const L2 = ILAI.reach, r0 = -ILAI.root + hd, sw = dir > 0 ? 1 : 0;
+    return `M ${f(at(r0))} ${f(cy - hd)} L ${f(at(L2 - 25))} ${f(cy - hd)}
+    Q ${f(at(L2 - 10))} ${f(cy - hd)} ${f(at(L2 - ht))} ${f(cy - ht)}
+    A ${f(ht)} ${f(ht)} 0 0 ${sw} ${f(at(L2 - ht))} ${f(cy + ht)}
+    Q ${f(at(L2 - 10))} ${f(cy + hd)} ${f(at(L2 - 25))} ${f(cy + hd)}
+    L ${f(at(r0))} ${f(cy + hd)}
+    A ${f(hd)} ${f(hd)} 0 0 ${sw} ${f(at(r0))} ${f(cy - hd)} Z`;
+  }
+  function ilaiNeck(cx, cy, dir) {
+    const f = (n) => n.toFixed(2);
+    const at = (t) => cx + dir * t;
+    const [a0, a1, rise, band] = ILAI.arch;
+    const yN = cy + rise + band / 2, yB = cy - ILAI.depth / 2 + 0.5;
+    const k = (a1 - a0) * 0.35;
+    return `M ${f(at(a0))} ${f(yN)} L ${f(at(a0 + k))} ${f(yN)}
+    C ${f(at(a0 + k + 12))} ${f(yN)} ${f(at(a1))} ${f(yN + 3)} ${f(at(a1))} ${f(yB)}`;
+  }
+  function ilaiHandle(cx, cy, dir) {
+    const f = (n) => n.toFixed(2);
+    const at = (t) => cx + dir * t;
+    const u = Math.round(cx) + "-" + Math.round(cy);
+    const outline = ilaiOutline(cx, cy);
+    const hd = ILAI.depth / 2;
+    const arch = ilaiNeck(cx, cy, dir);
+    const band2 = (fr, bw, a) => {
+      const x = at(ILAI.reach * fr) - bw / 2;
+      return `<rect x="${f(x)}" y="${f(cy - hd + ILAI.depth * 0.12)}" width="${bw}" height="${f(ILAI.depth * 0.76)}"
+                  fill="url(#ilaiBand-${u})" opacity="${a}"/>`;
+    };
+    return `
+    <g>
+      <linearGradient id="ilaiBand-${u}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"   stop-color="#fff" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#fff" stop-opacity="1"/>
+        <stop offset="1"   stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="ilaiFace-${u}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="#fff" stop-opacity="0.12"/>
+        <stop offset="0.45" stop-color="#fff" stop-opacity="0"/>
+        <stop offset="1"    stop-color="#000" stop-opacity="0.10"/>
+      </linearGradient>
+      <!-- the rolled edge: lit along the head and down the key light's side -->
+      <linearGradient id="ilaiRim-${u}" x1="0" y1="0" x2="1" y2="0.35">
+        <stop offset="0"    stop-color="#fff" stop-opacity="0.72"/>
+        <stop offset="0.40" stop-color="#fff" stop-opacity="0.40"/>
+        <stop offset="0.75" stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="ilaiShadow-${u}" x="-20%" y="-150%" width="140%" height="400%">
+        <feGaussianBlur stdDeviation="7"/>
+      </filter>
+
+      <!-- the plate stands ~8 mm proud: a short, soft shadow -->
+      <path d="${outline}" transform="translate(2 5)"
+            fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
+
+      <!-- the plate: the Rotem's satin, its rolled edge lit on the head and
+           the key light's side, darker opposite -->
+      <path data-mount="backplate" d="${outline}" fill="url(#rotemFace)"/>
+      <path d="${outline}" fill="#000" opacity="0.14"/>
+      <path d="${outline}" fill="url(#ilaiFace-${u})"/>
+      <path d="${outline}" fill="none" stroke="#000" stroke-opacity="0.34" stroke-width="1.4"
+            transform="translate(0.9 0.7)"/>
+      <path d="${outline}" fill="none" stroke="url(#ilaiRim-${u})" stroke-width="2.4"
+            transform="translate(-0.7 -0.6)"/>
+
+      ${euroEgg(cx, cy, ILAI.bezel, ILAI.plug)}
+
+      <!-- the lever's shadow: it stands ~55 mm proud -->
+      <path d="${ilaiBar(cx, cy, dir)}" transform="translate(4 15)"
+            fill="#000" opacity="0.30" filter="url(#ilaiShadow-${u})"/>
+
+      <!-- the neck: a dark hollow under a band that leaves the plate above the
+           bar and curves down into it -->
+      <path d="${arch} L ${f(at(ILAI.arch[0]))} ${f(cy - hd)} Z" fill="#000" opacity="0.46"/>
+      <path d="${arch}" fill="none" stroke="url(#rotemLever)" stroke-width="${ILAI.arch[3]}" stroke-linecap="round"/>
+      <path d="${arch}" fill="none" stroke="#fff" stroke-opacity="0.50" stroke-width="1.2"
+            transform="translate(0 -1.5)"/>
+
+      <!-- the bar: a slim satin strap, lit along its top, rolled away under -->
+      <path d="${ilaiBar(cx, cy, dir)}" fill="url(#rotemLever)"/>
+      <path d="M ${f(at(-ILAI.root + hd + 1))} ${f(cy - hd + 1.2)} L ${f(at(ILAI.reach - 12))} ${f(cy - hd + 1.2)}"
+            stroke="#fff" stroke-opacity="0.42" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M ${f(at(-ILAI.root + hd + 1))} ${f(cy + hd - 1.4)} L ${f(at(ILAI.reach - 12))} ${f(cy + hd - 1.4)}"
+            stroke="#000" stroke-opacity="0.22" stroke-width="2" stroke-linecap="round"/>
+      ${band2(0.55, 20, 0.4)}
+      ${band2(0.82, 10, 0.32)}
     </g>`;
   }
   function almogLever(cx, cy, dir) {
@@ -8503,6 +8681,22 @@ ${body}
              A ${k} ${k} 0 0 1 ${r} ${top + k} L ${r} ${yF.toFixed(2)}
              A ${r} ${fy.toFixed(2)} 0 0 1 ${-r} ${yF.toFixed(2)} Z"/>
     <rect x="${-L2}" y="${-hd}" width="${L2 + PLATE.root}" height="${LEVER_BLADE}" rx="${hd}"/>
+    <path d="M ${-e1} ${c1} A ${e1} ${e1} 0 0 1 ${e1} ${c1} L ${e2.toFixed(2)} ${c2.toFixed(2)}
+             A ${e2.toFixed(2)} ${e2.toFixed(2)} 0 0 1 ${-e2.toFixed(2)} ${c2.toFixed(2)} Z"
+          fill="var(--paper, #EFEDE8)"/>` };
+    },
+    // עילי: the waisted plate, the slim bar with its arch, the egg — the door's
+    // own outline (ilaiOutline) and numbers, so the tile cannot drift from it.
+    ilai: () => {
+      const hd = ILAI.depth / 2, L2 = ILAI.reach;
+      const band = ILAI.arch[3];
+      const [bw, bh, bc] = ILAI.bezel, e1 = bw / 2 * 0.8, e2 = e1 * 0.59;
+      const c1 = bc - bh / 2 + bw / 2, c2 = bc + bh / 2 - bw / 2 * 0.59;
+      return { box: [-(L2 + 18), ILAI.top - 16, ILAI.base + 16, ILAI.foot + 16], art: `
+    <path d="${ilaiOutline(0, 0)}"/>
+    <path d="${ilaiBar(0, 0, -1)}"/>
+    <path d="${ilaiNeck(0, 0, -1)}" fill="none"
+          stroke="currentColor" stroke-width="${band}" stroke-linecap="round"/>
     <path d="M ${-e1} ${c1} A ${e1} ${e1} 0 0 1 ${e1} ${c1} L ${e2.toFixed(2)} ${c2.toFixed(2)}
              A ${e2.toFixed(2)} ${e2.toFixed(2)} 0 0 1 ${-e2.toFixed(2)} ${c2.toFixed(2)} Z"
           fill="var(--paper, #EFEDE8)"/>` };
@@ -9799,13 +9993,13 @@ ${body}
   // js/works.js
   var WORKS = [
     { id: "d003", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d004", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
+    { id: "d004", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "ilai", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
     { id: "d012", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d015", state: { colour: "rb-9005d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d016", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
-    { id: "d022", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d022", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "ilai", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d026", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d029", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d029", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "ilai", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d030", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "cadoor", size: "standard", handing: "left-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
     { id: "d031", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "cadoor", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
     { id: "d034", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "nitzan", handleFinish: "hf-nickel", grab: "nograb", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
@@ -9821,8 +10015,8 @@ ${body}
     { id: "d092", state: { colour: "rb-6219d", detail: "plain", window: "rect", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "knobplate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d097", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d099", state: { colour: "rb-7126d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d106", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "circles-light", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d108", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d106", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "circles-light", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "ilai", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d108", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "ilai", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "idan", handleFinish: "hf-black", grab: "nograb", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d116", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d122", state: { colour: "rb-7240d", detail: "plain", window: "rect", grille: "grid", handle: "idan", handleFinish: "hf-black", grab: "nograb", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },

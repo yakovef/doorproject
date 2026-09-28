@@ -82,7 +82,10 @@ const longestBar = Math.max(...barLens).toFixed(2);
 const RECT_LOWER = 'our square light sits lower and shorter than this photograph\'s — '
   + 'the Greek set\'s rows since 26.9.2026, on the owner\'s son\'s word, not a misfit';
 const CASES = [
-  { id: 'd003', label: 'basic 3195 - waisted plate',
+  /* ⚠ LABELLED "waisted plate" UNTIL 28.9.2026, and it is not: d003's plate has
+     a flat head and straight sides — the Rotem, as the owner's son's three
+     photographs show it. The waisted one is the עילי (d004 d022 d029 d106 d108). */
+  { id: 'd003', label: 'basic 3195 - Rotem plate',
     q: 'c=rb-7110d&w=none&g=none&n=none&k=plate&d=plain&s=standard',
     gap: 'the plate is BRASS in the photograph; the finish is withdrawn, so ours is nickel' },
   { id: 'd012', label: 'basic 3450 - Rotem plate',
@@ -140,8 +143,9 @@ const CASES = [
   { id: 'd106', label: 'luxury 8500 - interlocking rings',
     /* `d=plain` since 14.9.2026 — see the note on d097 above. `circles-light`
        since 27.9.2026: the rings on d106 are pale on a pale door, and the base
-       `circles` is black now. */
-    q: 'c=rb-7080d&w=broad&g=circles-light&n=none&k=plate&d=plain&s=standard',
+       `circles` is black now. `k=ilai` since 28.9.2026: its plate is the
+       waisted עילי, not the Rotem — the catalogue cites d106 for it. */
+    q: 'c=rb-7080d&w=broad&g=circles-light&n=none&k=ilai&d=plain&s=standard',
     /* ⚠ This note claimed the ring cell was "capped at 96 mm", and there has
        been no such cap since the glass patterns were redrawn — a tool
        describing a drawing that no longer exists, which is CLAUDE.md §5 in its

@@ -26,6 +26,53 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — עילי (`ilai`), A NEW LOCKSET, INCLUDED.** The owner's son, with three
+  photographs of installed doors: *"here is a new handle, it is very similar to
+  rotem, it is also in the price, i want you to call it 'עילי'"*. In the app on
+  the 27.9 standing instruction (*"put in the app things without my
+  permission"*). Research in `research/handles/ilai/`.
+  · **It answers an open question.** It is the WAISTED backplate: the plate our
+    Rotem was drawn as until 27.9, and the one §9 found on five gallery doors
+    (d004 d022 d029 d106 d108) once the Rotem was redrawn. That item is closed.
+  · **Measured** off millimetre-ruled crops, each scaled by its leaf's height at
+    the plate's column (0.624 / 0.542 / 0.584 px/mm). Edge profiles, which worked
+    on the Rotem, failed on bronze-on-cream and satin-on-grey. Door 2 is sheared
+    by the camera's angle and gave heights only. 220 tall (−75.5 to 144.5 about
+    the bar's centre line; −73.8/153.8, −76/136, −77/143.8), 91 at head and foot,
+    77.8 at a waist 0.54 down, sides concave all the way (half-widths at 25 mm
+    steps in `ILAI`'s comment), head and foot domed ~4, corners r 12; spindle
+    0.343; the key egg 29 × 47 at 93, slot 79; the bar 14 deep (tip 16), 107 to
+    the tip, root 18 past; the NECK leaves the plate 19 above the bar, runs level,
+    and turns down onto the bar 31 toward the tip, a 6 mm band over a dark
+    hollow. Against the old waisted drawing: 220 not 240, waist 0.85 not 0.91, a
+    slim level bar with no collar, no black keyhole.
+  · **Drawn** by `ilaiHandle` from `ILAI`, read by the door and the tile through
+    `ilaiOutline`, `ilaiBar` and `ilaiNeck`. The key is `euroEgg`, lifted out of
+    `plateHandle` so both plates share one routine, and the Rotem's drawing was
+    checked byte-identical after the lift. The metal is the Rotem's satin
+    (`rotemFace`, `rotemLever`), following the פרזול. v1's neck was a small
+    hump on the bar; the photographs show it leaving the plate ABOVE the bar, and
+    it was redrawn twice (the position, then a 6 mm band with an easier turn).
+  · **Wire format:** APPENDED to `LOCKSETS` as the tenth of sixteen the field
+    holds, so no VERSION. `LOCKSET.ilai = 0` (included). The footprint was
+    measured by `collide -- boxes`: drawn 46 / 107 / 145, declared 48 / 107 / 147
+    (the Rotem's margins).
+  · **The gallery:** the records call both plates "lever-plate", so
+    `tools/corpus.mjs` now gives a backplate to the lockset whose `doors` CITES
+    the door, and the Rotem otherwise. `js/works.js` moved on exactly the five
+    cited rows, `plate` → `ilai`.
+  · **Found on the way:** `tools/recreate.mjs` types each door's query by hand and
+    had d106 as `k=plate`; it says `k=ilai` now, so `recreate-d106` moved. Its
+    d003 label read "waisted plate" and d003 is the Rotem (flat head, straight
+    sides); the label is corrected (it is console text, so no sheet moved).
+  · Gates at the first commit: `collide -- boxes` clean (the עילי drawn 46 / 107
+    / 145); `collide -- all` 2,602 designs clean (2,342 base, 610 with the bow,
+    866 with the latch); `npm run sheets` moved the five cited doors' `corpus-`
+    sheets (00 01 02 07 08), `recreate-d106`, `lockset-plate` (the five left it),
+    the new `lockset-ilai`, `corpus-links.md` and the noisy `shot` sheets — and
+    no `against-` sheet (they carry the default Rotem). `npm test` and
+    `npm run audit` on that tree follow in the next commit.
+
 - **27.9 — THE BIG ROUND, 8 OF 8: THE RECORD.** The round's own last
   instruction: §0a gains the placements the owner's son makes himself and the
   decisions taken for him; the record is corrected where the round made it
@@ -1464,6 +1511,34 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** The navigator as a dark column (3 of 8): *"a black rectangle …
+  the section that i am in will turn white and be square … a checkmark."* A
+  56 px ink column on the panel's inline-end edge above 1100, the phone row
+  dressed the same; live = a light square; checks = `visited` (steps left by
+  a gesture, session only). Long form: `HISTORY.md`.
+- **27.9** The price card at the door's top-right corner (2 of 8): *"it looks
+  bad under the lamp, move to near the door, at the up right corner"* — his own
+  28.8 placement, moved by him. Anchored on the frame's SETTLED geometry (its
+  6 px entrance put the card 2 px high); physical right in every language.
+  Breakdown at 1920×918 10 → 13 of 13 rows. Long form: `HISTORY.md`.
+- **27.9** Copy and small chrome (1 of 8, the owner's son's eleven notes):
+  **עצבו** את הדלת שלכם on one line, the lede gone (leaf 421 → 468 px at
+  1280×720, which the band spends); the gallery opener on `--accent`; the
+  summary's send full-width "הזמינו את הדלת דרך נציג" over the telephone; the
+  handing card gone; undo/redo 52 px and a save; the finish group only with a
+  bar, bow or bell. Long form: `HISTORY.md`.
+- **27.9** The Rotem INTO THE APP (*"yes put it in and fix the coral and curved"*),
+  with its lever as photographed (reach 114, root 19 past), and the Coral 128 →
+  133 and curved lever 106 → 109 — their "parallax" shrink ran the wrong way; the
+  full correction's size did not hold up, so all three are drawn as photographed.
+  Tile redrawn from `PLATE`; footprints re-measured; the blind-fitting gate 2 → 0.
+  ⚠ Standing instruction: put things in the app without asking (§0a).
+- **27.9** The Rotem — the DEFAULT lockset — measured off three installed doors,
+  a PROPOSAL with the app untouched (`research/handles/rotem/`): a flat head,
+  straight sides and a foot 1.16× deeper than a semicircle (we drew a waisted
+  plate), 88.5 × 224 (was 90 × 240), satin not chrome, an egg-shaped key rim with
+  no black keyhole, an even 23 mm strap with a dark bend at its root; reach 119
+  kept. ⚠ Found doing it: the Coral's and curved lever's parallax ran the WRONG way (§9).
 - **27.9** The handle branch merged into this one (*"yes you should"* — the levers
   were only on `claude/door-handle-design-catalog-votz53` and the owner's son
   looked for them on the page): the Coral and the curved lever measured off seven
