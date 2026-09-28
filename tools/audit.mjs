@@ -581,10 +581,16 @@ for (const v of VIEWS) {
      and the one-line `#summary` stands in its place, which is the deliberate
      phone design: the rail is fixed at the top of every phone screen and every
      step is already one tap away.
+     ⚠ RESTATED 27.9.2026: the rows are the pictures of what was chosen now,
+     drawn at EVERY width (the form check in the summary walk asserts it), so
+     the `v.w >= 700` gate that kept this off the phone would now be skipping a
+     screen the buttons are on. It runs at every viewport, the same four
+     clauses. The "label: value" aria-label is load-bearing now in a way it was
+     not: the visible text under a picture is the option's short name alone.
      Falsified by making the row a div again (clause 1), by removing
      `min-block-size` (2), by dropping the `aria-label` (3), or by pointing
      `SPEC_STEP.stripes` at the wrong step (4). */
-  if (v.w >= 700) {
+  {
     await p.goto('file://' + process.cwd() + '/index.html?sp=13&s=half&w=rect&g=grid&lang=he');
     await p.waitForSelector('#stage svg');
     await p.waitForTimeout(400);
@@ -597,7 +603,8 @@ for (const v of VIEWS) {
       const r = e.getBoundingClientRect();
       return { key: e.dataset.key, tag: e.tagName, step: e.dataset.step || '',
                w: Math.round(r.width), h: Math.round(r.height),
-               aria: e.getAttribute('aria-label') || '' };
+               aria: e.getAttribute('aria-label') || '',
+               name: (e.querySelector('.spec__name') || {}).textContent || '' };
     }));
     if (rows.length < 5) {
       fault(v.name, `the summary shows ${rows.length} spec rows and this check has lost `
@@ -618,6 +625,17 @@ for (const v of VIEWS) {
       }
       if (!r.step) {
         fault(v.name, `the summary row "${r.key}" is a button that goes nowhere`);
+      }
+      /* ⚠ 27.9: and the short name under its picture is words of that row.
+         This door (a דלת וחצי, a window, a grille) is the one whose grille row
+         is worded its own way — "רשת — בכנף הדלת ובכנף הצדדית (2 יחידות)" —
+         and the tile first said "סורג רשת" under it. Found by the dialog's
+         falsification, which walked the option loop into this door; the loop
+         itself never reached it. */
+      const val = r.aria.replace(/^[^:]*:\s*/, '');
+      if (!r.name.trim() || !val.includes(r.name.trim())) {
+        fault(v.name, `the summary picture "${r.key}" is named "${r.name.trim()}" and its row `
+          + `says "${val}" — the name under the picture is not the thing chosen`);
       }
     }
     /* And the tap actually lands there. One row is enough to prove the wiring;
@@ -1906,7 +1924,23 @@ for (const v of VIEWS) {
            `display` test would call both of them shown at every width and this
            check would never fail. It reads the drawn WIDTH instead.
 
-           §5.15: both elements must be found, and the table must have rows. */
+           §5.15: both elements must be found, and the table must have rows.
+
+           ⚠ RESTATED 27.9.2026 — THE FORM IS NOW ONE AT EVERY WIDTH. The table
+           became a grid of pictures (the owner's son: *"show the icons of all
+           the things the person chose … instead of the text"*), and a picture
+           with a two-line name under it reads on a 320 px phone as well as on
+           a desktop, so the 700 px swap is gone and the one-line run of
+           unlabelled values — the form this check was written to keep off the
+           iPad — is off every screen. Same subject, the claim equal or
+           stronger: "exactly one is on screen" becomes "the pictures ARE, the
+           line is NOT", at every viewport, which still fails a stylesheet that
+           shows both and one that shows neither, and fails the old swap coming
+           back at any width. And each tile must actually carry its picture (an
+           svg or the colour's swatch) and a name — a grid of empty cards is
+           "the grid on screen" and says nothing.
+           Falsified by restoring the 700 px swap (the grid off at 390 and 320)
+           and by emptying `.spec__art`. */
         const said = await p.evaluate(() => {
           const spec = document.getElementById('spec');
           const line = document.getElementById('summary');
@@ -1915,37 +1949,32 @@ for (const v of VIEWS) {
             const r = el.getBoundingClientRect();
             return getComputedStyle(el).display !== 'none' && r.width > 40 && r.height > 4;
           };
+          const rows = [...spec.querySelectorAll('.spec__row')];
           return {
-            rows: spec.querySelectorAll('.spec__row').length,
+            rows: rows.length,
+            bare: rows.filter(r => !r.querySelector('.spec__art svg, .spec__art .spec__swatch')
+                                || !(r.querySelector('.spec__name') || {}).textContent?.trim())
+                      .map(r => r.dataset.key),
             table: drawn(spec), line: drawn(line),
             w: innerWidth, h: innerHeight,
           };
         });
-        /* The stylesheet's rule, restated once here rather than as a bare 700:
-           the desktop keeps the table at any height, and below 1100 the table
-           needs 700 px of BOTH axes — the width so the card beats the column
-           the table was drawn for, the height because a landscape phone is
-           700+ px across and 390 px tall and the worst table is 423 px. */
-        const wantTable = said.w >= 1100 || (said.w >= 700 && said.h >= 700);
         if (said.missing) {
           fault(v.name, `the summary has no ${said.missing} — this check can no `
             + 'longer tell which form the door is stated in');
         } else if (!said.rows) {
-          fault(v.name, 'the spec table has no rows, so "the table is on screen" '
+          fault(v.name, 'the summary grid has no tiles, so "the pictures are on screen" '
             + 'cannot mean anything');
-        } else if (said.table === said.line) {
-          fault(v.name, said.table
-            ? 'the summary states the door TWICE — the spec table and the '
-              + 'one-line summary are both on screen'
-            : 'the summary states the door in NEITHER form — no spec table and '
-              + 'no one-line summary on screen');
-        } else if (wantTable && !said.table) {
-          fault(v.name, `${said.w}x${said.h} of screen and the summary shows the `
-            + 'unlabelled one-line summary rather than the spec table');
-        } else if (!wantTable && !said.line) {
-          fault(v.name, `${said.w}x${said.h} of screen and the summary spends up `
-            + 'to 423 px on the spec table rather than the one line a phone-sized '
-            + 'screen was given');
+        } else if (said.table && said.line) {
+          fault(v.name, 'the summary states the door TWICE — the pictures and the '
+            + 'one-line summary are both on screen');
+        } else if (!said.table) {
+          fault(v.name, `${said.w}x${said.h} of screen and the summary does not show the `
+            + 'pictures of what was chosen'
+            + (said.line ? ' — it shows the unlabelled one-line run instead' : ' at all'));
+        } else if (said.bare.length) {
+          fault(v.name, `the summary tiles ${said.bare.join(', ')} have no picture or no `
+            + 'name — a card that shows nothing is not the door');
         }
       }
 
@@ -2249,9 +2278,16 @@ for (const v of VIEWS) {
           summary: document.getElementById('summary').textContent,
           /* The OTHER sink. `#summary` is one line under the price; `#spec` is
              the table a desktop customer actually proof-reads, row by row. */
+          /* ⚠ RESTATED 27.9.2026: the row is a picture and a short name now,
+             and the whole row — label AND value — is its accessible name, so
+             that is what is read (a stronger read than the value span it
+             replaced: the label cannot drift either). The short name under
+             the picture is read too, and must be a part of the value it
+             abbreviates — a picture of one door named after another. */
           spec: [...document.querySelectorAll('#spec .spec__row')].map(r => ({
             key: r.dataset.key,
-            value: (r.querySelector('.spec__value') || {}).textContent || '',
+            aria: r.getAttribute('aria-label') || '',
+            name: (r.querySelector('.spec__name') || {}).textContent || '',
           })),
         };
       });
@@ -2341,12 +2377,19 @@ for (const v of VIEWS) {
                       + `js/spec.js says ${want.length}`);
         } else {
           for (let i = 0; i < want.length; i++) {
-            const got = s.spec[i].value.replace(/\s+/g, ' ').trim();
-            const exp = String(want[i].value).replace(/\s+/g, ' ').trim();
+            const got = s.spec[i].aria.replace(/\s+/g, ' ').trim();
+            const exp = `${want[i].label}: ${want[i].value}`.replace(/\s+/g, ' ').trim();
             if (s.spec[i].key !== want[i].key || got !== exp) {
               fault(v.name, `${key}=${id}: spec row ${i} on the page is `
-                          + `"${s.spec[i].key}: ${got}" and js/spec.js says `
-                          + `"${want[i].key}: ${exp}" — #spec has drifted off js/spec.js`);
+                          + `"${s.spec[i].key}" — "${got}" and js/spec.js says `
+                          + `"${want[i].key}" — "${exp}" — #spec has drifted off js/spec.js`);
+              break;
+            }
+            const short = s.spec[i].name.replace(/\s+/g, ' ').trim();
+            if (!short || !String(want[i].value).replace(/\s+/g, ' ').includes(short)) {
+              fault(v.name, `${key}=${id}: the summary picture for "${want[i].key}" is named `
+                          + `"${short}" and the row's value is "${want[i].value}" — the short `
+                          + 'name is not the thing chosen');
               break;
             }
           }
@@ -2434,7 +2477,8 @@ for (const v of VIEWS) {
           const after = decodeCode(await readCode());
           if (!before || !after) { fault(v.name, `משקוף ${part}: the code could not be read back`); break; }
           const moved = rowOf(after) - rowOf(before);
-          const spec = await p.$eval('#spec .spec__row[data-key="mashkof"] .spec__value', e => e.textContent.trim()).catch(() => '');
+          /* The row's value is its aria-label's since 27.9 (the row is a picture). */
+          const spec = await p.$eval('#spec .spec__row[data-key="mashkof"]', e => (e.getAttribute('aria-label') || '').replace(/^[^:]*:\s*/, '').trim()).catch(() => '');
           if (expect === 'norm') {
             if (moved > 0) fault(v.name, `משקוף ${part}: ticking standard first ADDED ${moved} agorot`);
             if (seen.price !== priceLabel(0)) fault(v.name, `משקוף ${part}: the standard pill printed "${seen.price}" — it is included`);
@@ -5300,22 +5344,30 @@ for (const v of VIEWS) {
     await p.waitForTimeout(700);
 
     const style = await p.evaluate(() => {
-      const read = (cls) => {
+      /* ⚠ `within`, since 27.9.2026: the summary's mark is sized by its
+         container now (`.spec__art .spec__ico`, 28 px — the fallback picture
+         of a row whose step has no tile glyph, the משקוף and the handing). A
+         bare `.spec__ico` on <body> has no size rule left and computes to an
+         SVG's default 300 px, which this check would have rasterised quietly
+         — a picture the page does not draw. */
+      const read = (cls, within) => {
         const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         el.setAttribute('class', cls);
         el.setAttribute('viewBox', '0 0 24 24');
-        document.body.appendChild(el);
+        const host = within ? document.createElement('span') : null;
+        if (host) { host.className = within; host.appendChild(el); document.body.appendChild(host); }
+        else document.body.appendChild(el);
         const c = getComputedStyle(el);
         const out = {
           px: Math.round(parseFloat(c.inlineSize) || parseFloat(c.width) || 0),
           w: c.strokeWidth, cap: c.strokeLinecap, join: c.strokeLinejoin,
         };
-        el.remove();
+        (host || el).remove();
         return out;
       };
       const rail = [...document.querySelectorAll('.steps__g')]
         .map(s => [...s.querySelectorAll('path')].map(q => q.getAttribute('d')).join('|'));
-      return { nav: read('steps__g'), spec: read('spec__ico'), rail };
+      return { nav: read('steps__g'), spec: read('spec__ico', 'spec__art'), rail };
     });
 
     const ds = art => [...art.matchAll(/ d="([^"]*)"/g)].map(m => m[1]).join('|');
@@ -5335,7 +5387,7 @@ for (const v of VIEWS) {
 
     for (const [tag, tbl, s] of [['nav', SECTION_ICON, style.nav], ['spec', SPEC_ICON, style.spec]]) {
       const famBefore = faults;
-      if (!s.px || s.px < 8) {
+      if (!s.px || s.px < 8 || s.px > 64) {
         fault('marks', `a ${tag} mark computes to ${s.px}px — the stylesheet has moved under this check`);
         continue;
       }

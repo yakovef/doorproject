@@ -26,6 +26,79 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE BIG ROUND, 6 OF 8: THE SUMMARY SHOWS THE PICTURES OF WHAT WAS
+  CHOSEN.** The owner's son: *"at the end page … show the icons of all the
+  things the person chose in each section instead of the text, clicking one
+  takes them to that section."*
+  · **What was there.** `#spec`, the mockup's table (11.9): one row per
+    `specRows` entry, a 18 px row mark, the label and the value; above 700 px
+    of both axes, with the one-line `#summary` (values run together with
+    middots) in its place below. The rows became buttons to their steps on
+    14.9 — and `#spec` was still `aria-hidden="true"`, so from that day the
+    buttons were inside a box a screen reader is told does not exist.
+  · **What it is.** The same `specRows(state)`, one `<button>` per row, drawn
+    with the SAME glyph the step's tile draws (`GROUPS[].glyph` of the chosen
+    option, `copyOf`-namespaced — the art is also in the tile, possibly in a
+    hidden step, and a `url(#id)` resolves to the first in the document); the
+    colour as its swatch; the stripes as the stripe pill's picture; the glazing
+    row as the window's; `SPEC_ICON` (28 px) only where a step has no tile
+    glyph — the משקוף and the handing. Under each picture the option's short
+    name — the colour's CODE (ours, §0a: Peretz orders paint by it) — and
+    "label: value" as the button's name and title. Auto-filled at 84 px: two
+    across at 320 and in the desktop column (236 px beside the navigator),
+    three at 390. `leaveTo(step)`, so a tile marks the summary visited the way
+    the rail does. `#spec` is `role="group"` named `sum.chosen` ("מה בחרתם").
+  · **At every width.** A picture with a two-line name reads on a phone as well
+    as on a desktop, so the 700 px swap is gone and `#summary` is visually
+    hidden everywhere — still written, still read against `summaryLine` by the
+    audit, the door in one sentence for anyone who hears the page.
+  · **Measured** (default door, eight tiles, whole above the pinned send on
+    arrival at the summary; the table's rows before in brackets): 1280×720
+    4 (3), 1100×800 6 (5), 1440×900 8 (7), 1680×1050 8 (8), 1920×918 8 (7).
+    The cost is the phone: 294 px of grid at 390 and 395 at 320, where the
+    one-line run took 59 and 79 — the send there is in the fixed quote bar and
+    never leaves the screen.
+  · **A fault found on the way.** The dialog's falsification (askConfirm
+    calling yes at once) walked the option loop into a דלת וחצי with a window
+    and a grille, and there the grille row is worded its own way — "רשת —
+    בכנף הדלת ובכנף הצדדית (2 יחידות)", the label dropped — while the tile
+    printed "סורג רשת". The short name is now the option's name where the row
+    says it, and the row's first phrase where it does not: always words of
+    the order. The loop itself never reached that door, so the row-button
+    block (which loads exactly that door, at every viewport) asserts it.
+  · **Audit, restated with their old subjects.** "The door is stated in one
+    form": exactly-one-of-two becomes the pictures drawn AND the line not, at
+    every viewport, every tile carrying a picture and a name. "Every summary
+    row is the way back": the `v.w >= 700` gate is gone (the buttons are on
+    every screen now), the same four clauses, plus the short name being words
+    of its row. The drift check ("#spec has drifted off js/spec.js") reads each
+    tile's "label: value" against `specRows` row for row — a stronger read than
+    the value span it replaced, the label cannot drift either — and the short
+    name must be a part of the value. The משקוף block reads its row the same
+    way. "No two of the page's own marks are the same picture" read the spec
+    mark's size off a bare `.spec__ico` on `<body>`, which has no size rule
+    left and computes to the SVG default (1,280 px here): it reads it inside
+    `.spec__art` now (28 px), with an upper bound. Re-run and unchanged: the
+    order check (card before explainer), the saved drawer (`#spec` does not
+    move), the print sheet (it reads `specRows`, not `#spec`).
+  · **Falsified.** The 700 px swap restored — the grid off at 320: "does not
+    show the pictures … the unlabelled one-line run instead" and ten tiles at
+    0×0 under the tap floor (11 faults). `.spec__art` emptied — 1. The short
+    name wrong by a letter — a fault on every state of the option loop. The
+    row a div below 700 — 10. One row's aria-label off by a character — the
+    drift fault on every state. The old short name ("סורג רשת") — 2, at 320
+    and 1280. The marks block reading the bare element — "computes to 1280px".
+  · **Gates:** node --check, npm run build, npm test 9,118,917 passed / 5 failed — the five
+    sheet-staleness rows (shot, recreate, corpus, against, lockset), allowed on
+    an intermediate commit. The full audit (not required after this commit, run
+    anyway): no faults at any viewport — 14 spec marks at 28 px, closest grab ~
+    stripes 65%; 30 saved rows, the card and its grid unmoved. Sheets: none can move (bare hides the
+    panel).
+  · **Not done, on purpose:** a third column at 1280 (it needs a wider panel
+    or 70 px tiles — §9 keeps the figure); the rail drawing tile art (the
+    rule stands: at 20 px a tile glyph is a smudge); taking `#summary` away
+    (the audit's sink and the one-sentence reading).
+
 - **27.9 — THE BIG ROUND, 5 OF 8: A TAP THAT WOULD TAKE SOMETHING AWAY ASKS
   FIRST.** The owner's son: *"when the user wants to choose something that
   will remove something else that he chose, i want a window to pop up before

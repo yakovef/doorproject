@@ -1921,71 +1921,47 @@ html[dir="rtl"] .quote__back .quote__chev { transform: none; }
    or two do (423 → 464 px in Russian).
    `npm run audit` asserts that EXACTLY ONE of the two is on screen at every
    viewport, and which one. */
-.spec { display: grid; gap: 0; margin: 2px 0 14px; }
+/* ⚠ SINCE 27.9.2026 IT IS A GRID OF PICTURES, NOT A TABLE — the owner's son:
+   *"show the icons of all the things the person chose in each section instead
+   of the text, clicking one takes them to that section."* Everything above is
+   the history of the table this replaced (its 700 px swap with the one-line
+   summary included, which is gone: the pictures read at every width, and
+   `#summary` is visually hidden everywhere — the audit's form check asserts
+   exactly that). One tile per spec row: the step tile's own glyph at 56 px,
+   the option's short name under it, a hairline card that is a 44 px+ button
+   to the step. Auto-filled at 84 px: two across at 320 and in the desktop's
+   column (236 px beside the navigator), three at 390. Measured on the default
+   door's eight tiles, whole above the pinned send on arrival: 1280×720 4
+   (the table showed 3 of its 8 rows), 1100×800 6 (5), 1440×900 8 (7),
+   1920×918 8 (7). The price is the phone: 294 px of grid at 390 and 395 at
+   320, where the one-line run took 59 and 79 — the send there is in the
+   fixed quote bar and never leaves the screen. */
+.spec {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px; margin: 4px 0 14px;
+}
 .spec__row {
-  display: grid;
-  /* icon · label · value · swatch. The icon column is a fixed 18 px whether or
-     not the row has one, so nine rows of labels line up rather than stepping
-     in and out as `glazing` appears on a two-panel door. */
-  grid-template-columns: 18px auto 1fr auto;
-  align-items: center; gap: 8px;
-  padding: 7px 0;
-  border-block-end: 1px solid var(--rule);
-  font-size: .82rem;
-  /* ⚠ MOST OF THESE ROWS ARE `<button>` SINCE 14.9.2026 — a tap goes back to
-     the step that asked for that answer. The declarations below are what a
-     button needs to look like the row it already was, and they are here rather
-     than on a `.spec__row--btn` because every row that CAN be one is one, and
-     a rule that applies to a div as well costs nothing.
-     `min-block-size: 44px` is the tap floor, which `npm run audit`'s sweep
-     measures on both axes; the row is full-width so the other axis is free.
-     It was 7 px of padding on a .82rem line — about 31 px — so this is the
-     only thing about the table that moves. */
-  min-block-size: 44px;
-  inline-size: 100%;
-  appearance: none; -webkit-appearance: none;
-  background: none;
-  border-inline: 0; border-block-start: 0;
-  font: inherit; color: inherit; text-align: inherit;
+  display: grid; justify-items: center; align-content: start; gap: 4px;
+  min-block-size: 44px; padding: 8px 4px 8px;
+  border: 1px solid var(--rule); border-radius: var(--r-tile);
+  background: none; appearance: none; -webkit-appearance: none;
+  font: inherit; color: var(--ink); text-align: center;
 }
 button.spec__row { cursor: pointer; }
-/* The row is a control, so it says so on hover and focus — but quietly: this
-   is a summary being read, not a menu being chosen from. */
-button.spec__row:hover .spec__label { text-decoration: underline; }
-button.spec__row:focus-visible {
-  outline: 2px solid var(--ink); outline-offset: -2px; border-radius: 6px;
-}
-.spec__ico {
-  inline-size: 18px; block-size: 18px; stroke: var(--ink-2);
-  stroke-linecap: round; stroke-linejoin: round;
-  opacity: .85;
-}
-.spec__row:last-child { border-block-end: 0; }
-.spec__label { font-weight: 600; color: var(--ink); }
-.spec__value { color: var(--ink-2); text-align: end; }
-.spec__chip {
-  inline-size: 14px; block-size: 14px; border-radius: var(--r-chip);
+button.spec__row:hover { border-color: var(--ink-3); }
+button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.spec__art { inline-size: 56px; block-size: 56px; display: grid; place-items: center; }
+.spec__art svg { inline-size: 100%; block-size: 100%; }
+.spec__art .spec__ico { inline-size: 28px; block-size: 28px; stroke: var(--ink-2); }
+/* The colour is its own swatch — the chart's rectangle — rather than a glyph. */
+.spec__swatch {
+  inline-size: 48px; block-size: 36px; border-radius: 8px;
   background: var(--chip); border: 1px solid rgb(0 0 0 / .22);
 }
-/* ⚠ TWO QUERIES, OR'D, AND THE SECOND IS THE ONE AN ADVERSARIAL READ ADDED.
-   `min-width: 700px` alone turns the table on for a LANDSCAPE PHONE — 740×360,
-   844×390, 932×430 are all past 700 across and are 390 px screens lying on
-   their side, which is the exact case the paragraph above declines to reopen.
-   Measured there: the worst table is 423 px (a loud door emits twelve rows,
-   not eight), which is 108% of an 844×390 viewport. So height is gated too,
-   at 700: 423 / 0.6 ≈ 705, i.e. the worst table stays under 60% of the screen
-   — margin rather than the one-pixel gates this file keeps paying for. It
-   admits every tablet in portrait and 1024×768 (55%) and excludes every
-   landscape phone measured, by 270 px.
-   Width ≥ 1100 is never in this rule at all, so the desktop is untouched at
-   any height — 1920×918 keeps the table it has always had. */
-@media (max-width: 699px), (max-height: 699px) and (max-width: 1099px) {
-  .spec { display: none; }
-  /* and the one-line version comes back out of the screen-reader-only box */
-  #summary.sr-only {
-    position: static; inline-size: auto; block-size: auto;
-    margin: 0; overflow: visible; clip-path: none; white-space: normal;
-  }
+.spec__name {
+  font-size: .74rem; line-height: 1.25; color: var(--ink);
+  max-inline-size: 100%; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
 }
 
 /* ── THE NAVIGATOR, AS CIRCLES ──────────────────────────────────────

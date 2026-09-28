@@ -150,6 +150,15 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The summary as pictures (6 of 8): *"show the icons of all the
+  things the person chose in each section instead of the text, clicking one
+  takes them to that section."* One button per spec row, the step tile's own
+  glyph at 56 px (the colour as its swatch) and the option's short name under
+  it (the colour's code — ours, §0a), "label: value" its accessible name; at
+  every width (the 700 px swap with the one-line run is gone, `#summary` is
+  visually hidden everywhere). `#spec` is no longer `aria-hidden` — it had held
+  buttons since 14.9. Whole above the pinned send at 1280×720: 4 of 8 (was 3).
+  Long form: `HISTORY.md`.
 - **27.9** The confirm dialog (5 of 8): *"…a window to pop up before you remove
   the other thing … a red button that says yes and a black that says no."*
   `#confirm` replaces `#clash`; `displacedBy` (pure, `rules.js`) on a dry run
@@ -491,8 +500,8 @@ substitutes for the other** — §5 is a list of what happens when only one look
 - **`js/spec.js`** — the door as a list of rows. It exists because four places
   described a door four ways and disagreed, and the disagreement charged a
   customer ₪620 for ironwork the accessible name said was not there. The
-  message, the spec table, the one-line summary, the drawing's `aria-label` and
-  the A4 sheet all read it. **Never assemble a description of a door anywhere
+  message, the summary's pictures (their "label: value" names), the one-line
+  summary, the drawing's `aria-label` and the A4 sheet all read it. **Never assemble a description of a door anywhere
   else.**
 - **`js/works.js`** — written by `npm run corpus` from the measured records.
   Nothing in it is typed, because handing was once typed on eight recreations
@@ -1280,15 +1289,20 @@ are not in `VIEWS`:
   exactly the tap), while a pull handle or bow against the window stays
   refused with its reason.
 - **the summary** — spec before explainer (as an ORDER, not a row count); the
-  table above 700 px and the line below, exactly one drawn; no handing card
+  pictures drawn at every width and the one-line run never (27.9), every tile
+  carrying a picture and a name; each a `<button>` ≥ 44 px to the step that
+  owns it with "label: value" as its name, read row for row against
+  `specRows`, its short name a part of the row's value; no handing card
   (removed 27.9 — the order keeps `handingWords()`) and, under the green send,
   the telephone reading exactly `PHONE_DISPLAY`.
 - **routes** — `prefers-reduced-motion` (nothing left running), bare mode,
   no-photo (drawn room still painting), a wrong code says the code was not
   recognised, the language switch leaves no Hebrew behind, the order sheet
   prints on **one page** (real PDFs at 703 px, counting pages).
-- **pictures** — the navigator's nine marks and the spec's fourteen, rasterised
-  at shipped size and compared pairwise (floor 0.50); the stripe pills; the
+- **pictures** — the navigator's nine marks (21 px) and the spec's fourteen
+  (28 px since 27.9 — the summary's fallback for a row whose step has no tile
+  glyph, the משקוף and the handing), rasterised at the size the stylesheet
+  gives them inside their container and compared pairwise (floor 0.50); the stripe pills; the
   gallery grid never one column, no tile under 132 px; the photographed floor
   and sconces measured in pixels against the drawn ones.
 - **copy** — no explainer contradicts the price on its step; the
@@ -1300,9 +1314,12 @@ are not in `VIEWS`:
 outlive it. Current ones are in §9.
 
 ⚠ **The rail does not reuse tile art.** An option glyph shrunk to 20 px is a
-smudge, so the navigator's circles and the spec's row marks are their own
-drawings in `js/icons.js`, on a 24-unit grid, saying WHICH QUESTION and never
-which answer.
+smudge, so the navigator's circles are their own drawings in `js/icons.js`, on
+a 24-unit grid, saying WHICH QUESTION and never which answer. The summary is
+the other way round since 27.9: it shows the ANSWER, at tile size (56 px), so
+it draws the tile's own glyph (`copyOf`-namespaced — the same art is in the
+step's tile) and falls back to `SPEC_ICON` only where a step has no tile
+glyph.
 
 ### The fifteen named assertions
 
@@ -1577,9 +1594,12 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   under the fixed furniture. Since 27.9 the question is always on screen (the
   band above the door) and the glass step shows an answer at both — one of
   eight; the other seven still show none. **The layout is
-  chosen by WIDTH and the problem is HEIGHT** — but `max-width: 1099px` has eight
-  readers (fixed rail, body padding, quote bar, sticky stage, `placeSend`, the
-  toast's anchor, the spec/summary swap), so moving it is a decision above CSS.
+  chosen by WIDTH and the problem is HEIGHT** — but `max-width: 1099px` is
+  read 19 times in the stylesheet alone (the fixed rail, body padding, quote
+  bar, sticky stage, `placeSend`, the toast's anchor among them; the
+  spec/summary swap, listed here until 27.9, had moved to 700 px on 11.9 and
+  is gone since the summary became pictures), so moving it is a decision above
+  CSS.
   Named exemptions; an iPad in landscape has the same 205 px band as a 320 phone
   because `.stage` is `clamp(40vh, 100vw, 56vh)` and pins at its maximum where
   the screen is shortest. `VIEWS` has no landscape tablet; English grille tiles
@@ -1589,11 +1609,12 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   by the band above the door: the question is in the sticky block now, on screen
   on all 45 steps of the five landscape shapes, arrival included; both
   exemptions came out of the audit.
-- **The summary cannot show its whole spec at 1280×720**: the table starts at
-  385 now (the handing card went on 27.9; it was 523) and 3 of the default
-  door's 8 rows are whole above the pinned foot — which grew 93 → 151 px with
-  the full-width send and the telephone under it. 1100×800 5 of 8, 1440 7,
-  1680 8, 1920×918 7. Denser rows or a wider summary column.
+- **The summary cannot show its whole spec at 1280×720**: since 27.9 it is a
+  grid of pictures, two across in the 236 px column beside the navigator, and
+  4 of the default door's 8 tiles are whole above the pinned foot (the table
+  showed 3 of 8 rows); 1100×800 6 (5), 1440×900 8 (7), 1680 8, 1920×918 8 (7).
+  The foot is 151 px — the full-width send and the telephone under it. A
+  third column would need a wider panel or 70 px tiles.
 - **At 320×568 step 01 arrives with its answers 78 px below the fold.** What
   would close it: the illustration note (45 px) not standing between door and
   question on a phone — an honesty commitment, ask before moving it — or shorter

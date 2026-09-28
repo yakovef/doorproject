@@ -673,6 +673,8 @@
        this action will cause the removal of y' — fewer words if you can."* `{0}`
        is the option tapped, `{1}` what goes, as the spec rows' values joined
        with ' · ' (`confirmSentence` in app.js) — no option or price is typed. */
+    /* The summary's grid of pictures, as a group a screen reader can name. */
+    "sum.chosen": ["מה בחרתם", "What you chose", "Что вы выбрали"],
     "dlg.confirm": ["{0}? זה יסיר את {1}", "{0}? This removes {1}", "{0}? Будет удалено: {1}"],
     "dlg.yes": ["כן", "Yes", "Да"],
     "dlg.no": ["לא", "No", "Нет"],
@@ -11116,18 +11118,37 @@ ${body}
     $("#summary").textContent = summaryLine(state);
     const table = $("#spec");
     if (table) {
+      const pictureOf = (r) => {
+        if (r.key === "colour") return `<span class="spec__swatch" style="--chip:${r.hex}"></span>`;
+        if (r.key === "stripes") return stripesGlyph(state.stripeDir);
+        const g = GROUPS.find((x) => x.key === (r.key === "glazing" ? "window" : r.key));
+        const o = g && g.list().find((x) => x.id === (r.key === "glazing" ? state.window : r.id));
+        if (g && g.glyph && o) return copyOf(g.glyph(o), `spec-${r.key}`);
+        return specIcon(r.key);
+      };
+      const nameOf = (r) => {
+        if (r.key === "colour") {
+          const c = byId(COLOURS, state.colour);
+          return colourCode(c).replace(/^.*\s/, "");
+        }
+        const g = GROUPS.find((x) => x.key === r.key);
+        const o = g && g.list().find((x) => x.id === r.id);
+        const said = String(r.value);
+        return o && said.includes(L(o)) ? L(o) : said.split(/ — | · /)[0];
+      };
       table.replaceChildren(...specRows(state).map((r) => {
         const step2 = stepFor(r.key);
         const row = document.createElement(step2 ? "button" : "div");
         row.className = "spec__row";
         row.dataset.key = r.key;
+        row.setAttribute("aria-label", `${r.label}: ${r.value}`);
+        row.title = `${r.label}: ${r.value}`;
         if (step2) {
           row.type = "button";
           row.dataset.step = step2;
-          row.setAttribute("aria-label", `${r.label}: ${r.value}`);
           row.addEventListener("click", () => leaveTo(step2));
         }
-        row.innerHTML = specIcon(r.key) + `<span class="spec__label">${r.label}</span><span class="spec__value">${r.value}</span>` + (r.hex ? `<span class="spec__chip" style="--chip:${r.hex}"></span>` : "");
+        row.innerHTML = `<span class="spec__art" aria-hidden="true">${pictureOf(r)}</span><span class="spec__name" aria-hidden="true">${nameOf(r)}</span>`;
         return row;
       }));
     }

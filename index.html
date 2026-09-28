@@ -13,7 +13,7 @@
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=cedc2a68">
+<link rel="stylesheet" href="css/app.css?v=e43fd687">
 
 <!-- ⚠ THE PHOTOGRAPHED ROOM, IN TWO CROPS, AND ONLY ONE IS EVER FETCHED.
      The owner supplied the same entrance framed 3:4 and 16:9 and both ship:
@@ -578,7 +578,13 @@
            drifted off `js/spec.js`, which is the check that would have caught
            the accessible name announcing a door with no ironwork on it while
            the order charged ₪620 for some. -->
-      <div class="spec" id="spec" aria-hidden="true"></div>
+      <!-- ⚠ SINCE 27.9.2026 THE PICTURES OF WHAT WAS CHOSEN, each a button to
+           its step (the owner's son: "show the icons of all the things the
+           person chose in each section instead of the text, clicking one takes
+           them to that section"). ⚠ And no longer `aria-hidden`: it held
+           buttons from 14.9, and a focusable control inside an aria-hidden box
+           is announced as nothing. Each carries "label: value" as its name. -->
+      <div class="spec" id="spec" role="group" aria-label="מה בחרתם" data-ta="aria-label=sum.chosen"></div>
       <p class="send__spec sr-only" id="summary"></p>
 
       <p class="send__lead" data-t="send.lead">בחרתם דלת? שלחו לנו אותה ונחזור אליכם עם הצעה מדויקת.</p>
@@ -750,7 +756,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=b22ceb32"></script>
+<script src="assets/bundle.js?v=e305d7bb"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

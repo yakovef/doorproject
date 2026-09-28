@@ -754,6 +754,8 @@ export const UI = {
      this action will cause the removal of y' — fewer words if you can."* `{0}`
      is the option tapped, `{1}` what goes, as the spec rows' values joined
      with ' · ' (`confirmSentence` in app.js) — no option or price is typed. */
+  /* The summary's grid of pictures, as a group a screen reader can name. */
+  'sum.chosen':       ['מה בחרתם', 'What you chose', 'Что вы выбрали'],
   'dlg.confirm':      ['{0}? זה יסיר את {1}', '{0}? This removes {1}', '{0}? Будет удалено: {1}'],
   'dlg.yes':          ['כן', 'Yes', 'Да'],
   'dlg.no':           ['לא', 'No', 'Нет'],

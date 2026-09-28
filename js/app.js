@@ -3136,45 +3136,65 @@ function paint() {
      exactly as the price is. */
   $('#summary').textContent = summaryLine(state);
 
-  /* ── THE SPEC TABLE ──────────────────────────────────────────────
-     The mockup's best idea, and it costs almost nothing here because the rows
-     already exist: this is `specRows(state)` with a different renderer, not a
-     fifth description of the door. Label on the right, value on the left, and
-     a swatch where the row carries one.
-     `#summary` above stays and is not redundant — it is the same rows as ONE
-     line, which is what a 320 px phone has room for, and it is what
-     `npm run audit` compares against `summaryLine` to prove the page has not
-     drifted off `js/spec.js`. The table is the desktop's version of it. */
+  /* ── THE SUMMARY, AS THE PICTURES OF WHAT WAS CHOSEN — 27.9.2026 ────────
+     The owner's son: *"at the end page … show the icons of all the things the
+     person chose in each section instead of the text, clicking one takes them
+     to that section."* It was a table of label · value rows (the mockup's,
+     11.9) — `specRows(state)` with a renderer, and it still is: one button per
+     spec row, in the rows' own order, drawn with the SAME glyph the step's tile
+     draws (`GROUPS[].glyph`; the colour as its swatch), so the summary shows
+     the pictures the customer chose them by. ⚠ Not the navigator's rule being
+     broken: `js/icons.js` keeps the RAIL off tile art because an option glyph
+     at 20 px is a smudge; here it is at tile size, which is what it is for.
+     Under each picture the option's SHORT name — for the colour its code,
+     which is what Peretz orders paint by (ours, CLAUDE.md §0a) — and the full
+     "label: value" is the button's accessible name, so nothing the table said
+     is lost to a screen reader. Each goes to the step that owns it
+     (`stepFor`, `leaveTo`). `copyOf` namespaces each picture's ids: the same
+     glyph is also in its step's tile, possibly inside a hidden step, and a
+     `url(#id)` resolves to the first in the document (§5.13).
+     `#summary` stays the one line it was, visually hidden — the audit reads
+     it against `summaryLine`, and it is the door in one sentence for anyone
+     who hears the page. */
   const table = $('#spec');
   if (table) {
-    /* ⚠ EVERY ROW IS A BUTTON BACK TO THE STEP THAT OWNS IT — 14.9.2026.
-       Asked for from outside: the summary lists every answer, and a customer
-       reading it who wants to change one had to find the step themselves.
-       The row already knows which answer it is; `stepFor` knows which question
-       asked it.
-       A real `<button>`, not a `<div>` with a listener: it is in the tab order,
-       it takes Enter and Space, and a screen reader says "button" rather than
-       reading a row of text nobody has said is interactive. The grid is
-       unchanged — `display: grid` is set on `.spec__row` and a button takes it
-       as happily as a div — so the four columns still line up.
-       `aria-label` carries "label: value" because the visible text is split
-       across two spans and a swatch, which a screen reader would otherwise
-       read as three fragments with no relation. */
+    const pictureOf = r => {
+      if (r.key === 'colour') return `<span class="spec__swatch" style="--chip:${r.hex}"></span>`;
+      if (r.key === 'stripes') return stripesGlyph(state.stripeDir);
+      const g = GROUPS.find(x => x.key === (r.key === 'glazing' ? 'window' : r.key));
+      const o = g && g.list().find(x => x.id === (r.key === 'glazing' ? state.window : r.id));
+      if (g && g.glyph && o) return copyOf(g.glyph(o), `spec-${r.key}`);
+      return specIcon(r.key);
+    };
+    const nameOf = r => {
+      if (r.key === 'colour') {
+        const c = byId(COLOURS, state.colour);
+        return colourCode(c).replace(/^.*\s/, '');
+      }
+      const g = GROUPS.find(x => x.key === r.key);
+      const o = g && g.list().find(x => x.id === r.id);
+      /* The option's own name where the row says it; where the row words it
+         its own way — the grille's "סורג רשת" is "רשת — בכנף הדלת ובכנף
+         הצדדית (2 יחידות)" on a door with a side leaf, the label dropped —
+         the row's first phrase, so the name under the picture is always
+         words of the order. */
+      const said = String(r.value);
+      return o && said.includes(L(o)) ? L(o) : said.split(/ — | · /)[0];
+    };
     table.replaceChildren(...specRows(state).map(r => {
       const step = stepFor(r.key);
       const row = document.createElement(step ? 'button' : 'div');
       row.className = 'spec__row';
       row.dataset.key = r.key;
+      row.setAttribute('aria-label', `${r.label}: ${r.value}`);
+      row.title = `${r.label}: ${r.value}`;
       if (step) {
         row.type = 'button';
         row.dataset.step = step;
-        row.setAttribute('aria-label', `${r.label}: ${r.value}`);
         row.addEventListener('click', () => leaveTo(step));
       }
-      row.innerHTML = specIcon(r.key)
-        + `<span class="spec__label">${r.label}</span>`
-        + `<span class="spec__value">${r.value}</span>`
-        + (r.hex ? `<span class="spec__chip" style="--chip:${r.hex}"></span>` : '');
+      row.innerHTML = `<span class="spec__art" aria-hidden="true">${pictureOf(r)}</span>`
+        + `<span class="spec__name" aria-hidden="true">${nameOf(r)}</span>`;
       return row;
     }));
   }
