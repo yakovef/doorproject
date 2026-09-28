@@ -255,6 +255,10 @@ export const UI = {
   'stage.h1.verb':    ['עצבו', 'Design', 'Создайте'],
   'stage.h1.rest':    ['את הדלת שלכם', 'your door', 'свою дверь'],
   'stage.label':      ['הדלת שלכם', 'Your door', 'Ваша дверь'],
+  /* The two arrows beside the door (27.9.2026): the step's first group, one
+     option back or on, skipping what does not fit. */
+  'arrow.prev':       ['האפשרות הקודמת', 'Previous option', 'Предыдущий вариант'],
+  'arrow.next':       ['האפשרות הבאה', 'Next option', 'Следующий вариант'],
   /* ⚠ SEVEN GRIP KEYS AND `notice.moved` CAME OUT ON 18.9.2026 with the drag,
      the rotate button and the home button: `grip.drag`, `grip.rotate`,
      `grip.home`, `grip.aria`, `grip.ariaAt`, `grip.tooLong`,
@@ -747,6 +751,12 @@ export const UI = {
   'dlg.leverBar':     ['ידית זו וידית המשיכה שבחרתם לא יכולות להיות יחד באותה דלת',
                        'This lever and the pull handle you chose cannot be on the same door',
                        'Эта ручка и выбранная вами ручка-скоба не могут быть на одной двери'],
+  /* An arrow with nowhere to go (27.9.2026, the owner's son: *"if none is
+     compatible, a window: 'there is no compatible x with your build'"*). `{0}`
+     is the group's own title; "אפשרות" carries the gender so no title has to
+     agree with the verb. */
+  'dlg.noFit':        ['אין אפשרות אחרת של {0} שמתאימה לדלת שלכם', 'No other {0} fits this door',
+                       'Для этой двери нет другого варианта: {0}'],
   'dlg.ok':           ['הבנתי', 'OK', 'Понятно'],
   'dlg.close':        ['סגירת ההודעה', 'Close this message', 'Закрыть сообщение'],
 

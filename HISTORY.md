@@ -26,6 +26,65 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE BIG ROUND, 4 OF 8: THE BAND ABOVE THE DOOR, AND THE ARROWS.**
+  The owner's son: *"the middle of the screen: the white strip with the main
+  text smaller and less tall … above the door the name of the section we are
+  at, big — moved from the panel; two arrows on each side of the door that
+  change the option (the next available one; if none is compatible, a window:
+  'there is no compatible x with your build'); and between the section name and
+  the door, the name of the thing now selected — e.g. '2 panels'."*
+  · **The band.** `.stage__band` between the title and the stage: the live
+    step's title (600, 22–30 px) and `nowLabel` of its first group (13–15 px),
+    written by `markSteps` on every step change and paint; `aria-hidden`, since
+    the panel's `<h2>` stays for screen readers (visually hidden now; `goStep`
+    still focuses it). Each line is ONE line in every language (ellipsis), so
+    the band is the same height on all nine steps and the door never resizes
+    between them. **Above 1100 it is in the flow**, and its budget is the
+    height commit 1 took off the title. Standard door, leaf height before the
+    round (`0c6e4ac`) → after commit 1 → now: 1280×720 421.0 → 467.9 → 426.2 ·
+    1440×900 550.3 → 595.4 → 550.2 · 1920×918 563.3 → 607.6 → 562.4 ·
+    1920×1080 679.9 → 724.3 → 679.1 · 1100×800 483.2 → 527.6 → 490.1 (band
+    57.9 / 62.8 / 62.8 / 62.8 / 52.1 px). Asserted: no smaller than before
+    less 4 px. **On a phone** it is one 30 px line (`--band-h`) and the STAGE
+    gives it up, not the question: 390×844 280.9 → 259.3, 360×740 259.3 →
+    237.7, 320×568 171.8 → 150.2 — the door 21.6 px shorter at each.
+  · **The arrows.** Two 44 px buttons, absolute in the wall at the frame's
+    mid-height, 8 px outside the casing (`--frame-left`, `--frame-mid`, beside
+    commit 2's `--frame-right`), clamped inside the wrap; the way on is the
+    interface's inline end (the left in Hebrew), chevrons mirrored. A click
+    moves the live step's FIRST group (size on fit, mashkof on mk, the faces on
+    face) to the next/previous option `conflicts` does not grey, wrapping,
+    through `choose` — the price, the code, the URL and the toast follow. With
+    no other option free, the one-button dialog (`dlg.noFit`, "…אין אפשרות
+    אחרת של {group} שמתאימה לדלת שלכם", `אפשרות` carrying the gender) and no
+    change. Skipping refused options rather than asking is ours (§0a). Hidden
+    (box kept) on the summary; in the bare hide-list and `down-css`.
+  · **Audit.** New block: the leaf budget at 1280/1440/1920 in he and ru; the
+    band one height and one line per line on all nine steps; next from plain
+    → panel2 with the band and the address following, prev wrapping past the
+    start; beside the tall slot (where every other face is refused) the arrow
+    opens the dialog and the drawing, the address and the code are
+    byte-identical; hidden on the summary with its box. Restated: the
+    landscape check measures the BAND's title (and asserts it is the live
+    step's); the "name twice" check compares group headings with the band; the
+    wall-ink check covers the arrows.
+  · **Exemptions that moved, all reported by their own "still needed"
+    clauses on the first full audit**: the landscape block's two (568×320 and
+    the arrival step) are GONE — the question is in the sticky block now, 45 of
+    45 steps; `extra1` left the phone wall-ink exemption (gated clean with
+    `standard` now); the short-and-wide answer exemption shrank from "none" to
+    "the glass step only" at 844×390 and 640×360. One reading got WORSE and is
+    named with its number: the widest double at 1152×800, `Русский` 43 px² (he)
+    / 15 (ru) — the band spends 52 of the title's 62 px there, so the door is
+    ~7 px taller than before the round; the gate at ≥ 1152 is not widened.
+  · **Falsified**: the band 24 px taller — 6 faults, the leaf 12–18 px under
+    budget at every width; the arrows not skipping refused options — beside the
+    slot no dialog opens (2 faults).
+  · **Gates**: `node --check`, build, `npm test` 9,118,844 passed / 5 failed
+    (the five staleness rows); `npm run audit` — five faults on the first run,
+    all exemptions moving as above, restated; the two changed blocks re-run
+    clean. Sheets: `?bare=1` hides the band and the arrows, so no bare sheet.
+
 - **27.9 — THE BIG ROUND, 3 OF 8: THE NAVIGATOR AS A DARK COLUMN.** The
   owner's son: *"the icons would look better if they were [vertical] and on the
   left of the place where you choose options … i want it all to be a black

@@ -94,6 +94,10 @@
     "stage.h1.verb": ["עצבו", "Design", "Создайте"],
     "stage.h1.rest": ["את הדלת שלכם", "your door", "свою дверь"],
     "stage.label": ["הדלת שלכם", "Your door", "Ваша дверь"],
+    /* The two arrows beside the door (27.9.2026): the step's first group, one
+       option back or on, skipping what does not fit. */
+    "arrow.prev": ["האפשרות הקודמת", "Previous option", "Предыдущий вариант"],
+    "arrow.next": ["האפשרות הבאה", "Next option", "Следующий вариант"],
     /* ⚠ SEVEN GRIP KEYS AND `notice.moved` CAME OUT ON 18.9.2026 with the drag,
        the rotate button and the home button: `grip.drag`, `grip.rotate`,
        `grip.home`, `grip.aria`, `grip.ariaAt`, `grip.tooLong`,
@@ -667,6 +671,15 @@
       "ידית זו וידית המשיכה שבחרתם לא יכולות להיות יחד באותה דלת",
       "This lever and the pull handle you chose cannot be on the same door",
       "Эта ручка и выбранная вами ручка-скоба не могут быть на одной двери"
+    ],
+    /* An arrow with nowhere to go (27.9.2026, the owner's son: *"if none is
+       compatible, a window: 'there is no compatible x with your build'"*). `{0}`
+       is the group's own title; "אפשרות" carries the gender so no title has to
+       agree with the verb. */
+    "dlg.noFit": [
+      "אין אפשרות אחרת של {0} שמתאימה לדלת שלכם",
+      "No other {0} fits this door",
+      "Для этой двери нет другого варианта: {0}"
     ],
     "dlg.ok": ["הבנתי", "OK", "Понятно"],
     "dlg.close": ["סגירת ההודעה", "Close this message", "Закрыть сообщение"],
@@ -10047,6 +10060,9 @@ ${body}
     if (barNext) barNext.addEventListener("click", () => stepBy(1));
     const barBack = document.querySelector(".quote__back");
     if (barBack) barBack.addEventListener("click", () => stepBy(-1));
+    for (const a of document.querySelectorAll(".stage__arrow")) {
+      a.addEventListener("click", () => arrowStep(Number(a.dataset.dir) || 1));
+    }
     document.querySelectorAll("[data-wa]").forEach((el) => {
       el.addEventListener("click", async (ev) => {
         if (!canSharePicture()) return;
@@ -10167,9 +10183,11 @@ ${body}
     if (typeof d.close === "function") d.close();
     else d.removeAttribute("open");
   }
-  function openClash() {
+  function openClash(text = T("dlg.leverBar")) {
     const d = $("#clash");
     if (!d) return;
+    const p = d.querySelector("#clash-p");
+    if (p) p.textContent = text;
     if (typeof d.showModal === "function") d.showModal();
     else d.setAttribute("open", "");
   }
@@ -10713,6 +10731,24 @@ ${body}
     if (i < 0 || i >= keys.length) return;
     leaveTo(keys[i]);
   }
+  var firstGroup = (key) => groupsIn(key)[0] || null;
+  function arrowStep(dir) {
+    noteEngaged();
+    const g = firstGroup(liveStep);
+    if (!g) return;
+    const list = g.list();
+    const blocked = conflicts(state)[g.key] || {};
+    const at = list.findIndex((o) => o.id === state[g.key]);
+    for (let k = 1; k < list.length; k++) {
+      const o = list[((at + dir * k) % list.length + list.length) % list.length];
+      if (o.id !== state[g.key] && !blocked[o.id]) {
+        choose(g, o.id);
+        return;
+      }
+    }
+    const title = T(g.title);
+    openClash(T("dlg.noFit", lang() === "en" ? title.toLowerCase() : title));
+  }
   function leaveTo(key) {
     if (key !== liveStep && STEP_KEYS().includes(key)) visited.add(liveStep);
     goStep(key);
@@ -10825,6 +10861,14 @@ ${body}
     }
     const panel = document.querySelector(".panel--choose");
     if (panel) panel.dataset.live = liveStep;
+    const sec = [...SECTIONS, SUMMARY].find((x) => x.key === liveStep);
+    const bandT = document.querySelector("[data-band-title]");
+    const bandN = document.querySelector("[data-band-now]");
+    const fg = firstGroup(liveStep);
+    if (bandT && sec) bandT.textContent = T(sec.title);
+    if (bandN) bandN.textContent = fg ? nowLabel(fg) : "";
+    const wrapEl = document.querySelector(".stage-wrap");
+    if (wrapEl) wrapEl.dataset.step = liveStep;
     const live = document.querySelector(".steps__step.is-on");
     const row = live && live.closest(".steps");
     if (row && typeof row.scrollBy === "function") {
@@ -10988,6 +11032,11 @@ ${body}
     const top = items[0].getBoundingClientRect().top;
     const n = items.findIndex((el) => el.getBoundingClientRect().top > top + 1);
     return n === -1 ? items.length : n;
+  }
+  function nowLabel(g) {
+    const list = g.list();
+    const hit = list.find((o) => o.id === state[g.key]) || list[0];
+    return hit ? L(hit) : "";
   }
   function paint() {
     const colour = byId(COLOURS, state.colour);
@@ -11234,6 +11283,8 @@ ${body}
       const sw = $(".stage-wrap").style;
       sw.setProperty("--frame-top", `${Math.round(f.top - wrap.y)}px`);
       sw.setProperty("--frame-right", `${Math.round(f.right - wrap.x)}px`);
+      sw.setProperty("--frame-left", `${Math.round(f.left - wrap.x)}px`);
+      sw.setProperty("--frame-mid", `${Math.round((f.top + f.bottom) / 2 - wrap.y)}px`);
       sw.setProperty("--hud-b", `${Math.round(hudB - wrap.y)}px`);
       const root = document.documentElement.style;
       root.setProperty("--stage-l", `${Math.round(wrap.x)}px`);

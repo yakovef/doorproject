@@ -1059,6 +1059,85 @@ svg { direction: ltr; }
   .stage__h1 { padding: 10px 14px 4px; }
 }
 
+/* ── THE BAND ABOVE THE DOOR — 27.9.2026 ──────────────────────────────
+   The live step's name, big, and under it what is chosen in its first group
+   (the owner's son: *"above the door the name of the section we are at, big —
+   moved from the panel … between the section name and the door, the name of
+   the thing now selected — e.g. '2 panels'"*). Written by `markSteps`.
+   ⚠ ABOVE 1100 IT IS IN THE FLOW, so every pixel of it comes out of the
+   drawing (§0c): its budget is the 60-odd pixels the title gave back in the
+   same round, and `npm run audit` holds the leaf to no smaller than it was
+   before the title shrank, less 4 px. Each line is ONE line in every language
+   (ellipsis rather than a wrap), so the band — and with it the door — is the
+   same height on every step. */
+.stage__band {
+  flex: 0 0 auto;
+  display: grid; justify-items: center; gap: 0;
+  padding: 2px 16px 6px;
+  text-align: center;
+}
+.band__title, .band__now {
+  margin: 0; max-inline-size: 100%;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.band__title {
+  font: 600 clamp(22px, 2.1vw, 30px)/1.15 var(--sans);
+  letter-spacing: -.01em; color: var(--ink);
+}
+.band__now {
+  font: 400 clamp(13px, 1.1vw, 15px)/1.35 var(--sans);
+  color: var(--ink-2); min-block-size: 1.35em;
+}
+/* ⚠ ON A PHONE IT IS ONE LINE, and the stage gives up exactly that line
+   (`--band-h`, in `.stage`'s phone rules) — the question below the door does
+   not move down for it. The title then the option, the way the two lines read
+   above 1100, in the interface's direction. */
+@media (max-width: 1099px) {
+  :root { --band-h: 30px; }
+  .stage__band {
+    display: flex; justify-content: center; align-items: baseline; gap: 8px;
+    block-size: var(--band-h); padding: 4px 14px 0; overflow: hidden;
+  }
+  .band__title { font-size: 1.02rem; font-weight: 600; flex: 0 1 auto; min-inline-size: 0; }
+  .band__now { font-size: .86rem; flex: 0 1 auto; min-inline-size: 0; min-block-size: 0; }
+  .band__now:not(:empty)::before { content: '·'; margin-inline-end: 8px; color: var(--ink-3); }
+}
+
+/* ── THE TWO ARROWS BESIDE THE DOOR — 27.9.2026 ───────────────────────
+   Absolute in the wall at the door's mid-height, 8 px outside the casing on
+   either side (`--frame-left`, `--frame-right`, `--frame-mid`, published by
+   `fitStage` off the frame's settled box) and held inside the wrap where the
+   wall is narrower than the arrow. Absolute for `.stage__hud`'s reason:
+   nothing in the flow here. The way on is on the interface's inline end —
+   the left in Hebrew — and the chevrons mirror with it; the door does not.
+   44 px, the floor. Hidden (box kept) on the summary, where there is no group
+   to step through. */
+.stage__arrow {
+  position: absolute; z-index: 4;
+  inset-block-start: var(--frame-mid, 45%);
+  transform: translateY(-50%);
+  inline-size: 44px; block-size: 44px; padding: 0;
+  display: grid; place-items: center;
+  border: 1px solid var(--rule); border-radius: 50%;
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  color: var(--ink); cursor: pointer;
+}
+@supports not (background: color-mix(in srgb, red 50%, transparent)) {
+  .stage__arrow { background: var(--paper); }
+}
+.stage__arrow:hover { border-color: var(--ink-3); background: var(--paper); }
+.stage__chev {
+  inline-size: 20px; block-size: 20px;
+  fill: none; stroke: currentColor; stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.stage__arrow--prev { left: max(4px, calc(var(--frame-left, 30%) - 52px)); }
+.stage__arrow--next { left: min(calc(100% - 48px), calc(var(--frame-right, 70%) + 8px)); }
+[dir="rtl"] .stage__arrow--prev { left: min(calc(100% - 48px), calc(var(--frame-right, 70%) + 8px)); }
+[dir="rtl"] .stage__arrow--next { left: max(4px, calc(var(--frame-left, 30%) - 52px)); }
+[dir="rtl"] .stage__chev { transform: scaleX(-1); }
+.stage-wrap[data-step="sum"] .stage__arrow { visibility: hidden; }
+
 .stage {
   /* The door is never allowed off-screen — seeing it is the product.
      Height rather than width decides how big the door comes out, because the
@@ -1090,7 +1169,12 @@ svg { direction: ltr; }
    what they are answering. The two are not in tension here; the chrome was
    simply taking both. */
 @media (max-width: 1099px) {
-  .stage { block-size: clamp(40vh, 100vw, 56vh); }
+  /* ⚠ MINUS THE BAND, since 27.9.2026: the band above the door (the step's
+     name and what is chosen) is one line in the sticky block, and it is taken
+     out of the door rather than out of the question under it — at 320x568 the
+     answers already arrive below the fold (§9), and a sticky block 30 px
+     taller would have pushed them further. The door shrinks by that line. */
+  .stage { block-size: calc(clamp(40vh, 100vw, 56vh) - var(--band-h, 0px)); }
 }
 @media (min-width: 1100px) {
   .stage { block-size: auto; flex: 1 1 auto; min-block-size: 0; }
@@ -2370,13 +2454,20 @@ button.spec__row:focus-visible {
 
 /* The question itself, in the display voice — light and large, one step down
    from the page's `<h1>`. This is the line a customer reads on every one of
-   nine screens, and it was 16 px semibold. */
+   nine screens, and it was 16 px semibold.
+   ⚠ AND SINCE 27.9.2026 IT IS READ ABOVE THE DOOR, NOT HERE — the owner's son:
+   *"above the door the name of the section we are at, big — moved from the
+   panel."* The `<h2>` stays, visually hidden: `goStep` still focuses it and a
+   screen reader still hears the step (`.stage__band` is `aria-hidden`). The
+   type is kept for the day it is shown again. */
 .sect__title {
   margin: 0 0 10px;
   font: 300 clamp(22px, 2.4vw, 30px)/1.15 var(--sans);
   letter-spacing: -.015em;
   color: var(--ink);
   text-wrap: balance;
+  position: absolute; inline-size: 1px; block-size: 1px;
+  padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
 }
 /* What the question means, for the customer who does not already know. Capped
    at a readable measure rather than run to the full width of a 380 px card. */
@@ -2479,7 +2570,7 @@ button.spec__row:focus-visible {
    above, and `.sect__where` / `.sect__title` / `.sect__lede` directly above).
    §8, five times in this file and twice by me. */
 @media (max-width: 1099px) and (max-height: 700px) {
-  .stage { block-size: clamp(36vh, 100vw, 42vh); }
+  .stage { block-size: calc(clamp(36vh, 100vw, 42vh) - var(--band-h, 0px)); }
   .sect__where { margin-block-end: 3px; }
   .sect__title { margin-block-end: 4px; }
   /* ⚠ AND SMALLER, WHICH IS THE ONE PLACE THIS ROUND TOUCHES TYPE SIZE — the
@@ -3998,7 +4089,7 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    it. Anything added to the stage wrap belongs here the same day. */
 .is-bare .bar, .is-bare .strip, .is-bare .panel, .is-bare .stage__bar,
 .is-bare .stage__h1, .is-bare .steps, .is-bare .trust, .is-bare .saved,
-.is-bare .stage__hud, .is-bare .quote,
+.is-bare .stage__hud, .is-bare .quote, .is-bare .stage__band, .is-bare .stage__arrow,
 /* ⚠ `.brand` JOINS THE LIST THE DAY IT IS ADDED, which is the standing rule
    for anything put inside `.stage-wrap` — the one page element `?bare=1`
    keeps. Bare mode exists so the harnesses photograph THE DRAWING and no page

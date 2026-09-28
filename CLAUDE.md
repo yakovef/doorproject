@@ -150,6 +150,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The band above the door and the arrows (4 of 8): the step's name
+  big over the door with its chosen option under it, the panel's `<h2>`
+  visually hidden; the leaf at 1280/1440/1920 is 426.2/550.2/562.4 against
+  421.0/550.3/563.3 before the round (asserted ≥ −4); phones lose 21.6 px of
+  door to the band's line. Two arrows step the first group, skipping refused
+  options; with none free a dialog, the door byte-identical. Long form:
+  `HISTORY.md`.
 - **27.9** The navigator as a dark column (3 of 8): *"vertical and on the left
   of the place where you choose options … a black rectangle … the section that
   i am in will turn white and be square … a checkmark"* on steps chosen or
@@ -267,6 +274,23 @@ the summary's own `saveCurrent`).
   (67.0 px under 360, 71.3 above — `--quote-h` feeds every fold check), a
   disabled arrow keeps its box, and below 1100 the CAPTION yields
   (`minmax(min-content, 1fr)` floors the box at the figure), never the send.
+- **The band above the door** (27.9, *"above the door the name of the section
+  we are at, big — moved from the panel … the name of the thing now
+  selected"*): `.stage__band`, the live step's title and `nowLabel` of its first
+  group, written by `markSteps`; the panel's `<h2>` is visually hidden (goStep
+  still focuses it). ⚠ Above 1100 it is IN THE FLOW and its height comes out of
+  the drawing — its budget is the height the title gave back the same round,
+  and the audit holds the standard leaf to within 4 px of its pre-round size
+  (421.0 / 550.3 / 563.3 px at 1280×720 / 1440×900 / 1920×918). Each line is
+  one line in every language, so the door never resizes between steps. On a
+  phone it is one 30 px line (`--band-h`) and the STAGE gives it up (the door
+  loses 21.6 px), not the question below.
+- **Two arrows beside the door** (27.9): absolute in the wall at the frame's
+  mid-height, 8 px outside the casing (`--frame-left/-right/-mid`); they move
+  the live step's FIRST group to the next/previous free option, wrapping,
+  through `choose`; refused options are skipped (ours, §0a); with none free, a
+  one-button dialog and no change. Hidden (box kept) on the summary. The way
+  on is on the interface's inline end.
 - ⚠ **`.stage__hud` IS ABSOLUTE AND MUST STAY ABSOLUTE.** Above 1100 px the
   stage is a flex item, so anything in the flow up there takes its height out
   of the drawing — a control that merely appeared in `.stage__bar` once cost
@@ -298,7 +322,7 @@ the artefact** — walking §7's T-list means grepping for each one.
 | gate | reading | when |
 |---|---|---|
 | `npm test` | 9,118,821 assertions, **0 failed** on the Rotem merged with the big round's first two commits (27.9); the Rotem alone read 9,118,785 — +25 over 9,118,760, of which two are the new photo citations checked to exist and the rest the buildable set moving with four re-measured footprints (not traced per group). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 27.9 |
-| `npm run audit` | clean at all eight `VIEWS` with its sweeps on the Rotem commit `a74ec6b` (27.9). On `db529d6` — the Rotem merged with the big round's first two commits — **2 faults, both the big round's and both named in its own entry**: `[wall-ink]` at 1152×800 the language picker's `Русский` paints 314 px² (he) / 284 (ru) on a `halfextra2` door, because commit 1's shorter title made the door bigger; that entry says commit 4's band takes the height back. Not the Rotem's: the lockset moves no wall chrome, and its own audit was clean. ⚠ It was **red for one commit** on 27.9 (8 faults) when the trio change stranded two assertions — §5.27 | 27.9 |
+| `npm run audit` | on the big round's commit 4 (27.9): **five faults on the first run, every one an exemption moving** with the band above the door — the landscape block's two came out (the question is in the sticky block, 45 of 45 steps), `extra1` left the phone wall-ink exemption, the short-and-wide answer exemption shrank to the glass step — and ONE reading named with its number: the widest double at 1152×800, `Русский` 43 px² (he) / 15 (ru) (commit 1's interim 314/284, recorded on `db529d6` by the Rotem session, is what the band gave back most of). The restated blocks re-ran clean; the next full run is after commit 7. Clean at all eight `VIEWS` on the Rotem commit `a74ec6b`. ⚠ It was **red for one commit** on 27.9 (8 faults) when the trio change stranded two assertions — §5.27 | 27.9 |
 | `npm run collide` | `all` (1,508 designs — 1,338 base, 552 of them with the bow, plus 170 face-detail) and `boxes` clean on the Rotem (27.9: coral/square `in` 140, levertaper 116, plate 47/114/161, each re-measured) | 27.9 |
 | `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, nothing broke (the Rotem commit) | 27.9 |
 | `npm run latency` | **227 ms** worst door against a 600 ms gate — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · 531 · 656 for default · sidelight+ironwork · the heaviest (27.9: the default door carries the Rotem, and its redrawn plate is 7 elements more than the waisted one's 261). Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 27.9 |
@@ -1485,12 +1509,17 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   every phone. `…slice` would crop the door's head and foot (forbidden); a
   portrait tile loses the name and price row. The thirty tiles are distinct at
   shipped size (closest pair 2.07%, none under 0.45%).
-- **On a phone the wall's two controls cannot stand beside the five biggest
-  doors** (14.9). Ink on `#frame` on every size but `standard`, worst 600 px² at
-  360×740 on the widest double, where `Русский` is charcoal on a charcoal leaf.
-  73 px of wall against a 100–110 px picker; every way out moves chrome the owner
-  placed. Gated for the standard door everywhere and every door ≥ 1152 px; the
-  five are a named exemption.
+- **On a phone the wall's controls cannot stand beside the four biggest
+  doors** (14.9; four since 27.9 — the band above the door takes its line out of
+  the stage, the door is 21.6 px shorter, and `extra1` cleared). Ink on
+  `#frame` on `extra2`, `half`, `halfextra1`, `halfextra2`, worst 494/466 px²
+  (he/ru) on the widest double, where `Русский` is charcoal on a charcoal leaf;
+  the two arrows beside the door are measured with the rest. Gated for
+  `standard` and `extra1` everywhere and every door ≥ 1152 px — with ONE named
+  reading since 27.9: the widest double at 1152×800, `Русский` 43 px² (he) / 15
+  (ru), because the title shrank 62 px and the band spends 52 of them there, so
+  that door is ~7 px taller than before the round. Named with its number, the
+  gate not widened.
 - **Two controls pinned by rules that mirror differently stand in opposite walls
   in one language and the same wall in another** — the mechanism behind a
   closed fault (the removed grip controls under the price card in Hebrew only).
@@ -1521,9 +1550,11 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   1440×900 12 → 12, 1920×918 10 → 13. (The "~5 rows at 1280×720" this line
   carried was stale: it read 10 at the commit before the move.) Raising the
   46vh cap where the room allows, or two columns, is unmeasured.
-- **A short-and-wide screen shows the question and no answer** (13.9): a phone
-  on its side (844×390) and a laptop at 200% zoom (640×360) leave 75–92 px under
-  the fixed furniture, and the question block alone is ~110. **The layout is
+- **A short-and-wide screen shows the question and little answer** (13.9): a
+  phone on its side (844×390) and a laptop at 200% zoom (640×360) leave 75–92 px
+  under the fixed furniture. Since 27.9 the question is always on screen (the
+  band above the door) and the glass step shows an answer at both — one of
+  eight; the other seven still show none. **The layout is
   chosen by WIDTH and the problem is HEIGHT** — but `max-width: 1099px` has eight
   readers (fixed rail, body padding, quote bar, sticky stage, `placeSend`, the
   toast's anchor, the spec/summary swap), so moving it is a decision above CSS.
@@ -1531,9 +1562,11 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   because `.stage` is `clamp(40vh, 100vw, 56vh)` and pins at its maximum where
   the screen is shortest. `VIEWS` has no landscape tablet; English grille tiles
   clip `Needs a w…` there and seven Russian labels overrun their tiles.
-- **A phone held sideways: arrival still ends 29–84 px behind the quote bar**
-  (the boot call does not do `goStep`'s ~50 px scroll), and **568×320 is short by
-  five pixels** on every step. Named exemptions.
+- ✅ ~~**A phone held sideways: arrival still ends 29–84 px behind the quote
+  bar**, and **568×320 is short by five pixels** on every step.~~ **CLOSED 27.9**
+  by the band above the door: the question is in the sticky block now, on screen
+  on all 45 steps of the five landscape shapes, arrival included; both
+  exemptions came out of the audit.
 - **The summary cannot show its whole spec at 1280×720**: the table starts at
   385 now (the handing card went on 27.9; it was 523) and 3 of the default
   door's 8 rows are whole above the pinned foot — which grew 93 → 151 px with

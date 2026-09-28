@@ -589,6 +589,11 @@ function init() {
      once-at-boot wiring. */
   const barBack = document.querySelector('.quote__back');
   if (barBack) barBack.addEventListener('click', () => stepBy(-1));
+  /* The two arrows beside the door (27.9.2026) — in `index.html`, outside the
+     panel, so wired once here for the same reason as the two above. */
+  for (const a of document.querySelectorAll('.stage__arrow')) {
+    a.addEventListener('click', () => arrowStep(Number(a.dataset.dir) || 1));
+  }
 
   /* ── THE PICTURE GOES WITH THE ORDER ──────────────────────────────
      Both send buttons keep their `wa.me` href and keep it correct — that is
@@ -962,9 +967,14 @@ function closeWorks() {
    makes the page inert, and an old browser without it must not take the
    configurator down inside a click handler. Nothing here touches `state`:
    the door a customer sees behind the backdrop is the door they keep. */
-function openClash() {
+function openClash(text = T('dlg.leverBar')) {
   const d = $('#clash');
   if (!d) return;
+  /* One dialog, two sentences since 27.9.2026: the lever against the bar, and
+     an arrow with nowhere to go (`arrowStep`). Written every time it opens, so
+     the last sentence shown never lingers into the next. */
+  const p = d.querySelector('#clash-p');
+  if (p) p.textContent = text;
   if (typeof d.showModal === 'function') d.showModal();
   else d.setAttribute('open', '');
 }
@@ -2223,6 +2233,36 @@ function stepBy(d) {
   leaveTo(keys[i]);
 }
 
+/**
+ * ⚠ THE ARROWS BESIDE THE DOOR — 27.9.2026, the owner's son: *"two arrows on
+ * each side of the door that change the option (the next available one; if
+ * none is compatible, a window: 'there is no compatible x with your build')."*
+ * The live step's FIRST group (`size` on fit, `mashkof` on mk, `detail` on the
+ * face — the stripes keep their own control), one option on or back in the
+ * list's own order, WRAPPING, skipping every option `conflicts` greys — ours to
+ * have decided, recorded in CLAUDE.md §0a: a refused option would open the
+ * confirm dialog, and an arrow is for browsing. The move is `choose`, exactly
+ * a tile tap, so the price, the code, the URL, the toast and the undo stack
+ * follow. Where no other option is free the one-button dialog says so and
+ * nothing changes. On the summary there is no group, and the arrows are
+ * hidden (their box kept).
+ */
+const firstGroup = key => groupsIn(key)[0] || null;
+function arrowStep(dir) {
+  noteEngaged();
+  const g = firstGroup(liveStep);
+  if (!g) return;
+  const list = g.list();
+  const blocked = conflicts(state)[g.key] || {};
+  const at = list.findIndex(o => o.id === state[g.key]);
+  for (let k = 1; k < list.length; k++) {
+    const o = list[(((at + dir * k) % list.length) + list.length) % list.length];
+    if (o.id !== state[g.key] && !blocked[o.id]) { choose(g, o.id); return; }
+  }
+  const title = T(g.title);
+  openClash(T('dlg.noFit', lang() === 'en' ? title.toLowerCase() : title));
+}
+
 /** Leave the live step for another by a gesture: the step left is `visited`
  *  (its navigator mark takes the check), then the flow moves. Boot, the
  *  language switch and a link call `goStep` directly and mark nothing. */
@@ -2414,6 +2454,22 @@ function markSteps() {
      first one", so it is told. Above 1100 there is room and it stays. */
   const panel = document.querySelector('.panel--choose');
   if (panel) panel.dataset.live = liveStep;
+
+  /* ⚠ THE BAND ABOVE THE DOOR — the live step's name, big, and what is chosen
+     in its first group (27.9.2026). Written here because this runs on every
+     step change AND every paint, so the second line follows a tap, an arrow,
+     an undo and a link alike. `nowLabel` falls back to `list[0]`, so it always
+     names something; the summary has no group and its line stays empty (its
+     box does not, so the door does not move between steps). The wrap carries
+     the live step for the stylesheet (the arrows hide on the summary). */
+  const sec = [...SECTIONS, SUMMARY].find(x => x.key === liveStep);
+  const bandT = document.querySelector('[data-band-title]');
+  const bandN = document.querySelector('[data-band-now]');
+  const fg = firstGroup(liveStep);
+  if (bandT && sec) bandT.textContent = T(sec.title);
+  if (bandN) bandN.textContent = fg ? nowLabel(fg) : '';
+  const wrapEl = document.querySelector('.stage-wrap');
+  if (wrapEl) wrapEl.dataset.step = liveStep;
 
   /* ⚠ AND THE LIVE CIRCLE IS BROUGHT INTO VIEW — BY SCROLLING THE ROW, AND
      NOTHING ELSE. The row is nine 44 px circles and it does not fit 320 px,
@@ -3630,6 +3686,9 @@ function fitStage() {
     const sw = $('.stage-wrap').style;
     sw.setProperty('--frame-top', `${Math.round(f.top - wrap.y)}px`);
     sw.setProperty('--frame-right', `${Math.round(f.right - wrap.x)}px`);
+    /* and the other edge and the middle, for the two arrows (27.9, commit 4) */
+    sw.setProperty('--frame-left', `${Math.round(f.left - wrap.x)}px`);
+    sw.setProperty('--frame-mid', `${Math.round((f.top + f.bottom) / 2 - wrap.y)}px`);
     sw.setProperty('--hud-b', `${Math.round(hudB - wrap.y)}px`);
 
     const root = document.documentElement.style;
