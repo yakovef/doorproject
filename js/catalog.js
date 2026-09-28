@@ -1117,11 +1117,13 @@ export const PEEPHOLES = [
   /* ⚠ A DIGITAL VIEWER, +390, 20.9.2026 — Peretz: *"einit digital +390."*
      APPENDED, so `peep` keeps its index; `BITS.peephole` still had to go 1 → 2,
      which is a layout change and is inside `VERSION` 23 with the rest.
-     No photograph yet — `peepholeDigital` in the renderer says what is sourced
-     and what is convention — and `ASK-PERETZ.md` asks for one. It stands where
-     the optical viewer stands and is refused by the same `peepholeFits`. */
+     Drawn off its photograph since 28.9.2026 — the owner's son sent the product,
+     *"make the digital peephole look like this"* (`peepholeDigital` has what
+     was read off it). The photograph has no scale, so the SIZE is still the
+     sourced one. It stands where the optical viewer stands and is refused by
+     the same `peepholeFits`. */
   { id: 'peep-digital', he: 'עינית דיגיטלית', en: 'Digital peephole', ru: 'Цифровой глазок',
-    digital: true, photo: null },
+    digital: true, photo: 'research/viewer/digital.png' },
 ];
 
 /* ── WITHDRAWN: the glass as its own choice ──────────────────────────

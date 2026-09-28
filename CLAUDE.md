@@ -184,6 +184,12 @@ lines here. Dates are the day of the change.
   double-cone finial and a knob at each end (`GRAB`, `GRAB_END`). Footprint
   `in` + 10 → + 5 (the trio's field, §9); channel + Coral + bow no longer fits
   on two sizes. Sheets: `against-grab` only.
+- **28.9** The digital viewer drawn off the owner's son's photograph (*"make the
+  digital peephole look like this"*, `research/viewer/digital.png`): round black
+  face in a rounded-square bezel, lens, two lights, sensor ring, bell button; the
+  maker's badge left off. Face constant; size still 54 mm (no scale). 0 bare
+  sheets. Then its bezel stopped following the פרזול (*"remove the pirzul effect
+  from them"*): `#lockUnit` constant steel; copy says "the regular peephole".
 - **28.9** **כדור על אורך** (`knobplate`) redrawn off ONE photograph (*"i only
   have one image of this but i want it in … refine it"*): a waisted plate 90 ×
   216 (waist 70 at 0.54 — the עילי's family, 8 mm narrower), a 54 mm knob on a
@@ -212,12 +218,6 @@ lines here. Dates are the day of the change.
   closing edge in `#nickel` (published dimensions; fitted inside in reality —
   asked, §0k); each פרזול tile is this door's metal. 0 bare sheets moved, as
   predicted. Long form: `HISTORY.md`.
-- **27.9** The summary as pictures (6 of 8): *"show the icons of all the
-  things the person chose … clicking one takes them to that section."* A
-  button per spec row, the tile's own glyph (the colour its swatch) and the
-  short name (the colour's code — ours, §0a), "label: value" its name, at every
-  width; `#spec` no longer `aria-hidden` (§5.29). 1280×720: 4 of 8 tiles whole
-  above the send (was 3). Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -347,14 +347,14 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | **9,440,778 assertions, 0 failed** with the knob-plate redrawn, on the swing bar lock's withdrawal (28.9; 9,646,600 with עילי and the latch, 9,440,757 on the withdrawal alone). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 28.9 |
-| `npm run audit` | **no faults** at every viewport with the knob-plate redrawn, on the swing bar lock's withdrawal (28.9) | 28.9 |
-| `npm run collide` | `all` (1,646 designs — 1,476 base, 610 with the bow, plus 170 face-detail; 2,602 while the swing bar lock stood) and `boxes` clean with the knob-plate redrawn (28.9: drawn 46/46/155, declared 48/48/157; the deepest mount 109, the עילי's) | 28.9 |
+| `npm test` | **9,440,778 assertions, 0 failed** with the bow redrawn, on the digital viewer's redrawing (28.9 — the same total as with the knob-plate; 9,646,600 with עילי and the latch). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 28.9 |
+| `npm run audit` | **no faults** at every viewport with the bow redrawn, on the digital viewer's redrawing (28.9) | 28.9 |
+| `npm run collide` | `all` (1,638 designs — 1,468 base, 602 with the bow, plus 170 face-detail; 1,646 before the bow's measured 300 mm cost 8 channel + Coral designs, §9) and `boxes` clean with the bow redrawn (28.9: drawn 0/300/21, declared 4/305/26; the knob-plate 46/46/155 in 48/48/157; the deepest mount 109, the עילי's) | 28.9 |
 | `npm run fuzz` | 30,000 designs over every field (the latch among them), 1,800 clicks, 141 of them met the confirm dialog — 65 yes, 76 no, the door unchanged after every no — nothing broke (the big round's commit 7) | 27.9 |
 | `npm run latency` | **217 ms** worst door against a 600 ms gate (the big round's commit 7) — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · 531 · 656 for default · sidelight+ironwork · the heaviest, unchanged through the round. Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 27.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
-| `npm run sheets` | the bare sheet files and 6 `lockset` sheets byte-stable across commits that do not touch the drawing. ⚠ The Rotem (27.9) moved 33, every one ONLY in a lever-sized patch at lock height: 10 `against-` by 231 px at their edge (they set no lockset, so they carry the default Rotem), 8 `corpus-`, 6 `recreate-`, `lockset-coral`, `lockset-plate` and 7 `shot`. The big round (27.9), run once after its commit 7 with the prediction written first: **0 bare and 0 lockset moved**, as predicted — the 12 `shot` sheets, `.stamps.json` and `corpus-links.md` (v=26, `lt=`) only. The knob-plate (28.9): exactly the two that show it, `corpus-06` (d092) and `lockset-knobplate` | 28.9 |
+| `npm run sheets` | the bare sheet files and 6 `lockset` sheets byte-stable across commits that do not touch the drawing. ⚠ The Rotem (27.9) moved 33, every one ONLY in a lever-sized patch at lock height: 10 `against-` by 231 px at their edge (they set no lockset, so they carry the default Rotem), 8 `corpus-`, 6 `recreate-`, `lockset-coral`, `lockset-plate` and 7 `shot`. The big round (27.9), run once after its commit 7 with the prediction written first: **0 bare and 0 lockset moved**, as predicted — the 12 `shot` sheets, `.stamps.json` and `corpus-links.md` (v=26, `lt=`) only. The knob-plate (28.9): exactly the two that show it, `corpus-06` (d092) and `lockset-knobplate`. The bow (28.9): `against-grab` only — no gallery door carries it | 28.9 |
 
 ⚠ **When a bare sheet moves on a commit that could not have moved it, find out
 what did** — that is how chrome painted across every sheet was found once. And
@@ -944,8 +944,9 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
 - **`BELLS` and `PEEPHOLES`** — fittings on the face (`bl=`, `ey=`). The bell is
   a 132 mm **ring knocker on the centre line** (`KNOCKER_AFF` 1470), the
   peephole directly above it; the bell sits on the pull-handle step and takes
-  the handle's finish. The digital viewer is drawn from published dimensions
-  (`photo: null`). **Every viewer is refused beside a window** (`viewerOn`,
+  the handle's finish. The digital viewer is drawn off the owner's son's
+  photograph (`research/viewer/digital.png`, 28.9): round black face, lens,
+  two lights, bell button; its SIZE is still the sourced 54 mm (no scale). **Every viewer is refused beside a window** (`viewerOn`,
   27.9 — the rules had named `'peep'` only). Two LISTS, not a multi-select: the withdrawn add-ons were a
   bitmask under the retired `a=`.
 - ~~**`LATCHES` — the swing bar lock (סגר בטחון)**~~ — in the site 27.9 (the
@@ -961,7 +962,7 @@ before it picks a fill.**
 |---|---|
 | `gripHard` `gripSoft` | the pull bar and the bow, in the handle finish (`hf=`) |
 | `nickel` `nickelSoft` `plateFace` `domeKnob` `rotemFace` `rotemLever` `knobBall` | the פרזול — nickel is its **own** warm ramp, `FINISH_TONES.nickel` (27.9, measured off the Coral doors: 20% darker than `steel`, hue ≈40°); `steel` stays the pull bar's nickel, the extra locks' and the derivation reference. `domeKnob` (the כדור's ball) through `domeRamp` since 26.9, the measured dome kept literal on nickel |
-| `lockUnit` `lockUnitFace` `lockUnitSoft` `mirrorKnob` | the bought-in extra locks and the ספיר — a constant steel |
+| `lockUnit` `lockUnitFace` `lockUnitSoft` `mirrorKnob` | the bought-in extra locks, the ספיר and the DIGITAL viewer's bezel (28.9) — a constant steel |
 | `euroSteel` `euroRim` | the cylinder, following the פרזול at its own stand-off (`cylinderRamp`) — derived on nickel too since 27.9, so every finish's plug stands 2–16% off its plate |
 | `bellMetal` | the פעמון, following the pull handle's finish (`bellRamp` keeps Peretz's older *"nickel and gold only"* beside the instruction that overruled it) |
 
@@ -972,8 +973,8 @@ at least once, always silently.
 
 | | |
 |---|---|
-| follows it | the lever and its furniture, the כדור's ball and shank (26.9 — the owner's son called the constant ball a bug, overruling 31.8), the keyhole, the hinges, the peephole (both kinds), the security latch (in his list; not drawn — it is fitted inside, and the choice offered 27.9 was withdrawn 28.9), the metal strips. The כדור על אורך (`knobplate`) too — d092 is bronze. The פרזול tiles show these on THIS door since 27.9 — its lock furniture, the hinges and the viewer when chosen — redrawn when they change (`composite`) |
-| never | the pull handle, the bow and the פעמון (their own `hf=`) · the extra lock (`#lockUnit`) · the ספיר (the maker's finish, 31.8) |
+| follows it | the lever and its furniture, the כדור's ball and shank (26.9 — the owner's son called the constant ball a bug, overruling 31.8), the keyhole, the hinges, the OPTICAL peephole (the digital one stopped 28.9: *"remove the pirzul effect from them"*), the security latch (in his list; not drawn — it is fitted inside, and the choice offered 27.9 was withdrawn 28.9), the metal strips. The כדור על אורך (`knobplate`) too — d092 is bronze. The פרזול tiles show these on THIS door since 27.9 — its lock furniture, the hinges and the viewer when chosen — redrawn when they change (`composite`) |
+| never | the pull handle, the bow and the פעמון (their own `hf=`) · the extra lock and the digital viewer (`#lockUnit`) · the ספיר (the maker's finish, 31.8) |
 
 ### The lock furniture's measurements (`npm run lockset`, 19.9)
 
