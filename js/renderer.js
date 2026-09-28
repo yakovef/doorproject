@@ -10343,10 +10343,12 @@ const peephole = (cx, cy) => {
  * ⚠ The SIZE is still `PEEPHOLE_DIGITAL_R` — the photograph carries no scale,
  * so it says what the viewer looks like and not how big it is; every rule that
  * reads the viewer's reach reads that one constant, unchanged.
- * ⚠ Whose metal: the BEZEL is `#nickel` and follows the פרזול, as it did —
- * Peretz's 26.8 list has the עינית in it and nothing he has said since
- * separates the two viewers. The black face is the camera unit's own plastic
- * and does not change with anything.
+ * ⚠ Whose metal: the BEZEL is `#lockUnit`, a constant steel, and does NOT
+ * follow the פרזול since 28.9 — the owner's son, shown it in gold: *"remove
+ * the pirzul effect from them."* It is a bought-in camera unit, like the קודן
+ * and the כספת, so it takes their owner. (It had been `#nickel` on Peretz's
+ * 26.8 list, which names the עינית; the OPTICAL viewer still follows it.) The
+ * black face is the unit's own plastic and changes with nothing.
  * `data-kind="peephole"` like the optical one, because every rule that asks
  * "is there a viewer on the centre line" asks by kind.
  */
@@ -10370,7 +10372,7 @@ const peepholeDigital = (cx, cy) => {
             width="${n1(R * 1.9)}" height="${n1(R * 1.9)}" rx="${n1(S * 0.36)}"
             fill="#000" opacity="0.18"/>
       <rect x="${cx - R}" y="${cy - R}" width="${S}" height="${S}" rx="${n1(S * 0.36)}"
-            fill="url(#nickel)" stroke="#000" stroke-opacity=".26"/>
+            fill="url(#lockUnit)" stroke="#000" stroke-opacity=".26"/>
       <circle cx="${X(0)}" cy="${Y(0)}" r="${L(F / 2)}" fill="#111111"/>
       <circle cx="${X(0)}" cy="${Y(-0.29)}" r="${L(0.075)}" fill="#0d0d0f"
               stroke="#3a3c40" stroke-width="${L(0.01)}"/>

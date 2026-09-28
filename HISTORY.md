@@ -26,6 +26,14 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — THE DIGITAL VIEWER NO LONGER FOLLOWS THE פרזול.** The owner's son,
+  shown it in nickel, white and gold: *"i want you to remove the pirzul effect
+  from them, quick fix."* The bezel is `#lockUnit`, the constant steel of the
+  bought-in extra locks, where it was `#nickel`; the face was already constant.
+  The OPTICAL viewer still follows (Peretz's 26.8 list names the עינית), so
+  `exp.pz.a` now says "the regular peephole" / "העינית הרגילה" / "обычного
+  глазка". Gates in the commit message.
+
 - **28.9 — THE DIGITAL VIEWER, DRAWN OFF ITS PHOTOGRAPH.** The owner's son sent
   a product photograph of a digital door viewer: *"make the digital peephole
   look like this."* Kept as `research/viewer/digital.png` and cited from
