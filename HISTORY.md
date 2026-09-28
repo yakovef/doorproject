@@ -26,6 +26,56 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **27.9 — THE BIG ROUND, 2 OF 8: THE PRICE CARD AT THE DOOR'S TOP-RIGHT
+  CORNER.** The owner's son: *"move the pricing to another place that is
+  better, it looks bad under the lamp, move to near the door, at the up right
+  corner."* Chosen in chat: the top-right corner of the DOOR, on the wall
+  outside the frame's head, below the language buttons, above the lamp. ⚠ It
+  moves a placement he made himself with a circle on a desktop screenshot on
+  28.8 (*"on the right side below the lamps"*); he is the one moving it.
+  · **Mechanism.** `fitStage` publishes `--frame-top`, `--frame-right` and
+    `--hud-b` (the wall chrome's foot) on `.stage-wrap`; above 1100 the card is
+    `left: calc(var(--frame-right) + 8px)` — the 8 px the lamp clamp kept —
+    and `top: max(var(--frame-top), var(--hud-b) + 8px)`, no translate. PHYSICAL
+    right in every language, as the lamp was: the drawing does not mirror
+    (§0c), and in Hebrew that is the side the language buttons stand on. The
+    brief's word was "inline-end"; that would have put the card at the door's
+    top-LEFT in Hebrew, against his "up right corner" on the Hebrew page, so
+    the chat decision governs. `--lamp-cx`/`--lamp-b` are still published —
+    now the lamp alone, unclamped; the card's two old clamps (29.8 into the
+    stage, 14.9 sideways but never onto the casing) went with the anchor. The
+    phone bar is untouched.
+  · **A fault found by placing it.** The card first came to rest 2 px above the
+    head (1440×900: `--frame-top` 143, frame at 145). `#frame` carries two CSS
+    entrances — the arrival and a change of משקוף, each a 6 px `translateY` —
+    and `getBoundingClientRect` reads the box mid-flight; nothing read the
+    frame's TOP before. `fitStage` now reads the SETTLED geometry: the group's
+    `getBBox()` through the SVG's screen matrix (the group has no transform
+    attribute, so this is the drawing's own box).
+  · **Audit, restated on the same subject** ("the price card stays inside the
+    picture it is pinned to"): the three clauses stand — whole where the wall
+    holds it, never on the leaf, the breakdown centred on it — and a FOURTH
+    asserts the anchor (8 px outside the casing, at the head or 8 px under the
+    chrome, ±1.2 px — rounding is up to 1), with a check that the card never
+    reaches up into the chrome. Every reading now waits for the page's finite
+    animations first (§7). The lamp block's message follows the anchor.
+    Result: 162 readings, the card at the head corner on 162, whole on all 142
+    where the wall holds it, on the door on none, breakdown centred in all 27;
+    cut where the wall cannot hold it: ru 1100×800 halfextra1 7 px and
+    halfextra2 29 px, ru 1152×800 halfextra2 3 px.
+  · **Falsified**: the lamp anchor put back — 12 of 12 readings (he, 1280 and
+    1920, six sizes) fault 104–119 px down and 141–161 across; the settled
+    geometry taken out — 2 of 12 fault at −2.3 px (it is timing-dependent: a
+    fit that lands in the entrance's 640 ms reads the translate).
+  · **The breakdown, measured** (§9, "a short window on a long column"): a
+    thirteen-row door, rows whole, before → after — 1280×720 10 → 10 (capped by
+    the box's 46vh now, not the room), 1366×768 7 → 10, 1100×800 8 → 11,
+    1440×900 12 → 12, 1920×918 10 → 13. §9's "~5 rows at 1280×720" was stale
+    before this commit (10 at `1e6b36a`) and is corrected.
+  · **Gates**: `node --check`, build, `npm test` (below), the two audit blocks
+    above clean. Sheets: 0 bare can move (page only, `?bare=1` hides the card);
+    the one run is after commit 7.
+
 - **27.9 — THE BIG ROUND, 1 OF 8: COPY AND SMALL CHROME.** Eleven notes from
   the owner's son, four settled in chat, eight commits in an order chosen so a
   session that dies early leaves a coherent branch (page work first, the one
@@ -152,7 +202,7 @@ oldest lines move to the top of the "moved" section.
     margin in it passes the next mistake).
   · New sheets: `research/handles/rotem/sheet-photo-before-app.webp`,
     `…/coral/sheet-reach-before-after.webp`, `…/curved/sheet-reach-before-after.webp`.
-  · Gates at this commit: `collide -- all` 1,508 designs clean and `-- boxes` clean (the four footprints above re-declared); `npm test` 9,118,784 passed with only the five stale-sheet failures, then `npm run sheets` — 33 sheets moved, every one only in a lever-sized patch at lock height (10 `against-` by 231 px at their edge, 8 `corpus-`, 6 `recreate-`, `lockset-coral` and `lockset-plate`, and 7 `shot`); the rerun of `npm test` and `npm run audit` are recorded in the next commit.
+  · Gates at this commit: `collide -- all` 1,508 designs clean and `-- boxes` clean (the four footprints above re-declared); `npm test` 9,118,784 passed with only the five stale-sheet failures, then `npm run sheets` — 33 sheets moved, every one only in a lever-sized patch at lock height (10 `against-` by 231 px at their edge, 8 `corpus-`, 6 `recreate-`, `lockset-coral` and `lockset-plate`, and 7 `shot`); then `npm test` 9,118,785 / 0, `npm run audit` clean at all eight `VIEWS` with its sweeps, `npm run fuzz` 30,000 designs + 1,800 clicks clean, `npm run latency` 227 ms worst with 268 · 531 · 656 elements (the default door +7, the Rotem). Merged with the big round's first two commits (1e6b36a, ce68bb2; CLAUDE.md, HISTORY.md by hand, index.html re-stamped): `npm test` 9,118,821 / 0, sheets moved `shot` only.
 
 - **27.9 — THE ROTEM, MEASURED OFF THREE INSTALLED DOORS: A PROPOSAL.** The
   owner's son: *"here is 3 doors with the rotem handle."* The Rotem (`plate`) is
@@ -984,6 +1034,20 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **27.9** The handle branch merged into this one (*"yes you should"* — the levers
+  were only on `claude/door-handle-design-catalog-votz53` and the owner's son
+  looked for them on the page): the Coral and the curved lever measured off seven
+  installed doors (§3 LOCKSETS and the lock-furniture table; their two lines are
+  in `HISTORY.md`). Code merged clean; `CLAUDE.md`, `HISTORY.md`
+  merged by hand. On the merge: test 9,118,759 / 0, collide 1,508 + boxes,
+  fuzz clean, latency 190 ms; against this branch 40 of 57 sheets moved, every
+  one only by its nickel lock furniture (14 `against-` by one lever-sized patch).
+  The merge's audit found the trio clause's 8 faults too (same on this branch's
+  own code); `ab2cde4`'s restatement, below, is kept and the merge's own
+  one-line fixture move was dropped for it. ⚠ The test total fell ~92 k (9.21 →
+  9.12 M), traced per group: 60 designs per colour stopped being buildable —
+  the Coral beside a 700 mm Idan on `extra1`/`halfextra1` with the square
+  window; the Coral's measured 70 mm lock (66 → all 60 fit again). §9.
 - **27.9** Four navigator marks redrawn "so that a 5 year old will
   understand", after each section was described first (the brief is in
   `js/icons.js`): colour a palette, pz a bolt with a glint, face a child's door

@@ -11167,7 +11167,6 @@ ${body}
     const quoteEl = document.querySelector(".quote");
     const quoteR = quoteEl ? quoteEl.getBoundingClientRect() : null;
     const quoteH = quoteR ? quoteR.height : 0;
-    const quoteW = quoteR ? quoteR.width : 0;
     if (!(w > 0 && h > 0 && Number.isFinite(fx) && Number.isFinite(fy) && box.width > 0 && box.height > 0)) return;
     const scale = Math.min(box.width / w, box.height / h);
     const vw = box.width / scale, vh = box.height / scale;
@@ -11176,7 +11175,14 @@ ${body}
       `${(fx + (w - vw) / 2).toFixed(1)} ${(fy + (h - vh) / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`
     );
     const frame = svg.querySelector("#frame");
-    const frameR = frame ? frame.getBoundingClientRect() : null;
+    const frameR = (() => {
+      if (!frame || typeof frame.getBBox !== "function") return frame ? frame.getBoundingClientRect() : null;
+      const bb = frame.getBBox(), m = svg.getScreenCTM();
+      if (!m || !(bb.width > 0)) return frame.getBoundingClientRect();
+      const x = m.e + m.a * bb.x, y = m.f + m.d * bb.y;
+      const w2 = m.a * bb.width, h2 = m.d * bb.height;
+      return { x, y, left: x, top: y, width: w2, height: h2, right: x + w2, bottom: y + h2 };
+    })();
     const baseY = Number(svg.dataset.baseY);
     if (Number.isFinite(baseY)) {
       document.documentElement.style.setProperty(
@@ -11197,15 +11203,9 @@ ${body}
       ss.setProperty("--photo-h", `${p.h.toFixed(1)}px`);
       ss.setProperty("--photo-y", `${p.top.toFixed(1)}px`);
       const wrapR = $(".stage-wrap").getBoundingClientRect();
-      const lampB = Math.min(Math.max(p.lampBot, quoteH + 8), box.height - 8);
-      const half = quoteW / 2;
-      const edge = Math.min(wrapR.right, window.innerWidth) - box.x;
-      const pull = Math.min(p.lampX, edge - half - 8);
-      const stop = frameR ? frameR.right - box.x + half : -Infinity;
-      const lampX = Math.max(pull, Math.min(p.lampX, stop));
       const st = $(".stage-wrap").style;
-      st.setProperty("--lamp-cx", `${Math.round(box.x - wrapR.x + lampX)}px`);
-      st.setProperty("--lamp-b", `${Math.round(box.y - wrapR.y + lampB)}px`);
+      st.setProperty("--lamp-cx", `${Math.round(box.x - wrapR.x + p.lampX)}px`);
+      st.setProperty("--lamp-b", `${Math.round(box.y - wrapR.y + p.lampBot)}px`);
     }
     if (frameR) {
       const f = frameR;
@@ -11226,6 +11226,11 @@ ${body}
         st.setProperty("--lamp-cx", `${Math.round(lamp.x + lamp.width / 2 - wrap.x)}px`);
         st.setProperty("--lamp-b", `${Math.round(lamp.bottom - wrap.y)}px`);
       }
+      const hudB = Math.max(0, ...[...document.querySelectorAll(".stage__hud .hud__slot")].map((e) => e.getBoundingClientRect().bottom));
+      const sw = $(".stage-wrap").style;
+      sw.setProperty("--frame-top", `${Math.round(f.top - wrap.y)}px`);
+      sw.setProperty("--frame-right", `${Math.round(f.right - wrap.x)}px`);
+      sw.setProperty("--hud-b", `${Math.round(hudB - wrap.y)}px`);
       const root = document.documentElement.style;
       root.setProperty("--stage-l", `${Math.round(wrap.x)}px`);
       root.setProperty("--stage-w", `${Math.round(wrap.width)}px`);

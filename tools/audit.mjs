@@ -3210,7 +3210,7 @@ for (const v of VIEWS) {
     if (!r.qFixed) {
       if (r.qTop < r.boxT - 1 || r.qBot > r.boxB + 1) {
         fault(v.name, `the price card is outside the stage (${Math.round(r.boxT - r.qTop)} px above `
-          + 'its top) — it is anchored to a lamp and the lamp left the frame');
+          + 'its top) — it is anchored to the door\'s head (27.9; it was a lamp) and the anchor left the picture');
       }
       if (!r.hudCount) {
         fault(v.name, 'no .hud__slot on the wall — the overlap check has nothing to compare against');
@@ -5802,6 +5802,18 @@ for (const v of VIEWS) {
 }
 
 /* ── THE PRICE CARD STAYS INSIDE THE PICTURE IT IS PINNED TO ─────────────
+   ⚠ RESTATED 27.9.2026 FOR A NEW ANCHOR, SAME SUBJECT. The card hung under the
+   right-hand lamp (below); the owner's son moved it — *"it looks bad under the
+   lamp, move to near the door, at the up right corner"* — to the door's head
+   corner: `left: calc(var(--frame-right) + 8px)`, `top: max(var(--frame-top),
+   var(--hud-b) + 8px)`, no translate. The three clauses below keep their
+   subject (whole where the wall holds it; never on the leaf; the breakdown
+   centred on it) and a FOURTH asserts the anchor itself, because a card
+   quietly drifting back to the lamp would pass the other three. Every reading
+   now waits for the page's finite animations first: `#frame`'s own arrival is
+   a 6 px translate, and a card placed during it was placed by it (§7 — the
+   page reads the frame's settled geometry for exactly that reason).
+
    Measured 14.9 by walking as the customer who has a QUESTION halfway through
    — the one who taps the quiet send from a question step rather than the green
    one at the end — and then by looking at the wall as a picture.
@@ -5873,7 +5885,7 @@ try {
      place to be named, and the stale-exemption check still walks it. */
   const ON_DOOR_OK = new Set();
   const stillOverlapping = new Set();
-  let room = 0, tight = [], measured = 0, popovers = 0;
+  let room = 0, tight = [], measured = 0, popovers = 0, anchored = 0;
   const p = await b.newPage();
   for (const lang of ['he', 'en', 'ru']) {
     for (const [w, h] of SHAPES) {
@@ -5881,13 +5893,20 @@ try {
       for (const size of Object.keys(SIZES)) {
         await p.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=${size}`);
         await p.waitForTimeout(260);
-        const m = await p.evaluate(() => {
+        const m = await p.evaluate(async () => {
           const q = document.querySelector('.quote');
           const wrap = document.querySelector('.stage-wrap');
           const fr = document.querySelector('.door-svg #frame');
           if (!q || !wrap || !fr) return null;
+          /* the arrival animates `#frame` itself; read the settled page */
+          const finite = document.getAnimations()
+            .filter(a => a.effect && a.effect.getComputedTiming().iterations !== Infinity);
+          await Promise.race([Promise.all(finite.map(a => a.finished.catch(() => {}))),
+            new Promise(res => setTimeout(res, 3000))]);
           const r = q.getBoundingClientRect(), rw = wrap.getBoundingClientRect();
           const f = fr.getBoundingClientRect();
+          const hudB = Math.max(0, ...[...document.querySelectorAll('.stage__hud .hud__slot')]
+            .map(e => e.getBoundingClientRect().bottom));
           /* the box that actually PAINTS the card: its clipping ancestor, itself
              inside the window. Above 1100 the page cannot scroll, so anything
              outside this is gone rather than reachable. */
@@ -5900,6 +5919,11 @@ try {
             wall: Math.round(wall),
             cut: Math.round(Math.max(0, r.right - vis.r) + Math.max(0, vis.l - r.left)),
             onDoor: Math.round(Math.max(0, Math.min(r.right, f.right) - Math.max(r.left, f.left))),
+            /* the anchor: 8 px outside the casing's right edge, level with its
+               head or 8 px under the wall chrome, whichever is lower */
+            dx: Math.round((r.left - (f.right + 8)) * 10) / 10,
+            dy: Math.round((r.top - Math.max(f.top, hudB + 8)) * 10) / 10,
+            hudClear: Math.round(r.top - hudB),
           };
         });
         const tag = `${lang} ${w}x${h} ${size}`;
@@ -5916,6 +5940,18 @@ try {
           }
         } else if (m.cut > 0) {
           tight.push(`${tag} ${m.cut}px`);
+        }
+        /* 4 — and it stands at the door's head corner, not under the lamp */
+        /* 1.2 px: the three published lengths are whole pixels, so rounding
+           accounts for up to 1; the 2 px of a card placed during the frame's
+           entrance (the fault `fitStage`'s settled geometry fixed) must fire */
+        if (Math.abs(m.dx) > 1.2 || Math.abs(m.dy) > 1.2) {
+          fault('quote-wall', `${tag}: the price card is ${m.dx} px across and ${m.dy} px down from `
+            + 'the door\'s top-right corner (8 px outside the casing, at its head or under the wall '
+            + 'chrome) — it is not where the owner\'s son asked for it');
+        } else anchored++;
+        if (m.hudClear < 0) {
+          fault('quote-wall', `${tag}: the price card reaches ${-m.hudClear} px up into the wall chrome`);
         }
         /* 2 — and nowhere at all may it be pulled onto the leaf */
         if (m.onDoor > 0) {
@@ -5991,7 +6027,8 @@ try {
   }
   if (faults === before) {
     console.log(`    ${measured} readings in three languages x nine desktop widths x all six `
-      + `sizes: the price card is whole on all ${room} where the wall can hold it, it stands on `
+      + `sizes: the price card stands at the door's head corner on ${anchored}, is whole on all ${room} `
+      + `where the wall can hold it, it stands on `
       + `the door on ${ON_DOOR_OK.size ? `none but the ${ON_DOOR_OK.size} §9 names` : 'none'}, and its breakdown is centred on `
       + `it in all ${popovers}. ${tight.length} cut where the wall cannot hold it (§9): `
       + tight.slice(0, 4).join(', ') + (tight.length > 4 ? ` +${tight.length - 4} more` : ''));

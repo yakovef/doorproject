@@ -3395,12 +3395,12 @@ function fitStage() {
   const fx = Number(svg.dataset.fitX), fy = Number(svg.dataset.fitY);
   const w = Number(svg.dataset.fitW), h = Number(svg.dataset.fitH);
   const box = stage.getBoundingClientRect();
-  /* Read once, used three times: by the two lamp clamps below and by
-     `--quote-h` at the end. See the note at the clamp. */
+  /* Read once: `--quote-h` at the end needs the height (the phone bar), and
+     the width was the old lamp clamp's (gone 27.9 — the card stands at the
+     door's corner now, placed by the stylesheet off `--frame-*`). */
   const quoteEl = document.querySelector('.quote');
   const quoteR = quoteEl ? quoteEl.getBoundingClientRect() : null;
   const quoteH = quoteR ? quoteR.height : 0;
-  const quoteW = quoteR ? quoteR.width : 0;
   if (!(w > 0 && h > 0 && Number.isFinite(fx) && Number.isFinite(fy)
         && box.width > 0 && box.height > 0)) return;
 
@@ -3430,14 +3430,30 @@ function fitStage() {
      properties they become. */
   /* ⚠ READ ONCE, HERE, BECAUSE TWO THINGS NEED THE DOOR'S BOX AND ONLY ONE OF
      THEM USED TO ASK. The wall publication at the foot of this function has
-     always measured `#frame`; the lamp clamp below now needs the same rect, to
-     know how far the price card may be pulled inboard before it stops standing
-     on plaster and starts standing on the door. Two `getBoundingClientRect()`
+     always measured `#frame`; the price card's corner (27.9 — it was the lamp
+     clamp's, 14.9) needs the same rect, since the card stands against the
+     casing. Two `getBoundingClientRect()`
      calls on one element in one pass is the wasted forced reflow the note at
      the clamp already records costing 19 ms — and the "one quantity, two
      measurements" smell CLAUDE.md §5.10 is a list of. */
   const frame = svg.querySelector('#frame');
-  const frameR = frame ? frame.getBoundingClientRect() : null;
+  /* ⚠ THE FRAME'S SETTLED BOX, NOT ITS ANIMATED ONE — 27.9.2026. `#frame`
+     carries two CSS entrances (`fitPart`: the arrival, and a change of
+     משקוף), each a 6 px `translateY` for a few hundred milliseconds, and
+     `getBoundingClientRect` reports the box mid-flight. Nothing read the
+     frame's TOP until the price card was stood at its head, and then the card
+     came to rest 2 px above a head that settled lower (measured at 1440×900:
+     `--frame-top` 143, the frame at 145) — a card placed during an animation
+     is placed by the animation (§7). The geometry does not move: the group's
+     own box in the drawing's units, through the drawing's screen matrix. */
+  const frameR = (() => {
+    if (!frame || typeof frame.getBBox !== 'function') return frame ? frame.getBoundingClientRect() : null;
+    const bb = frame.getBBox(), m = svg.getScreenCTM();
+    if (!m || !(bb.width > 0)) return frame.getBoundingClientRect();
+    const x = m.e + m.a * bb.x, y = m.f + m.d * bb.y;
+    const w2 = m.a * bb.width, h2 = m.d * bb.height;
+    return { x, y, left: x, top: y, width: w2, height: h2, right: x + w2, bottom: y + h2 };
+  })();
 
   const baseY = Number(svg.dataset.baseY);
   /* ⚠ HOW DEEP THE FLOOR IS, published whether or not there is a photograph.
@@ -3468,73 +3484,19 @@ function fitStage() {
     ss.setProperty('--photo-w', `${p.w.toFixed(1)}px`);
     ss.setProperty('--photo-h', `${p.h.toFixed(1)}px`);
     ss.setProperty('--photo-y', `${p.top.toFixed(1)}px`);
-    /* The pill that hangs under the right-hand lamp now has a different lamp
-       to hang under — see the note on ROOMS. Same rects, same re-fit.
-       ⚠ AND IT IS CLAMPED INTO THE STAGE. Reported from outside off a
-       1920×918 laptop: the price card was sitting ON the language buttons —
-       6,288 px² of overlap — and 33 px ABOVE the top of the stage, out on the
-       header band. The lamp had climbed out of the frame and the card
-       faithfully followed it. A control anchored to a feature of the picture
-       must not leave the picture when the feature does: the anchor is held
-       inside the stage with room for the card itself, so the worst case is a
-       card sitting a little low rather than a card on the chrome. */
+    /* THE LAMP ITSELF, published for whatever stands against it. Until
+       27.9.2026 this was where the PRICE CARD was placed — centred under the
+       right-hand lamp, clamped into the stage (29.8, when it climbed off a
+       1920×918 stage onto the language buttons), and clamped sideways but never
+       onto the casing (14.9, when 64 of 162 readings lost up to 46 px of card
+       off the stage's edge). The card moved to the door's head corner on the
+       owner's son's word (see `.quote` in the stylesheet and the block at the
+       foot of this function), so what is left here is the lamp's own
+       position, unclamped. */
     const wrapR = $('.stage-wrap').getBoundingClientRect();
-    /* ⚠ THE BAR'S HEIGHT IS READ ONCE PER FIT, NOT TWICE. The clamp needs it
-       and so does `--quote-h` at the foot of this function, and asking the
-       layout for the same box twice in one pass is both a wasted forced
-       reflow and the "one quantity, two measurements" smell §5 is a list of.
-       `npm run latency` went 180 -> 219 ms when the second read went in. */
-    const lampB = Math.min(Math.max(p.lampBot, quoteH + 8), box.height - 8);
-    /* ⚠ AND THE SENTENCE ABOVE WAS TRUE OF ONE AXIS AND WRITTEN AS A RULE.
-       *"A control anchored to a feature of the picture must not leave the
-       picture when the feature does"* — and the card went on leaving it
-       sideways. `.quote` is `left: var(--lamp-cx); translateX(-50%)`, so half
-       its width hangs either side of a lamp that the crop can bring within
-       50 px of the stage's edge; `.stage-wrap` is `overflow: hidden`, so what
-       is past that edge is not off the fold, it is cut off. Measured over 162
-       readings (9 desktop widths × 3 languages × all six sizes), px of card
-       lost, worst size:
-
-           1100x800   he 23   en 34   ru 46
-           1152x800   he 18   en 29   ru 41
-           1200x800   he 14   en 25   ru 37
-           1440x900   he  0   en  5   ru 17
-           1280, 1366, 1536, 1680, 1920 — clean in all three
-
-       64 of the 162 lose something, up to 30 px of the GREEN SEND ITSELF, and
-       three of those widths are audit viewports. ⚠ Two axes of the fault are
-       the two this project keeps meeting: the card is 22–44 px wider on any
-       size but `standard` (the send's label grows the moment the door stops
-       being the default one, 11.9), and 22–44 px wider again in Russian —
-       so the reading everything here takes, the standard door in Hebrew, is
-       the least bad of the eighteen.
-
-       ⚠ AND IT MAY NOT SIMPLY BE PULLED INBOARD, which was the first version.
-       At 1100–1152 the wall is 139–213 px and the card is 141–207, so on the
-       wide doors there is no position that is both inside the stage and clear
-       of the leaf: a plain clamp lays up to 76 px × 122 of OPAQUE PAPER on the
-       door — three hundred times the 253 px² that got the language pill's
-       ground taken away on 28.8. So the pull stops at the casing. Where the
-       wall cannot hold the card the card stays where it is and stays cut, and
-       that residual is CLAUDE.md §9's existing entry about this wall gaining a
-       second occupant rather than a new fault.
-       ⚠ It only ever moves the card INBOARD. Where the card already overlaps
-       the door (1100 px, the two widest doubles) pushing it back out would buy
-       clean plaster with a bigger cut, which is a different decision and not
-       this one. */
-    /* ⚠ AGAINST THE WRAP, WHICH IS THE BOX THAT CLIPS, not against `.stage`.
-       They are coincident on every shape measured today — checked, 162
-       readings — and that is exactly the kind of agreement that stops being
-       true the day somebody gives the wrap a side padding again. The wrap is
-       what carries `overflow: hidden`, so it is what decides what is cut. */
-    const half = quoteW / 2;
-    const edge = Math.min(wrapR.right, window.innerWidth) - box.x;
-    const pull = Math.min(p.lampX, edge - half - 8);            // inside the picture
-    const stop = frameR ? frameR.right - box.x + half : -Infinity;   // not onto the door
-    const lampX = Math.max(pull, Math.min(p.lampX, stop));
     const st = $('.stage-wrap').style;
-    st.setProperty('--lamp-cx', `${Math.round(box.x - wrapR.x + lampX)}px`);
-    st.setProperty('--lamp-b', `${Math.round(box.y - wrapR.y + lampB)}px`);
+    st.setProperty('--lamp-cx', `${Math.round(box.x - wrapR.x + p.lampX)}px`);
+    st.setProperty('--lamp-b', `${Math.round(box.y - wrapR.y + p.lampBot)}px`);
   }
 
   /* HOW MUCH WALL THERE IS BESIDE THE DOOR, in css pixels, published for the
@@ -3623,6 +3585,36 @@ function fitStage() {
       st.setProperty('--lamp-cx', `${Math.round(lamp.x + lamp.width / 2 - wrap.x)}px`);
       st.setProperty('--lamp-b',  `${Math.round(lamp.bottom - wrap.y)}px`);
     }
+
+    /* ⚠ THE PRICE CARD STANDS AT THE DOOR'S TOP-RIGHT CORNER — 27.9.2026. The
+       owner's son: *"move the pricing to another place that is better, it looks
+       bad under the lamp, move to near the door, at the up right corner."*
+       Chosen in chat: the top-right corner of the DOOR, on the wall outside the
+       frame's head, below the language buttons, above the lamp. ⚠ It reverses
+       a placement he made himself with a circle on a screenshot (28.8, "on the
+       right side below the lamps"); he is the one moving it (CLAUDE.md §0a).
+       Three numbers, off rects this function already holds, so the card and
+       the door it stands against cannot disagree:
+         --frame-top   the casing's head
+         --frame-right the casing's RIGHT edge — physical, like the lamp was:
+                       the drawing does not mirror, so neither may anything
+                       pinned to it (§0c). In Hebrew that is the side the
+                       language buttons stand on; in English and Russian the
+                       undo pair's.
+         --hud-b       the foot of the wall chrome, so the card is below it
+                       whichever side it stands on
+       The stylesheet stands the card 8 px outside the casing (the gap the old
+       clamp kept) and at the head, or 8 px under the chrome where the head is
+       higher than that (the tall doubles). Where the wall is narrower than the
+       card it stays against the casing and the stage's edge cuts it — never
+       onto the door (the audit asserts both halves). Read only when the card
+       is on the wall; below 1100 it is the phone's bar and ignores these. */
+    const hudB = Math.max(0, ...[...document.querySelectorAll('.stage__hud .hud__slot')]
+      .map(e => e.getBoundingClientRect().bottom));
+    const sw = $('.stage-wrap').style;
+    sw.setProperty('--frame-top', `${Math.round(f.top - wrap.y)}px`);
+    sw.setProperty('--frame-right', `${Math.round(f.right - wrap.x)}px`);
+    sw.setProperty('--hud-b', `${Math.round(hudB - wrap.y)}px`);
 
     const root = document.documentElement.style;
     root.setProperty('--stage-l', `${Math.round(wrap.x)}px`);

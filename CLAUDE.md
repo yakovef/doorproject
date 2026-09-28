@@ -150,6 +150,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **27.9** The price card at the door's top-right corner (2 of 8): *"it looks
+  bad under the lamp, move to near the door, at the up right corner"* — his own
+  28.8 placement, moved by him. `--frame-top`/`--frame-right`/`--hud-b` from
+  `fitStage`, read off the frame's settled geometry (its 6 px entrance put the
+  card 2 px high); physical right in every language. The audit's card sweep
+  keeps its three clauses and gains the anchor as a fourth. Breakdown at
+  1920×918 10 → 13 of 13 rows. Long form: `HISTORY.md`.
 - **27.9** Copy and small chrome, the first of the big round's eight commits
   (the owner's son's eleven notes): **עצבו** את הדלת שלכם, one line, the lede
   gone (title 99 → 34 px at 1280×720, leaf 421 → 468 px — the band of commit 4
@@ -171,20 +178,6 @@ lines here. Dates are the day of the change.
   plate), 88.5 × 224 (was 90 × 240), satin not chrome, an egg-shaped key rim with
   no black keyhole, an even 23 mm strap with a dark bend at its root; reach 119
   kept. ⚠ Found doing it: the Coral's and curved lever's parallax ran the WRONG way (§9).
-- **27.9** The handle branch merged into this one (*"yes you should"* — the levers
-  were only on `claude/door-handle-design-catalog-votz53` and the owner's son
-  looked for them on the page): the Coral and the curved lever measured off seven
-  installed doors (§3 LOCKSETS and the lock-furniture table; their two lines are
-  in `HISTORY.md`). Code merged clean; `CLAUDE.md`, `HISTORY.md`
-  merged by hand. On the merge: test 9,118,759 / 0, collide 1,508 + boxes,
-  fuzz clean, latency 190 ms; against this branch 40 of 57 sheets moved, every
-  one only by its nickel lock furniture (14 `against-` by one lever-sized patch).
-  The merge's audit found the trio clause's 8 faults too (same on this branch's
-  own code); `ab2cde4`'s restatement, below, is kept and the merge's own
-  one-line fixture move was dropped for it. ⚠ The test total fell ~92 k (9.21 →
-  9.12 M), traced per group: 60 designs per colour stopped being buildable —
-  the Coral beside a 700 mm Idan on `extra1`/`halfextra1` with the square
-  window; the Coral's measured 70 mm lock (66 → all 60 fit again). §9.
 ---
 
 ## 0c. Where it stands today — 26.9.2026
@@ -247,9 +240,15 @@ beside the door, placed by the owner with circles on a screenshot; since 27.9
 undo/redo are 52 px and a floppy-disk save stands beside them (`#save-hud`,
 the summary's own `saveCurrent`).
 
-- **`.quote` — the price and a quiet send — moves with the viewport:** in the
-  wall under the right-hand lamp on a desktop, a bar at the foot of a phone
-  (at 390 px there are ~140 px of wall and a pill there lands on the door).
+- **`.quote` — the price and a quiet send — moves with the viewport:** on a
+  desktop at the DOOR'S top-right corner (27.9, the owner's son: *"it looks bad
+  under the lamp, move to near the door, at the up right corner"* — his own
+  28.8 circle under the lamp, moved by him): 8 px outside the casing, level
+  with its head or under the wall chrome, physically right in every language
+  (the drawing does not mirror); a bar at the foot of a phone (at 390 px there
+  are ~140 px of wall and a pill there lands on the door). `fitStage` reads the
+  frame's SETTLED geometry (`getBBox` through the screen matrix), because
+  `#frame`'s own entrance is a 6 px translate.
   **The price is stated once**; the SEND is stated twice (the quiet one and
   the summary's green one), and the audit requires both on every step with the
   identical href.
@@ -291,14 +290,14 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | 9,118,760 assertions, **0 failed** (9,210,648 before the levers' merge; the 92 k are 60 Coral + 700 mm bar designs per colour, §9) — the total is the product of catalogue list lengths and is not evidence of anything (it rose from 7.48 M on 27.9 with three more grilles; it fell from 9.09 M on 26.9 when the Coral stopped fitting beside a bar on the widest glazed leaves); read the failure count | 27.9 |
+| `npm test` | 9,118,821 assertions, **0 failed** on the Rotem merged with the big round's first two commits (27.9); the Rotem alone read 9,118,785 — +25 over 9,118,760, of which two are the new photo citations checked to exist and the rest the buildable set moving with four re-measured footprints (not traced per group). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 27.9 |
 | `npm run audit` | clean at all eight `VIEWS`, plus its own sweeps (§7) — about 20 minutes; the price-breakdown check waits for its animation. Last full run on the Rotem commit `a74ec6b` (27.9), before the big round's first commit was merged in; that commit ran its per-view audit at 1280×720 and 320×568. ⚠ It was **red for one commit** on 27.9 (8 faults) because the trio change stranded two of its assertions — §5.27 | 27.9 |
 | `npm run collide` | `all` (1,508 designs — 1,338 base, 552 of them with the bow, plus 170 face-detail) and `boxes` clean on the Rotem (27.9: coral/square `in` 140, levertaper 116, plate 47/114/161, each re-measured) | 27.9 |
 | `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, nothing broke (the Rotem commit) | 27.9 |
 | `npm run latency` | **227 ms** worst door against a 600 ms gate — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · 531 · 656 for default · sidelight+ironwork · the heaviest (27.9: the default door carries the Rotem, and its redrawn plate is 7 elements more than the waisted one's 261). Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 27.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
-| `npm run sheets` | the 51 bare sheet files (three twins' `against` sheets added 27.9) and 6 `lockset` sheets byte-stable across commits that do not touch the drawing; the design pairs moved 11 and added 3, every one a twin or an etched design. ⚠ The trio's rows and the משקוף section moved **0 bare sheets and 0 lockset**, as predicted: no fixture carries a three-panel face (`js/works.js` is 27 `plain` + 3 `panel2`, `tools/against.mjs` sets no face at all) and a tile is not in `?bare=1`. Only `.stamps.json` and 7 of the 12 `shot` sheets — the documented noise floor ⚠ The levers' merge (27.9) moved 40 of the 57: every one by its nickel lock furniture only — the 10 recreates and 10 corpus the tools write, all 6 lockset, 14 `against-` crops by one lever-sized patch at their edge; the 17 still are window-only crops and 7 `recreate-` files no tool writes any more | 27.9 |
+| `npm run sheets` | the bare sheet files and 6 `lockset` sheets byte-stable across commits that do not touch the drawing. ⚠ The Rotem (27.9) moved 33, every one ONLY in a lever-sized patch at lock height: 10 `against-` by 231 px at their edge (they set no lockset, so they carry the default Rotem), 8 `corpus-`, 6 `recreate-`, `lockset-coral`, `lockset-plate` and 7 `shot`. The big round's first two commits, merged on top, moved `.stamps.json` and the `shot` sheets only | 27.9 |
 
 ⚠ **When a bare sheet moves on a commit that could not have moved it, find out
 what did** — that is how chrome painted across every sheet was found once. And
@@ -1209,8 +1208,9 @@ are not in `VIEWS`:
 - **the price** — the FIGURE's own box hit-tested against the send and the way
   on, in three languages at 320/360/375/390/834 (*"intersects the viewport"* is
   not *readable*: it read green while ₪3,195 sat under the green pill on every
-  Russian phone); the breakdown readable to its total; the card inside the
-  picture, never pulled onto `#frame`, its breakdown centred on it.
+  Russian phone); the breakdown readable to its total; the card at the door's
+  head corner (27.9), inside the picture, never on `#frame`, its breakdown
+  centred on it.
 - **repairs** — a real repair at every viewport, every sentence on screen, its
   box covering no option; an undo that moves the price names a spec row.
 - **the summary** — spec before explainer (as an ORDER, not a row count); the
@@ -1474,11 +1474,11 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 - **Two controls pinned by rules that mirror differently stand in opposite walls
   in one language and the same wall in another** — the mechanism behind a
   closed fault (the removed grip controls under the price card in Hebrew only).
-  Check it for anything put in the wall next. At 1100–1152 px the wall is
-  140–152 px: the price card fits it since 27.9 (111/113/142 px in he/en/ru,
-  from 163/184/207, when the send became one word) and stands on no door at
-  any size — the audit's four named on-door readings are gone — but nothing
-  else fits there.
+  Check it for anything put in the wall next. At 1100–1152 px the wall right
+  of the widest door is 121–147 px: the price card (111–142 px since the send
+  became one word) stands against the casing there since 27.9 — at the door's
+  head corner, never on the door by construction — and the stage's edge cuts
+  it where the wall is narrower than the card. Nothing else fits there.
 - **The phone's Back button leaves the guide** (12.9): the whole walk is one
   history entry. The obvious fix — `pushState` per step — was built and
   **thrown away**: the in-page back button then grows the stack and system Back
@@ -1494,10 +1494,13 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   140mm`, which nobody chose by printing; what it needs first is how large the
   drawing must be for Peretz to read it in a workshop. The 8 mm body padding and
   12 mm `@page` margin are not to be shaved.
-- **The desktop price breakdown is a short window on a long column**: ~5 rows at
-  1280×720 inside `.stage-wrap`'s `overflow: hidden`, total pinned. Setting the
-  rows in two columns on the desktop is the better idea and unmeasured; moving
-  the chip is the owner's placement.
+- **The desktop price breakdown is a short window on a long column** — less so
+  since the card moved to the door's head (27.9). A thirteen-row door, rows
+  whole in the column, before → after: 1280×720 10 → 10 (capped by the box's
+  46vh now, not by the room under it), 1366×768 7 → 10, 1100×800 8 → 11,
+  1440×900 12 → 12, 1920×918 10 → 13. (The "~5 rows at 1280×720" this line
+  carried was stale: it read 10 at the commit before the move.) Raising the
+  46vh cap where the room allows, or two columns, is unmeasured.
 - **A short-and-wide screen shows the question and no answer** (13.9): a phone
   on its side (844×390) and a laptop at 200% zoom (640×360) leave 75–92 px under
   the fixed furniture, and the question block alone is ~110. **The layout is
