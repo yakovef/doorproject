@@ -70,8 +70,9 @@ oldest lines move to the top of the "moved" section.
     866 with the latch); `npm run sheets` moved the five cited doors' `corpus-`
     sheets (00 01 02 07 08), `recreate-d106`, `lockset-plate` (the five left it),
     the new `lockset-ilai`, `corpus-links.md` and the noisy `shot` sheets — and
-    no `against-` sheet (they carry the default Rotem). `npm test` and
-    `npm run audit` on that tree follow in the next commit.
+    no `against-` sheet (they carry the default Rotem). Then `npm test`
+    9,646,600 / 0 (no fitting drawn from nothing) and `npm run audit` no faults at
+    every viewport, on the big round's commit 8.
 
 - **27.9 — THE BIG ROUND, 8 OF 8: THE RECORD.** The round's own last
   instruction: §0a gains the placements the owner's son makes himself and the
