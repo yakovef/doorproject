@@ -5925,7 +5925,19 @@ for (const v of VIEWS) {
    ONE distinct row in five of six shape x language cases. So every row must
    also carry a PRICE, and every delete button must be whole on screen and
    return itself from `elementFromPoint`. Russian is carried for the reason it
-   always is: the longest copy, and the box grew with it. */
+   always is: the longest copy, and the box grew with it.
+
+   ⚠ RESTATED 29.9.2026, SAME SUBJECTS, FOR ROWS THAT ARE PICTURES — the
+   owner's son: *"show how they look and their price, that's it."* Each row is
+   the door drawn whole (132 px, fitted by height) and its price; the summary
+   is the button's accessible name. So "distinguishable by what is PAINTED" is
+   literal now: every pair of rows differs by RASTER (their pictures'
+   pixels, photographed), with the price beside. And §5.13's own case is
+   asserted where it can happen: two saved doors of different colours, each
+   picture's leaf in ITS door's colour (without `copyOf` the second resolves
+   the first's gradients). New beside them: never one column and no tile
+   under 132 px (the gallery's floors), every × and every tile ≥ 44 px, and
+   every tile's name carrying its price. */
 {
   console.log('\nthe saved-designs drawer fits the card it hangs in');
   const before = faults;
@@ -5951,13 +5963,17 @@ for (const v of VIEWS) {
     if (r.notice) fault('saved', `the fixture ${q} arrives repaired (${r.notice}) — it is not a `
       + 'door a customer could have saved');
   }
-  let opened = 0, rowsSeen = 0;
+  let opened = 0, rowsSeen = 0, savedColour = ''; const pairDiffs = [];
   for (const lang of ['he', 'ru']) {
     for (const s of SHAPES) {
       const p = await b.newPage({ viewport: { width: s.w, height: s.h } });
       try {
-        await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
-        await p.evaluate(l => localStorage.setItem('dm.saved.v1', JSON.stringify(l)), DOORS);
+        /* ⚠ SEEDED BEFORE THE PAGE'S OWN SCRIPT RUNS (29.9), not written on
+           one load and read on the next: a navigation may land in a new
+           renderer before the first one's write reaches it, and the drawer's
+           toggle then came up hidden on a random shape x language — 2 of 3
+           runs on `629f7d0`, 6 faults in `4fbb96c`'s record. */
+        await p.addInitScript(l => { try { localStorage.setItem('dm.saved.v1', JSON.stringify(l)); } catch { /* no storage */ } }, DOORS);
         await p.goto(`file://${process.cwd()}/index.html${DOORS[0]}&lang=${lang}`,
           { waitUntil: 'load' });
         /* Past the 900 ms summary reveal — an instrument that measures during
@@ -5978,43 +5994,23 @@ for (const v of VIEWS) {
           if (!box || !box.open) return { noDrawer: true };
           const modal = box.matches(':modal');
           const W = innerWidth, H = innerHeight;
-          /* ⚠ WHAT IS PAINTED, NOT WHAT IS IN THE NODE. The description is
-             elided, so `textContent` is the whole `summaryLine` whatever the
-             customer can see — and the first version of this compared exactly
-             that, which made the distinctness clause unable to fail for the
-             reason it was written. Measured by binary-searching the longest
-             prefix that still fits the box, against a hidden clone allowed to
-             size itself. */
-          const visible = el => {
-            if (!el) return '';
-            const room = el.getBoundingClientRect().width + 0.5;
-            const probe = el.cloneNode(true);
-            probe.style.position = 'absolute';
-            probe.style.visibility = 'hidden';
-            probe.style.inlineSize = 'auto';
-            probe.style.maxInlineSize = 'none';
-            el.parentElement.appendChild(probe);
-            const t = el.textContent;
-            let lo = 0, hi = t.length;
-            while (lo < hi) {
-              const mid = (lo + hi + 1) >> 1;
-              probe.textContent = t.slice(0, mid);
-              if (probe.getBoundingClientRect().width <= room) lo = mid; else hi = mid - 1;
-            }
-            probe.remove();
-            return t.slice(0, lo);
-          };
+          /* ⚠ WHAT IS PAINTED, NOT WHAT IS IN THE NODE (13.9) — literal since
+             29.9: the row is a picture, and its box is returned so it can be
+             photographed below. */
           const rows = [...document.querySelectorAll('.saved__row')].map(r => {
-            const d = r.querySelector('.saved__drop');
-            const rb = d.getBoundingClientRect();
+            const d = r.querySelector('.saved__drop'), o = r.querySelector('.saved__open'), a = r.querySelector('.saved__art');
+            const rb = d.getBoundingClientRect(), ob = o.getBoundingClientRect(), ab = a?.getBoundingClientRect();
             const top = document.elementFromPoint(rb.x + rb.width / 2, rb.y + rb.height / 2);
             return {
               cost: (r.querySelector('.saved__cost')?.textContent || '').trim(),
-              what: visible(r.querySelector('.saved__what')).trim(),
+              name: o.getAttribute('aria-label') || '',
+              art: ab && a.querySelector('svg') ? { x: ab.x, y: ab.y, width: ab.width, height: ab.height } : null,
+              tileW: ob.width, tileH: ob.height, dropW: rb.width, dropH: rb.height,
               dropOn: rb.x >= -0.5 && rb.right <= W + 0.5 && rb.y >= -0.5 && rb.bottom <= H + 0.5,
               dropHit: !!top && (top === d || d.contains(top)),
             };
           });
+          const cols = new Set(rows.map(r => Math.round(document.querySelectorAll('.saved__row')[rows.indexOf(r)].getBoundingClientRect().left))).size;
           return {
             shut, modal,
             open: {
@@ -6023,7 +6019,7 @@ for (const v of VIEWS) {
               spec: document.querySelector('#spec')?.getBoundingClientRect().width,
               alt: document.querySelector('.send__alt')?.getBoundingClientRect().width,
             },
-            rows,
+            rows, cols,
           };
         });
 
@@ -6072,13 +6068,34 @@ for (const v of VIEWS) {
             + 'rows name no price. Fitting the drawer must not cost the customer the one fact '
             + 'they saved two doors to compare');
         }
-        const distinct = new Set(m.rows.map(r => r.what + '|' + r.cost)).size;
-        if (distinct < m.rows.length) {
-          fault('saved', `${lang} ${s.name}: only ${distinct} of ${m.rows.length} saved rows are `
-            + `distinguishable from what is PAINTED on them — e.g. "${m.rows[0].what}`
-            + `${m.rows[0].cost ? ' ' + m.rows[0].cost : ''}". Three different doors reading the `
-            + 'same is a drawer a customer cannot choose from');
+        /* distinguishable by what is PAINTED: every pair of pictures differs
+           on more than 0.5 % of its pixels (the gallery's floor for "the same
+           picture" is 0.45 %) */
+        const shots = [];
+        for (const [i, r] of m.rows.entries()) {
+          if (!r.art) { fault('saved', `${lang} ${s.name}: row ${i + 1} has no picture — the row is the door (29.9)`); continue; }
+          const f = `/tmp/audit-saved-${process.pid}-${i}.png`;
+          await p.screenshot({ path: f, clip: r.art });
+          shots.push(load(f));
         }
+        const differ = (A, B2) => { if (A.w !== B2.w || A.h !== B2.h) return 1; let n = 0;
+          for (let k = 0; k < A.d.length; k += 4) if (Math.max(Math.abs(A.d[k] - B2.d[k]), Math.abs(A.d[k + 1] - B2.d[k + 1]), Math.abs(A.d[k + 2] - B2.d[k + 2])) > 16) n++;
+          return n / (A.d.length / 4); };
+        /* a row is its picture AND its price, as it was its words and its
+           price: a pair that paints the same picture must differ in price */
+        let same = 0;
+        for (let i = 0; i < shots.length; i++) for (let j = i + 1; j < shots.length; j++) {
+          const dp = differ(shots[i], shots[j]);
+          pairDiffs.push(dp);
+          if (dp < 0.005 && m.rows[i].cost === m.rows[j].cost) same++;
+        }
+        if (same) fault('saved', `${lang} ${s.name}: ${same} pair(s) of saved doors paint the same picture at the same price — a list a customer cannot choose from`);
+        if (m.rows.some(r => !r.name || (r.cost && !r.name.includes(r.cost)))) {
+          fault('saved', `${lang} ${s.name}: a saved door's button is not named by its summary and price — a screen reader hears less than the picture shows`);
+        }
+        if (m.rows.some(r => r.tileW < 132)) fault('saved', `${lang} ${s.name}: a saved door's tile is ${Math.round(Math.min(...m.rows.map(r => r.tileW)))} px wide — the gallery's floor is 132`);
+        if (m.rows.length > 1 && m.cols < 2) fault('saved', `${lang} ${s.name}: the saved doors stand in one column — two across at the least`);
+        if (m.rows.some(r => r.dropW < 44 || r.dropH < 44 || r.tileH < 44)) fault('saved', `${lang} ${s.name}: a saved door's × or tile is under 44 px`);
         const bad = m.rows.filter(r => !r.dropOn || !r.dropHit);
         if (bad.length) {
           fault('saved', `${lang} ${s.name}: ${bad.length} of ${m.rows.length} delete buttons are `
@@ -6089,6 +6106,48 @@ for (const v of VIEWS) {
       }
       await p.close().catch(() => {});
     }
+  }
+  /* ⚠ AND EACH PICTURE IN ITS OWN DOOR'S COLOUR (29.9, §5.13). `render()`
+     emits fixed SVG ids and `url(#x)` resolves to the first in the document:
+     two saved doors drawn straight in would paint the second in the first's
+     gradients. `copyOf` namespaces each; this is the raster proof — a white
+     door and a dark one saved, each row's leaf read at the middle of its
+     picture, the white one's light and the dark one's dark. */
+  {
+    const PAIR = ['?s=standard&c=rb-9016d&w=none&d=plain&n=plate&pz=pz-nickel',
+                  '?s=standard&c=rb-7126d&w=none&d=plain&n=plate&pz=pz-nickel'];
+    for (const q of PAIR) if (fromQuery(q).notice) fault('saved', `the colour fixture ${q} arrives repaired — not a door anybody saved`);
+    const p = await b.newPage({ viewport: { width: 390, height: 844 } });
+    try {
+      await p.addInitScript(l => { try { localStorage.setItem('dm.saved.v1', JSON.stringify(l)); } catch { /* no storage */ } }, PAIR);
+      await p.goto(`file://${process.cwd()}/index.html${PAIR[0]}&lang=he`, { waitUntil: 'load' });
+      await p.waitForTimeout(1500);
+      const arts = await p.evaluate(() => {
+        const btn = document.querySelector('#saved-btn');
+        if (!btn || btn.hidden) return null;
+        btn.click();
+        return [...document.querySelectorAll('#saved .saved__art')].map(a => {
+          const svg = a.querySelector('svg'), leaf = svg && svg.querySelector('[id^="leaf-sv"]');
+          const r = (leaf || a).getBoundingClientRect();
+          /* a patch in the leaf's upper middle: clear of the handle and lock */
+          return { x: r.x + r.width * 0.3, y: r.y + r.height * 0.2, width: Math.max(4, r.width * 0.25), height: Math.max(4, r.height * 0.15) };
+        });
+      });
+      if (!arts || arts.length !== 2) fault('saved', `two saved doors of two colours opened ${arts ? arts.length : 'no'} pictures — the colour clause has no subject`);
+      else {
+        const rel = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+        const L = [];
+        for (const [i, clip] of arts.entries()) {
+          const f = `/tmp/audit-saved-colour-${process.pid}-${i}.png`;
+          await p.screenshot({ path: f, clip });
+          const im = load(f); let t = 0;
+          for (let k = 0; k < im.d.length; k += 4) t += 0.2126 * rel(im.d[k]) + 0.7152 * rel(im.d[k + 1]) + 0.0722 * rel(im.d[k + 2]);
+          L.push(t / (im.d.length / 4));
+        }
+        savedColour = L.map(x => x.toFixed(3)).join(' / ');
+        if (!(L[0] > L[1] + 0.25)) fault('saved', `the white door's picture reads ${L[0].toFixed(3)} and the dark door's ${L[1].toFixed(3)} — the second saved door is not painted in its own colour (§5.13)`);
+      }
+    } finally { await p.close().catch(() => {}); }
   }
   /* ⚠ AND WHAT HAPPENS WHEN A SAVED DESIGN NO LONGER EXISTS. `saveCurrent`'s
      docstring says the stored form is a query because that "survives a
@@ -6107,8 +6166,7 @@ for (const v of VIEWS) {
     for (const lang of ['he', 'ru']) {
       const p = await b.newPage({ viewport: { width: 390, height: 844 } });
       try {
-        await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
-        await p.evaluate(q => localStorage.setItem('dm.saved.v1', JSON.stringify([q])), STALE);
+        await p.addInitScript(q => { try { localStorage.setItem('dm.saved.v1', JSON.stringify([q])); } catch { /* no storage */ } }, STALE);
         await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
         await p.waitForTimeout(900);
         const said = await p.evaluate(() => {
@@ -6146,9 +6204,12 @@ for (const v of VIEWS) {
       + `${want * DOORS.length}`);
   }
   if (faults === before) {
+    const pd = pairDiffs.length ? `${(Math.min(...pairDiffs) * 100).toFixed(2)}–${(Math.max(...pairDiffs) * 100).toFixed(1)} %` : '?';
     console.log(`    ${rowsSeen} saved rows across ${SHAPES.length} shapes in two languages: the `
-      + 'page never scrolls sideways, the card and its spec table do not move, every row names '
-      + 'its price and every delete button is on screen and hit-testable');
+      + 'page never scrolls sideways, the card and its spec table do not move, every row is its door '
+      + `drawn and its price, every pair told apart by its picture or its price (pictures differing ${pd}), `
+      + 'two across and none under 132 px, '
+      + `every × and tile ≥ 44 px, on screen and hit-testable; a white and a dark door each in its own colour (${savedColour})`);
   }
 }
 

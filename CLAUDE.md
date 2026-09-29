@@ -186,7 +186,8 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
     the same node moved in, never a copy); the "I have a question" state
     retired on BOTH sends (29.9, ours) — an untouched door sends the
     standard door's order, the desktop's quiet send reads "הזמינו את הדלת"
-    in every state, the phone bar keeps "שלחו";
+    in every state, the phone bar keeps "שלחו"; the saved door a `<button>`
+    that opens the door, its picture and price only (29.9, ours);
   · the extra lock's step keyed `xlock`;
   · the step's `<h2>`, shown again above the options on their word, stays
     visually hidden under 500 px tall (a phone on its side, a laptop at 200 %)
@@ -211,6 +212,11 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **29.9** The saved doors SHOW THE DOORS (*"show how they look and their
+  price, that's it"*): each row the door drawn (`copyOf`, 132 px) and its
+  price, the summary its accessible name, a small × in the corner; two across
+  (the dialog widened under 360, as the gallery's). Drawn only while the list
+  is open. The drawer sweep's flake was the seeding: an init script now. Long form: `HISTORY.md`.
 - **29.9** The quiet send says **"הזמינו את הדלת"** (*"Change the 'יש לי שאלה'
   text … to 'הזמינו את הדלת'"*) above 1100 in every state; the phone bar keeps
   "שלחו". The question state RETIRED on both sends and in the message — an
@@ -328,9 +334,14 @@ corner in every language (placed by the owner with circles on a screenshot,
 (`#save-hud`, 27.9). ⚠ **Since 28.9 the save ASKS** (the owner's son: *"on
 clicking, a window with two options, save or view a saved door"*): it opens
 `<dialog id="savedlg">` — "שמירת הדלת" (`saveCurrent`, its toast, closes) or
-"הדלתות השמורות שלי (N)", which opens `<dialog id="saved">`, the saved doors'
-rows (the summary's drawer until then; the summary's "העיצוב שלי" opens the
-same dialog, and its "שמירת העיצוב" still saves at once). Both modal, Escape
+"הדלתות השמורות שלי (N)", which opens `<dialog id="saved">`, the saved doors
+(the summary's drawer until then; the summary's "העיצוב שלי" opens the
+same dialog, and its "שמירת העיצוב" still saves at once). ⚠ **Since 29.9 each
+is the door and its price** (*"show how they look and their price, that's
+it"*): the door drawn whole through `copyOf` in a 132 px box, the price under
+it, the summary line as the button's accessible name, a small × in the
+picture's corner (44 px target); two across on a phone (the dialog widened
+under 360 px, as the gallery's), drawn only while the list is open. Both modal, Escape
 and the backdrop close them, focus returns to the save.
 ⚠ **Undo and redo left that row on 28.9** (*"not noticeable on pc and in the
 way on the phone — more noticeable, but not colliding with the door"*): two
@@ -1560,8 +1571,10 @@ are not in `VIEWS`:
   toast above them — a save's before any change included (every viewport,
   he/ru, six sizes); the save's dialog modal, saving only when asked, counting, opening
   the list as a modal, closing on Escape and the backdrop, focus back on the
-  save; the saved doors' rows priced, distinct and whole, the card under them
-  unmoved; a tap
+  save; the saved doors each its picture and price, told apart by their
+  pictures' pixels or their prices, a white and a dark door each in its own
+  colour by raster (§5.13), two across and no tile under 132, whole, the card
+  under them unmoved (29.9); a tap
   that would take something away asks first (the Coral against a bar and a
   peephole on glass: yes/no, red and ink, no/Escape change nothing, yes does
   exactly the tap), while a pull handle or bow against the window stays
@@ -1673,6 +1686,12 @@ to 1× to fit a sick container is **refused**.
   metal touching its own rose — not by a window.
 - **An instrument can be noisy rather than wrong.** Before reading a diff as a
   finding, run the instrument twice on the same input.
+- **State a page must read at boot is seeded by an init script, never written
+  on one load and read on the next** (29.9): a navigation can land in a new
+  renderer before the first one's `localStorage` write reaches it — the saved
+  doors' drawer came up empty on a random shape × language (2 of 3 runs on
+  `629f7d0`, six faults in `4fbb96c`'s record) until it was seeded before the
+  page's own script (`addInitScript`, as `tourless` does).
 - **A scratch file an instrument writes is named per process** (29.9): the
   tour's scrim reading wrote a fixed `/tmp` path, four falsified copies ran at
   once, and the .6 scrim read the .8 scrim's pixels — the same 5.6 %. Six

@@ -26,6 +26,54 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **29.9 — PROMPT A, 5 OF 5: THE SAVED LIST SHOWS THE DOORS.** The owner's son:
+  *"In the save menu, if you choose to view the doors you already made, show
+  how they look and their price, that's it."* Answered in chat: the rows keep
+  a small × on the picture to delete.
+  · **What was there.** `li.saved__row` > a pill (`saved__what`, the
+    one-line summary, elided; `saved__cost`) and a 44 px ×, one column.
+  · **What it is.** Each row is a tile: the door drawn whole — `render()` of
+    the saved state through `copyOf` (`sv0`…`sv5`: two doors in one document
+    share every SVG id, §5.13) — in a 132 px box fitted by height like the
+    gallery's `.work__art`, and the price under it; the summary line is the
+    button's accessible name (`label · price`), no longer printed; the × a
+    small paper disc in the picture's corner, a 44 px target. The row is a
+    `<button>` that opens the door (unchanged, the notice kept). The grid is
+    the gallery's (`minmax(132px, 1fr)`): two across on a phone, three on the
+    desktop's 560 px dialog; under 360 px the dialog is widened as the
+    gallery's is (UA `max-inline-size` left 238 px, one column). The pictures
+    are drawn only while the list is open (`openSaved`) — six doors a visitor
+    may never ask to see are not rendered on every load. Six kept
+    (`SAVED_MAX`), unchanged.
+  · **Restated, same subjects** (the block's rows priced, distinguishable by
+    what is painted, the × whole and hit-testable, the card unmoved): a row
+    is its picture and its price, so every pair is told apart by their
+    pictures' pixels (photographed; > 0.5 %) or their prices — the three
+    same-colour fixture doors' pictures differ 0.31–6.1 %, the 0.31 % pair by
+    ₪1,800 — the check was words-or-price; its `visible()` prefix search went
+    with the words. NEW: a white and a dark door saved, each picture's leaf in
+    ITS colour by raster (0.858 / 0.134 luminance — §5.13's own case); two
+    across and no tile under 132 px; every × and tile ≥ 44 px; every tile's
+    name carrying its price. The STALE fixture still says the catalogue no
+    longer builds it, on opening.
+  · **And the drawer's flake, found and fixed.** The block wrote the saved
+    doors to `localStorage` on one load and read them on the next; a
+    navigation can land in a new renderer before the first one's write
+    reaches it, so the toggle came up hidden on a random shape × language —
+    2 of 3 standalone runs on `629f7d0`, six faults in `4fbb96c`'s record,
+    and "unexplained" in §0c. Seeded by an init script now, before the page's
+    own script (as `tourless` does): 10 of 10 cases, 30 rows (a §7 rule).
+  · **Falsified:** `copyOf` dropped → the dark door's picture reads 0.837
+    against the white's 0.831 (the first door's gradients); no pictures drawn
+    → "row N has no picture" at every case; the under-360 widening removed →
+    "one column" at 320 (he, ru) and a × pushed off screen.
+  · **Sheets: 0 bare** (predicted: no `render()` change). {SHEETS}
+  · **Gates:** node --check (renderer, app, audit); npm run build; npm test
+    10,595,453 passed / 5 failed — the five sheet-staleness rows. A unit check
+    caught the tile's hover in the accent (kept for "chosen"): `--ink-3`.
+  · **Not done, on purpose:** a second line of words under the picture (his
+    "that's it"); pictures drawn at boot.
+
 - **29.9 — PROMPT A, 4 OF 5: THE QUIET SEND SAYS "הזמינו את הדלת", AND THE
   QUESTION STATE RETIRES.** The owner's son: *"Change the 'יש לי שאלה' text on
   the WhatsApp button near the price to 'הזמינו את הדלת'."*

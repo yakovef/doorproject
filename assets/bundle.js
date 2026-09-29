@@ -10948,7 +10948,7 @@ ${plate.defs}${plate.body}
     });
     $("#savedlg-list").addEventListener("click", () => {
       closeDialog($("#savedlg"));
-      openDialog($("#saved"));
+      openSaved();
     });
     $("#savedlg-close").addEventListener("click", () => closeDialog($("#savedlg")));
     $("#saved-close").addEventListener("click", () => closeDialog($("#saved")));
@@ -11000,7 +11000,7 @@ ${plate.defs}${plate.body}
         window.location.href = el.href;
       });
     });
-    $("#saved-btn").addEventListener("click", () => openDialog($("#saved")));
+    $("#saved-btn").addEventListener("click", openSaved);
     paintSaved();
     if (typeof ResizeObserver === "function") {
       new ResizeObserver(fitStage).observe($("#stage"));
@@ -11767,6 +11767,12 @@ ${plate.defs}${plate.body}
     toast(T("saved.ok", counted(Math.min(list.length, SAVED_MAX), "saved.noun")));
     paintSaved();
   }
+  function openSaved() {
+    const d = $("#saved");
+    if (!d) return;
+    openDialog(d);
+    paintSaved();
+  }
   function paintSaved() {
     const list = savedRead();
     const btn = $("#saved-btn");
@@ -11779,23 +11785,31 @@ ${plate.defs}${plate.body}
     const none = $("[data-saved-empty]");
     if (!box) return;
     if (none) none.hidden = list.length > 0;
-    box.replaceChildren(...list.map((q) => {
+    const draw = !!$("#saved")?.open;
+    box.replaceChildren(...list.map((q, i) => {
       const li = document.createElement("li");
       li.className = "saved__row";
       const open = document.createElement("button");
       open.type = "button";
       open.className = "saved__open";
-      let label = q, cost = "";
+      let label = q, cost = "", st = null;
       try {
-        const st = fromQuery(q).state;
+        st = fromQuery(q).state;
         label = summaryLine(st);
         cost = formatAgorot(priceAgorot(st));
       } catch {
       }
-      const what = document.createElement("span");
-      what.className = "saved__what";
-      what.textContent = label;
-      open.append(what);
+      open.setAttribute("aria-label", cost ? `${label} · ${cost}` : label);
+      const art = document.createElement("span");
+      art.className = "saved__art";
+      art.setAttribute("aria-hidden", "true");
+      if (draw && st) {
+        try {
+          art.innerHTML = copyOf(render(st), `sv${i}`);
+        } catch {
+        }
+      }
+      open.append(art);
       if (cost) {
         const money = document.createElement("b");
         money.className = "saved__cost";
@@ -11803,8 +11817,8 @@ ${plate.defs}${plate.body}
         open.append(money);
       }
       open.addEventListener("click", () => {
-        const { state: st, notice, said } = fromQuery(q);
-        set(st);
+        const { state: st2, notice, said } = fromQuery(q);
+        set(st2);
         closeDialog($("#saved"));
         if (notice) toast(said && said.length ? said.join(" · ") : T("notice.some"));
       });

@@ -632,7 +632,7 @@ function init() {
   $('#savedlg-save').addEventListener('click', () => { saveCurrent(); closeDialog($('#savedlg')); });
   $('#savedlg-list').addEventListener('click', () => {
     closeDialog($('#savedlg'));
-    openDialog($('#saved'));
+    openSaved();
   });
   $('#savedlg-close').addEventListener('click', () => closeDialog($('#savedlg')));
   $('#saved-close').addEventListener('click', () => closeDialog($('#saved')));
@@ -729,7 +729,7 @@ function init() {
   });
   /* The summary's "העיצוב שלי" opens the same list, a dialog since 28.9 (it
      was a drawer inside the send card). */
-  $('#saved-btn').addEventListener('click', () => openDialog($('#saved')));
+  $('#saved-btn').addEventListener('click', openSaved);
   paintSaved();
 
   /* The crop depends on the stage's shape, so it has to be recomputed
@@ -2534,6 +2534,16 @@ function saveCurrent() {
   paintSaved();
 }
 
+/** The saved doors' list, opened: its pictures are drawn now and not at boot
+ *  (29.9) — six doors a visitor may never ask to see are not rendered on
+ *  every load. */
+function openSaved() {
+  const d = $('#saved');
+  if (!d) return;
+  openDialog(d);
+  paintSaved();
+}
+
 function paintSaved() {
   const list = savedRead();
   const btn = $('#saved-btn');
@@ -2549,28 +2559,40 @@ function paintSaved() {
   const none = $('[data-saved-empty]');
   if (!box) return;
   if (none) none.hidden = list.length > 0;
-  box.replaceChildren(...list.map(q => {
+  /* ⚠ THE ROW IS THE DOOR AND ITS PRICE — 29.9.2026, the owner's son: *"In
+     the save menu, if you choose to view the doors you already made, show how
+     they look and their price, that's it."* It was a pill carrying the
+     one-line summary and the price. Now the picture — `render()` of the saved
+     state through `copyOf` (§5.13: two doors in one document share every SVG
+     id, and without the namespace the second paints in the first's colours),
+     fitted by height in a 132 px box like the gallery's tiles, the door whole
+     — and the price under it; the summary line is the button's accessible
+     name, what a screen reader hears, and no longer printed. The pictures are
+     drawn only while the list is open (`openSaved`). */
+  const draw = !!$('#saved')?.open;
+  box.replaceChildren(...list.map((q, i) => {
     const li = document.createElement('li');
     li.className = 'saved__row';
     const open = document.createElement('button');
     open.type = 'button';
     open.className = 'saved__open';
-    /* Named by what the door IS, from the same rows everything else uses —
-       and by what it COSTS, which is the only part of the row a 320 px phone
-       has room for and the reason somebody saved two doors. `priceAgorot` on
-       the state, never a figure stored beside the query: a price written down
-       at save time is a price that goes stale the day `js/prices.js` moves,
-       which is the shape `js/works.js` already refuses for the gallery. */
-    let label = q, cost = '';
+    /* The price is `priceAgorot` on the state, never a figure stored beside
+       the query: a price written down at save time goes stale the day
+       `js/prices.js` moves, the shape `js/works.js` refuses for the gallery. */
+    let label = q, cost = '', st = null;
     try {
-      const st = fromQuery(q).state;
+      st = fromQuery(q).state;
       label = summaryLine(st);
       cost = formatAgorot(priceAgorot(st));
     } catch { /* keep the query */ }
-    const what = document.createElement('span');
-    what.className = 'saved__what';
-    what.textContent = label;
-    open.append(what);
+    open.setAttribute('aria-label', cost ? `${label} · ${cost}` : label);
+    const art = document.createElement('span');
+    art.className = 'saved__art';
+    art.setAttribute('aria-hidden', 'true');
+    if (draw && st) {
+      try { art.innerHTML = copyOf(render(st), `sv${i}`); } catch { /* the box stays, empty */ }
+    }
+    open.append(art);
     if (cost) {
       const money = document.createElement('b');
       money.className = 'saved__cost';

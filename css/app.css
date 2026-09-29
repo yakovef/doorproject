@@ -620,52 +620,44 @@ svg { direction: ltr; }
   max-block-size: 40vh; overflow-y: auto;
 }
 .saved__none { margin: 0; font-size: .82rem; color: var(--ink-2); }
+/* ⚠ THE ROWS ARE THE DOORS SINCE 29.9.2026 — the owner's son: *"show how they
+   look and their price, that's it."* Each is a tile: the door drawn whole in a
+   132 px box (the gallery's `.work__art`, fitted by height), the price under
+   it, the × small in the picture's corner. They were pills in one column — a
+   one-line summary and a price — because a price was the only part of a line
+   a 320 px phone had room for (13.9: three doors of one colour read as one
+   row in five of six cases). A picture tells them apart whatever they share.
+   The grid is the gallery's: `minmax(132px, 1fr)`, two across on a phone and
+   never one column (the dialog is widened for it under 360, below), and the
+   track `minmax` rather than `auto` for §8's reason. */
 .saved__list {
   margin: 0; padding: 0; list-style: none;
-  display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 8px;
 }
-/* ⚠ `nowrap`. The pill carries a whole `summaryLine` and had no width floor,
-   so on a phone it took the entire row and the 44 px delete button wrapped
-   into the 6 px gap ABOVE the next entry: measured 10 px from a pill to its
-   own ×, and 6 px from that × to the NEXT design's pill. The control nearest
-   your thumb deleted the wrong door. At 1440 the rows did stay on one line,
-   but the pills were 513 px and 810 px, so the × jumped 297 px between rows. */
-.saved__row {
-  display: flex; align-items: center; gap: 10px; flex-wrap: nowrap;
-  min-inline-size: 0;
-}
+.saved__row { position: relative; min-inline-size: 0; }
 .saved__open {
   appearance: none; background: none; border: 1px solid var(--rule);
-  border-radius: var(--r-pill); min-block-size: 44px; padding-inline: 12px;
-  font: 500 .82rem var(--sans); color: var(--ink); cursor: pointer;
-  /* Takes the room that is left and gives the × a fixed place to stand.
-     `min-inline-size: 0` because a flex item will not shrink below its
-     content without it, which is what pushed the × out of the row. */
-  flex: 1 1 auto; min-inline-size: 0;
-  text-align: start;
-  display: flex; align-items: center; gap: 8px;
+  border-radius: 10px; padding: 6px; inline-size: 100%; min-block-size: 44px;
+  font: 600 .86rem var(--sans); color: var(--ink); cursor: pointer;
+  display: grid; gap: 4px; justify-items: stretch; text-align: center;
 }
-/* ⚠ THE PRICE IS THE ONE PART OF A SAVED ROW THAT MUST NOT BE ELIDED, AND IT
-   IS WHY THE DRAWER EXISTS. Once the chain above stopped overflowing, the
-   description alone was 132 px on a 320 px phone and 186 at 1440 — measured,
-   three doors a customer would really compare (the standard ₪3,195 leaf, the
-   same leaf with a square window and ironwork at ₪6,995, and the same leaf
-   with a gold פרזול and a keypad at ₪4,995): **one distinct row out of three**
-   in five of six shape x language cases, because `summaryLine` opens with the
-   colour and all three are the same colour. The money is what tells them
-   apart, and it is the reason somebody saved two doors rather than one. */
-.saved__what {
-  flex: 1 1 auto; min-inline-size: 0;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+.saved__open:hover { border-color: var(--ink-3); }
+.saved__art {
+  display: block; block-size: 132px;
+  background: var(--wall); border-radius: 8px; overflow: hidden;
 }
-.saved__cost {
-  flex: 0 0 auto; font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
+/* The drawing never mirrors with the interface (PLAN.md §6.1). */
+.saved__art svg { inline-size: 100%; block-size: 100%; display: block; }
+.saved__cost { font-variant-numeric: tabular-nums; }
+/* The × in the picture's corner: a 44 px target (T14) drawing a small paper
+   disc, so it reads on a dark door and stays out of the way on a light one. */
 .saved__drop {
-  appearance: none; background: none; border: 0; cursor: pointer;
-  min-block-size: 44px; min-inline-size: 44px;
-  color: var(--ink-2); font-size: 1.1rem;
+  position: absolute; inset-block-start: 0; inset-inline-end: 0;
+  appearance: none; border: 0; cursor: pointer; padding: 0;
+  inline-size: 44px; block-size: 44px;
+  display: grid; place-items: center;
+  background: radial-gradient(circle, var(--paper) 0 12px, transparent 12.5px);
+  color: var(--ink); font-size: 1.05rem; line-height: 1;
 }
 
 /* ── THE TRUST BAND ──────────────────────────────────────────────────
@@ -3145,6 +3137,17 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
   padding: 0; margin-block-end: 14px;
   background: none; border: 0;
   max-block-size: 60vh;
+}
+/* ⚠ TWO ACROSS ON A 320 PHONE TOO — the gallery's fix, for the gallery's
+   reason: a modal dialog's UA `max-inline-size: calc(100% - 38px)` leaves 282
+   of 320, less 44 of padding is 238, and two 132 tiles and a gap want 272 —
+   one column. 6 px of margin and 12 of padding give 284. After the rules it
+   overrides (§8). */
+@media (max-width: 359px) {
+  .saved-dlg {
+    margin-inline: 6px; padding-inline: 12px;
+    inline-size: calc(100% - 12px); max-inline-size: calc(100% - 12px);
+  }
 }
 
 /* ── swatches ─────────────────────────────────────────────── */
