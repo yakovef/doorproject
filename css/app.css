@@ -445,7 +445,7 @@ svg { direction: ltr; }
      everywhere else, on the control a customer who cannot read the page needs
      to find — and invisible to the audit, whose own tap-target check is a
      single 44 that both dimensions have to clear only where it looks. */
-  min-block-size: 44px; min-inline-size: 44px; padding-inline: 8px;
+  min-block-size: 44px; min-inline-size: 44px; padding-inline: 5px;
   /* ⚠ `--ink-2`, AND IT USED TO SAY `var(--ink-3, var(--ink-2))`. `--ink-3` did
      not exist when that was written, so the fallback was doing the whole job
      and the language buttons rendered at 4.75:1. Defining the token — three
@@ -457,12 +457,25 @@ svg { direction: ltr; }
      "whatever x becomes, one day, in another file". Named outright now.
      Found by grepping every `--ink-3` the moment the token was added, which is
      the habit rather than the luck. */
-  font: 500 .8rem var(--sans); color: var(--ink-2);
+  /* ⚠ 400 AT .75rem WITH 5 px EACH SIDE, SINCE 28.9 — it was 500 at .8rem with
+     8 px. The page's face became Rubik that day, and Rubik's Latin and Cyrillic
+     are wider than what these labels had been painted in: the old fallback was
+     tuned to Assistant's HEBREW and drew Latin at 89%. The picker went 109.7 →
+     128.3 px at 320 and `Русский` landed on the standard door (55 px²) and on
+     `extra1` at 320–390 — both gated clear at every width — and the widest
+     double's named reading at 1152 went 43 → 394 px². Weight first (Rubik is
+     variable, so 400 is the same face lighter), then the padding, then the
+     size, measured with the audit's own ink test until every gate cleared: the
+     1152 readings are 17 and 18 px². The 44 px floor is the `min-` above and is
+     unaffected. */
+  font: 400 .75rem var(--sans); color: var(--ink-2);
   cursor: pointer; border-radius: var(--r-pill);
   border-block-end: 2px solid transparent;
 }
 .lang:hover { color: var(--ink); }
-.lang.is-on { color: var(--ink); font-weight: 600; border-block-end-color: var(--ink); }
+/* 500, not 600: the current language is marked by its ink and its underline,
+   and at 600 it was the widest of the three (28.9). */
+.lang.is-on { color: var(--ink); font-weight: 500; border-block-end-color: var(--ink); }
 /* ⚠ ON THE SMALLEST PHONE THE CURRENT LANGUAGE'S OWN BUTTON GOES, and that
    is the one thing on this control that can be spared. The button you are
    least likely to press is the one for the language you are already reading —
@@ -500,7 +513,7 @@ svg { direction: ltr; }
    hidden, so the rule reads as one statement: on a phone the header carries
    the brand, the way OUT of the language you are in, and the telephone. */
 @media (max-width: 1099px) {
-  .lang { padding-inline: 6px; font-size: .78rem; }
+  .lang { padding-inline: 4px; font-size: .74rem; }   /* 6 px and .78rem until 28.9 — see `.lang` */
   .lang.is-on { display: none; }
   /* ⚠ AND IT IS THE ITEM THAT DOES NOT GIVE. Measured at 390 px with the
      current-language button already dropped, the header's four children came
@@ -4114,6 +4127,20 @@ html.is-live.is-untouched .wa__ask { display: inline; }
      about the colour except its name. */
   .sheet__chip { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .sheet__art svg { max-block-size: 140mm; }
+  /* ⚠ 4 px BETWEEN PRINTED ROWS, NOT 6 — 28.9.2026. Rubik (the page's own face
+     since that day) is 3.5–3.8% wider in Latin and Cyrillic than the face the
+     sheet had been laid out in, and three values each took one more line
+     (5.8 mm a line): English "Window" and "Frame", Russian "Остекление". The
+     widest glazed double went 265.1 → 276.5 mm in English (two pages, new) and
+     277.5 → 283.9 in Russian (past the 280 ceiling of its named exemption).
+     The levers §9 protects were left alone — the 8 mm body padding, the 12 mm
+     page margin, the 140 mm elevation — and so was the text's size: shrinking
+     it to .85rem put English at exactly 273.0 of 273, a page with nothing to
+     spare. Two pixels off each row's top and bottom, on paper only, puts EVERY
+     door in every language on ONE page, the Russian double at 270.2 mm — which
+     it had not been since the keypad row arrived on 30.8, so its exemption in
+     the audit is gone. The screen keeps its 6 px. */
+  .sheet__row { padding-block: 4px; }
 }
 
 /* ── bare mode: the stage only, for tools/compare.mjs ─────── */

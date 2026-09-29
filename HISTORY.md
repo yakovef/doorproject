@@ -26,6 +26,56 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — WHAT THE NEW FACE MOVED, PUT BACK (1b).** No new instruction: this is
+  `npm run audit` answering commit 1, which it ran after, as the order has it.
+  Eleven faults, every one a WIDTH the new face changed — the order named four
+  of the five things label widths feed, and it was right about all of them.
+
+  **THE A4 SHEET.** Rubik is 3.5–3.8% wider than what the sheet had been laid
+  out in, and three values each took one more line (5.8 mm a line): English
+  "Window" and "Frame", Russian "Остекление" — measured row by row against
+  `9abc298` with the same harness (`tools/_print.mjs`). The widest glazed double
+  went **265.1 → 276.5 mm in English (two pages, new)** and **277.5 → 283.9 in
+  Russian**, past the 280 ceiling of the exemption it has carried since the
+  keypad row (30.8). The ceiling may not be widened, and English was new, so the
+  layout moved. Tried against the audit's own fixtures, not guessed: the text at
+  `.85rem` put English at exactly 273.0 of 273 — a page with nothing to spare;
+  `.86rem` left it on two; rows 6 → 5 px left Russian on two. **Rows 6 → 4 px, in
+  print only, put every door in every language on ONE page** — the Russian double
+  at 270.2 mm, which it had not been since 30.8 — with the text's size, the
+  140 mm elevation, the 8 mm body padding and the 12 mm margin all untouched (the
+  last three are §9's). The audit's print exemption is EMPTY, its machinery kept,
+  and its one-page clause holds all six prints. Falsified: at 6 px, English and
+  Russian print on two pages.
+
+  **THE LANGUAGE PICKER.** It grew **109.7 → 128.3 px** at 320 — far more than
+  3.5%, because the old fallback was tuned to Assistant's HEBREW and drew Latin
+  and Cyrillic at 89%, so the audit had been measuring a narrower picker than a
+  served page ever showed. `Русский` landed on the standard door at 320 (55 px²)
+  and on `extra1` at 320, 360 and 390 (129 / 146 / 38) — both gated clear at
+  every width — and the widest double's named reading at 1152 went 43 → 394 (he)
+  and 15 → 373 (ru). Re-cut with the audit's own ink measurement
+  (`tools/_ink.mjs`) until every gate cleared: weight 400 (Rubik is variable —
+  the same face, lighter), the current language 500 (it is marked by its ink and
+  underline, and at 600 it was the widest), 5 px padding and `.75rem` on a
+  desktop, 4 px and `.74rem` on a phone. Readings after: the gates clear, the
+  1152 pair at **17 and 18 px²**. The Hebrew name narrows 43 → 17; the Russian
+  stays named at 15 with 18 inside the check's +10 — re-measured, never widened.
+  An unscoped size rule tried on the way leaked onto the phone and put `extra1`
+  back on the door at 360 — §8's "a media query adds no specificity", met in a
+  scratch run rather than a commit.
+
+  **THE LANDSCAPE ANSWER — AN IMPROVEMENT, SO THE EXEMPTION NARROWS.** At 844×390
+  and 640×360 the grip step now shows an answer too, beside the glass step:
+  Rubik's Hebrew is narrower than the stack it replaced and the grip question
+  lost a line. The audit asks for exactly this — narrow the exemption, here and
+  in §9 — and it is `['glass', 'grip']`.
+
+  **GATES.** `node --check`, `npm run build`, `npm test` 9,440,830 passed / 5 failed — the five sheet-staleness rows. The wall-ink and
+  print readings above are the audit's own measurements run in isolation; the
+  full audit on this commit runs after it, in a worktree, and is recorded with
+  commit 2.
+
 - **28.9 — THE BOW (`grab`) REDRAWN OFF FOUR INSTALLED DOORS.** The owner's son,
   with four photographs: *"now i want you to copy the horizontal handle."* Same
   product, id, place and price; the drawing had been built from corpus
@@ -1806,6 +1856,12 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.9** **עילי** (`ilai`), a new lockset, INCLUDED (*"very similar to rotem, it
+  is also in the price, i want you to call it 'עילי'"*): the waisted backplate —
+  220 tall, 91 at head and foot, 78 at a waist 0.54 down, a slim 14 mm bar under
+  an arched neck, the Rotem's egg and satin — measured off three doors. It is the
+  plate the Rotem was drawn as until 27.9; the five gallery doors carrying it
+  (d004 d022 d029 d106 d108) are cited and refit to it. Appended: no VERSION.
 - **27.9** The record (8 of 8): §0a — the placements they make themselves and
   the five decisions taken for them; §0c's gates; §3's flow; §5.28–29; §9's
   wall table and breakdown window re-measured (unchanged by the band). The

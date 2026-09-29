@@ -4364,7 +4364,13 @@ for (const v of VIEWS) {
      the clause below FAILS the day it prints on one page or grows past the
      ceiling — an exemption may not outlive its fault, and it may not quietly
      cover a worse one. */
-  const EXEMPT = { 'widest דו כנפי, glazed': { ru: { pages: 2, maxMm: 280 } } };
+  /* ⚠ EMPTY SINCE 28.9.2026, and the machinery kept so the next one is named
+     the same way. The Russian double printed on two pages from 30.8; Rubik's
+     wider Cyrillic took it to 283.9 mm, past its 280 ceiling, and 4 px of
+     printed row padding (css/app.css, `@media print`) put every door in every
+     language on one page — the Russian double at 270.2 mm. The `pages !== 1`
+     clause below now holds that for all six prints. */
+  const EXEMPT = {};
   const exemptSeen = {};
   for (const [what, st] of Object.entries(DOORS)) {
     const fixed = repair(st);
@@ -4624,8 +4630,12 @@ for (const v of VIEWS) {
      one of eight (measured; its first window tile clears the quote bar). The exemption shrank; it is re-named at its new size rather
      than dropped, because seven steps still show none. */
   const EXEMPT = [
-    { name: '844x390 a phone on its side', w: 844, h: 390, shows: ['glass'] },
-    { name: '640x360 a 1280 laptop at 200% zoom', w: 640, h: 360, shows: ['glass'] },
+    /* ⚠ `grip` JOINED `glass` ON 28.9 — the text face became Rubik, whose Hebrew
+       is narrower than the stack it replaced, so the grip step's question is a
+       line shorter and an answer reaches the screen. Narrowed, as the clause
+       below asks, never widened. */
+    { name: '844x390 a phone on its side', w: 844, h: 390, shows: ['glass', 'grip'] },
+    { name: '640x360 a 1280 laptop at 200% zoom', w: 640, h: 360, shows: ['glass', 'grip'] },
   ];
 
   /* How much of a tile the customer can actually see: its box, clipped to the
@@ -6257,7 +6267,11 @@ for (const v of VIEWS) {
      1152 and up is NOT widened: these two readings are named, asserted still
      overlapping (and no larger than measured, with a margin of a few px²), and
      the day they clear this fails and they come out. */
-  const WIDE_KNOWN = { 'he 1152x800 halfextra2': 43, 'ru 1152x800 halfextra2': 15 };
+  /* ⚠ `he` NARROWED 43 → 17 ON 28.9: the page's face became Rubik, the picker
+     was re-cut to fit the wall (css/app.css, `.lang`), and the Hebrew reading
+     came in under what was named — so the name follows it down. `ru` reads 18
+     and stays named at 15, inside this check's +10: re-measured, never widened. */
+  const WIDE_KNOWN = { 'he 1152x800 halfextra2': 17, 'ru 1152x800 halfextra2': 15 };
   const wideSeen = {};
   let measured = 0;
   const seen = {};
