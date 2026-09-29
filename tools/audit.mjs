@@ -6436,10 +6436,14 @@ for (const v of VIEWS) {
    `0c6e4ac`'s (1280x720 421.0 px, 1440x900 550.3, 1920x918 563.3) less 4 px.
    The band is on the photograph now and gives its height back; the crop took
    part of it for the wall the band stands on (`FIT_TRIM.top`, whose table is
-   in js/renderer.js). So the leaf is held to what it was on `fc30c08`, the
-   commit BEFORE the move — 426.2, 550.2, 562.4 — with no tolerance: it is
-   436.9, 556.0 and 567.4 after it, and a later change that spends the gain
-   fails here.
+   in js/renderer.js). So the leaf was held to what it was on `fc30c08`, the
+   commit BEFORE the move — 426.2, 550.2, 562.4 — with no tolerance, and read
+   436.9, 556.0 and 567.4 after it.
+   ⚠ RESTATED 29.9.2026, SAME SUBJECT, STRONGER: `fitCrop` gives the crop
+   exactly the wall the band needs at each desktop viewport instead of
+   1280×720's for all of them (437.0, 564.0, 576.5 px), so the leaf is held to
+   what it was the commit before THAT — 436.9, 556.0, 567.4 — no tolerance. A
+   later change that spends either gain fails here.
    The band itself: the live step's title and its first group's chosen option,
    the SAME HEIGHT on every step (one line each, in every language) — its foot
    is anchored over the door, so a second line would climb toward the stage's
@@ -6452,7 +6456,7 @@ for (const v of VIEWS) {
 {
   console.log('\nthe band above the door fits its budget, and the arrows step');
   const before = faults;
-  const BUDGET = { '1280x720': 426.2, '1440x900': 550.2, '1920x918': 562.4 };
+  const BUDGET = { '1280x720': 436.9, '1440x900': 556.0, '1920x918': 567.4 };
   let asked = 0;
   for (const [w, h] of [[1280, 720], [1440, 900], [1920, 918]]) for (const lang of ['he', 'ru']) {
     const tag = `${lang} ${w}x${h}`;
@@ -6677,16 +6681,16 @@ for (const v of VIEWS) {
        touches it — `placeBand` gives it only the span between them;
      · CENTRED on the door wherever its span lets it be, and otherwise moved
        off the door's centre only as far as that span requires.
-   ⚠ ONE NAMED READING, asserted STILL NEEDED: at 320x568 the stage is too
-   short for the band over the two tallest doors (the crop would have wanted
-   351 units there and the desktop could give 272 before its leaf shrank), so
-   the band keeps the stage's top and its gap to the casing narrows — to more
-   than 2 px, never onto it. The day the gap is 7.5 there, this fails. */
+   ⚠ NO NAMED READING SINCE 29.9. There was one, asserted still needed: at
+   320x568 the stage was too short for the band over the two tallest doors
+   under one crop for every viewport, and the gap to their casing narrowed to
+   2.5 px. `fitCrop` (js/app.js) now gives each viewport the wall its band
+   needs, the pair reads 8.3 px, and the 8 px clause holds at every size and
+   width — its "still needed" clause said so. */
 {
   console.log('\nthe band stands on the photograph, over the door and on nothing else');
   const before = faults;
-  const NARROW = new Set(['320x568 extra2', '320x568 halfextra2']);
-  let read = 0; const narrowSeen = new Set(); const offCentre = [];
+  let read = 0; const offCentre = [];
   const bandAt = async (pg) => pg.evaluate(() => {
     const R = e => { const r = e.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height }; };
     const band = document.querySelector('.stage__band'), stage = document.querySelector('#stage');
@@ -6737,9 +6741,7 @@ for (const v of VIEWS) {
         if (m.band.top < m.stage.top - 0.5) fault('band-photo', `${tag}: the band's top is ${(m.stage.top - m.band.top).toFixed(1)} px above the stage — off the picture`);
         const onFrame = area(m.band, m.frame);
         const gap = m.frame.top - m.band.bottom;
-        const key = `${v.w}x${v.h} ${size}`;
         if (onFrame) fault('band-photo', `${tag}: the band stands on the door — ${onFrame} px² of it on #frame`);
-        else if (NARROW.has(key)) { if (gap < 7.5) narrowSeen.add(key); if (gap < 2) fault('band-photo', `${tag}: the named narrow gap is ${gap.toFixed(1)} px — it may narrow, not close`); }
         else if (gap < 7.5) fault('band-photo', `${tag}: the band's foot is ${gap.toFixed(1)} px above the casing, not 8`);
         for (const o of m.others) {
           const x = area(m.band, o.r);
@@ -6761,10 +6763,9 @@ for (const v of VIEWS) {
       fault('band-photo', `${v.name} ${lang} ${size}: chromium died before the band was measured`);
     } finally { await pg.close().catch(() => {}); }
   }
-  for (const k of NARROW) if (!narrowSeen.has(k)) fault('band-photo', `${k}: the named narrow gap is gone — the band clears the casing by 8 px there now; remove it from NARROW`);
   const want = VIEWS.length * 3 * Object.keys(SIZES).length * 2;
   if (read < want) fault('band-photo', `read ${read} of ${want} bands — this check is measuring less than it says`);
-  if (faults === before) console.log(`    ${read} readings over ${VIEWS.length} viewports x three languages x ${Object.keys(SIZES).length} sizes x two steps: absolute, inside the stage, its foot 8 px above the casing on all but the named narrow pair at 320 (gap > 2), on no wall control, price, arrow or column; centred on the door on ${read - offCentre.length}, moved only as far as its span requires on ${offCentre.length}`);
+  if (faults === before) console.log(`    ${read} readings over ${VIEWS.length} viewports x three languages x ${Object.keys(SIZES).length} sizes x two steps: absolute, inside the stage, its foot 8 px above the casing at every size and width, on no wall control, price, arrow or column; centred on the door on ${read - offCentre.length}, moved only as far as its span requires on ${offCentre.length}`);
 }
 
 /* ── THE NAVIGATOR IS A DARK COLUMN, AND ITS CHECKS ARE WHAT YOU WALKED ───
@@ -7104,9 +7105,20 @@ for (const v of VIEWS) {
      the crop took 202 units more wall above the door (`FIT_TRIM`), so every
      door stands lower under the wall's top row — `half` read 0 at every phone
      width in both languages, reported by the "still needed" clause below. */
-  const CLEARS = ['standard', 'extra1', 'half'];
+  /* ⚠ AND `halfextra1` ON 29.9: `fitCrop` gave 320x568 the wall its band
+     needs (the one phone where FIT_TRIM's was short), every door there stands
+     lower under the top row, and `halfextra1`'s 35 px² of `Русский` at 320 —
+     its only reading — went to 0; the "still needed" clause below said so.
+     Below 1100 the crop never gives LESS wall than FIT_TRIM: exactly the
+     band's need there put `halfextra2` under the picker by 224 px² at 390. */
+  const CLEARS = ['standard', 'extra1', 'half', 'halfextra1'];
   const CLEAR = CLEARS[0];
   const KNOWN = ALL.filter(s => !CLEARS.includes(s));   // the exemption, asserted below
+  /* ⚠ AND THE NAMED DOORS' READINGS ARE CEILINGS SINCE 29.9, as the wide ones
+     are (+10 px²): the worst over the phone widths, he/ru, measured the day
+     `fitCrop` landed. Without them the crop's phone floor had no guard — built
+     without it, `halfextra2` read 271/154 and every clause here passed. */
+  const KNOWN_MAX = { extra2: { he: 41, ru: 0 }, halfextra2: { he: 152, ru: 70 } };
   /* ⚠ AND ONE NAMED READING AT 1152, NEW THE SAME DAY, WITH ITS NUMBER — the
      widest double's casing reaches `Русский` by 43 px² (he) and 15 (ru). The
      title shrank by 62 px and the band spends 52 of them at 1100–1152, so the
@@ -7220,6 +7232,14 @@ for (const v of VIEWS) {
     if (!wideSeen[tag]) {
       fault('wall-ink', `${tag} is named as a reading where the wall chrome lands on the door (${px} px²) and it no `
         + 'longer does — take it off the list here and out of CLAUDE.md §9');
+    }
+  }
+  for (const size of KNOWN) for (const lang of ['he', 'ru']) {
+    const max = KNOWN_MAX[size]?.[lang];
+    if (max === undefined) fault('wall-ink', `${size} is exempted with no measured ceiling in KNOWN_MAX`);
+    else if ((seen[size]?.[lang] ?? 0) > max + 10) {
+      fault('wall-ink', `${lang}: the named ${size} overlap grew to ${seen[size][lang]} px² below 1152 (named at ${max}) `
+        + '— the door stands higher under the top row than it did; see the floor in fitCrop (js/app.js)');
     }
   }
   for (const size of KNOWN) {

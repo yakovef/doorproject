@@ -5560,6 +5560,7 @@ ${stops}
 <svg viewBox="${view.x} ${view.y} ${view.w} ${view.h}" role="img" class="door-svg"
      style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint2)}"
+     data-head-y="${PAD.top}"
      data-fit-x="${FIT_BOX.x}" data-fit-y="${FIT_BOX.y}"
      data-fit-w="${FIT_BOX.w}" data-fit-h="${FIT_BOX.h}"
      data-base-y="${BASE_Y}"
@@ -12164,6 +12165,27 @@ ${plate.defs}${plate.body}
     return (usable.find((s) => s.off <= 0) || usable.slice().sort((a, b) => a.off - b.off)[0]).room;
   }
   var liveRoom = null;
+  var BAND_GAP = 8;
+  function fitCrop(svg, box) {
+    const fx = Number(svg.dataset.fitX), w = Number(svg.dataset.fitW);
+    let fy = Number(svg.dataset.fitY), h = Number(svg.dataset.fitH);
+    const headY = Number(svg.dataset.headY);
+    const band = document.querySelector(".stage__band");
+    const H = box.height, sW = box.width / w;
+    if (band && band.getClientRects().length && Number.isFinite(headY) && w > 0 && h > 0 && box.width > 0) {
+      const need = band.offsetHeight + BAND_GAP;
+      if (H > need) {
+        let d = (need * h - (headY - fy) * H) / (H - need);
+        if (H / (h + d) > sW) d = 2 * (need / sW - (headY - fy) - (H / sW - h) / 2);
+        if (!window.matchMedia("(min-width: 1100px)").matches) d = Math.max(0, d);
+        if (h + d > 0) {
+          fy -= d;
+          h += d;
+        }
+      }
+    }
+    return { fx, fy, w, h };
+  }
   function armRoom() {
     const root = document.documentElement;
     if (root.classList.contains("is-bare") || root.classList.contains("is-sheet")) return;
@@ -12171,8 +12193,8 @@ ${plate.defs}${plate.body}
     const svg = stage && stage.querySelector("svg");
     if (!stage || !svg) return;
     const box = stage.getBoundingClientRect();
-    const fy = Number(svg.dataset.fitY), fh = Number(svg.dataset.fitH);
-    const fw = Number(svg.dataset.fitW), baseY = Number(svg.dataset.baseY);
+    const { fy, h: fh, w: fw } = fitCrop(svg, box);
+    const baseY = Number(svg.dataset.baseY);
     if (!(box.width > 0 && box.height > 0 && fh > 0 && Number.isFinite(baseY))) return;
     const scale = Math.min(box.width / fw, box.height / fh);
     const want = pickRoom(box.width, box.height, (baseY - fy) * scale);
@@ -12200,7 +12222,15 @@ ${plate.defs}${plate.body}
     const v = (k) => parseFloat(ws.getPropertyValue(k));
     const wrap = wrapEl.getBoundingClientRect(), st = stage.getBoundingClientRect();
     if (!st.width || !Number.isFinite(v("--frame-right"))) return;
-    const frame = {
+    const fEl = document.querySelector(".door-svg #frame"), sEl = fEl && fEl.ownerSVGElement;
+    const ctm = sEl && typeof fEl.getBBox === "function" ? sEl.getScreenCTM() : null;
+    const bb = ctm ? fEl.getBBox() : null;
+    const frame = bb && bb.width > 0 ? {
+      left: ctm.e + ctm.a * bb.x,
+      right: ctm.e + ctm.a * (bb.x + bb.width),
+      top: ctm.f + ctm.d * bb.y,
+      bottom: ctm.f + ctm.d * (bb.y + bb.height)
+    } : {
       left: wrap.left + v("--frame-left"),
       right: wrap.left + v("--frame-right"),
       top: wrap.top + v("--frame-top"),
@@ -12245,7 +12275,7 @@ ${plate.defs}${plate.body}
     const wrap = wrapEl.getBoundingClientRect(), box = stage.getBoundingClientRect();
     const sTop = Math.ceil(box.top - wrap.top);
     const h = band.getBoundingClientRect().height;
-    const top = Math.max(sTop, Math.floor(fTop - 8 - h));
+    const top = Math.max(sTop, Math.floor(fTop - BAND_GAP - h));
     const cx = (fL + fR) / 2;
     let L2 = box.left - wrap.left + 8, R2 = box.right - wrap.left - 8;
     for (const el of wrapEl.querySelectorAll(".stage__hud .hud__slot, #quote, .stage__arrow, .stage-wrap > .steps")) {
@@ -12325,9 +12355,8 @@ ${plate.defs}${plate.body}
     if (!stage) return;
     const svg = stage.querySelector("svg");
     if (!svg) return;
-    const fx = Number(svg.dataset.fitX), fy = Number(svg.dataset.fitY);
-    const w = Number(svg.dataset.fitW), h = Number(svg.dataset.fitH);
     const box = stage.getBoundingClientRect();
+    const { fx, fy, w, h } = fitCrop(svg, box);
     const quoteEl = document.querySelector(".quote");
     const quoteR = quoteEl ? quoteEl.getBoundingClientRect() : null;
     const quoteH = quoteR ? quoteR.height : 0;

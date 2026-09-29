@@ -204,6 +204,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **29.9** The crop gives each viewport exactly the wall its band needs
+  (`fitCrop`, `data-head-y`): above 1100 the standard leaf is 502.6 / 437.0 /
+  564.0 / 576.5 px at 1100 / 1280 / 1440 / 1920 (was 492.6 / 436.9 / 556.0 /
+  567.4); at 320×568 the band stands 8 px over the tallest casings, not 2.5
+  (leaf 160.4 → 156.2). Below 1100 `FIT_TRIM` is the floor — exactly the need
+  there put `halfextra2` under the picker by 224 px² at 390. `halfextra1`
+  cleared; the phone exemptions have ceilings. Long form: `HISTORY.md`.
 - **29.9** ברזל מחושל is BACK, as `iron` and `iron-light` (black, and the
   door's colour) — the owner's son sent three photographs of doors installed
   since 26.8 (`research/ironwork/`), which makes thirteen doors against one
@@ -382,16 +389,17 @@ hold — side by side, stacked, or the glyph alone (a phone beside a wide door)
   in the wrap, placed by `placeBand` — its foot 8 px above the casing's head,
   centred on the door, given only the free span between the wall's controls on
   its own rows (`--band-w`) and moved off-centre only as far as that span
-  requires. It takes no height, so the door has it back; the crop gave the wall
-  over the tallest door exactly what the band needs (`FIT_TRIM.top` −162, §3),
-  and the standard leaf still grew: 426.2 → 436.9 / 550.2 → 556.0 / 562.4 →
-  567.4 px at 1280×720 / 1440×900 / 1920×918, asserted no smaller than the
-  first figures. Each line is one line in every language (ellipsis), so it never
+  requires. It takes no height, so the door has it back; the crop gives the
+  wall over the tallest door exactly what the band needs at each viewport
+  (`fitCrop` in js/app.js, since 29.9; `FIT_TRIM.top` −162, §3, is the floor
+  below 1100, where the band shares its row with the picker), and the standard
+  leaf grew: 426.2 → 437.0 / 550.2 → 564.0 / 562.4 → 576.5 px at 1280×720 /
+  1440×900 / 1920×918, asserted no smaller than 436.9 / 556.0 / 567.4 (the
+  one crop for every viewport, 28.9). Each line is one line in every language (ellipsis), so it never
   climbs. On a phone it is one line at the same anchor (`--band-h` is gone, the
   stage has its 30 px back); the option's name yields to an ellipsis before
-  the step's. ⚠ At 320×568 over the two tallest doors the stage is too short:
-  the band keeps the stage's top and its gap to the casing narrows to ~2.5 px
-  (named in the audit, asserted still needed).
+  the step's. At 320×568 the crop extends past `FIT_TRIM` so the band clears
+  the two tallest casings by 8 px too (it was ~2.5 until 29.9).
 - **A first visit gets a tour** (28.9, the owner's son: *"a grey overlay on
   everything but the thing described, an arrow from the text to the thing …
   only on the first visit"*): `js/tour.js`, a modal `<dialog id="tour">` of
@@ -645,9 +653,11 @@ its middle, and the wall, floor, sconces and vignette do not move.
 - **`data-fit-x/y/w/h` is `FIT_BOX`**, the fixed scene less `FIT_TRIM` — 130
   off the bottom, and since 28.9 162 units MORE at the top (a negative trim:
   the wall the band stands on over the tallest door, its table beside the
-  constant) — identical for every door. `fitStage()` crops to
-  it and only ever widens it to the stage's shape, so the on-screen scale is a
-  constant. Bare mode skips `fitStage`.
+  constant) — identical for every door. `fitStage()` crops to it through
+  `fitCrop` (29.9), which moves its top to exactly the wall the band needs over
+  the tallest casing (`data-head-y`) — above 1100 by the band's need, below it
+  only ever up — and widens it to the stage's shape, so the on-screen scale is
+  a constant per viewport. Bare mode skips `fitStage`.
 - **`STAGE_BOX`** is the room itself: the backdrop, vignette and sconces hang
   off it. ⚠ The trim could not come out of `PAD`: `PAD` feeds the natural
   `viewBox`, and trimming it moves every committed sheet.
@@ -1811,15 +1821,17 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   every phone. `…slice` would crop the door's head and foot (forbidden); a
   portrait tile loses the name and price row. The thirty tiles are distinct at
   shipped size (closest pair 2.07%, none under 0.45%).
-- **On a phone the wall's controls cannot stand beside the three biggest
-  doors** (14.9; four on 27.9, three since 28.9 — the band went onto the
+- **On a phone the wall's controls cannot stand beside the two biggest
+  doors** (14.9; four on 27.9, three on 28.9 — the band went onto the
   photograph and the crop gave 202 units more wall above the door, so every
-  door stands lower under the top row and `half` cleared). Ink on `#frame` on
-  `extra2`, `halfextra1`, `halfextra2` — worst px² of glyph he/ru, 28.9:
-  extra2 57/0, halfextra1 35/0, halfextra2 261/70 (they were 81/0, 194/74,
-  494/466; the Russian 90 → 70 when the picker moved to the right and the save
-  was kept outermost); the two arrows beside the door are measured with the rest. Gated
-  for `standard`, `extra1` and `half` everywhere and every door ≥ 1152 px with
+  door stands lower under the top row and `half` cleared; two since 29.9, when
+  320×568's crop gave its band the full 8 px and `halfextra1`'s only reading
+  went 35 → 0). Ink on `#frame` on `extra2` and `halfextra2` — worst px² of
+  glyph he/ru, 29.9: extra2 41/0, halfextra2 152/70 (28.9: 57/0, 261/70;
+  before: 81/0, 494/466), now CEILINGS (+10 px²): the crop's phone floor is
+  what holds them (exactly the band's need there read 93/0 and 271/154); the
+  two arrows beside the door are measured with the rest. Gated for `standard`,
+  `extra1`, `half` and `halfextra1` everywhere and every door ≥ 1152 px with
   NO named reading since 28.9 (the widest double at 1152×800 read 17/18 px² on
   commit 1b and 0 once the crop moved).
 - **At 320×568 beside the two widest doors the undo pills cannot clear the

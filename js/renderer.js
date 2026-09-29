@@ -1495,6 +1495,16 @@ const STAGE_BOX = { x: 0, y: 0, w: MID_X * 2, h: BASE_Y + PAD.bottom };
  * stage's top and its gap to the casing narrows to ~2.5 px (CLAUDE.md §9).
  * `PAD` and the bare viewBox are untouched: the SVG's `viewBox` is not this
  * box, and no sheet moves.
+ *
+ * ⚠ AND SINCE 29.9 THIS IS THE ANSWER ONLY BELOW 1100, and there a FLOOR.
+ * `fitCrop` in js/app.js gives each viewport exactly the wall its band needs
+ * over the tallest door, read off `data-head-y` (that casing's head, `PAD.top`,
+ * in scene units): above 1100 that is less than this at every width but
+ * 1280×720 (the leaf 502.6 / 564.0 / 576.5 px at 1100 / 1440 / 1920), and at
+ * 320×568 it is MORE — the band 8 px over the tallest casings, not 2.5. Below
+ * 1100 it never gives less than this: there the band shares its row with the
+ * picker, and this wall is what keeps the widest doors' casings off the
+ * picker's words (the table is over `fitCrop`).
  */
 const FIT_TRIM = { top: -162, bottom: 130 };
 const FIT_BOX = {
@@ -3765,6 +3775,7 @@ export function render(state) {
 <svg viewBox="${view.x} ${view.y} ${view.w} ${view.h}" role="img" class="door-svg"
      style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint)}"
+     data-head-y="${PAD.top}"
      data-fit-x="${FIT_BOX.x}" data-fit-y="${FIT_BOX.y}"
      data-fit-w="${FIT_BOX.w}" data-fit-h="${FIT_BOX.h}"
      data-base-y="${BASE_Y}"

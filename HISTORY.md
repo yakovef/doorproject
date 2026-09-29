@@ -26,6 +26,89 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **29.9 — THE CROP GIVES EACH VIEWPORT EXACTLY THE WALL ITS BAND NEEDS.**
+  Chosen by the owner's son over the one crop for every viewport, after both
+  were measured side by side.
+  · **What was wrong.** Commit 3 of the chrome round (`f39697f`) gave the band
+    its wall with one constant, `FIT_TRIM.top` −162: exactly 1280×720's
+    shortfall, given to every viewport. Everywhere else that was either more
+    wall than the band needed (the door smaller than it could be: 1100, 1440,
+    1920) or less (320×568, where the band kept the stage's top and stood
+    2.5 px over the two tallest casings, a named reading).
+  · **What it is.** `fitCrop` in js/app.js, which `fitStage` and `armRoom`
+    both crop through (a photograph chosen off one crop and placed off
+    another would re-arm on every fit): it moves the crop's top by exactly
+    what puts the TALLEST casing's head (`data-head-y`, `PAD.top` in scene
+    units — a new attribute) the band's own height + `BAND_GAP` (8) below the
+    stage's top — `d = (need·h − (headY − fy)·H) / (H − need)` where the scale
+    is height-driven, as it is at every viewport this app has, and the
+    centred form where a stage is width-driven. The scale is still one
+    constant for every door at a viewport. `placeBand` reads the same
+    `BAND_GAP`.
+  · **Measured, the standard leaf, one crop → this:** 1100×800 492.6 → 502.6,
+    1280×720 436.9 → 437.0, 1440×900 556.0 → 564.0, 1920×918 567.4 → 576.5,
+    320×568 160.4 → 156.2 (the price of the 8 px: the band 8.3 px over the
+    tallest casings, not 2.5). The gap is 7.8–9.3 px at every size and width.
+  · **Below 1100 `FIT_TRIM` is the floor, not the answer — built exact first,
+    measured, and not shipped that way.** There the band shares its row with
+    the picker and the save, and the wall `FIT_TRIM` gives is what stands the
+    widest doors clear of the picker's words. Exactly the band's need put the
+    tallest casing 7–32 px higher at 390–834 (the leaf +5 px at 390, +17 / +23
+    at 768 / 834), and `Русский` on `halfextra2`'s casing went 31 → 224 px² at
+    390 and 0 → 162 at 430, `extra2` 3 → 30 at 390 — every clause passed,
+    because the named phone doors had no ceiling. So below 1100 the crop only
+    extends (320×568); 390–834 are exactly the one-crop page.
+  · **What it moved in the audit, found by its own "still needed" clauses:**
+    the band's named narrow pair at 320 (gap 2.5) is gone — 8 px is asserted
+    at every size and width; `halfextra1`'s wall-ink reading (35 px² at 320,
+    its only one) went to 0, so it is gated with `standard`, `extra1` and
+    `half`; `extra2` 57 → 41, `halfextra2` 261 → 152 (he), and those two now
+    carry ceilings (+10 px², as the wide readings do). The leaf budget is
+    restated stronger: no smaller than the one-crop figures, 436.9 / 556.0 /
+    567.4.
+  · **What it exposed in `placeUndo`, fixed here.** At 320×568 the smaller
+    door gave the undo pills room for "iconrow" beside `halfextra1` by a
+    rounding: `placeUndo` tested the shapes against `--frame-*`, which are
+    rounded to the pixel, and the casing stood half a pixel outside them — 7
+    px² of pill on it (the audit's "on the door"). It reads the frame's
+    settled box now, the way `fitStage` does (the group's box through the
+    drawing's screen matrix); a one-pixel pad was tried first and made the
+    page stricter than the audit's own shape rule (at 390×844 in Russian
+    "iconrow" fit and "icon" was chosen). The named redo-on-arrow reading at
+    320 stays, needed.
+  · **Falsified, each in its own copy of the tree:** `fitCrop` returning the
+    attribute (the tree before) → 16 faults: the band 2.5 px over the casing
+    at 320 on both tallest doors, both steps, three languages (12), the
+    wall ink on `halfextra1` at 320 (35 px²), and the two new ceilings
+    (`extra2` 57, `halfextra2` 261); the need + 20 px → the leaf budget at
+    1280, 1440 and 1920 in he and ru (6: 422.2 / 549.2 / 561.7); the phone
+    floor removed → the ceilings (`extra2` 106, `halfextra2` 307 / 176; 3).
+  · **Found by the full audit and NOT this change's** — the same readings on
+    `dc8481e` itself, and fixed by that session's record (`5c83a7f`) while
+    this was being built: a phone on its side showing an answer on `xlock`
+    too, and in Hebrew at 1100–1152 the column's foot on the undo pill after
+    an undo (936 px² there, 607 / 663 on this crop). Rebased onto it; the
+    `placeUndo` change here sits beside that fix (the box it compares) and
+    does not touch it.
+  · **Gates:** node --check (renderer, app, audit); npm run build; npm test
+    9,441,238 passed, 0 failed on `629f7d0`, and 10,595,363 / 0 after the
+    rebase onto `d797065` (the ironwork, VERSION 28 — neither the crop nor
+    the wall; the band, budget, wall-ink and undo blocks re-run on it,
+    clean); `npm run audit` on `629f7d0` + this: every
+    block clean but one, the saved doors' drawer (the toggle not found once
+    in eight languages × shapes; "the stale design did not reach the
+    drawer") — intermittent on `629f7d0` itself, 2 of 3 standalone runs
+    there against 0 of 3 here, and the recurring audit on `629f7d0` read 6
+    faults, all that drawer's (`4fbb96c`) — a timing fault of that sweep's
+    and not this change's; named, not fixed here. Sheets predicted 0 bare (bare mode
+    skips `fitStage`; `data-head-y` paints nothing): 0 moved, and 0 on
+    `629f7d0`'s own run; re-run on `d797065`: 0 bare, the desktop page shots
+    moved (the larger door) and `phone` / `tablet` did not (the floor). Not run: collide (bare), fuzz,
+    latency (one closed-form line per fit).
+  · **Not done, on purpose:** the exact crop below 1100 (above); a picker
+    clearance in the crop's need on a phone (it would shrink every door there
+    to clear the two widest, which are named); the tablets' gain (+17 / +23
+    px), which comes only with the phone contacts.
 - **⚠ PORTED TO THIS BRANCH — 29.9.2026.** The two entries below were written
   on `claude/elegant-knuth-89z101`, which is NOT the branch the site is built
   from, so the owner's son opened the web app and could not find the design.

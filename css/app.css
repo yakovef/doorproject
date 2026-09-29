@@ -1124,8 +1124,9 @@ svg { direction: ltr; }
    frame it is read from; the drawing does not mirror. It takes no height, so
    the stage gets the band's ~52–63 px back and the door grows with it.
    ⚠ IT NEVER LANDS ON THE CASING BECAUSE THE CROP MAKES ROOM FOR IT, not
-   because it is pushed: `FIT_TRIM.top` in js/renderer.js was given exactly the
-   wall the band needs over the tallest door (the table is there).
+   because it is pushed: the crop gives the wall over the tallest door exactly
+   what the band needs at each viewport (`fitCrop` in js/app.js, the table
+   there; `FIT_TRIM.top` in js/renderer.js is the floor below 1100).
    ⚠ AND IT NEVER LANDS ON THE WALL'S CONTROLS, because it is given only the
    free span between them on its own rows (`--band-w`) and its centre is moved
    off the door's only as far as that span requires (`--band-l`). On a phone

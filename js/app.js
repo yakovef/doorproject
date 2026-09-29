@@ -3667,6 +3667,58 @@ function pickRoom(boxW, boxH, yBase) {
  */
 let liveRoom = null;
 
+/**
+ * THE CROP, WITH EXACTLY THE WALL THE BAND NEEDS — 29.9.2026.
+ * `data-fit-*` is the scene less FIT_TRIM, whose top (−162) was the worst
+ * shortfall of all the viewports — 1280×720's — given to every viewport. This
+ * gives the crop's top, at the viewport it is fitting, exactly the wall the
+ * band needs over the TALLEST door (`data-head-y`, its casing's head in scene
+ * units): the band's own height and BAND_GAP, the scale still one constant
+ * for every door. Measured the day it was built, the standard leaf:
+ *
+ *                 FIT_TRIM alone    this
+ *   1100×800          492.6         502.6
+ *   1280×720          436.9         437.0   (FIT_TRIM was cut for it)
+ *   1440×900          556.0         564.0
+ *   1920×918          567.4         576.5
+ *    320×568          160.4         156.2   the band 8.3 px over the tallest
+ *                                           casings, not 2.5
+ *
+ * ⚠ BELOW 1100 FIT_TRIM IS THE FLOOR, NOT THE ANSWER. There the band shares
+ * its row with the picker and the save, and the wall FIT_TRIM gives is what
+ * stands the widest doors clear of the picker's words: exactly the band's need
+ * there was built first and put the tallest casing 7–32 px higher at 390–834,
+ * and `Русский` on `halfextra2`'s casing grew 31 → 224 px² at 390 and 0 → 162
+ * at 430 (`extra2` 3 → 30 at 390). So below 1100 the crop only ever EXTENDS —
+ * at 320×568, where the stage is too short for FIT_TRIM's wall, and where
+ * every door then stands lower under the top row (`halfextra1` off the picker,
+ * 35 → 0 px²) — and above it, where the wall's controls stand in the corners,
+ * it is exact. The gap is 7.8–9.3 px at every size and width (the two
+ * roundings in `placeBand`; the audit asks ≥ 7.5).
+ */
+const BAND_GAP = 8;
+function fitCrop(svg, box) {
+  const fx = Number(svg.dataset.fitX), w = Number(svg.dataset.fitW);
+  let fy = Number(svg.dataset.fitY), h = Number(svg.dataset.fitH);
+  const headY = Number(svg.dataset.headY);
+  const band = document.querySelector('.stage__band');
+  const H = box.height, sW = box.width / w;
+  if (band && band.getClientRects().length && Number.isFinite(headY) && w > 0 && h > 0 && box.width > 0) {
+    const need = band.offsetHeight + BAND_GAP;
+    if (H > need) {
+      /* the scale is height-driven at every viewport this app has, where
+         (headY - fy + d) * H / (h + d) = need solves to this … */
+      let d = (need * h - (headY - fy) * H) / (H - need);
+      /* … and where a wide stage is width-driven the scale does not move and
+         the crop is centred: (headY - fy + d/2 + (H/s - h)/2) * s = need */
+      if (H / (h + d) > sW) d = 2 * (need / sW - (headY - fy) - (H / sW - h) / 2);
+      if (!window.matchMedia('(min-width: 1100px)').matches) d = Math.max(0, d);
+      if (h + d > 0) { fy -= d; h += d; }
+    }
+  }
+  return { fx, fy, w, h };
+}
+
 function armRoom() {
   const root = document.documentElement;
   if (root.classList.contains('is-bare') || root.classList.contains('is-sheet')) return;
@@ -3674,8 +3726,8 @@ function armRoom() {
   const svg = stage && stage.querySelector('svg');
   if (!stage || !svg) return;
   const box = stage.getBoundingClientRect();
-  const fy = Number(svg.dataset.fitY), fh = Number(svg.dataset.fitH);
-  const fw = Number(svg.dataset.fitW), baseY = Number(svg.dataset.baseY);
+  const { fy, h: fh, w: fw } = fitCrop(svg, box);
+  const baseY = Number(svg.dataset.baseY);
   if (!(box.width > 0 && box.height > 0 && fh > 0 && Number.isFinite(baseY))) return;
   const scale = Math.min(box.width / fw, box.height / fh);
   const want = pickRoom(box.width, box.height, (baseY - fy) * scale);
@@ -3726,8 +3778,21 @@ function placeUndo() {
   const v = k => parseFloat(ws.getPropertyValue(k));
   const wrap = wrapEl.getBoundingClientRect(), st = stage.getBoundingClientRect();
   if (!st.width || !Number.isFinite(v('--frame-right'))) return;
-  const frame = { left: wrap.left + v('--frame-left'), right: wrap.left + v('--frame-right'),
-                  top: wrap.top + v('--frame-top'), bottom: wrap.top + v('--frame-bot') };
+  /* ⚠ THE FRAME'S OWN SETTLED BOX, NOT `--frame-*` (29.9): those four are
+     rounded to the pixel, and the casing can stand half a pixel outside them.
+     Found when `fitCrop` gave 320×568 a smaller door: "iconrow" beside
+     `halfextra1` passed a test against the rounded box and stood 7 px² on the
+     casing. Read the way `fitStage` reads it — the group's box in the
+     drawing's units through the drawing's screen matrix, which an entrance
+     transform cannot move. */
+  const fEl = document.querySelector('.door-svg #frame'), sEl = fEl && fEl.ownerSVGElement;
+  const ctm = sEl && typeof fEl.getBBox === 'function' ? sEl.getScreenCTM() : null;
+  const bb = ctm ? fEl.getBBox() : null;
+  const frame = bb && bb.width > 0
+    ? { left: ctm.e + ctm.a * bb.x, right: ctm.e + ctm.a * (bb.x + bb.width),
+        top: ctm.f + ctm.d * bb.y, bottom: ctm.f + ctm.d * (bb.y + bb.height) }
+    : { left: wrap.left + v('--frame-left'), right: wrap.left + v('--frame-right'),
+        top: wrap.top + v('--frame-top'), bottom: wrap.top + v('--frame-bot') };
   const q = document.querySelector('#quote');
   const obstacles = [frame,
     ...[...document.querySelectorAll('.stage__arrow')].map(e => e.getBoundingClientRect()),
@@ -3799,7 +3864,7 @@ function placeBand() {
   const wrap = wrapEl.getBoundingClientRect(), box = stage.getBoundingClientRect();
   const sTop = Math.ceil(box.top - wrap.top);
   const h = band.getBoundingClientRect().height;
-  const top = Math.max(sTop, Math.floor(fTop - 8 - h));
+  const top = Math.max(sTop, Math.floor(fTop - BAND_GAP - h));
   const cx = (fL + fR) / 2;
   let L = box.left - wrap.left + 8, R = box.right - wrap.left - 8;
   for (const el of wrapEl.querySelectorAll('.stage__hud .hud__slot, #quote, .stage__arrow, .stage-wrap > .steps')) {
@@ -3964,9 +4029,10 @@ function fitStage() {
      `w / 2` when the rect starts at `x` puts the door off centre by exactly
      `x`, and CLAUDE.md §7 already records a tool bitten by assuming a viewBox
      origin was zero. */
-  const fx = Number(svg.dataset.fitX), fy = Number(svg.dataset.fitY);
-  const w = Number(svg.dataset.fitW), h = Number(svg.dataset.fitH);
   const box = stage.getBoundingClientRect();
+  /* ⚠ AND THE CROP'S TOP IS NOT ALWAYS THE ATTRIBUTE'S (29.9): `fitCrop` gives
+     it the wall the band needs over the tallest door at this viewport. */
+  const { fx, fy, w, h } = fitCrop(svg, box);
   /* Read once: `--quote-h` at the end needs the height (the phone bar), and
      the width was the old lamp clamp's (gone 27.9 — the card stands at the
      door's corner now, placed by the stylesheet off `--frame-*`). */
