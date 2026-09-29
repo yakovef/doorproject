@@ -5621,12 +5621,33 @@ for (const v of VIEWS) {
      · a link carrying a door, bare mode and the sheet never show it;
      · with storage refused it shows, ends, and throws nothing.
    At 1280x720 (he), 390x844 and 320x568 (ru — the longest words in the
-   narrowest callout). */
+   narrowest callout).
+   ⚠ AND SINCE 29.9 (*"The grey overlay in the tutorial more black"*; *"In the
+   tutorial there should still be an option to change languages, so that area
+   is not greyed out"*):
+     · the scrim is `.8` — the attribute, AND a reading: a patch of wall off
+       every cut-out and the callout, photographed with the tour up and again
+       after it, its mean luminance through the scrim at most 10 % of bare
+       (SCRIM_GATE, below); the callout's words ≥ 4.5:1 on its paper;
+     · on every step `#langs` is whole inside a cut-out and each of its
+       visible buttons is what a finger at its centre presses;
+     · pressing the other language on step 2 re-renders the callout in that
+       language's script on the SAME step, the tour still up;
+     · after the tour the picker stands where it stands with no tour (a second
+       load), within 1 px. */
 {
   console.log('\nthe first-visit tour: four cut-outs, once, and never on a link');
   const before = faults;
   const raw = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   let steps = 0;
+  let scrimPatch = null; const scrimReadings = [];
+  /* per process: two audits in one container must not read each other's */
+  const SCRIM_ON = `/tmp/audit-scrim-${process.pid}-on.png`, SCRIM_OFF = `/tmp/audit-scrim-${process.pid}-off.png`;
+  /* ⚠ 10 %, NOT THE BRIEF'S 25 % — both measured the day it was set: the
+     wall reads 5.6–6.7 % of bare through the .8 scrim and 15.2–18.5 % through
+     the old .6, so a 25 % gate passes the scrim he called too grey. 10 % sits
+     between them and tells the two apart (stronger, never weaker). */
+  const SCRIM_GATE = 0.10;
   const URL0 = `file://${process.cwd()}/index.html`;
   const state = pg => pg.evaluate(() => {
     const d = document.querySelector('#tour');
@@ -5672,7 +5693,12 @@ for (const v of VIEWS) {
       if (!e || !e.closest('#tour')) out.clickThrough.push(t.id || t.className.baseVal || String(t.className).split(' ')[0]);
     }
     out.cardIn = card.left >= 0 && card.top >= 0 && card.right <= innerWidth && card.bottom <= innerHeight;
-    out.cardOnHole = holes.some(h => meets(card, h));
+    /* none of the STEP's cut-outs; the picker's (29.9) only by its margin —
+       never the picker itself, which must stay whole and pressable */
+    const stepHoles = [...d.querySelectorAll('.tour__hole:not(.tour__hole--langs)')].map(h => ({ left: +h.getAttribute('x'), top: +h.getAttribute('y'),
+      right: +h.getAttribute('x') + +h.getAttribute('width'), bottom: +h.getAttribute('y') + +h.getAttribute('height') }));
+    const lp = document.querySelector('#tour #langs');
+    out.cardOnHole = stepHoles.some(h => meets(card, h)) || (lp ? meets(card, R(lp)) : false);
     out.arrowsOk = arrows.every(a => onEdge(a.x1, a.y1, card) && holes.some(h => onEdge(a.x2, a.y2, h)));
     out.arrows = arrows.length;
     return out;
@@ -5687,10 +5713,74 @@ for (const v of VIEWS) {
       await pg.waitForFunction(() => document.querySelector('#tour')?.open, null, { timeout: 2500 }).catch(() => {});
       const a = await state(pg);
       if (!a.open || !a.modal || a.step !== '1') { fault('tour', `${tag}: a first bare load did not open the tour as a modal on step 1 (${JSON.stringify(a)})`); continue; }
+      let langNow = lang;
       for (let k = 1; k <= 4; k++) {
         await pg.waitForTimeout(120);
         const m = await measure(pg);
         steps++;
+        /* the picker, live inside the tour, on every step */
+        const pk = await pg.evaluate(() => {
+          const d = document.querySelector('#tour'), p = document.querySelector('#langs');
+          if (!p) return null;
+          const r = p.getBoundingClientRect();
+          const holes = [...d.querySelectorAll('.tour__hole')].map(h => ({ left: +h.getAttribute('x'), top: +h.getAttribute('y'),
+            right: +h.getAttribute('x') + +h.getAttribute('width'), bottom: +h.getAttribute('y') + +h.getAttribute('height') }));
+          const whole = holes.some(h => r.left >= h.left - 1 && r.top >= h.top - 1 && r.right <= h.right + 1 && r.bottom <= h.bottom + 1);
+          const dead = [...p.querySelectorAll('.lang')].filter(b => b.getClientRects().length && getComputedStyle(b).display !== 'none').filter(b => {
+            const q = b.getBoundingClientRect(); const e = document.elementFromPoint((q.left + q.right) / 2, (q.top + q.bottom) / 2);
+            return !(e && (e === b || b.contains(e)));
+          }).map(b => b.lang);
+          return { inTour: !!p.closest('#tour'), whole, dead, n: p.querySelectorAll('.lang').length };
+        });
+        if (!pk || !pk.n) fault('tour', `${tag} step ${k}: no language picker — the picker clause has no subject`);
+        else {
+          if (!pk.whole) fault('tour', `${tag} step ${k}: the language picker is not whole inside a cut-out — it is greyed out with the page`);
+          if (pk.dead.length) fault('tour', `${tag} step ${k}: ${pk.dead.join(', ')} cannot be pressed — a finger at its centre meets ${pk.inTour ? 'something else' : 'the tour'}`);
+        }
+        if (k === 1) {
+          /* the scrim: its attribute, the callout's ink, and the wall through it */
+          const sc = await pg.evaluate(() => {
+            const d = document.querySelector('#tour');
+            const rect = d.querySelector('.tour__scrim > rect');
+            const cs = e => getComputedStyle(e);
+            const rgb = c => (c.match(/\d+(\.\d+)?/g) || []).slice(0, 3).map(Number);
+            const rel = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+            const L = c => { const [r, g, b2] = rgb(c); return 0.2126 * rel(r) + 0.7152 * rel(g) + 0.0722 * rel(b2); };
+            const t = d.querySelector('.tour__t'), card = d.querySelector('.tour__card');
+            const a = L(cs(t).color), b2 = L(cs(card).backgroundColor);
+            const ink = (Math.max(a, b2) + 0.05) / (Math.min(a, b2) + 0.05);
+            /* a patch of wall off every cut-out and the callout */
+            const holes = [...d.querySelectorAll('.tour__hole')].map(h => ({ left: +h.getAttribute('x'), top: +h.getAttribute('y'),
+              right: +h.getAttribute('x') + +h.getAttribute('width'), bottom: +h.getAttribute('y') + +h.getAttribute('height') }));
+            const cr = card.getBoundingClientRect(), st = document.querySelector('#stage').getBoundingClientRect();
+            const off = [...holes, cr, ...[...document.querySelectorAll('.quote, .stage__band, .stage-wrap > .steps, .stage__arrow, .stage__undo, .stage__hud')].map(e => e.getBoundingClientRect())];
+            const meet = (x, y, r) => x < r.right && x + 32 > r.left && y < r.bottom && y + 32 > r.top;
+            let patch = null;
+            for (let fy = 0.15; fy < 0.8 && !patch; fy += 0.05) for (let fx = 0.04; fx < 0.9 && !patch; fx += 0.04) {
+              const x = st.left + st.width * fx, y = st.top + st.height * fy;
+              if (x >= 0 && y >= 0 && x + 32 <= innerWidth && y + 32 <= innerHeight && !off.some(r => meet(x, y, r))) patch = { x: Math.round(x), y: Math.round(y), width: 32, height: 32 };
+            }
+            return { opacity: rect?.getAttribute('fill-opacity'), ink, patch };
+          });
+          if (sc.opacity !== '.8' && sc.opacity !== '0.8') fault('tour', `${tag}: the scrim's fill-opacity is ${sc.opacity} — he asked for it blacker (.8)`);
+          if (sc.ink < 4.5) fault('tour', `${tag}: the callout's words are ${sc.ink.toFixed(2)}:1 on its paper — under 4.5`);
+          if (!sc.patch) fault('tour', `${tag}: no patch of wall off the cut-outs to read the scrim on — the reading has no subject`);
+          else { scrimPatch = sc.patch; await pg.screenshot({ path: SCRIM_ON, clip: sc.patch }); }
+        }
+        if (k === 2) {
+          /* the other language, pressed inside the tour */
+          const other = langNow === 'he' ? 'ru' : 'he';
+          const was = await pg.evaluate(() => document.querySelector('#tour .tour__t')?.textContent);
+          await pg.evaluate(o => document.querySelector(`#langs .lang[lang="${o}"]`)?.click(), other);
+          await pg.waitForTimeout(250);
+          const now = await pg.evaluate(() => ({ open: !!document.querySelector('#tour')?.open, step: document.querySelector('#tour')?.dataset.step,
+            lang: document.documentElement.lang, text: document.querySelector('#tour .tour__t')?.textContent || '' }));
+          const script = other === 'ru' ? /[\u0400-\u04FF]/ : /[\u0590-\u05FF]/;
+          if (!now.open) fault('tour', `${tag}: pressing ${other} inside the tour closed it`);
+          else if (now.step !== '2') fault('tour', `${tag}: pressing ${other} moved the tour to step ${now.step} — it re-shows the same step`);
+          if (now.lang !== other || now.text === was || !script.test(now.text)) fault('tour', `${tag}: after pressing ${other} the callout reads "${now.text.slice(0, 40)}" (page ${now.lang}) — it re-renders in the new language`);
+          else langNow = other;
+        }
         if (m.step !== k) fault('tour', `${tag}: expected step ${k}, the tour is on ${m.step}`);
         if (!m.targets) fault('tour', `${tag} step ${k}: no target on the page — this step has no subject`);
         if (m.empty.length) fault('tour', `${tag} step ${k}: ${m.empty.join(', ')} is not painted — the cut-out opens over an empty corner`);
@@ -5704,9 +5794,32 @@ for (const v of VIEWS) {
       await pg.waitForTimeout(150);
       const z = await state(pg);
       if (z.open || z.flag !== 'seen') fault('tour', `${tag}: after the last step the tour is ${z.open ? 'still open' : 'shut'} and the flag is ${z.flag}`);
-      await pg.goto(`${URL0}?lang=${lang}`);
+      /* the picker went home, and the wall the scrim was over, bare */
+      const pickAfter = await pg.evaluate(() => { const p = document.querySelector('#langs'); const r = p?.getBoundingClientRect();
+        return p ? { home: !!p.closest('.stage__hud') && !p.closest('#tour'), left: r.left, top: r.top, right: r.right, bottom: r.bottom } : null; });
+      if (scrimPatch) {
+        await pg.waitForTimeout(250);
+        await pg.screenshot({ path: SCRIM_OFF, clip: scrimPatch });
+        const mean = f => { const im = load(f); let t = 0; const rel = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+          for (let i = 0; i < im.d.length; i += 4) t += 0.2126 * rel(im.d[i]) + 0.7152 * rel(im.d[i + 1]) + 0.0722 * rel(im.d[i + 2]);
+          return t / (im.d.length / 4); };
+        const ratio = mean(SCRIM_ON) / Math.max(1e-6, mean(SCRIM_OFF));
+        scrimReadings.push(`${tag} ${(ratio * 100).toFixed(1)} %`);
+        if (ratio > SCRIM_GATE) fault('tour', `${tag}: the wall through the scrim is ${(ratio * 100).toFixed(1)} % of its bare luminance — over ${SCRIM_GATE * 100} %, not the blacker overlay he asked for`);
+        scrimPatch = null;
+      }
+      /* the second visit, in the language the tour ended in (step 2 changed
+         it): the tour must not come back, and the picker stands where it
+         stood when the tour put it home */
+      await pg.goto(`${URL0}?lang=${langNow}`);
       await pg.waitForTimeout(1800);
       if ((await state(pg)).open) fault('tour', `${tag}: the tour came back on the second visit`);
+      const pickBare = await pg.evaluate(() => { const r = document.querySelector('#langs')?.getBoundingClientRect(); return r ? { left: r.left, top: r.top, right: r.right, bottom: r.bottom } : null; });
+      if (!pickAfter || !pickAfter.home) fault('tour', `${tag}: after the tour the language picker is not back in its slot on the wall`);
+      else if (!pickBare) fault('tour', `${tag}: no picker on the second visit — the home clause has no subject`);
+      else if (['left', 'top', 'right', 'bottom'].some(k => Math.abs(pickAfter[k] - pickBare[k]) > 1)) {
+        fault('tour', `${tag}: after the tour the picker stands at ${JSON.stringify(pickAfter)}, and with no tour at ${JSON.stringify(pickBare)} — more than 1 px apart`);
+      }
       if (errs.length) fault('tour', `${tag}: ${errs.join(' | ').slice(0, 120)}`);
     } catch (e) {
       if (!crashed(e)) throw e;
@@ -5754,7 +5867,8 @@ for (const v of VIEWS) {
   }
   await raw.close();
   if (steps < 12) fault('tour', `only ${steps} of 12 tour steps were measured`);
-  if (faults === before) console.log(`    ${steps} steps at three shapes: a modal on a first bare load, every target whole in its cut-out and not pressable through the scrim, the callout inside the viewport and off the cut-outs, every arrow edge to edge; remembered after the last step, skip and Escape; never on a link, bare or the sheet; with storage refused it shows and ends without throwing`);
+  console.log(`    the wall through the scrim, % of bare: ${scrimReadings.join(', ') || 'none read'}`);
+  if (faults === before) console.log(`    ${steps} steps at three shapes: a modal on a first bare load, the scrim .8 and the wall through it under ${SCRIM_GATE * 100} % of bare, the callout's words ≥ 4.5:1, the picker live in its own cut-out on every step and a language pressed there re-showing the same step in it, the picker home after, every target whole in its cut-out and not pressable through the scrim, the callout inside the viewport and off the cut-outs, every arrow edge to edge; remembered after the last step, skip and Escape; never on a link, bare or the sheet; with storage refused it shows and ends without throwing`);
 }
 
 /* ── THE SAVED DOORS: A DIALOG, AND THE CARD UNDER IT DOES NOT MOVE ───────

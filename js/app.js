@@ -54,7 +54,7 @@ import { canSharePicture, copyMessage, drawingCaveat, fallbackWhatsappUrl,
 import { counted, L, LANGS, lang, pickLang, setLang, T, withLang } from './copy.js';
 import { DEFAULTS, encodeCode, fromQuery, isUntouched, toQuery } from './url-state.js';
 import { WORKS } from './works.js';
-import { startTour } from './tour.js';
+import { refreshTour, startTour } from './tour.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -587,6 +587,9 @@ function buildLangs() {
       buildPanel();
       goStep(live);
       paint();
+      /* the picker can be pressed during the first-visit tour (29.9): the
+         tour shows the same step again, in the new language */
+      refreshTour();
     });
     return b;
   }));
@@ -896,7 +899,7 @@ function init() {
      After the door has assembled, so the cut-out is round a door at rest. */
   const root0 = document.documentElement.classList;
   if (!carries && !root0.contains('is-bare') && !root0.contains('is-sheet')) {
-    setTimeout(() => { if (!document.querySelector('dialog[open]')) startTour(); }, 1100);
+    setTimeout(() => { if (!document.querySelector('dialog[open]')) startTour({ refit: fitStage }); }, 1100);
   }
 
   /* ⚠ M1: THE DOOR ASSEMBLES, ONCE. `is-arriving` is on `<html>` for one

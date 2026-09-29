@@ -10274,6 +10274,7 @@ ${plate.defs}${plate.body}
   };
   var PAD2 = 8;
   var GAP = 18;
+  var TIGHT = 10;
   var EDGE2 = 12;
   var R = (el) => {
     if (!el) return null;
@@ -10314,10 +10315,38 @@ ${plate.defs}${plate.body}
   var dlg = null;
   var at = 0;
   var onResize = null;
+  var refit = null;
+  var home = null;
+  function holdPicker() {
+    const p = document.getElementById("langs");
+    if (!p || !dlg) return null;
+    if (home && p.parentElement === dlg) home.parent.insertBefore(p, home.next);
+    p.classList.remove("tour__langs");
+    p.style.removeProperty("top");
+    p.style.removeProperty("right");
+    const r = p.getBoundingClientRect();
+    if (!(r.width && r.height)) return null;
+    home = { parent: p.parentElement, next: p.nextSibling };
+    dlg.append(p);
+    p.classList.add("tour__langs");
+    p.style.top = `${r.top}px`;
+    p.style.right = `${window.innerWidth - r.right}px`;
+    return R(p);
+  }
+  function releasePicker() {
+    const p = document.getElementById("langs");
+    if (p && home && p.parentElement === dlg) home.parent.insertBefore(p, home.next);
+    if (p) {
+      p.classList.remove("tour__langs");
+      p.style.removeProperty("top");
+      p.style.removeProperty("right");
+    }
+    home = null;
+  }
   function card() {
     return dlg.querySelector(".tour__card");
   }
-  function placeCard(holes) {
+  function placeCard(holes, aimed = holes.length) {
     const c = card();
     c.style.left = "0px";
     c.style.top = "0px";
@@ -10334,10 +10363,14 @@ ${plate.defs}${plate.body}
       { x: cx(midX - cw / 2), y: h.top - GAP - ch },
       after,
       before,
+      /* closer, before giving up (29.9): the picker's own cut-out can leave a
+         narrow phone a gap only just the callout's height */
+      { x: cx(midX - cw / 2), y: h.bottom + TIGHT },
+      { x: cx(midX - cw / 2), y: h.top - TIGHT - ch },
       { x: cx(W / 2 - cw / 2), y: cy(H - EDGE2 - ch) },
       { x: cx(W / 2 - cw / 2), y: EDGE2 }
     ];
-    const fits = (t) => t.x >= EDGE2 - 0.5 && t.y >= EDGE2 - 0.5 && t.x + cw <= W - EDGE2 + 0.5 && t.y + ch <= H - EDGE2 + 0.5 && !holes.some((o) => meets({ left: t.x, top: t.y, right: t.x + cw, bottom: t.y + ch }, grow(o, 4)));
+    const fits = (t) => t.x >= EDGE2 - 0.5 && t.y >= EDGE2 - 0.5 && t.x + cw <= W - EDGE2 + 0.5 && t.y + ch <= H - EDGE2 + 0.5 && !holes.some((o, i) => meets({ left: t.x, top: t.y, right: t.x + cw, bottom: t.y + ch }, grow(o, i < aimed ? 4 : 2 - PAD2)));
     const pick = tries.find(fits) || tries[tries.length - 2];
     c.style.left = `${Math.round(pick.x)}px`;
     c.style.top = `${Math.round(pick.y)}px`;
@@ -10362,14 +10395,14 @@ ${plate.defs}${plate.body}
       svg.append(line);
     }
   }
-  function paintScrim(holes) {
+  function paintScrim(holes, aimed = holes.length) {
     const mask = dlg.querySelector("#tour-cut");
     const r = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--r-tile")) || 12;
     mask.querySelectorAll(".tour__hole").forEach((n) => n.remove());
     const NS = "http://www.w3.org/2000/svg";
-    for (const h of holes) {
+    holes.forEach((h, i) => {
       const rect = document.createElementNS(NS, "rect");
-      rect.setAttribute("class", "tour__hole");
+      rect.setAttribute("class", i < aimed ? "tour__hole" : "tour__hole tour__hole--langs");
       rect.setAttribute("x", h.left.toFixed(1));
       rect.setAttribute("y", h.top.toFixed(1));
       rect.setAttribute("width", (h.right - h.left).toFixed(1));
@@ -10377,34 +10410,43 @@ ${plate.defs}${plate.body}
       rect.setAttribute("rx", String(r));
       rect.setAttribute("fill", "#000");
       mask.append(rect);
-    }
+    });
   }
   function show() {
     const s = TOUR_STEPS[at];
     if (s.before) s.before();
-    const holes = s.targets().filter(Boolean).map((r) => grow(r, PAD2));
+    const aimed = s.targets().filter(Boolean).map((r) => grow(r, PAD2));
+    const picker = holdPicker();
+    const holes = picker ? [...aimed, grow(picker, PAD2)] : aimed;
     dlg.dataset.step = String(at + 1);
     dlg.querySelector(".tour__n").textContent = T("tour.count", at + 1, TOUR_STEPS.length);
     dlg.querySelector(".tour__t").textContent = T(s.text);
+    dlg.querySelector(".tour__skip").textContent = T("tour.skip");
     dlg.querySelector(".tour__next").textContent = T(at === TOUR_STEPS.length - 1 ? "tour.done" : "tour.next");
-    paintScrim(holes);
-    if (!holes.length) {
+    paintScrim(holes, aimed.length);
+    if (!aimed.length) {
       arrows({ left: 0, top: 0, right: 0, bottom: 0 }, []);
       placeCard([{ left: 0, top: 0, right: 0, bottom: 0 }]);
       return;
     }
-    arrows(placeCard(holes), holes);
+    arrows(placeCard(holes, aimed.length), aimed);
+  }
+  function refreshTour() {
+    if (dlg && dlg.open) show();
   }
   function end() {
     remember();
     if (onResize) window.removeEventListener("resize", onResize);
     onResize = null;
+    releasePicker();
     if (dlg && dlg.open) dlg.close();
     document.documentElement.classList.remove("is-touring");
+    if (refit) refit();
   }
-  function startTour() {
+  function startTour(opts = {}) {
     dlg = document.querySelector("#tour");
     if (!dlg || tourSeen() || typeof dlg.showModal !== "function") return false;
+    refit = typeof opts.refit === "function" ? opts.refit : null;
     at = 0;
     dlg.querySelector(".tour__skip").onclick = end;
     dlg.querySelector(".tour__next").onclick = () => {
@@ -10904,6 +10946,7 @@ ${plate.defs}${plate.body}
         buildPanel();
         goStep(live);
         paint();
+        refreshTour();
       });
       return b;
     }));
@@ -11028,7 +11071,7 @@ ${plate.defs}${plate.body}
     const root0 = document.documentElement.classList;
     if (!carries && !root0.contains("is-bare") && !root0.contains("is-sheet")) {
       setTimeout(() => {
-        if (!document.querySelector("dialog[open]")) startTour();
+        if (!document.querySelector("dialog[open]")) startTour({ refit: fitStage });
       }, 1100);
     }
     document.documentElement.classList.add("is-arriving");
@@ -11624,8 +11667,8 @@ ${plate.defs}${plate.body}
     const panel = $("#choices"), wrap = $(".stage-wrap");
     if (!nav || !panel || !wrap) return;
     const wide = typeof window.matchMedia === "function" && window.matchMedia("(min-width: 1100px)").matches;
-    const home = wide ? wrap : panel;
-    if (nav.parentElement === home) return;
+    const home2 = wide ? wrap : panel;
+    if (nav.parentElement === home2) return;
     const had = nav.contains(document.activeElement) ? document.activeElement : null;
     if (wide) wrap.appendChild(nav);
     else panel.insertBefore(nav, panel.querySelector(".sect") || null);

@@ -3081,7 +3081,8 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
 
 /* ── THE FIRST-VISIT TOUR — 28.9.2026 (js/tour.js) ──────────────────
    A modal dialog over the whole viewport with no ground of its own: the scrim
-   is the SVG under it (ink at .6, cut out over the live target), the callout a
+   is the SVG under it (ink at .8 since 29.9 — *"more black"*; .6 before — cut
+   out over the live target and over the language picker), the callout a
    paper card placed by the script, the arrows white lines from its edge to
    each cut-out. Its fade is the one animation it has, and it goes under
    reduced motion and in bare mode with every other (T9, T13). */
@@ -3109,6 +3110,21 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
 .tour .tour__skip { background: none; color: var(--ink); border-color: var(--rule); }
 .tour .tour__next { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 @keyframes tourIn { from { opacity: 0; } }
+/* ⚠ SMALLER ON A NARROW PHONE (29.9): with the picker in a cut-out of its own
+   at the top-right, a 320 × 568 screen's options step has one free place for
+   the callout — over the door, between the picker's cut-out and the options'
+   — and the card at full size was taller than it (203 px in Russian against
+   ~170). The words come down a size there; the buttons keep their 44 px. */
+@media (max-width: 400px) {
+  .tour__card { padding: 12px 12px 10px; }
+  .tour__n { margin-block-end: 2px; }
+  .tour__t { margin-block-end: 8px; font-size: .88rem; line-height: 1.4; }
+}
+/* THE PICKER WHILE THE TOUR HOLDS IT (29.9, js/tour.js): the same `#langs`,
+   moved into the dialog and anchored where its slot stood — `top` and `right`
+   are written by the script. Above the scrim, in its own cut-out; its slot's
+   ground and its buttons' look come with it (`.hud__slot`, `.lang`). */
+.tour .tour__langs { position: absolute; z-index: 2; margin: 0; }
 .is-bare .tour { display: none; }
 
 /* ── the save's two dialogs — 28.9.2026 ─────────────────────────────

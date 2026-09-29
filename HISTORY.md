@@ -26,6 +26,66 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **29.9 — PROMPT A, 3 OF 5: THE TOUR — A BLACKER SCRIM, AND THE LANGUAGE PICKER
+  STAYS LIVE.** The owner's son: *"The grey overlay in the tutorial more black."*
+  And: *"In the tutorial there should still be an option to change languages,
+  so that area is not greyed out."*
+  · **The scrim.** `fill-opacity` .6 → **.8** (ours, reversible in a line).
+    Asserted twice: the attribute, and a reading — a 32 px patch of wall off
+    every cut-out and the callout, photographed with the tour up and after it:
+    **5.6 % / 6.7 % / 6.6 %** of bare at 1280×720 he / 390×844 ru / 320×568 ru,
+    and 15.2 / 18.5 / 18.3 % through the old .6. The brief's 25 % would have
+    passed the scrim he called too grey, so the gate is **10 %**, between the
+    two (stronger, and the reason is beside it). The callout's words ≥ 4.5:1
+    on its paper (asserted).
+  · **The picker, and its trap.** `showModal` makes everything outside the
+    dialog inert, and `inert` cannot be lifted on a child; a copied picker is
+    two controls that must be kept in step (§5.29's shape). So the tour MOVES
+    `#langs` — the same node, as `placeNav` moves `.steps` — into the dialog
+    for its duration (`holdPicker`): measured at home on every step (moved back
+    for the reading and returned in the same task, so nothing paints between —
+    a resize or a language moves its slot), anchored by its right edge (it is
+    top-right in every language), above the scrim in a fifth cut-out
+    (`.tour__hole--langs`) on every step; the arrow still runs only to the
+    step's target. Its handler already rebuilds the panel and repaints; it now
+    ends with `refreshTour()`, which re-shows the SAME step — words through
+    `T()`, the callout placed for the new direction, the count unmoved.
+    `end()` puts it back where it was and runs the page's `fitStage` (handed in
+    as `startTour({ refit })` — `placeBand` gave the empty slot's room to the
+    band meanwhile).
+  · **What the fifth cut-out cost, and on which screen.** At 320×568 the
+    options step has one free place for the callout — over the door, between
+    the picker's cut-out and the options' — and the Russian card (203 px, then
+    176 at the smaller type) was taller than it (~170): it fell back onto the
+    options. Two changes: under 400 px the callout's words come down a size
+    (.98 → .88 rem, the buttons keep 44 px), a placement 10 px from the target
+    is tried before giving up, and the callout may share the picker's cut-out
+    MARGIN (8 px) — never the picker, which stays whole and pressable. The
+    audit's "covers no cut-out" is restated to exactly that: none of the
+    step's, and never the picker's own box.
+  · **Asserted, per step at 1280 he / 390 ru / 320 ru:** `#langs` whole in a
+    cut-out; each visible button is what a finger at its centre presses; on
+    step 2 the other language pressed — the tour still up, the same step, the
+    callout in that language's script; after the tour the picker in its slot
+    and within 1 px of where it stands on a second visit (in the language the
+    tour ended in). The "not pressable through the scrim" clause stands for the
+    four targets.
+  · **Falsified:** the picker left in the wall → 24 (not in a cut-out, and "he,
+    en, ru cannot be pressed — a finger meets the tour", every step); the scrim
+    back at .6 → the attribute AND the reading at all three (15.2–18.5 %); no
+    `refreshTour` → the callout stays in the old language at all three (and
+    the picker, never re-anchored, 12–418 px off its slot); no release → "not
+    back in its slot" at all three. ⚠ The first .6 run read 5.6 % — the four
+    falsified copies shared one `/tmp` path and read each other's pixels; the
+    files are per process now (§7).
+  · **Sheets: 0 bare.** `npm run audit` on this commit's tree: **no faults**, every
+    viewport and every block to the end.
+  · **Gates:** node --check (renderer, app, tour, audit); npm run build; npm test
+    10,595,465 passed / 5 failed — the five sheet-staleness rows.
+  · **Not done, on purpose:** the picker copied into the dialog (two controls);
+    `inert` removed from the page (a modal is what keeps a finger off the
+    targets); a smaller callout at every width (only where it did not fit).
+
 - **29.9 — PROMPT A, 2 OF 5: UNDO AND REDO PAINTED FROM THE FIRST PAINT, GREYED.**
   The owner's son: *"At the tutorial's fourth step the undo button is not shown
   yet, so it looks strange — available but greyed out at the start, because

@@ -181,7 +181,9 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   · the phone's band stays one line (the option's name yields first);
   · the saved doors in a dialog, reached from both saves;
   · the tour never on a link carrying a door, bare or the sheet, and set
-    ink at 0.6 rather than a literal grey;
+    ink at ~~0.6~~ **.8 since 29.9, their word** (*"more black"*) rather than
+    a literal grey; the picker held live inside the tour's modal (29.9, ours:
+    the same node moved in, never a copy);
   · the extra lock's step keyed `xlock`;
   · the step's `<h2>`, shown again above the options on their word, stays
     visually hidden under 500 px tall (a phone on its side, a laptop at 200 %)
@@ -206,6 +208,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **29.9** The tour: scrim .6 → **.8** (*"more black"*: the wall reads 5.6–6.7 %
+  of bare through it), and the language picker LIVE in it (*"there should still
+  be an option to change languages"*) — `#langs` itself moves into the dialog,
+  in a cut-out of its own, and a language pressed re-shows the same step in
+  it; home after, to the pixel. On a 320 phone the callout may share the
+  picker's margin, never the picker. Long form: `HISTORY.md`.
 - **29.9** Undo and redo PAINTED FROM LOAD, greyed while disabled (*"available
   but greyed out at the start"*): ink at .45, no shadow, still `disabled`; no
   placeholder box. The toast clears them before the first change too.
@@ -396,8 +404,17 @@ placement is the other session's, merged at the owner's son's choice.
   everything but the thing described, an arrow from the text to the thing …
   only on the first visit"*): `js/tour.js`, a modal `<dialog id="tour">` of
   four cut-outs — the door, the navigator, the options, the save and the undo
-  pills' corner — with the callout placed off every cut-out and an arrow to
-  each, remembered in `localStorage` (`dm.tour.v1`, behind a try). Never on a
+  pills — with the callout placed off every cut-out and an arrow to
+  each, remembered in `localStorage` (`dm.tour.v1`, behind a try). ⚠ **Since
+  29.9 the scrim is .8** (*"The grey overlay in the tutorial more black"*) **and
+  the language picker stays live** (*"there should still be an option to
+  change languages, so that area is not greyed out"*): a modal makes the page
+  inert and `inert` cannot be lifted on a child, so the tour MOVES `#langs` —
+  the same node, never a copy — into the dialog, anchored where its slot
+  stood, in a fifth cut-out on every step; a language pressed there re-shows
+  the same step in that language (`refreshTour`), and `end` puts it home and
+  re-fits the stage. On a narrow phone the callout may share the picker's
+  cut-out MARGIN, never the picker (320×568's options step has one free place). Never on a
   link carrying a door, bare or the sheet. ⚠ **Every instrument opens the
   page `tourless`** (`tools/browser.mjs`, §8); the audit's one tour block
   launches a raw browser and asserts the tour opened.
@@ -989,10 +1006,11 @@ for the same half of the leaf and `repair` trades between them.
 - A bare load opens step 01; a shared link or a code opens the summary (T11).
 - ⚠ **A first bare visit gets a TOUR** (28.9, the owner's son: *"A little
   tutorial when a person first joins … Only on the first visit"*; `js/tour.js`):
-  a modal over the page, an ink scrim at .6 with cut-outs over four live
-  targets — the door's frame, the navigator, the options, the save and the undo
-  pills' corner — a callout that covers none of them inside the viewport, an
-  arrow from its edge to each. Next / Done and Skip on every step, Escape
+  a modal over the page, an ink scrim at .8 (29.9; .6 before) with cut-outs
+  over four live targets — the door's frame, the navigator, the options, the
+  save and the undo pills — and one over the language picker, which the tour
+  holds live in its dialog (29.9); a callout that covers none of the targets'
+  inside the viewport, an arrow from its edge to each. Next / Done and Skip on every step, Escape
   skips; remembered (`dm.tour.v1`) when it ends or is skipped. Never on a link
   that carries a door, in bare mode, on the sheet or without script; with
   storage refused it shows every visit and never throws. ⚠ **A modal makes the
@@ -1539,9 +1557,12 @@ are not in `VIEWS`:
   `specRows`, its short name a part of the row's value; no handing card
   (removed 27.9 — the order keeps `handingWords()`) and, under the green send,
   the telephone reading exactly `PHONE_DISPLAY`.
-- **the tour** — a modal on a first bare load; on each of four steps the
-  target whole in its cut-out and not pressable through the scrim (the
-  fourth: the save and each undo pill, painted — 29.9), the callout
+- **the tour** — a modal on a first bare load; the scrim `.8` and the wall
+  through it under 10 % of bare (5.6–6.7 % read; the old .6 reads 15–18), the callout's words ≥ 4.5:1 (29.9); on each
+  of four steps the target whole in its cut-out and not pressable through the
+  scrim (the fourth: the save and each undo pill, painted — 29.9), the
+  language picker whole in its own cut-out and pressable, a language pressed
+  on step 2 re-showing that step in it, the picker home after within 1 px, the callout
   inside the viewport and off the cut-outs, every arrow edge to edge (1280 he,
   390 and 320 ru); remembered after the last step, skip and Escape, gone on
   the second visit; never on a link, bare or the sheet; with storage refused
@@ -1636,6 +1657,11 @@ to 1× to fit a sick container is **refused**.
   metal touching its own rose — not by a window.
 - **An instrument can be noisy rather than wrong.** Before reading a diff as a
   finding, run the instrument twice on the same input.
+- **A scratch file an instrument writes is named per process** (29.9): the
+  tour's scrim reading wrote a fixed `/tmp` path, four falsified copies ran at
+  once, and the .6 scrim read the .8 scrim's pixels — the same 5.6 %. Six
+  other blocks still write fixed paths; they are safe only while one audit
+  runs at a time.
 - **An instrument that measures during an animation measures the animation.**
   Under a `both` fill an entering element's opacity is exactly 0 before its
   first frame. **A fixed wait is a guess about a machine, not a question about a
