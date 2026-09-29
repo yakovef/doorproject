@@ -204,6 +204,11 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **29.9** The window step before the face (B, 1 of 3) — *"The window section
+  before the face section"*: `SECTIONS` · `glass` · `face` ·, adjacent still
+  (§3); `WANT_ORDER` and the audit's arrows walk with it. No copy claimed the
+  old order (grepped in three languages: none to correct). No `VERSION` —
+  a step key is `data-step`. Long form: `HISTORY.md`.
 - **29.9** Undo, redo and save in BRONZE (`--accent-ink`, white glyph, 6.1:1)
   — *"more noticeable, make them a different color … on both phone and pc"* —
   and on a phone undo/redo STACKED (*"vertical"*; `placeUndo` offers `stack`,
@@ -249,8 +254,12 @@ gave the numbers on 26.8; `PLACEHOLDER` is `false`. Not deployed on the
 instruction *"dont deploy it, i want to see that its finished."*
 
 **The page is a flow of nine steps and a summary**, one live at every width:
-fit · colour · lock · **pz** · **xlock** · face · glass · **grip** · mk · sum.
-The extra lock became its own step on 28.9 (the owner's son: *"The extra locks
+fit · colour · lock · **pz** · **xlock** · **glass** · **face** · **grip** · mk · sum.
+The window comes BEFORE the face since 29.9 (the owner's son: *"The window
+section before the face section. If a user chooses a window, in the face
+section the stripes are greyed out"*) — face → glass since the two were split,
+so stripes were chosen and then lost to the window a step later; the pair
+stays adjacent (§3). The extra lock became its own step on 28.9 (the owner's son: *"The extra locks
 as a separate section, right after the pirzul section — they don't fit on the
 screen and I need to scroll for them"*); it had been the lock step's second
 group. The owner's

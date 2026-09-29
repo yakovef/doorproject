@@ -26,6 +26,36 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **29.9 — THE WINDOW STEP BEFORE THE FACE (prompt B, 1 of 3).** The owner's
+  son: *"The window section before the face section. If a user chooses a
+  window, in the face section the stripes are greyed out; with no window the
+  arrows go through the stripes as well."* This commit is the first sentence;
+  the greying and the cycle are commit 3.
+  · **What was wrong.** `face` stood before `glass` since the two were split.
+    A customer chose stripes on the face, then a window one step later, and the
+    window took the stripes away (the confirm dialog asked, but the question
+    arrived after the answer it undid). Asked first, the window decides what
+    the face step can offer, and the face step can say so in grey.
+  · **What moved.** `SECTIONS` in js/app.js: fit · colour · lock · pz · xlock
+    · glass · face · grip · mk. The two stay ADJACENT — a panel and a window
+    compete for one half of the leaf and `repair` trades between them (§3);
+    only which is asked first changed. `WANT_ORDER` in the audit and the
+    arrows block's walked steps moved with it; the navigator's marks, the
+    "step N of M", `stepFor` and the summary's row → step map are derived and
+    did not need touching. The fixture that walks forward to the grip step and
+    back to the glass by the navigator still does exactly that.
+  · **The copy, grepped for an order claim** — `step.face.*`,
+    `step.glass.*`, `exp.face.*`, `exp.glass.*`, `g.detail.h`, `g.window.h`,
+    `g.grille.h`, and every "next / previous / later / earlier / הבא / הקודם /
+    בהמשך / дальше / следующ / предыдущ" in the file: none says the face comes
+    before the window or the reverse. `exp.face.a`'s "the pull handle comes
+    later" is still true (grip follows both). Nothing to correct, said here so
+    the next reader does not grep again.
+  · **Not done:** no `VERSION` (step keys are `data-step` and nowhere in the
+    URL or the code). No sheet moves: nothing here reaches `render()`.
+  · **Falsified:** SECTIONS swapped back → `WANT_ORDER` fires at every
+    viewport.
+
 - **29.9 — UNDO, REDO AND SAVE IN BRONZE; UNDO STACKED ON THE PHONE.** The
   owner's son: *"On the phone I want you to make the undo and save buttons
   vertical and make them more noticeable, make them a different color and maybe

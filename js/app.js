@@ -435,11 +435,21 @@ const SECTIONS = [
   { key: 'xlock',  title: 'step.xlock.t',  sub: 'step.xlock.s',  lede: 'step.xlock.l', exp: 'exp.xlock',
     expArgs: () => [formatAgorot(byId(SPECIAL_LOCKS, 'kasefet').delta),
                     formatAgorot(byId(SPECIAL_LOCKS, 'kodan').delta)] },
+  /* ⚠ THE WINDOW BEFORE THE FACE, 29.9.2026 — the owner's son: *"The window
+     section before the face section. If a user chooses a window, in the face
+     section the stripes are greyed out."* They had stood face → glass since
+     the two were split, so a customer chose stripes and then lost them to the
+     window a step later; now the window is asked first and the face step
+     shows, greyed with its reason, what that window rules out. The two stay
+     ADJACENT (§3: a panel and a window compete for one half of the leaf and
+     `repair` trades between them); only which comes first moved. Keys
+     unchanged, no `VERSION`; `WANT_ORDER` and the arrows block in the audit
+     moved with it. */
+  { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass',
+    expArgs: () => [L(SIZES.half)] },
   { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face',
     expArgs: () => [formatAgorot(STRIPE_A.h), formatAgorot(STRIPE_A.v),
                     L(byId(DETAILS, 'panel2')), L(byId(DETAILS, 'panel3'))] },
-  { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass',
-    expArgs: () => [L(SIZES.half)] },
   /* ⚠ THE PULL HANDLE COMES AFTER THE GLASS, 26.9.2026 — the owner's son:
      *"The section with the hardware finish needs to be right after the lever
      handles section. The pull handle section needs to be after the section

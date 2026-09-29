@@ -1691,13 +1691,17 @@ for (const v of VIEWS) {
        asked. It overrules Peretz's 30.8 "handles before the panels"; the
        fault text names both. Falsified by the old SECTIONS: fires at every
        viewport and prints both sequences. */
-    const WANT_ORDER = ['fit', 'colour', 'lock', 'pz', 'xlock', 'face', 'glass', 'grip', 'mk', 'sum'];
+    /* ⚠ AND THE WINDOW BEFORE THE FACE, 29.9.2026 — the owner's son: *"The
+       window section before the face section."* The pair stays adjacent (§3).
+       Falsified by swapping them back in SECTIONS: this fires at every
+       viewport. */
+    const WANT_ORDER = ['fit', 'colour', 'lock', 'pz', 'xlock', 'glass', 'face', 'grip', 'mk', 'sum'];
     if (keys.join(',') !== WANT_ORDER.join(',')) {
       fault(v.name, `the flow asks its questions as ${keys.join(' → ')}, `
         + `and it should be ${WANT_ORDER.join(' → ')} `
         + '(the owner\'s son, 26.9.2026: the finish right after the lever, the pull '
         + 'handle after the panels and the glass — overruling Peretz\'s 30.8 "handles '
-        + 'before the panels"; משקוף last, 30.8)');
+        + 'before the panels"; משקוף last, 30.8; the window before the face, 29.9)');
     }
 
     for (const k of keys) {
@@ -6573,7 +6577,7 @@ for (const v of VIEWS) {
     try {
       await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
       await pg.waitForTimeout(500);
-      for (const step of ['fit', 'colour', 'lock', 'pz', 'face', 'glass', 'grip']) {
+      for (const step of ['fit', 'colour', 'lock', 'pz', 'glass', 'face', 'grip']) {
         await pg.evaluate(k => document.querySelector(`.steps__step[data-step="${k}"]`)?.click(), step);
         await pg.waitForTimeout(350);
         const read = () => pg.evaluate(() => {
