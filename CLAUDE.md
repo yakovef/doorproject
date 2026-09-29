@@ -187,6 +187,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** The extra lock's own step (7 of 10) — *"as a separate section, right
+  after the pirzul section"*: `xlock` after `pz`, the קודן's case its mark, the
+  lock's old explainer with it. Ten marks make the column 514 px; at 1100–1152
+  (en, ru) under the price it fits only because its floor is now the trust
+  band's WORDS, not its box. The audit's sixteen typed 8s and 9s read
+  `QUESTIONS`/`STEPS`. Long form: `HISTORY.md`.
 - **28.9** Four small page things (6 of 10): the arrows walk the tiles in the
   order they are DRAWN (the colour step jumped); the window designs split
   regular / special (surcharge per window in the heading), twins side by side;
@@ -227,13 +233,6 @@ lines here. Dates are the day of the change.
   On no door, arrow or wall control at any size or width. ⚠ Until commit 4 the
   Hebrew price CARD still covers its top at 1100–1152 (≤ 1,982 px²); commit 4
   takes the card from that corner. Long form: `HISTORY.md`.
-- **28.9** What the new face moved, put back (1b) — the audit on commit 1, eleven
-  faults, all widths. **Print:** English's widest double went to two pages
-  (276.5 mm), Russian past its 280 ceiling (283.9); rows 6 → 4 px on paper put all
-  six prints on ONE page (Russian 270.2) — its 30.8 exemption is gone. **Picker:**
-  109.7 → 128.3 px (the old fallback drew Latin at 89%); weight 400, 5/4 px, `.75/
-  .74rem` clears every gate. **Landscape:** grip now shows an answer too — the
-  exemption narrows. Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -242,8 +241,12 @@ lines here. Dates are the day of the change.
 gave the numbers on 26.8; `PLACEHOLDER` is `false`. Not deployed on the
 instruction *"dont deploy it, i want to see that its finished."*
 
-**The page is a flow of eight steps and a summary**, one live at every width:
-fit · colour · lock · **pz** · face · glass · **grip** · mk · sum. The owner's
+**The page is a flow of nine steps and a summary**, one live at every width:
+fit · colour · lock · **pz** · **xlock** · face · glass · **grip** · mk · sum.
+The extra lock became its own step on 28.9 (the owner's son: *"The extra locks
+as a separate section, right after the pirzul section — they don't fit on the
+screen and I need to scroll for them"*); it had been the lock step's second
+group. The owner's
 son, 26.9: *"The section with the hardware finish needs to be right after the
 lever handles section. The pull handle section needs to be after the section
 with the panels and stripes"* — after the glass, asked. ⚠ That **overrules
@@ -871,13 +874,13 @@ bands sit inside the pane.
 
 ### The flow — `SECTIONS` and `GROUPS` in `js/app.js`
 
-Eight steps and a summary, in the order in §0c. Each step holds one or two
+Nine steps and a summary, in the order in §0c. Each step holds one or two
 groups; each group is a list of options drawn as tiles (or swatches, pills,
 rows). `face` and `glass` stay adjacent because a panel and a window compete
 for the same half of the leaf and `repair` trades between them.
 
 - **Section keys are not in the wire format** (they appear as `data-step` and
-  nowhere in `url-state.js`), so reordering costs no `VERSION`; the `01`–`08`
+  nowhere in `url-state.js`), so reordering costs no `VERSION`; the `01`–`09`
   are a CSS counter over position. What must move with a reorder is
   `WANT_ORDER` in `tools/audit.mjs`.
 - **The navigator is a table of contents, never a progress bar**: every step
@@ -893,9 +896,12 @@ for the same half of the leaf and `repair` trades between them.
   above 1100 and back into the panel below it (the phone row must stay in the
   panel — a fixed row inside the sticky wrap's stacking context would paint
   under its own ink strip). Absolute, 12 px off the stage's panel-facing edge,
-  its own ink and `--r-card`, 464 px tall; centred on the door's mid-height
+  its own ink and `--r-card`, 514 px tall with ten marks (28.9 — the extra
+  lock's step); centred on the door's mid-height
   unless the wall chrome on its side reaches below that, then 8 px under it,
-  never below the trust band (`--steps-top`, computed by `placeSteps` off the
+  never onto the trust band's WORDS (the band's box is the floor strip, but
+  its centred words never reach the column's corner — the ten marks needed
+  that strip at 1100–1152; `--steps-top`, computed by `placeSteps` off the
   live rects — in English and Russian the price stands on the same wall, and
   where the room under it is short the column's gaps tighten, never its
   targets). The panel is one column again with `scrollbar-gutter: stable`
@@ -1459,7 +1465,7 @@ are not in `VIEWS`:
   block of text on every step, 390 and 1280 × three languages (~720 readings),
   measured in Rubik and in its fallback: none moves by more than a line, at
   most 2 in 100 move at all (28.9 1c).
-- **pictures** — the navigator's nine marks (21 px) and the spec's fourteen
+- **pictures** — the navigator's ten marks (21 px) and the spec's fourteen
   (28 px since 27.9 — the summary's fallback for a row whose step has no tile
   glyph, the משקוף and the handing), rasterised at the size the stylesheet
   gives them inside their container and compared pairwise (floor 0.50); the stripe pills; the

@@ -137,6 +137,11 @@ export const SECTION_ICON = {
      picture frame or a monitor */
   mk:     '<path d="M3.4 20.6V3.2h17.2v17.4"/><path d="M7.8 20.6V7.6h8.4v13"/>'
         + '<path d="M1.8 20.6h20.4"/>',
+  /* the extra lock's step, 28.9.2026: the קודן's own case — the summary's row
+     drew it first (`SPEC_ICON.speciallock`, which now refers here) */
+  xlock:  '<rect x="7.4" y="3.6" width="9.2" height="16.8" rx="4.6"/>'
+        + '<path d="M10.6 8.6h.01M13.4 8.6h.01M10.6 12.2h.01M13.4 12.2h.01"/>'
+        + '<circle cx="12" cy="16.6" r="1.6"/>',
   sum:    '<path d="M5.4 3h8.8l4.4 4.4V21H5.4Z"/><path d="M14.2 3v4.4h4.4"/>'
         + '<path d="m8.4 14 2.4 2.6 4.8-5.4"/>',
 };
@@ -222,9 +227,7 @@ export const SPEC_ICON = {
   pirzul:  SECTION_ICON.pz,
   stripes: '<path d="M4.6 7.4h14.8M4.6 12h14.8M4.6 16.6h14.8"/>',
   /* the קודן's own case — the one of the two a stranger names */
-  speciallock: '<rect x="7.4" y="3.6" width="9.2" height="16.8" rx="4.6"/>'
-             + '<path d="M10.6 8.6h.01M13.4 8.6h.01M10.6 12.2h.01M13.4 12.2h.01"/>'
-             + '<circle cx="12" cy="16.6" r="1.6"/>',
+  speciallock: SECTION_ICON.xlock,
 };
 
 export const specIcon = key => (Object.prototype.hasOwnProperty.call(SPEC_ICON, key)

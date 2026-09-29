@@ -327,10 +327,17 @@ export const UI = {
                        'The bar you pull on. You can go without one, and the length is yours to choose.',
                        'Скоба, за которую тянут дверь. Можно обойтись без неё, длину выбираете вы.'],
   'step.lock.t':      ['מנעול', 'The lock', 'Замок'],
-  'step.lock.s':      ['הידית המסתובבת ונעילה נוספת', 'The lever, and any extra lock', 'Нажимная ручка и дополнительный замок'],
-  'step.lock.l':      ['הידית שמסובבים והצילינדר — יש בכל דלת. אפשר להוסיף כספת או קודן.',
-                       'The lever and the cylinder — every door has them. A safe lock or a keypad can be added.',
-                       'Нажимная ручка и цилиндр — есть в каждой двери. Можно добавить сейфовый или кодовый замок.'],
+  'step.lock.s':      ['הידית המסתובבת והצילינדר', 'The lever and the cylinder', 'Нажимная ручка и цилиндр'],
+  'step.lock.l':      ['הידית שמסובבים והצילינדר — יש בכל דלת. כספת או קודן — בשלב משלהם, אחרי הפרזול.',
+                       'The lever and the cylinder — every door has them. A safe lock or a keypad has its own step, after the hardware finish.',
+                       'Нажимная ручка и цилиндр — есть в каждой двери. Сейфовый или кодовый замок — на своём шаге, после отделки фурнитуры.'],
+  /* the extra lock's own step, 28.9.2026 (*"the extra locks as a separate
+     section, right after the pirzul section"*) */
+  'step.xlock.t':     ['מנעול נוסף', 'Extra lock', 'Дополнительный замок'],
+  'step.xlock.s':     ['כספת או קודן, לצד המנעול', 'A safe lock or a keypad, beside the lock', 'Сейфовый или кодовый, рядом с основным'],
+  'step.xlock.l':     ['נעילה שנייה לצד המנעול הרגיל — כספת, קודן, או בלי.',
+                       'A second lock beside the ordinary one — a safe lock, a keypad, or none.',
+                       'Второй замок рядом с основным — сейфовый, кодовый или никакого.'],
   'step.pz.t':        ['פרזול', 'Hardware finish', 'Отделка фурнитуры'],
   'step.pz.s':        ['גוון הידית והצירים', 'The tone of the lever and the hinges', 'Оттенок ручки и петель'],
   /* ⚠ THE KEYHOLE JOINED THE LIST ON 31.8, AND THE ADDITIONAL LOCK LEFT IT
@@ -574,7 +581,13 @@ export const UI = {
   'exp.grip.a':           ['ידית המשיכה היא המוט שמושכים בו כדי לפתוח. יש מוט עגול ומוט מלבני, ולכל אחד שני מחירים: עד מטר, ומעל מטר. האורך מוגבל לגובה הכנף, כך שדלת נמוכה לא תקבל מוט ארוך מדי. אפשר לבחור גימור שחור או זהב — התוספת היא לכל פריט בנפרד: לידית, ל{0} ולפעמון. אפשר גם בלי ידית משיכה בכלל. ל{1} אין בחירת אורך — היא חרוצה בדלת עצמה.',
                        'The pull handle is the bar you pull to open the door. There is a round bar and a rectangular one, and each has two prices: up to a metre, and past a metre. The length is capped by the height of the leaf, so a short door cannot take a bar that would not fit. The finish can be black or gold — the surcharge is per item: on the handle, on the {0} and on the doorbell. Going without one is a choice too. The {1} has no length to choose — it is cut into the door itself.',
                        'Ручка-скоба — это то, за что тянут дверь. Есть круглая и прямоугольная, и у каждой две цены: до метра и свыше метра. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Отделку можно выбрать чёрную или золотую — доплата за каждый предмет: за ручку, за «{0}» и за звонок. Можно обойтись и без ручки. У «{1}» длина не выбирается — она врезана в само полотно.'],
-  'exp.lock.q':           ['כספת וקודן — במקום המנעול או בנוסף?', 'Safe lock and keypad — instead of the lock, or as well?', 'Сейфовый и кодовый замок — вместо основного или вдобавок?'],
+  /* ⚠ THE LOCK STEP'S OWN QUESTION SINCE 28.9 — the extra lock went to its own
+     step, and took the question below (`exp.xlock`) with it. */
+  'exp.lock.q':           ['מה כלול במנעול?', 'What comes with the lock?', 'Что входит в замок?'],
+  'exp.lock.a':           ['בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כאן בוחרים את צורת הידית; את הגוון שלה בוחרים בשלב הבא, בפרזול. מנעול נוסף — כספת או קודן — נבחר אחרי הפרזול, בשלב משלו. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.',
+                           'Every door has a lever and a cylinder, included in the price — that is the ordinary lock. Here you choose the lever\'s shape; its tone is chosen in the next step, the hardware finish. An extra lock — a safe lock or a keypad — is chosen after the hardware finish, on its own step. A smart lock is a different product and is in the lever list.',
+                           'В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Здесь выбирают форму ручки; её оттенок — на следующем шаге, в отделке фурнитуры. Дополнительный замок — сейфовый или кодовый — выбирают после отделки фурнитуры, на отдельном шаге. Умный замок — отдельный продукт, он в списке ручек.'],
+  'exp.xlock.q':          ['כספת וקודן — במקום המנעול או בנוסף?', 'Safe lock and keypad — instead of the lock, or as well?', 'Сейфовый и кодовый замок — вместо основного или вдобавок?'],
   /* ⚠ THE TWO FIGURES WERE TYPED HERE AND THEY WENT STALE — 25.9.2026. This
      paragraph said ₪700 and ₪900 in all three languages for five days after
      Peretz corrected himself on 20.9 — *"kasefet - 690 · kodan 880"* — and
@@ -585,7 +598,7 @@ export const UI = {
      They come through `{0}` and `{1}` now, out of `SPECIAL_LOCKS[].delta`,
      which is the same place the tiles read. A figure that cannot be typed
      cannot drift. */
-  'exp.lock.a':           ['בנוסף. בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כספת ({0}) וקודן ({1}) מותקנים לצדו ולא במקומו, ולכן אפשר לבחור גם וגם. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.',
+  'exp.xlock.a':          ['בנוסף. בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כספת ({0}) וקודן ({1}) מותקנים לצדו ולא במקומו, ולכן אפשר לבחור גם וגם. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.',
                        'As well. Every door has a lever and a cylinder, included in the price — that is the ordinary lock. A safe lock ({0}) and a keypad ({1}) are fitted BESIDE it rather than instead of it, so you can have both. A smart lock is a different product and is in the lever list.',
                        'Вдобавок. В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Сейфовый ({0}) и кодовый ({1}) ставятся РЯДОМ с ним, а не вместо, поэтому можно выбрать оба. Умный замок — отдельный продукт, он в списке ручек.'],
   'exp.pz.q':             ['מה הפרזול משנה?', 'What does the hardware finish change?', 'На что влияет отделка фурнитуры?'],

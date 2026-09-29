@@ -48,6 +48,14 @@ const CODE = new RegExp(`^DM-[0-9A-Z]{${encodeCode(DEFAULTS).length - 3}}$`);
    is the one just past a breakpoint, not the round number a laptop happens to
    be. `css/app.css` has exactly one breakpoint, 1100, so it is here; 1152 is
    the far side of the band, where the wall is only just wide enough. */
+/* ⚠ THE WALK'S LENGTH, STATED ONCE — 28.9.2026. Nine question steps and the
+   summary since the extra lock got its own step (`xlock`, after the פרזול).
+   Sixteen places in this file had typed 8 or 9 by hand, and a tenth step would
+   have left every walk one step short, green. `WANT_ORDER` (the arrival block)
+   asserts the page's navigator is exactly this long. */
+const QUESTIONS = 9;
+const STEPS = QUESTIONS + 1;
+
 const VIEWS = [
   { name: 'phone',    w: 390,  h: 844 },
   { name: 'phone-s',  w: 320,  h: 568 },
@@ -1488,7 +1496,7 @@ for (const v of VIEWS) {
       if (!n) return false; n.click(); return true;
     });
     let picked = 0, onGrip = false;
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < STEPS; i++) {
       /* ⚠ RE-AIMED 25.9.2026. It tapped the Idan and the two-panel face, and
          the square window then said two sentences: the face went, and the
          lever went. Since the lever yields the moment a bar is chosen, that
@@ -1596,7 +1604,7 @@ for (const v of VIEWS) {
     await p.waitForTimeout(300);
     const fresh = await opener();
     let walked = 0;
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < QUESTIONS; i++) {
       const moved = await p.evaluate(() => {
         const b = [...document.querySelectorAll('.sect__next')]
           .find(x => x.offsetParent && !x.disabled);
@@ -1682,7 +1690,7 @@ for (const v of VIEWS) {
        asked. It overrules Peretz's 30.8 "handles before the panels"; the
        fault text names both. Falsified by the old SECTIONS: fires at every
        viewport and prints both sequences. */
-    const WANT_ORDER = ['fit', 'colour', 'lock', 'pz', 'face', 'glass', 'grip', 'mk', 'sum'];
+    const WANT_ORDER = ['fit', 'colour', 'lock', 'pz', 'xlock', 'face', 'glass', 'grip', 'mk', 'sum'];
     if (keys.join(',') !== WANT_ORDER.join(',')) {
       fault(v.name, `the flow asks its questions as ${keys.join(' → ')}, `
         + `and it should be ${WANT_ORDER.join(' → ')} `
@@ -4185,7 +4193,7 @@ for (const v of VIEWS) {
       fault(where, `could not be walked: ${e.message}`);
     } finally { await p.close(); }
   }
-  if (walked) console.log(`    ${walked} walks, 9 steps each: one way on and one way back in the bar, no foot, one bar height`);
+  if (walked) console.log(`    ${walked} walks, ${STEPS} steps each: one way on and one way back in the bar, no foot, one bar height`);
 }
 
 /* ── A PHONE HELD SIDEWAYS CAN SEE WHAT IT IS BEING ASKED ────────────────
@@ -4237,7 +4245,7 @@ for (const v of VIEWS) {
     try {
       await p.goto(SIDEWAYS, { waitUntil: 'load' });
       await p.waitForTimeout(500);
-      for (let i = 0; i < 9; i++) {
+      for (let i = 0; i < STEPS; i++) {
         const m = await p.evaluate(() => {
           const live = document.querySelector('.sect.is-live');
           if (!live) return { missing: 'no live step' };
@@ -4284,7 +4292,7 @@ for (const v of VIEWS) {
         } else if (w === EXEMPT_W && m.key !== EXEMPT_STEP) {
           exemptSeen += m.short ? 1 : 0;
         }
-        if (i === 8) break;
+        if (i === STEPS - 1) break;
         const next = await p.$('.quote__next:not([hidden])');
         if (!next) { fault(where, `step "${m.key}": no way on in the quote bar`); break; }
         await next.click();
@@ -4653,7 +4661,7 @@ for (const v of VIEWS) {
     try {
       await p.goto(KB_URL, { waitUntil: 'load' });
       await p.waitForTimeout(700);
-      for (let s = 0; s < 9; s++) {
+      for (let s = 0; s < STEPS; s++) {
         const live = await p.evaluate(() => document.querySelector('.sect.is-live')?.dataset.section || null);
         if (!live || live === 'sum') break;
         stepsSeen++;
@@ -4808,7 +4816,7 @@ for (const v of VIEWS) {
 
   let steps = 0;
   const walk = async (p, onStep) => {
-    for (let s = 0; s < 9; s++) {
+    for (let s = 0; s < STEPS; s++) {
       const m = await p.evaluate(seen);
       if (!m) return 'no live step';
       if (m.step === 'sum') return null;
@@ -4869,7 +4877,7 @@ for (const v of VIEWS) {
         + 'CLAUDE.md §9; if it shows fewer, something took the answer back off the screen');
     }
   }
-  if (steps < 8 * MUST.length) fault('answer', `only ${steps} steps were measured of ${8 * MUST.length} — the sweep is not walking the guide`);
+  if (steps < QUESTIONS * MUST.length) fault('answer', `only ${steps} steps were measured of ${QUESTIONS * MUST.length} — the sweep is not walking the guide`);
   if (!faults) {
     console.log(`    ${steps} steps across ${MUST.length} viewports show an answer; a phone on its `
       + `side and a laptop at 200% zoom show ${EXEMPT.map(e => `${e.shows.length} (${e.shows.join(', ')})`).join(' and ')} of eight, and are the two named exemptions`);
@@ -4905,7 +4913,7 @@ for (const v of VIEWS) {
     try {
       await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
       await p.waitForTimeout(700);
-      for (let s = 0; s < 9; s++) {
+      for (let s = 0; s < STEPS; s++) {
         const m = await p.evaluate(() => {
           const live = document.querySelector('.sect.is-live');
           if (!live) return null;
@@ -4966,7 +4974,7 @@ for (const v of VIEWS) {
     }
     await p.close().catch(() => {});
   }
-  if (steps < 24) fault('twice', `only ${steps} steps of 24 were walked — the sweep is not walking the guide`);
+  if (steps < QUESTIONS * 3) fault('twice', `only ${steps} steps of ${QUESTIONS * 3} were walked — the sweep is not walking the guide`);
   /* §5.15: the day nothing renders a `.field__title` this passes for the wrong
      reason, and the steps that legitimately keep one are what say otherwise. */
   if (headings < 8) fault('twice', `only ${headings} group headings were found across three languages — `
@@ -5953,7 +5961,7 @@ for (const v of VIEWS) {
     try {
       await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
       await p.waitForTimeout(900);
-      for (let s = 0; s < 8; s++) {
+      for (let s = 0; s < QUESTIONS; s++) {
         const live = await p.evaluate(() => document.querySelector('.sect.is-live')?.dataset.section || null);
         if (!live) { fault(where, 'no live step — this check has no subject'); break; }
         /* ⚠ RESTATED 27.9.2026 ON BOTH AXES, SAME SUBJECT (the live mark is
@@ -6042,7 +6050,7 @@ for (const v of VIEWS) {
   /* §5.15, twice: a sweep that tapped nothing and one that never looked at the
      circle both read green without these. */
   if (clicks < 60) fault('tap', `only ${clicks} taps were made with the panel scrolled — this check is not measuring what it is named after`);
-  if (circles < 8 * TAP.length - 2) fault('tap', `the live circle was checked on ${circles} steps of ${8 * TAP.length} — the walk stopped short`);
+  if (circles < QUESTIONS * TAP.length - 2) fault('tap', `the live circle was checked on ${circles} steps of ${QUESTIONS * TAP.length} — the walk stopped short`);
   if (faults === before0) {
     console.log(`    ${clicks} real taps with the panel scrolled, none scrolled anything `
       + `(${changed} changed what the panel holds and were not judged); `
@@ -6299,7 +6307,7 @@ for (const v of VIEWS) {
       await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
       await pg.waitForTimeout(700);
       const heights = [];
-      for (let i = 0; i < 9; i++) {
+      for (let i = 0; i < STEPS; i++) {
         const m = await pg.evaluate(() => {
           const band = document.querySelector('.stage__band'), leaf = document.querySelector('.door-svg #leaf');
           const t = document.querySelector('[data-band-title]'), n = document.querySelector('[data-band-now]');
@@ -6324,7 +6332,7 @@ for (const v of VIEWS) {
         await pg.waitForTimeout(260);
       }
       if (new Set(heights).size > 1) fault('band', `${tag}: the band is ${[...new Set(heights)].join(' / ')} px tall across the steps — it climbs toward the stage's top on some`);
-      if (heights.length < 9) fault('band', `${tag}: only ${heights.length} of 9 steps walked`);
+      if (heights.length < STEPS) fault('band', `${tag}: only ${heights.length} of ${STEPS} steps walked`);
     } finally { await pg.close().catch(() => {}); }
   }
   /* the arrows, on the face step: a door where they can move, and one where they cannot */
@@ -6377,7 +6385,7 @@ for (const v of VIEWS) {
     } finally { await pg.close().catch(() => {}); }
   }
   if (asked < 10) fault('band', `only ${asked} of 10 readings were made — this check is measuring almost nothing`);
-  if (faults === before) console.log(`    ${asked} readings: the leaf no smaller than before the band went onto the photograph at 1280, 1440 and 1920, the band one height on all nine steps in he and ru; the arrows step the face and wrap, the band follows, the tall slot's refusal opens the dialog and changes nothing, hidden on the summary`);
+  if (faults === before) console.log(`    ${asked} readings: the leaf no smaller than before the band went onto the photograph at 1280, 1440 and 1920, the band one height on all ${STEPS} steps in he and ru; the arrows step the face and wrap, the band follows, the tall slot's refusal opens the dialog and changes nothing, hidden on the summary`);
 }
 
 /* ── THE ARROWS WALK THE TILES IN THE ORDER THEY ARE DRAWN ────────────────
@@ -6694,7 +6702,7 @@ for (const v of VIEWS) {
         };
       }, [INK]);
       const a = await look();
-      if (!a || a.n !== 9) { fault('nav-column', `${tag}: ${a ? a.n : 'no'} navigator marks — this check has no subject`); continue; }
+      if (!a || a.n !== STEPS) { fault('nav-column', `${tag}: ${a ? a.n : 'no'} navigator marks — this check has no subject`); continue; }
       readings++;
       const wide = w >= 1100;
       if (wide) {
@@ -6769,7 +6777,7 @@ for (const v of VIEWS) {
     } finally { await pg.close().catch(() => {}); }
   }
   if (wallRead < 5 * 2 * Object.keys(SIZES).length) fault('nav-column', `the wall gate read ${wallRead} of ${5 * 2 * Object.keys(SIZES).length} doors`);
-  if (faults === before) console.log(`    ${readings} viewports: a dark column on the photograph above 1100 (a dark row below), nine whole ≥44 px targets, the live one a light square; checks on exactly the steps walked, none on arrival or after a reload, the address unmoved; ${wallRead} doors × widths × directions with the column on no door, arrow or wall control`);
+  if (faults === before) console.log(`    ${readings} viewports: a dark column on the photograph above 1100 (a dark row below), ${STEPS} whole ≥44 px targets, the live one a light square; checks on exactly the steps walked, none on arrival or after a reload, the address unmoved; ${wallRead} doors × widths × directions with the column on no door, arrow or wall control`);
 }
 
 /* ── THE HANDLE FINISH IS ON THE PAGE ONLY WHERE IT PAINTS SOMETHING ──────

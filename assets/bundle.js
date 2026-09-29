@@ -177,11 +177,20 @@
       "Скоба, за которую тянут дверь. Можно обойтись без неё, длину выбираете вы."
     ],
     "step.lock.t": ["מנעול", "The lock", "Замок"],
-    "step.lock.s": ["הידית המסתובבת ונעילה נוספת", "The lever, and any extra lock", "Нажимная ручка и дополнительный замок"],
+    "step.lock.s": ["הידית המסתובבת והצילינדר", "The lever and the cylinder", "Нажимная ручка и цилиндр"],
     "step.lock.l": [
-      "הידית שמסובבים והצילינדר — יש בכל דלת. אפשר להוסיף כספת או קודן.",
-      "The lever and the cylinder — every door has them. A safe lock or a keypad can be added.",
-      "Нажимная ручка и цилиндр — есть в каждой двери. Можно добавить сейфовый или кодовый замок."
+      "הידית שמסובבים והצילינדר — יש בכל דלת. כספת או קודן — בשלב משלהם, אחרי הפרזול.",
+      "The lever and the cylinder — every door has them. A safe lock or a keypad has its own step, after the hardware finish.",
+      "Нажимная ручка и цилиндр — есть в каждой двери. Сейфовый или кодовый замок — на своём шаге, после отделки фурнитуры."
+    ],
+    /* the extra lock's own step, 28.9.2026 (*"the extra locks as a separate
+       section, right after the pirzul section"*) */
+    "step.xlock.t": ["מנעול נוסף", "Extra lock", "Дополнительный замок"],
+    "step.xlock.s": ["כספת או קודן, לצד המנעול", "A safe lock or a keypad, beside the lock", "Сейфовый или кодовый, рядом с основным"],
+    "step.xlock.l": [
+      "נעילה שנייה לצד המנעול הרגיל — כספת, קודן, או בלי.",
+      "A second lock beside the ordinary one — a safe lock, a keypad, or none.",
+      "Второй замок рядом с основным — сейфовый, кодовый или никакого."
     ],
     "step.pz.t": ["פרזול", "Hardware finish", "Отделка фурнитуры"],
     "step.pz.s": ["גוון הידית והצירים", "The tone of the lever and the hinges", "Оттенок ручки и петель"],
@@ -472,7 +481,15 @@
       "The pull handle is the bar you pull to open the door. There is a round bar and a rectangular one, and each has two prices: up to a metre, and past a metre. The length is capped by the height of the leaf, so a short door cannot take a bar that would not fit. The finish can be black or gold — the surcharge is per item: on the handle, on the {0} and on the doorbell. Going without one is a choice too. The {1} has no length to choose — it is cut into the door itself.",
       "Ручка-скоба — это то, за что тянут дверь. Есть круглая и прямоугольная, и у каждой две цены: до метра и свыше метра. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Отделку можно выбрать чёрную или золотую — доплата за каждый предмет: за ручку, за «{0}» и за звонок. Можно обойтись и без ручки. У «{1}» длина не выбирается — она врезана в само полотно."
     ],
-    "exp.lock.q": ["כספת וקודן — במקום המנעול או בנוסף?", "Safe lock and keypad — instead of the lock, or as well?", "Сейфовый и кодовый замок — вместо основного или вдобавок?"],
+    /* ⚠ THE LOCK STEP'S OWN QUESTION SINCE 28.9 — the extra lock went to its own
+       step, and took the question below (`exp.xlock`) with it. */
+    "exp.lock.q": ["מה כלול במנעול?", "What comes with the lock?", "Что входит в замок?"],
+    "exp.lock.a": [
+      "בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כאן בוחרים את צורת הידית; את הגוון שלה בוחרים בשלב הבא, בפרזול. מנעול נוסף — כספת או קודן — נבחר אחרי הפרזול, בשלב משלו. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.",
+      "Every door has a lever and a cylinder, included in the price — that is the ordinary lock. Here you choose the lever's shape; its tone is chosen in the next step, the hardware finish. An extra lock — a safe lock or a keypad — is chosen after the hardware finish, on its own step. A smart lock is a different product and is in the lever list.",
+      "В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Здесь выбирают форму ручки; её оттенок — на следующем шаге, в отделке фурнитуры. Дополнительный замок — сейфовый или кодовый — выбирают после отделки фурнитуры, на отдельном шаге. Умный замок — отдельный продукт, он в списке ручек."
+    ],
+    "exp.xlock.q": ["כספת וקודן — במקום המנעול או בנוסף?", "Safe lock and keypad — instead of the lock, or as well?", "Сейфовый и кодовый замок — вместо основного или вдобавок?"],
     /* ⚠ THE TWO FIGURES WERE TYPED HERE AND THEY WENT STALE — 25.9.2026. This
        paragraph said ₪700 and ₪900 in all three languages for five days after
        Peretz corrected himself on 20.9 — *"kasefet - 690 · kodan 880"* — and
@@ -483,7 +500,7 @@
        They come through `{0}` and `{1}` now, out of `SPECIAL_LOCKS[].delta`,
        which is the same place the tiles read. A figure that cannot be typed
        cannot drift. */
-    "exp.lock.a": [
+    "exp.xlock.a": [
       "בנוסף. בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כספת ({0}) וקודן ({1}) מותקנים לצדו ולא במקומו, ולכן אפשר לבחור גם וגם. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.",
       "As well. Every door has a lever and a cylinder, included in the price — that is the ordinary lock. A safe lock ({0}) and a keypad ({1}) are fitted BESIDE it rather than instead of it, so you can have both. A smart lock is a different product and is in the lever list.",
       "Вдобавок. В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Сейфовый ({0}) и кодовый ({1}) ставятся РЯДОМ с ним, а не вместо, поэтому можно выбрать оба. Умный замок — отдельный продукт, он в списке ручек."
@@ -9456,6 +9473,9 @@ ${plate.defs}${plate.body}
     /* open at the foot: two nested CLOSED rectangles, which this was, are a
        picture frame or a monitor */
     mk: '<path d="M3.4 20.6V3.2h17.2v17.4"/><path d="M7.8 20.6V7.6h8.4v13"/><path d="M1.8 20.6h20.4"/>',
+    /* the extra lock's step, 28.9.2026: the קודן's own case — the summary's row
+       drew it first (`SPEC_ICON.speciallock`, which now refers here) */
+    xlock: '<rect x="7.4" y="3.6" width="9.2" height="16.8" rx="4.6"/><path d="M10.6 8.6h.01M13.4 8.6h.01M10.6 12.2h.01M13.4 12.2h.01"/><circle cx="12" cy="16.6" r="1.6"/>',
     sum: '<path d="M5.4 3h8.8l4.4 4.4V21H5.4Z"/><path d="M14.2 3v4.4h4.4"/><path d="m8.4 14 2.4 2.6 4.8-5.4"/>'
   };
   function sectionIcon(key) {
@@ -9497,7 +9517,7 @@ ${plate.defs}${plate.body}
     pirzul: SECTION_ICON.pz,
     stripes: '<path d="M4.6 7.4h14.8M4.6 12h14.8M4.6 16.6h14.8"/>',
     /* the קודן's own case — the one of the two a stranger names */
-    speciallock: '<rect x="7.4" y="3.6" width="9.2" height="16.8" rx="4.6"/><path d="M10.6 8.6h.01M13.4 8.6h.01M10.6 12.2h.01M13.4 12.2h.01"/><circle cx="12" cy="16.6" r="1.6"/>'
+    speciallock: SECTION_ICON.xlock
   };
   var specIcon = (key) => Object.prototype.hasOwnProperty.call(SPEC_ICON, key) ? `<svg class="spec__ico" viewBox="0 0 24 24" aria-hidden="true">${SPEC_ICON[key]}</svg>` : '<span class="spec__ico" aria-hidden="true"></span>';
   var HUD_ICON = {
@@ -10227,7 +10247,7 @@ ${plate.defs}${plate.body}
     {
       key: "speciallock",
       title: "g.speciallock",
-      in: "lock",
+      in: "xlock",
       kind: "hw",
       list: () => SPECIAL_LOCKS,
       glyph: specialLockGlyph,
@@ -10362,10 +10382,7 @@ ${plate.defs}${plate.body}
       sub: "step.lock.s",
       lede: "step.lock.l",
       exp: "exp.lock",
-      expArgs: () => [
-        formatAgorot(byId(SPECIAL_LOCKS, "kasefet").delta),
-        formatAgorot(byId(SPECIAL_LOCKS, "kodan").delta)
-      ]
+      expArgs: () => []
     },
     {
       key: "pz",
@@ -10374,6 +10391,26 @@ ${plate.defs}${plate.body}
       lede: "step.pz.l",
       exp: "exp.pz",
       expArgs: () => [L(byId(LOCKSETS, "cadoor")), L(byId(LOCKSETS, "sapir"))]
+    },
+    /* ⚠ THE EXTRA LOCK HAS ITS OWN STEP, 28.9.2026 — the owner's son: *"The extra
+       locks as a separate section, right after the pirzul section — they don't
+       fit on the screen and I need to scroll for them."* They were the lock
+       step's second group, under the levers. A new key, so no link goes stale
+       and no `VERSION` moves (the key is not in the wire format); what moved with
+       it is `WANT_ORDER` in the audit, the tenth navigator mark
+       (`SECTION_ICON.xlock` — the קודן's own case, which the summary's row
+       already drew) and every walk that counted nine steps. Its explainer is the
+       lock step's old one: the two figures still come through arguments. */
+    {
+      key: "xlock",
+      title: "step.xlock.t",
+      sub: "step.xlock.s",
+      lede: "step.xlock.l",
+      exp: "exp.xlock",
+      expArgs: () => [
+        formatAgorot(byId(SPECIAL_LOCKS, "kasefet").delta),
+        formatAgorot(byId(SPECIAL_LOCKS, "kodan").delta)
+      ]
     },
     {
       key: "face",
@@ -11876,9 +11913,12 @@ ${plate.defs}${plate.body}
       const r = el.getBoundingClientRect();
       if (inX(r) && r.top < mid && r.bottom + 8 > top) top = r.bottom + 8;
     }
-    const trust = document.querySelector(".trust");
-    const tr = trust && trust.getBoundingClientRect();
-    let floor = (tr && tr.height && tr.top > mid ? tr.top : wrap.bottom) - 8;
+    const st = document.querySelector("#stage")?.getBoundingClientRect();
+    let floor = (st ? st.bottom : wrap.bottom) - 8;
+    for (const w of document.querySelectorAll(".trust__i")) {
+      const r = w.getBoundingClientRect();
+      if (r.width && inX(r) && r.top > mid) floor = Math.min(floor, r.top - 8);
+    }
     const un = document.querySelector(".stage__undo");
     const ur = un && un.getBoundingClientRect();
     if (ur && ur.width && inX(ur) && ur.top > mid) floor = Math.min(floor, ur.top - 8);

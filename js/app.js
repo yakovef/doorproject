@@ -226,7 +226,7 @@ const GROUPS = [
      lever, a smart lock and a keypad at once and Peretz prices all three
      independently. Putting them in `LOCKSETS` would have made three products
      mutually exclusive that are not. */
-  { key: 'speciallock', title: 'g.speciallock', in: 'lock', kind: 'hw',
+  { key: 'speciallock', title: 'g.speciallock', in: 'xlock', kind: 'hw',
     list: () => SPECIAL_LOCKS, glyph: specialLockGlyph,
     hint: 'g.speciallock.h' },
 
@@ -419,10 +419,21 @@ const SECTIONS = [
      navigator rather than a pair-wise rule — so a half-finished reorder fails
      there rather than shipping. */
   { key: 'lock',   title: 'step.lock.t',   sub: 'step.lock.s',   lede: 'step.lock.l', exp: 'exp.lock',
-    expArgs: () => [formatAgorot(byId(SPECIAL_LOCKS, 'kasefet').delta),
-                    formatAgorot(byId(SPECIAL_LOCKS, 'kodan').delta)] },
+    expArgs: () => [] },
   { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz',
     expArgs: () => [L(byId(LOCKSETS, 'cadoor')), L(byId(LOCKSETS, 'sapir'))] },
+  /* ⚠ THE EXTRA LOCK HAS ITS OWN STEP, 28.9.2026 — the owner's son: *"The extra
+     locks as a separate section, right after the pirzul section — they don't
+     fit on the screen and I need to scroll for them."* They were the lock
+     step's second group, under the levers. A new key, so no link goes stale
+     and no `VERSION` moves (the key is not in the wire format); what moved with
+     it is `WANT_ORDER` in the audit, the tenth navigator mark
+     (`SECTION_ICON.xlock` — the קודן's own case, which the summary's row
+     already drew) and every walk that counted nine steps. Its explainer is the
+     lock step's old one: the two figures still come through arguments. */
+  { key: 'xlock',  title: 'step.xlock.t',  sub: 'step.xlock.s',  lede: 'step.xlock.l', exp: 'exp.xlock',
+    expArgs: () => [formatAgorot(byId(SPECIAL_LOCKS, 'kasefet').delta),
+                    formatAgorot(byId(SPECIAL_LOCKS, 'kodan').delta)] },
   { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face',
     expArgs: () => [formatAgorot(STRIPE_A.h), formatAgorot(STRIPE_A.v),
                     L(byId(DETAILS, 'panel2')), L(byId(DETAILS, 'panel3'))] },
@@ -3858,9 +3869,20 @@ function placeSteps() {
     const r = el.getBoundingClientRect();
     if (inX(r) && r.top < mid && r.bottom + 8 > top) top = r.bottom + 8;
   }
-  const trust = document.querySelector('.trust');
-  const tr = trust && trust.getBoundingClientRect();
-  let floor = (tr && tr.height && tr.top > mid ? tr.top : wrap.bottom) - 8;
+  /* ⚠ THE FLOOR IS THE TRUST BAND'S WORDS, NOT ITS BOX — 28.9.2026 (the
+     extra lock's step made the column ten marks, 514 px, ≥ 470 even with its
+     gaps given). The band's box is the whole floor strip, but its four claims
+     are centred and never reach the stage's corner where the column stands;
+     measured at 1100–1152 in English and Russian, where the column is under
+     the price, that strip was the 41 px the ten marks were short of. So the
+     column stops 8 px above any WORD in its own x-range, and otherwise 8 px
+     above the stage's foot. */
+  const st = document.querySelector('#stage')?.getBoundingClientRect();
+  let floor = (st ? st.bottom : wrap.bottom) - 8;
+  for (const w of document.querySelectorAll('.trust__i')) {
+    const r = w.getBoundingClientRect();
+    if (r.width && inX(r) && r.top > mid) floor = Math.min(floor, r.top - 8);
+  }
   /* the undo pills at the stage's foot, where they share the column's corner
      (Hebrew): their box is kept even with nothing to undo, so the column does
      not jump on the first change */

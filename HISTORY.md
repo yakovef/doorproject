@@ -26,6 +26,47 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — THE EXTRA LOCK'S OWN STEP (7 of 10).** The owner's son: *"The extra
+  locks as a separate section, right after the pirzul section — they don't fit
+  on the screen and I need to scroll for them."*
+
+  **WHAT IT IS.** `SECTIONS` gains `xlock` (מנעול נוסף / Extra lock /
+  Дополнительный замок) after `pz`, and the `speciallock` group moved to it:
+  fit · colour · lock · pz · **xlock** · face · glass · grip · mk · sum. A new
+  key, never in the wire format, so no `VERSION`; the summary's row finds its
+  step through `sectionOf` (derived from the group's `in`). The lock step's
+  explainer was the extra lock's — it moved with it (`exp.xlock`, the two
+  figures still through `{0}`/`{1}`), and the lock step has its own now (what
+  comes with the lock, where its tone and the extra lock are chosen); its
+  one-line summary and lede no longer promise the extra lock there.
+
+  **THE TENTH MARK** is the קודן's own case — the mark the summary's row already
+  drew (`SPEC_ICON.speciallock` now refers to `SECTION_ICON.xlock`: one idea,
+  one mark). Ten nav marks at 21 px, 45 pairs, closest lock ~ grip at 60 %
+  (floor 50); falsified by drawing it as the lock's → "differ on 0 %".
+
+  **THE COLUMN IS 514 px NOW, AND AT 1100–1152 IT DID NOT FIT.** In English and
+  Russian it stands under the price there, with 436–450 px of room against
+  ≥ 470 even with its gaps given (ten 44 px targets are 440 on their own). The
+  room was the trust band: its box is the whole floor strip, but its four
+  claims are centred and never reach the column's corner. So the column's
+  floor is the band's WORDS in its own x-range, else 8 px above the stage's
+  foot — the ~41 px the ten marks needed. Measured over six desktop widths ×
+  three languages × six sizes: on no price, hud, pill, arrow, word or door,
+  inside the stage, no mark cut. Falsified: the band's box back as the floor →
+  "the price and the steps overlap" on five readings.
+
+  **THE WALK'S LENGTH, STATED ONCE.** Sixteen places in the audit had typed 8
+  or 9 by hand — every walk would have gone one step short, green. They read
+  `QUESTIONS` (9) and `STEPS` (10) now, and `WANT_ORDER` (the arrival clause)
+  holds the navigator to that sequence. The band's walk, the navigator's
+  gate, the marks block: run alone on this tree, clean.
+
+  **GATES.** `node --check` (app, icons, copy, audit); `npm run build`; `npm
+  test` **9,440,999 passed / 5 failed** — the five sheet-staleness rows (the
+  new step's hint and explainer counted in all three languages, T15). Sheets:
+  0 bare.
+
 - **28.9 — FOUR SMALL PAGE THINGS (6 of 10).** The owner's son, four
   sentences: *"The arrows choose very randomly in the colour section — I want
   it to go nicely one by one, in every section."* · *"Put the expensive window
@@ -2330,6 +2371,13 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.9** What the new face moved, put back (1b) — the audit on commit 1, eleven
+  faults, all widths. **Print:** English's widest double went to two pages
+  (276.5 mm), Russian past its 280 ceiling (283.9); rows 6 → 4 px on paper put all
+  six prints on ONE page (Russian 270.2) — its 30.8 exemption is gone. **Picker:**
+  109.7 → 128.3 px (the old fallback drew Latin at 89%); weight 400, 5/4 px, `.75/
+  .74rem` clears every gate. **Landscape:** grip now shows an answer too — the
+  exemption narrows. Long form: `HISTORY.md`.
 - **28.9** **The bow** (`grab`) redrawn off four installed doors (*"now i want
   you to copy the horizontal handle"*): 300 tip to tip (was 280), a 25.5 shaft
   (was 18.7), posts at 0.175/0.825 confirmed, 42 mm roses with 28 mm balls, a

@@ -3873,7 +3873,7 @@ html.is-live.is-untouched .wa__ask { display: inline; }
     /* `fitStage` publishes the top: the door's mid-height less half the
        column, or 8 px under the wall chrome on its side where that is lower
        (see `--steps-top` there). Before the first fit, centred on the stage. */
-    inset-block-start: var(--steps-top, calc(50% - 232px));
+    inset-block-start: var(--steps-top, calc(50% - 257px));
     z-index: 4;
     /* ⚠ THE GAPS GIVE, NEVER THE TARGETS — 28.9, with the price's move. In
        English and Russian at 1100–1152 the price stands in the column's own
