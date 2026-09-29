@@ -26,6 +26,81 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — THE RECORD, AND THE SLOW GATES ON THE FINISHED ROUND (10 of 10).**
+  One sheet run, every gate once, the numbers re-read into §0c rather than
+  carried forward.
+
+  **THE SHEETS, PREDICTED FIRST.** Written before the run, against the last one
+  (`c58d80b`): three commits since touch the drawing. `f39697f` moved
+  `FIT_TRIM` (only `data-fit-*`, and bare mode skips `fitStage`). `4d4ff8c`
+  changed the bell's tone with no bar or bow, and `repair` now resets a
+  subjectless finish; no gallery door carries a bell, the four `hf-black`
+  gallery doors all carry a bar, and no recreate/against/lockset query sets
+  `bl=`. Commit 9 changed the fixed leaf; no gallery door is a double, and
+  recreate's d122 is `s=sidelight` → `half`, the square window, plain.
+  Predicted: **exactly `recreate-d122`** among the bare sheets, 0 `lockset`,
+  `corpus-links.md` and `js/works.js` unchanged. **Got exactly that**: d122's
+  change is one box, 154 × 242 px at the sheet's 2× (27,654 px), round the
+  fixed leaf's lower panel, which widened to the casing. The 12 `shot` sheets
+  and `.stamps.json` moved too (not byte-stable, §7). And the sheet settles
+  commit 9's own call: **on d122's photograph the fixed leaf's panel IS the
+  casing's width** — the second door read, and the one that agrees with his
+  sentence (d119 did not).
+
+  **THE TOUR'S COPY, ALL THREE** (his sentences, the door's with the
+  illustration note):
+  · door — זו הדלת שתעצבו — כל בחירה תופיע כאן. (הדלת האמיתית עשויה להיראות
+    מעט אחרת: זה איור.) / This is the door you are designing — every choice
+    appears here. (The real door may look a little different: this is an
+    illustration.) / Это дверь, которую вы создаёте, — каждый выбор появится
+    здесь. (Настоящая дверь может выглядеть немного иначе: это иллюстрация.)
+  · steps — אלה השלבים שתעברו בדרך לדלת שחלמתם עליה. / These are the steps you
+    go through on the way to the door of your dreams. / Это шаги, которые вы
+    пройдёте на пути к двери своей мечты.
+  · options — בכל שלב בוחרים כאן מה שאוהבים — או לוחצים על החצים שליד הדלת
+    כדי לעבור מהר. / At each step, choose what you like here — or tap the
+    arrows beside the door to flip through quickly. / На каждом шаге выбирайте
+    здесь то, что нравится, — или нажимайте стрелки у двери, чтобы листать
+    быстрее.
+  · undo — הכפתורים האלה עוזרים לחזור אחורה או לשמור. / These buttons help
+    you go back or save. / Эти кнопки помогают вернуться назад или сохранить.
+
+  **THE GATES** (the figures are in §0c's table):
+  · `npm test` **9,441,223 passed, 0 failed** (after the fix below; the
+    stale run's 9,441,227 counted five staleness rows where a current run
+    asserts one).
+  · `npm run audit`, the full run on the finished round: **4 faults, all
+    ours, from commits that had no full run after them.** (1) At 844×390 the
+    new `xlock` step shows an answer — commit 7's step, the exemption not
+    narrowed with it; now six of nine (§9). (2–4) In Hebrew at 1100×800 and
+    1152×800 (standard, half) the undo pill stood 936 px² on the navigator's
+    last mark: after an undo the redo joins the row, the row reaches the trust
+    band's words and lifts 25 px at the same HEIGHT, and `placeUndo` re-placed
+    the column only on a height change. It compares the whole box now (§8),
+    and `placeSteps` COUNTS its gaps — it divided by 8 after commit 7 made them
+    nine. The cost, named: there the column shortens 25 px on the first undo
+    (gaps 5.9 → 3.1 px). Also: the landscape message typed "of eight"; it
+    reads `QUESTIONS`. ⚠ **The second full run did not finish** — the
+    container restarted under it. It was clean (0 faults) through every block
+    up to the navigator's, the undo block's 96 readings and the landscape
+    clause among them; the blocks after that passed on the first run, before
+    the fix, and were not re-run after it.
+  · `npm run sheets`, re-run after the fix: no bare or lockset sheet moved,
+    as predicted (bare mode places nothing); 11 `shot` sheets.
+  · `npm run collide -- all` 1,638 designs clean (at commit 9; the drawing has
+    not changed since). `-- boxes` clean
+    (the deepest mount 109, the עילי's, under `MOUNT_REACH` 121). `latency`
+    420 ms worst against 600, on a container just restarted — the element
+    counts 268 · 531 · 656 are unchanged, and those are the page's part; no
+    old commit was interleaved, so the milliseconds say nothing either way.
+  · `npm run fuzz`: **not run this round** — the order asked for it; the
+    session was told to finish.
+
+  **THE RECORD.** §0a lists this round's decisions taken for them in one place,
+  each reversible in a line; §0c is dated 28.9 and carries the tour; §3 the
+  fixed leaf, with d122. `PROMPT.md`, the order kept untracked through the
+  round, is deleted, and the scratch worktrees with it.
+
 - **28.9 — כדור (`cadoor`) REDRAWN OFF ONE PHOTOGRAPH.** The owner's son: *"here
   is the cadoor handle, i only found one image of it though, but i do think that
   it is similar in ways with the 'knob on backplate' handle."*
@@ -114,7 +189,9 @@ oldest lines move to the top of the "moved" section.
   carried. Traced by running the sweep at each commit: 82eb150 1,476/610,
   `86eb6fa` 1,468/602, the same ever since. The bow's redraw off four doors
   moved its box, and eight designs carrying it left the buildable set. Not this
-  round's; the figure had simply not been re-read.) In `catalog.js`
+  round's — and §0c's table already said so, recorded by the bow's own round;
+  it was this entry's author who compared against the figure from before it.
+  The commit message of 9 repeats the mistake and cannot be amended.) In `catalog.js`
   the `SIDE_OPENING_MIN` and `glazedPanels` notes described the clamp; they
   describe the fractions now, and the latter's dead citation of an
   `ASK-PERETZ.md` §4b (no longer in the file) points at §0g (A18). No gallery
@@ -2530,6 +2607,12 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.9** The type's two promises, asserted (1c, an audit block only): no
+  request leaves the folder (a Google Fonts `<link>` → 6 caught), and the swap
+  moves no block by more than a line and at most 2 in 100 readings at all (6 of
+  720 on 8bbd134; 28.8's fallback 107/12, raw Arial 38 — both caught). A second
+  fallback, nine faces script × weight, measured no better (4–9): not shipped.
+  Long form: `HISTORY.md`.
 - **28.9** The price on the photograph (4 of 10) — *"not on a white thing …
   left of the door, between the door and the lamp, on the higher end"*: no
   ground, figure 2.4 rem, the send a line of ink; `right` 8 px off the casing's
