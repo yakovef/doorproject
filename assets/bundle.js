@@ -2009,6 +2009,18 @@
          `VERSION` bump is owed — the ids come back at the END of the list rather
          than where they stood. They are also removed from `grid`'s aliases above,
          or `byId` would have two answers for one name. */
+    /* ⚠ THIS CITATION LIST COVERS TWO PATTERNS AND THE DRAWING IS ONE OF THEM.
+       Seen side by side on screenshots/against-iron.png, d090 d092 d108 d119 are
+       the composition we draw — an oval crown, a ring course, bars at sixths —
+       and d101 d103 d112 d129 are a visibly different thing: far denser, finer
+       scrollwork filling the whole light. The drawing is measured off the three
+       photographs in research/ironwork/, which are the first group.
+       ⚠ THE LIST IS LEFT WHOLE ON PURPOSE. It is what npm run corpus fits a
+       measured door BY, so trimming it would drop the ironwork off gallery
+       doors — which is exactly what withdrawing this id did to d092, d108 and
+       d128 on 26.8. Whether the dense one is a second product is Peretz's to
+       say; ASK-PERETZ.md 2a asks him. Until he does, one id draws one of the
+       two and the sheet shows which. */
     {
       id: "iron",
       he: "ברזל מחושל",
@@ -6357,7 +6369,7 @@ ${body}
       return out.join("");
     }
     if (kind === "iron") {
-      const BAR = [0.03, 1 / 6, 1 / 3, 0.5, 2 / 3, 5 / 6, 0.97];
+      const BAR = [1 / 6, 1 / 3, 0.5, 2 / 3, 5 / 6];
       const flow = (pts) => {
         if (pts.length < 3) return poly(pts);
         const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
@@ -6369,97 +6381,152 @@ ${body}
         const e = pts[pts.length - 1];
         return d + ` L ${n2(e[0])} ${n2(e[1])}`;
       };
-      const thin = Math.max(2, w * 0.016), spine = Math.max(2, w * 0.018);
-      const rib = Math.max(2, w * 0.02);
+      const thin = Math.max(2, w * 0.0164), spine = Math.max(2, w * 0.0145);
+      const rib = Math.max(2, w * 0.025), scr = Math.max(2, w * 0.019);
       const out = [];
-      const K = Math.min(1, h * 0.46 / (w * 0.62));
+      const K = Math.min(1, h * 0.46 / (w * 0.6));
       const T2 = (f) => y + w * f * K;
       const B = (f) => y + h - w * f * K;
       const yb = V(0.5);
       const RING = [];
-      for (let k = 0; k < BAR.length - 1; k++) RING.push((BAR[k] + BAR[k + 1]) / 2);
-      const cr = w * 0.065;
-      for (const f of [BAR[0], BAR[6]]) out.push(line(U(f), T2(0.15), U(f), B(0.15), thin));
-      for (const f of [BAR[1], BAR[5]]) out.push(line(U(f), T2(0.1), U(f), B(0.1), thin));
-      for (const f of [BAR[2], BAR[4]]) out.push(line(U(f), T2(0.512), U(f), B(0.512), thin));
-      out.push(line(U(0.5), T2(0.188), U(0.5), B(0.188), spine));
+      for (let k = 0; k <= BAR.length; k++) RING.push((k * 2 + 1) / (2 * (BAR.length + 1)));
+      const cr = w * 0.064;
+      for (const f of [BAR[0], BAR[4]]) out.push(line(U(f), T2(0.15), U(f), B(0.15), thin));
+      for (const f of [BAR[1], BAR[3]]) out.push(line(U(f), T2(0.57), U(f), B(0.57), thin));
+      out.push(line(U(0.5), T2(0.26), U(0.5), B(0.26), spine));
       for (const f of RING) {
         out.push(ink(`M ${n2(U(f) - cr)} ${n2(yb)} a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(cr * 2)} 0
-                    a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(-cr * 2)} 0`, w * 0.022));
+                    a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(-cr * 2)} 0`, w * 0.019));
       }
       for (let k = 0; k < RING.length - 1; k++) {
-        out.push(line(U(RING[k]) + cr, yb, U(RING[k + 1]) - cr, yb, w * 0.022, "butt"));
-        out.push(collar(U(BAR[k + 1]), yb, w * 0.042, w * 0.026));
+        out.push(line(U(RING[k]) + cr, yb, U(RING[k + 1]) - cr, yb, w * 0.019, "butt"));
+        out.push(collar(U(BAR[k]), yb, w * 0.04, w * 0.024));
       }
+      const OVAL = [
+        [0.5, 0.027],
+        [0.441, 0.029],
+        [0.389, 0.039],
+        [0.338, 0.059],
+        [0.287, 0.092],
+        [0.236, 0.139],
+        [0.201, 0.191],
+        [0.18, 0.228],
+        [0.172, 0.266],
+        [0.172, 0.303],
+        [0.177, 0.331],
+        [0.186, 0.346],
+        [0.193, 0.367],
+        [0.203, 0.387],
+        [0.215, 0.408],
+        [0.234, 0.428],
+        [0.254, 0.449],
+        [0.273, 0.469],
+        [0.297, 0.482],
+        [0.326, 0.48],
+        [0.355, 0.48],
+        [0.383, 0.477],
+        [0.412, 0.465],
+        [0.441, 0.445],
+        [0.465, 0.418],
+        [0.482, 0.391],
+        [0.498, 0.379]
+      ];
+      const SCROLL = [
+        [0.496, 0.332],
+        [0.475, 0.307],
+        [0.461, 0.287],
+        [0.439, 0.268],
+        [0.416, 0.258],
+        [0.393, 0.256],
+        [0.371, 0.26],
+        [0.348, 0.275],
+        [0.332, 0.297],
+        [0.324, 0.32],
+        [0.326, 0.342],
+        [0.34, 0.365],
+        [0.363, 0.373],
+        [0.385, 0.363],
+        [0.395, 0.34],
+        [0.4, 0.318]
+      ];
+      const HOOK = [
+        [0.27, 0.471],
+        [0.252, 0.473],
+        [0.234, 0.473],
+        [0.215, 0.48],
+        [0.203, 0.49],
+        [0.191, 0.5],
+        [0.181, 0.514],
+        [0.172, 0.531],
+        [0.17, 0.543],
+        [0.172, 0.555],
+        [0.184, 0.568],
+        [0.195, 0.584],
+        [0.213, 0.59],
+        [0.232, 0.586],
+        [0.244, 0.57],
+        [0.248, 0.557],
+        [0.248, 0.545]
+      ];
+      const CORNER = [
+        [0.166, 0.15],
+        [0.166, 0.121],
+        [0.163, 0.1],
+        [0.157, 0.077],
+        [0.146, 0.056],
+        [0.13, 0.039],
+        [0.111, 0.028],
+        [0.09, 0.023],
+        [0.066, 0.023],
+        [0.045, 0.032],
+        [0.028, 0.052],
+        [0.019, 0.079],
+        [0.02, 0.105],
+        [0.03, 0.129],
+        [0.047, 0.148],
+        [0.061, 0.141],
+        [0.071, 0.127],
+        [0.076, 0.102],
+        [0.074, 0.086]
+      ];
+      const KNEE = [
+        [0.297, 0.484],
+        [0.303, 0.496],
+        [0.314, 0.508],
+        [0.32, 0.522],
+        [0.326, 0.54],
+        [0.33, 0.556],
+        [0.332, 0.572]
+      ];
       const cap = (up) => {
         const Y = (f) => up ? T2(f) : B(f);
-        const s = up ? 1 : -1;
         const o = [];
-        const OVAL = [
-          [0.5, 0.09],
-          [0.44, 0.091],
-          [0.392, 0.095],
-          [0.348, 0.104],
-          [0.316, 0.117],
-          [0.288, 0.134],
-          [0.262, 0.152],
-          [0.238, 0.175],
-          [0.219, 0.203],
-          [0.205, 0.235],
-          [0.194, 0.272],
-          [0.188, 0.315],
-          [0.187, 0.36],
-          [0.196, 0.412],
-          [0.215, 0.452],
-          [0.245, 0.49],
-          [0.288, 0.514],
-          [0.335, 0.514],
-          [0.388, 0.496],
-          [0.446, 0.452],
-          [0.5, 0.404]
-        ];
-        for (const sx of [-1, 1]) {
-          o.push(ink(flow(OVAL.map(([f, t]) => [U(0.5 + sx * (0.5 - f)), Y(t)])), rib));
-        }
+        const arm = (tbl, sw) => {
+          for (const sx of [-1, 1]) {
+            o.push(ink(flow(tbl.map(([f, t]) => [U(0.5 + sx * (0.5 - f)), Y(t)])), sw));
+          }
+        };
+        arm(OVAL, rib);
+        arm(SCROLL, scr);
+        arm(HOOK, scr);
+        arm(CORNER, thin);
+        arm(KNEE, thin);
         const lx = U(0.5);
-        o.push(solid(`M ${n2(lx)} ${n2(Y(0.19))}
-                    C ${n2(lx + w * 8e-3)} ${n2(Y(0.22))} ${n2(lx + w * 0.013)} ${n2(Y(0.234))}
-                      ${n2(lx + w * 0.013)} ${n2(Y(0.25))}
-                    C ${n2(lx + w * 0.013)} ${n2(Y(0.282))} ${n2(lx + w * 0.01)} ${n2(Y(0.296))}
-                      ${n2(lx + w * 0.01)} ${n2(Y(0.35))}
-                    L ${n2(lx - w * 0.01)} ${n2(Y(0.35))}
-                    C ${n2(lx - w * 0.01)} ${n2(Y(0.296))} ${n2(lx - w * 0.013)} ${n2(Y(0.282))}
-                      ${n2(lx - w * 0.013)} ${n2(Y(0.25))}
-                    C ${n2(lx - w * 0.013)} ${n2(Y(0.234))} ${n2(lx - w * 8e-3)} ${n2(Y(0.22))}
-                      ${n2(lx)} ${n2(Y(0.19))} Z`, w * 0.04));
-        o.push(collar(lx, Y(0.377), w * 0.06, w * 0.038));
-        o.push(collar(lx, Y(0.415), w * 0.04, w * 0.02));
+        o.push(solid(`M ${n2(lx)} ${n2(Y(0.176))}
+                    C ${n2(lx + w * 7e-3)} ${n2(Y(0.2))} ${n2(lx + w * 0.011)} ${n2(Y(0.208))}
+                      ${n2(lx + w * 0.011)} ${n2(Y(0.22))}
+                    C ${n2(lx + w * 0.011)} ${n2(Y(0.248))} ${n2(lx + w * 8e-3)} ${n2(Y(0.262))}
+                      ${n2(lx + w * 8e-3)} ${n2(Y(0.3))}
+                    L ${n2(lx - w * 8e-3)} ${n2(Y(0.3))}
+                    C ${n2(lx - w * 8e-3)} ${n2(Y(0.262))} ${n2(lx - w * 0.011)} ${n2(Y(0.248))}
+                      ${n2(lx - w * 0.011)} ${n2(Y(0.22))}
+                    C ${n2(lx - w * 0.011)} ${n2(Y(0.208))} ${n2(lx - w * 7e-3)} ${n2(Y(0.2))}
+                      ${n2(lx)} ${n2(Y(0.176))} Z`, w * 0.034));
+        o.push(collar(lx, Y(0.336), w * 0.052, w * 0.034));
+        o.push(collar(lx, Y(0.372), w * 0.034, w * 0.018));
         for (const sx of [-1, 1]) {
-          o.push(ink(flow(curl(
-            U(0.5 + sx * 0.115),
-            Y(0.392),
-            U(0.5 + sx * 0.045),
-            Y(0.325),
-            1.2,
-            -sx * s
-          )), rib));
-          o.push(collar(U(0.5 + sx / 3), Y(0.56), w * 0.04, w * 0.024));
-          o.push(ink(flow(curl(
-            U(0.5 + sx * 0.278),
-            Y(0.594),
-            U(0.5 + sx / 3),
-            Y(0.534),
-            1.1,
-            -sx * s
-          )), w * 0.02));
-          o.push(ink(flow(curl(
-            U(0.5 + sx * 0.452),
-            Y(0.15),
-            U(0.5 + sx * 0.395),
-            Y(0.098),
-            1.15,
-            sx * s
-          )), w * 0.02));
+          o.push(collar(U(0.5 + sx / 3), Y(0.278), w * 0.036, w * 0.05));
+          o.push(collar(U(0.5 + sx / 3), Y(0.524), w * 0.034, w * 0.024));
         }
         return o.join("");
       };

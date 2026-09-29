@@ -1275,6 +1275,18 @@ export const GRILLES = [
      `VERSION` bump is owed — the ids come back at the END of the list rather
      than where they stood. They are also removed from `grid`'s aliases above,
      or `byId` would have two answers for one name. */
+  /* ⚠ THIS CITATION LIST COVERS TWO PATTERNS AND THE DRAWING IS ONE OF THEM.
+     Seen side by side on screenshots/against-iron.png, d090 d092 d108 d119 are
+     the composition we draw — an oval crown, a ring course, bars at sixths —
+     and d101 d103 d112 d129 are a visibly different thing: far denser, finer
+     scrollwork filling the whole light. The drawing is measured off the three
+     photographs in research/ironwork/, which are the first group.
+     ⚠ THE LIST IS LEFT WHOLE ON PURPOSE. It is what npm run corpus fits a
+     measured door BY, so trimming it would drop the ironwork off gallery
+     doors — which is exactly what withdrawing this id did to d092, d108 and
+     d128 on 26.8. Whether the dense one is a second product is Peretz's to
+     say; ASK-PERETZ.md 2a asks him. Until he does, one id draws one of the
+     two and the sheet shows which. */
   { id: 'iron',    he: 'ברזל מחושל',     en: 'Wrought ironwork', ru: 'Кованое железо',
     doors: ['ironwork', 'd090', 'd092', 'd101', 'd103', 'd108',
             'd112', 'd119', 'd124', 'd128', 'd129'] },
