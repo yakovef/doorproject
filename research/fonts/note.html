@@ -1,0 +1,11 @@
+<b>The pick (28.9.2026): Rubik for the text, Bona Nova for the price, the &lt;h1&gt; and the band's title.</b>
+Criteria in the order given: Hebrew-first and readable at 12 px captions and at display size · Cyrillic AND Latin · SIL OFL · tabular figures · three weights.<br><br>
+<b>Rubik</b> — kept. Its Hebrew captions read at 12 px (the lock step above); Hebrew, Latin and Cyrillic in one variable file per script (300–900), so the Russian page is in the same face as the Hebrew for the first time; real tabular figures (every figure string one width under <code>tnum</code>). And it is the face Peretz's own site sets every word in (<code>research/works/css-14.css</code>). 58 KB for all three scripts.<br>
+<b>Bona Nova</b> — kept. The only display candidate with Cyrillic, so the only one whose Russian row above is one face. High-contrast serif, as the 26.8 note asked of the price (<i>"something that reads rich"</i>). Tabular figures are real — which is also why the "1" in ₪3,195 sits in a full-width slot: the price keeps one width as it changes. 103 KB for two weights × three scripts.<br><br>
+<b>Rejected</b> —
+<b>Heebo</b> and <b>Assistant</b> (today's face): no Cyrillic — the Russian rows above fall back mid-page, which is how the Russian page has always looked.
+<b>Arimo</b>: covers all three, but it is Arial's metrics in Arial's manner — the system look this change exists to leave.
+<b>Open Sans</b>: covers all three and reads well, but costs 90 KB against Rubik's 58 for no gain the sheet shows — and it is not the shop's own face.
+<b>Frank Ruhl Libre</b>: a fine Hebrew serif with no Cyrillic — the Russian head above switches face between the two lines.
+<b>Secular One</b>, <b>Suez One</b>: no Cyrillic and a single weight; Suez One's slab makes ₪3,195 read like a sale sticker.<br><br>
+Any of these is one edit: name it and it is nine <code>@font-face</code> rules in <code>index.html</code>, its files in <code>assets/fonts/</code>, and the fallback re-measured with <code>measure.mjs</code> beside this sheet.

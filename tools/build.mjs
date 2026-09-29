@@ -30,7 +30,7 @@
  * drives, which is what `npm run audit` proves on every run.
  */
 import { createHash } from 'node:crypto';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { build, context } from 'esbuild';
 
@@ -81,6 +81,22 @@ function stampHtml() {
     [/(href=")(assets\/room\.webp)(\?v=[0-9a-f]+)?(")/, 'assets/room.webp'],
     [/(href=")(assets\/room-wide\.webp)(\?v=[0-9a-f]+)?(")/, 'assets/room-wide.webp'],
   ];
+  /* ⚠ THE PAGE'S TYPE (28.9), ONE FILE PER SCRIPT PER FACE, EACH REFERENCED
+     FROM ONE PLACE — its `@font-face` in the head — for the rooms' reason. The
+     list is the FOLDER, not a list typed here, so a file added to
+     `assets/fonts/` that the page never names fails the build instead of
+     shipping as dead weight; and a name in the page with no file behind it
+     fails too, below, instead of painting the fallback in silence. */
+  const fonts = readdirSync('assets/fonts').filter(f => f.endsWith('.woff2')).sort();
+  for (const f of fonts) {
+    const esc = f.replace(/[.]/g, '\\.');
+    refs.push([new RegExp(`(url\\(")(assets\\/fonts\\/${esc})(\\?v=[0-9a-f]+)?(")`), `assets/fonts/${f}`]);
+  }
+  /* Only inside `url("…")`: the head's comments name the folder in prose, and
+     prose is not a reference (CLAUDE.md §5's last note). */
+  const named = [...html.matchAll(/url\("assets\/fonts\/([^"?]+)/g)].map(m => m[1]);
+  const missing = named.filter(n => !fonts.includes(n));
+  if (missing.length) throw new Error(`index.html names fonts with no file: ${missing.join(', ')}`);
   for (const [re, path] of refs) {
     if (!re.test(html)) throw new Error(`index.html no longer references ${path}`);
     html = html.replace(re, `$1$2?v=${stamp(path)}$4`);

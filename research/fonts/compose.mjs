@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+import fs from 'node:fs';
+const DIR = process.cwd() + '/research/fonts';
+const note = fs.existsSync(DIR + '/note.html') ? fs.readFileSync(DIR + '/note.html', 'utf8') : '(pick pending)';
+fs.writeFileSync(DIR + '/contact.html', fs.readFileSync(DIR + '/contact.tmpl.html', 'utf8').replace('%NOTE%', note));
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const p = await b.newPage({ viewport: { width: 1700, height: 1200 } });
+await p.goto('file://' + DIR + '/contact.html'); await p.waitForTimeout(800);
+await p.screenshot({ path: DIR + '/contact.png', fullPage: true });
+await b.close(); console.log('composed');

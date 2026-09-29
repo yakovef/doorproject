@@ -184,6 +184,15 @@ lines here. Dates are the day of the change.
   double-cone finial and a knob at each end (`GRAB`, `GRAB_END`). Footprint
   `in` + 10 → + 5 (the trio's field, §9); channel + Coral + bow no longer fits
   on two sizes. Sheets: `against-grab` only.
+- **28.9** The page's own type, in its folder (1 of 10) — *"change the font …
+  Hebrew first"*: **Rubik** for the text (the face Peretz's own site uses),
+  **Bona Nova** for the price, `<h1>` and band — the only candidates with
+  Cyrillic (`research/fonts/contact.png`, rejections by name). Nine woff2 in
+  `assets/fonts/`, 165 KB, stamped; the Google script gone, no request leaves
+  the folder. Fallback re-measured PER SCRIPT (one value lost 5 en / 8 ru lines):
+  0 he, 0 ru, 1 en paragraph moves. `--mono` off four Hebrew captions (§9
+  closed); Russian grille names hyphenate inside their tile (4 → 6 → 0 outside).
+  Test 9,440,830 / 5 (sheets). Long form: `HISTORY.md`.
 - **28.9** The digital viewer drawn off the owner's son's photograph (*"make the
   digital peephole look like this"*, `research/viewer/digital.png`): round black
   face in a rounded-square bezel, lens, two lights, sensor ring, bell button; the
@@ -207,17 +216,6 @@ lines here. Dates are the day of the change.
   an arched neck, the Rotem's egg and satin — measured off three doors. It is the
   plate the Rotem was drawn as until 27.9; the five gallery doors carrying it
   (d004 d022 d029 d106 d108) are cited and refit to it. Appended: no VERSION.
-- **27.9** The record (8 of 8): §0a — the placements they make themselves and
-  the five decisions taken for them; §0c's gates; §3's flow; §5.28–29; §9's
-  wall table and breakdown window re-measured (unchanged by the band). The
-  big round is closed: `npm test` 0 failed, the audit clean. Long form:
-  `HISTORY.md`.
-- **27.9** The swing bar lock and the פרזול tiles (7 of 8): `LATCHES`, `lt=`,
-  one bit, `VERSION` 26; price to follow (`null` + `priceTBD`, A22 — "מחיר
-  בהמשך", "—", "(מחיר יימסר)", out of the total); drawn at the head of the
-  closing edge in `#nickel` (published dimensions; fitted inside in reality —
-  asked, §0k); each פרזול tile is this door's metal. 0 bare sheets moved, as
-  predicted. Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -347,8 +345,8 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | **9,440,778 assertions, 0 failed** with the bow redrawn, on the digital viewer's redrawing (28.9 — the same total as with the knob-plate; 9,646,600 with עילי and the latch). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 28.9 |
-| `npm run audit` | **no faults** at every viewport with the bow redrawn, on the digital viewer's redrawing (28.9) | 28.9 |
+| `npm test` | **9,440,831 assertions, 0 failed** with the bow redrawn, on the type round's 1 of 10 (28.9; 9,440,778 on the viewer's redrawing before the type, 9,646,600 with עילי and the latch). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 28.9 |
+| `npm run audit` | **no faults** at every viewport with the bow redrawn on the digital viewer's redrawing (`cb2b217`, 28.9). ⚠ **On the type round's 1 of 10 (`0f73fb9`, merged in): 11 faults, every one the new fonts'** — the widest double's A4 sheet over its page in en and ru and its ru exemption outgrown (3), the 844×390 and 640×360 answer exemptions now showing grip too (2), "Русский" ink on the standard and extra1 doors at 320–390 px and the 1152 px named readings grown (6). That commit defers its audit verdict to its next; none of the 11 involves a fitting | 28.9 |
 | `npm run collide` | `all` (1,638 designs — 1,468 base, 602 with the bow, plus 170 face-detail; 1,646 before the bow's measured 300 mm cost 8 channel + Coral designs, §9) and `boxes` clean with the bow redrawn (28.9: drawn 0/300/21, declared 4/305/26; the knob-plate 46/46/155 in 48/48/157; the deepest mount 109, the עילי's) | 28.9 |
 | `npm run fuzz` | 30,000 designs over every field (the latch among them), 1,800 clicks, 141 of them met the confirm dialog — 65 yes, 76 no, the door unchanged after every no — nothing broke (the big round's commit 7) | 27.9 |
 | `npm run latency` | **217 ms** worst door against a 600 ms gate (the big round's commit 7) — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · 531 · 656 for default · sidelight+ironwork · the heaviest, unchanged through the round. Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 27.9 |
@@ -461,13 +459,19 @@ works from `file://` and Peretz can open the folder on his own laptop.
 - **`assets/room.webp` and `assets/room-wide.webp`** are the photographed room
   in two crops; `pickRoom` measures the stage and fetches ONE. Delete them and
   the page is complete, the door standing in the drawn room the SVG contains.
-- **Assistant** comes from Google Fonts over `http(s)` only, never blocking a
-  paint; over `file://` it is never requested and a metric-matched fallback
-  keeps the layout.
+- **`assets/fonts/`** — the page's own type since 28.9: **Rubik** (the text,
+  and the face Peretz's own site uses) and **Bona Nova** (the price, the `<h1>`,
+  the band's title), nine woff2 files, one per script per face behind its
+  `unicode-range`, 165 KB, OFL licences beside them. Declared in `index.html`'s
+  head, stamped by the build like the rooms, and **the page makes no request
+  outside its folder**. Delete the folder and the page is complete in the
+  system stack; a fallback tuned per script to Rubik (`"Rubik Fallback"`)
+  keeps the swap from moving a line. The pick, its rejections and the scripts
+  that measured it are `research/fonts/`.
 
 | file | what it is |
 |---|---|
-| `index.html` | the page: stage, quote bar, flow, send, gallery, order sheet. **Markup, not generated** — only its two asset hashes are stamped by the build |
+| `index.html` | the page: stage, quote bar, flow, send, gallery, order sheet. **Markup, not generated** — only its asset hashes are stamped by the build (the stylesheet, the bundle, the two rooms, the nine font files) |
 | `css/app.css` | RTL-first, logical properties throughout |
 | `js/catalog.js` | every option. **The wire format** — read its header. Converts prices to agorot (`BUILD_A`, `STRIPE_A`, `priceInto`) |
 | `js/prices.js` | every price, plain shekels, one screen |
@@ -1074,7 +1078,7 @@ often wrong at drawing scale.
 
 ## 5. The failure mode that keeps recurring
 
-**Things that vanish rather than break.** Twenty-seven so far. None threw. All
+**Things that vanish rather than break.** Twenty-nine so far. None threw. All
 looked like a working page. **The item numbers are cited from code — never
 renumber.**
 
@@ -1676,6 +1680,12 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   because `.stage` is `clamp(40vh, 100vw, 56vh)` and pins at its maximum where
   the screen is shortest. `VIEWS` has no landscape tablet; English grille tiles
   clip `Needs a w…` there and seven Russian labels overrun their tiles.
+  ⚠ **Re-measured 28.9 on the new faces** (`tools/_label.mjs`, 320–1024 px,
+  three languages): the English clip was already gone at `9abc298`, and grille
+  names outside their tile are **0 of 15** everywhere — `.tile__name` hyphenates
+  (`hyphens: auto`, the page's `lang`) with `overflow-wrap: anywhere` behind it,
+  so a Russian word wider than an 80 px tile breaks inside it. Without a
+  hyphenation dictionary (headless Linux) the break carries no hyphen.
 - ✅ ~~**A phone held sideways: arrival still ends 29–84 px behind the quote
   bar**, and **568×320 is short by five pixels** on every step.~~ **CLOSED 27.9**
   by the band above the door: the question is in the sticky block now, on screen
@@ -1745,11 +1755,9 @@ orders and rests on the shape of two Hebrew names.
   behind it, and the best next piece of drawing work here. A satin sheen was
   built twice and cut twice (no photograph asks for it; it moved `profile` and
   failed); the argument sits beside `FALLOFF`.
-- **Four text slots set Hebrew in `--mono`, which has no Hebrew**:
-  `.swatch__meta`, `.tile__meta`, `.tile__why`, `.sheet__dims` — one line, two
-  typefaces. Reordering the stack cannot fix it; `@font-face` with
-  `unicode-range` for Assistant needs a second webfont URL, a real decision.
-  Take all four at once.
+- ✅ ~~**Four text slots set Hebrew in `--mono`, which has no Hebrew**~~ —
+  **CLOSED 28.9**: the page's own Rubik has Hebrew, and `.swatch__meta`,
+  `.tile__meta`, `.tile__why` and `.sheet__dims` are `--sans` (asserted).
 - **A recreate case for the Greek-set door**, so something re-checks it against
   its photograph: a record with a measured `leaf` box and a measured `handle.x`.
 - **Re-base `npm run profile`'s bead check on a quantity the light cancels out
