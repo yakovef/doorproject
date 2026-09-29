@@ -26,6 +26,94 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — THE PRICE AND THE SEND STAND ON THE PHOTOGRAPH, LEFT OF THE DOOR
+  (4 of 10).** The owner's son: *"The price bigger and not on a white thing but
+  directly on the image; change the font … Remove the 'מחיר משוער' text above
+  the price. Move the WhatsApp button with the price to the left of the door,
+  between the door and the lamp, on the higher end."*
+
+  **WHAT WAS THERE.** A paper card at the door's top-right corner (27.9, his
+  *"move to near the door, at the up right corner"*), a caption "מחיר משוער" over
+  a 1.9 rem figure and a green pill under it; on a phone the same caption over
+  the bar's figure, yielding to an ellipsis between 360 and ~480 px in Russian.
+  The third placement of this element, and every one of them his.
+
+  **WHAT IT IS.** Above 1100: no ground — no card, border or shadow — the figure
+  in `--display` at 2.4 rem, and the send under it as a line of ink with the
+  WhatsApp mark, underlined, 44 px tall. Anchored PHYSICALLY: `right` 8 px
+  outside the casing's LEFT edge (`--frame-left`), `top` at the casing's head or
+  8 px under the wall chrome (`--hud-b`), flush toward the door in every
+  language (in Hebrew the column's cross-axis start is the right, so the
+  alignment is stated per direction). The caption is off the figure everywhere;
+  the key stays for the A4 sheet's fine print. The mark is ink too: WhatsApp's
+  green on lamp-lit plaster is under 2:1. The one green button is still the
+  summary's.
+
+  **CONTRAST, MEASURED BEFORE ANY WASH WAS CONSIDERED.** With the ink made
+  transparent, the photograph under the figure's box and the send's was sampled
+  at nine desktop widths in three languages and its darkest 5 % compared with
+  `--ink`: the lowest reading is **10.6:1** (English, 1536×864, the figure),
+  the highest 13.1. The gate is 4.5; no wash was needed, so none was added.
+
+  **THE PICKER MOVED WITH IT.** The language picker was the hud's START slot —
+  right in Hebrew, LEFT in English and Russian — so in two languages it would
+  have shared the price's corner. A left-to-right hud row now runs reversed:
+  the picker is top-right in every language, the undo and save top-left.
+
+  **WHAT THE MOVE BROKE, AND ITS FIX.** In English and Russian the navigator
+  column stands on the same wall, and at 1100–1152 in the price's own x-range
+  (five readings, up to 665 px² at 1100×800, Russian, the half door). Under the
+  price there was 436–450 px of room against the column's 464, so the
+  trust-band floor pulled the column back up under it. Its eight gaps now give
+  first (6 → no less than 2) and then its paddings (10 → no less than 6), by
+  exactly the shortfall — 2.5 px gaps at the worst reading; the nine 44 px
+  targets never shrink. `placeSteps` is its own function. ⚠ **A wrong cause was
+  written down first and caught:** the figure is painted after `fitStage`, so a
+  second placement after the figure changes looked necessary; built, then
+  measured with and without it — on a load and on a tap from ₪6,390 to ₪10,190 —
+  it changed nothing (the stage's observer re-fits after the first paint, and
+  the column is pushed by the price's FOOT, which a wider figure does not
+  move). The falsification of the gate found it by firing nothing. Removed, and
+  the comment says why it is not there.
+
+  **THE BREAKDOWN** hangs off the figure's box (`.quote__price` is the figure's
+  since the caption went), centred on it; where the wall left of a wide door is
+  narrower than half of it, the stage's edge would cut it, so `placeBreakdown`
+  moves it inboard by exactly what keeps it 8 px inside (`--bd-shift`) — read
+  off the layout box and the anchor, never off the popover during its
+  entrance. Held on 6 of 27 readings: he 1100 22 px, en 1100 50, en 1152 24,
+  ru 1100 49, ru 1152 28, ru 1200 3. The rows whole on a thirteen-row door are
+  unchanged by the move: 10 / 10 / 11 / 12 / 13 at 1280×720 / 1366×768 /
+  1100×800 / 1440×900 / 1920×918, before and after (§9).
+
+  **THE PHONE BAR** keeps its layout; with the caption gone it is 67.0 px at
+  every width (it was 71.3 above 360) — 4.3 px more room under every fold
+  check, which the audit after commit 5 reads.
+
+  **ASSERTED.** The 14.9 sweep (162 readings, nine widths × three languages ×
+  six sizes) keeps its subjects on the new anchor — whole where the wall holds
+  it (159 of 159), never on the door, its breakdown centred on the figure or
+  held inside the stage (every held reading named) — plus: the anchor itself
+  (left of the door; a price drifting back right fails); on no ground; under no
+  picker, arrow, column or band; the ink ≥ 4.5:1 on the picture (54 readings);
+  the picker top-right in all three languages. The lamps block's "inside the
+  stage, clear of the chrome" holds unchanged. Falsified: a paper ground put back → "stands on a ground" at every
+  reading; the old right-hand anchor → the anchor clause everywhere; the picker
+  by direction again → the picker clause in English and Russian; a dark layer
+  under the ink → the contrast clause, figure and send; the breakdown not held
+  → "leaves the stage" at 1100 in all three languages; the column's gaps not
+  giving → "the price and the steps overlap" on the five readings above.
+
+  **GATES.** `node --check js/renderer.js`, `js/app.js`,
+  `tools/audit.mjs`; `npm run build`; `npm test` 9,440,832 passed / 5 failed — two assertions fewer than commit 3: the caption's `data-t` key left the markup, and its copy check went with it (the five sheet-staleness
+  rows: shot, recreate, corpus, against, lockset). The restated sweep, the band
+  gate (288 readings), the navigator's gate and the wall-ink gate re-run
+  standalone on this tree: clean. The wall-ink gate first caught one thing the
+  move did — in Russian at 320 the save, now the innermost of the undo trio,
+  put up to 263 px² of glyph on the door; the save is kept outermost in every
+  language (and the Russian widest double went 90 → 70 px²). Sheets: 0 bare —
+  the price is chrome, hidden in bare mode.
+
 - **28.9 — THE BAND STANDS ON THE PHOTOGRAPH, OVER THE DOOR (3 of 10).** The
   owner's son: *"The header of the section needs to be on the image and closer
   to the door, in some good font — that also goes for the little text below that
@@ -2024,6 +2112,13 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.9** The digital viewer drawn off the owner's son's photograph (*"make the
+  digital peephole look like this"*, `research/viewer/digital.png`): round black
+  face in a rounded-square bezel, lens, two lights, sensor ring, bell button; the
+  maker's badge left off. Face constant; size still 54 mm (no scale). 0 bare
+  sheets. Then its bezel stopped following the פרזול (*"remove the pirzul effect
+  from them"*, then *"…from the regular peephole too"*): both viewers `#lockUnit`,
+  out of the פרזול tile and its copy; the test sweeps both.
 - **28.9** **כדור על אורך** (`knobplate`) redrawn off ONE photograph (*"i only
   have one image of this but i want it in … refine it"*): a waisted plate 90 ×
   216 (waist 70 at 0.54 — the עילי's family, 8 mm narrower), a 54 mm knob on a

@@ -580,6 +580,7 @@ function init() {
     const open = btn.getAttribute('aria-expanded') === 'true';
     btn.setAttribute('aria-expanded', String(!open));
     box.hidden = open;
+    placeBreakdown();
   });
   $('#works-close').addEventListener('click', closeWorks);
   /* The confirm dialog's three buttons, its Escape and its backdrop. A click
@@ -3668,6 +3669,95 @@ function placeBand() {
   band.style.setProperty('--band-l', `${Math.round(Math.max(L, Math.min(cx - w / 2, R - w)))}px`);
 }
 
+/**
+ * ⚠ THE BREAKDOWN IS CENTRED ON THE FIGURE, AND KEPT INSIDE THE PICTURE —
+ * 28.9.2026. Since the price moved to the LEFT of the door it can stand close
+ * to the stage's left edge (the wall beside the widest double at 1100 is
+ * ~137 px), and `.stage-wrap` is `overflow: hidden`: a breakdown centred on
+ * the figure there would lose its left half to the edge, not to a fold. So it
+ * is centred on the figure and then moved inboard by exactly what keeps it
+ * 8 px inside the stage (`--bd-shift`), and no further. Computed from the
+ * layout box and the anchor — never from `getBoundingClientRect` of the
+ * popover itself, whose entrance is a transform (§7: a placement read during
+ * an animation is placed by the animation). Only on the wall; the phone's bar
+ * opens it upward over the page and the window is its edge.
+ */
+function placeBreakdown() {
+  const box = $('#breakdown');
+  if (!box) return;
+  box.style.setProperty('--bd-shift', '0px');
+  const q = document.querySelector('.quote');
+  const wrap = document.querySelector('.stage-wrap');
+  if (box.hidden || !q || !wrap || getComputedStyle(q).position !== 'absolute') return;
+  const a = box.parentElement.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+  const width = box.offsetWidth;
+  const left = a.left + a.width / 2 - width / 2;
+  const lo = Math.max(w.left, 0) + 8, hi = Math.min(w.right, window.innerWidth) - 8;
+  const d = left < lo ? lo - left : left + width > hi ? hi - (left + width) : 0;
+  if (d) box.style.setProperty('--bd-shift', `${Math.round(d)}px`);
+}
+
+/**
+ * ⚠ WHERE THE NAVIGATOR COLUMN STANDS (28.9), when it is on the photograph.
+ * Centred on the door's mid-height, as asked — UNLESS that puts it under the
+ * wall's other furniture on its side: measured the day it moved, the price
+ * card then at the door's head covered its top two marks in Hebrew at 1100 on
+ * every size (up to 5,246 px²), so "fit" and "colour" could not be tapped. So
+ * it stands 8 px under whatever chrome its own x-range meets above the door's
+ * middle, and 8 px above the trust band at the stage's foot. The chrome is read
+ * off the page, never listed as numbers.
+ * ⚠ AND WHERE THE ROOM UNDER THE PRICE IS SHORT, THE GAPS GIVE (28.9, the
+ * same day the price moved beside it). In English and Russian the column and
+ * the price both stand LEFT of the door, and at 1100–1152 the price is in the
+ * column's own x-range: the room between it and the trust band measured
+ * 436–450 px against the column's 464, so the floor pulled the column back up
+ * UNDER the price (665 px² at 1100×800 in Russian on the half door). The
+ * eight gaps give first, then the two paddings, by exactly the shortfall.
+ * (A second placement after `paint` writes the figure was tried too, and
+ * measured to change nothing on a load or on a tap that took the figure from
+ * four digits to five: the stage's observer re-fits after the first paint,
+ * and the column is pushed by the price's FOOT, which a wider figure does not
+ * move. So it is not here.) Its height is `offsetHeight` — the layout box,
+ * which a transform cannot distort.
+ */
+function placeSteps() {
+  const col = document.querySelector('.stage-wrap > .steps');
+  const wrapEl = document.querySelector('.stage-wrap');
+  if (!col || !wrapEl) return;
+  const mid0 = parseFloat(wrapEl.style.getPropertyValue('--frame-mid'));
+  if (!Number.isFinite(mid0)) return;
+  const wrap = wrapEl.getBoundingClientRect();
+  const mid = wrap.y + mid0;
+  col.style.removeProperty('--steps-gap');
+  col.style.removeProperty('--steps-pad');
+  let H = col.offsetHeight;
+  const cx = col.getBoundingClientRect();
+  let top = mid - H / 2;
+  const inX = r => r.width && r.right > cx.left && r.left < cx.right;
+  for (const el of document.querySelectorAll('#quote, .stage__hud .hud__slot')) {
+    const r = el.getBoundingClientRect();
+    if (inX(r) && r.top < mid && r.bottom + 8 > top) top = r.bottom + 8;
+  }
+  const trust = document.querySelector('.trust');
+  const tr = trust && trust.getBoundingClientRect();
+  const floor = (tr && tr.height && tr.top > mid ? tr.top : wrap.bottom) - 8;
+  /* Short of room below what pushed it down: the eight gaps give first (to
+     2 px), then the two paddings (to 6) — by exactly the shortfall, and never
+     the 44 px targets. What is still short after that is pulled up, and the
+     audit names it. */
+  let short = top + H - floor;
+  if (short > 0) {
+    const g = Math.max(2, 6 - short / 8);
+    short -= (6 - g) * 8;
+    const pad = Math.max(6, 10 - Math.max(0, short) / 2);
+    col.style.setProperty('--steps-gap', `${g.toFixed(2)}px`);
+    col.style.setProperty('--steps-pad', `${pad.toFixed(2)}px`);
+    H = col.offsetHeight;
+  }
+  if (top + H > floor) top = floor - H;
+  wrapEl.style.setProperty('--steps-top', `${Math.round(top - wrap.y)}px`);
+}
+
 function fitStage() {
   /* Bare mode is the measurement harness (tools/frame.mjs, recreate.mjs and
      friends), and a harness wants the drawing's own frame: the door filling
@@ -3934,36 +4024,9 @@ function fitStage() {
     sw.setProperty('--hud-b', `${Math.round(hudB - wrap.y)}px`);
     placeBand();
 
-    /* ⚠ WHERE THE NAVIGATOR COLUMN STANDS (28.9), when it is on the photograph.
-       Centred on the door's mid-height, as asked — UNLESS that puts it under
-       the wall's other furniture on its side: measured the day it moved, the
-       price card at the door's head covered its top two marks in Hebrew at
-       1100 on every size (up to 5,246 px²) and at 1152 on the four larger
-       doors, so "fit" and "colour" could not be tapped. So it stands 8 px under
-       whatever chrome its own x-range meets above the door's middle, and 8 px
-       above the trust band at the stage's foot. The chrome is read off the
-       page, never listed as numbers: the price moves in the same round, and a
-       column that asked where the card USED to be would be wrong the day after.
-       Read after the variables above are set, so the card is already where
-       those put it. Its own height is `offsetHeight` — the layout box, which a
-       transform cannot distort. */
-    const col = document.querySelector('.stage-wrap > .steps');
-    if (col) {
-      const H = col.offsetHeight;
-      const cx = col.getBoundingClientRect();
-      const mid = (f.top + f.bottom) / 2;
-      let top = mid - H / 2;
-      const inX = r => r.width && r.right > cx.left && r.left < cx.right;
-      for (const el of document.querySelectorAll('#quote, .stage__hud .hud__slot')) {
-        const r = el.getBoundingClientRect();
-        if (inX(r) && r.top < mid && r.bottom + 8 > top) top = r.bottom + 8;
-      }
-      const trust = document.querySelector('.trust');
-      const tr = trust && trust.getBoundingClientRect();
-      const floor = (tr && tr.height && tr.top > mid ? tr.top : wrap.bottom) - 8;
-      if (top + H > floor) top = floor - H;
-      sw.setProperty('--steps-top', `${Math.round(top - wrap.y)}px`);
-    }
+    /* the navigator column, after the variables above so the price is already
+       where they put it (see `placeSteps`) */
+    placeSteps();
 
     const root = document.documentElement.style;
     root.setProperty('--stage-l', `${Math.round(wrap.x)}px`);
@@ -4073,6 +4136,7 @@ function fitStage() {
     }
     document.documentElement.style.setProperty(
       '--bd-room', `${Math.max(0, Math.round(clip - a.bottom))}px`);
+    placeBreakdown();
   }
 
   /* ⚠ AND HOW MUCH OF THE DESKTOP PANEL IS SPOKEN FOR, for the

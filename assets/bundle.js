@@ -10444,6 +10444,7 @@ ${plate.defs}${plate.body}
       const open = btn.getAttribute("aria-expanded") === "true";
       btn.setAttribute("aria-expanded", String(!open));
       box.hidden = open;
+      placeBreakdown();
     });
     $("#works-close").addEventListener("click", closeWorks);
     $("#confirm-yes").addEventListener("click", () => closeConfirm("yes"));
@@ -11733,6 +11734,53 @@ ${plate.defs}${plate.body}
     const w = band.offsetWidth;
     band.style.setProperty("--band-l", `${Math.round(Math.max(L2, Math.min(cx - w / 2, R - w)))}px`);
   }
+  function placeBreakdown() {
+    const box = $("#breakdown");
+    if (!box) return;
+    box.style.setProperty("--bd-shift", "0px");
+    const q = document.querySelector(".quote");
+    const wrap = document.querySelector(".stage-wrap");
+    if (box.hidden || !q || !wrap || getComputedStyle(q).position !== "absolute") return;
+    const a = box.parentElement.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+    const width = box.offsetWidth;
+    const left = a.left + a.width / 2 - width / 2;
+    const lo = Math.max(w.left, 0) + 8, hi = Math.min(w.right, window.innerWidth) - 8;
+    const d = left < lo ? lo - left : left + width > hi ? hi - (left + width) : 0;
+    if (d) box.style.setProperty("--bd-shift", `${Math.round(d)}px`);
+  }
+  function placeSteps() {
+    const col = document.querySelector(".stage-wrap > .steps");
+    const wrapEl = document.querySelector(".stage-wrap");
+    if (!col || !wrapEl) return;
+    const mid0 = parseFloat(wrapEl.style.getPropertyValue("--frame-mid"));
+    if (!Number.isFinite(mid0)) return;
+    const wrap = wrapEl.getBoundingClientRect();
+    const mid = wrap.y + mid0;
+    col.style.removeProperty("--steps-gap");
+    col.style.removeProperty("--steps-pad");
+    let H = col.offsetHeight;
+    const cx = col.getBoundingClientRect();
+    let top = mid - H / 2;
+    const inX = (r) => r.width && r.right > cx.left && r.left < cx.right;
+    for (const el of document.querySelectorAll("#quote, .stage__hud .hud__slot")) {
+      const r = el.getBoundingClientRect();
+      if (inX(r) && r.top < mid && r.bottom + 8 > top) top = r.bottom + 8;
+    }
+    const trust = document.querySelector(".trust");
+    const tr = trust && trust.getBoundingClientRect();
+    const floor = (tr && tr.height && tr.top > mid ? tr.top : wrap.bottom) - 8;
+    let short = top + H - floor;
+    if (short > 0) {
+      const g = Math.max(2, 6 - short / 8);
+      short -= (6 - g) * 8;
+      const pad = Math.max(6, 10 - Math.max(0, short) / 2);
+      col.style.setProperty("--steps-gap", `${g.toFixed(2)}px`);
+      col.style.setProperty("--steps-pad", `${pad.toFixed(2)}px`);
+      H = col.offsetHeight;
+    }
+    if (top + H > floor) top = floor - H;
+    wrapEl.style.setProperty("--steps-top", `${Math.round(top - wrap.y)}px`);
+  }
   function fitStage() {
     if (document.documentElement.classList.contains("is-bare")) return;
     const stage = $("#stage");
@@ -11812,23 +11860,7 @@ ${plate.defs}${plate.body}
       sw.setProperty("--frame-mid", `${Math.round((f.top + f.bottom) / 2 - wrap.y)}px`);
       sw.setProperty("--hud-b", `${Math.round(hudB - wrap.y)}px`);
       placeBand();
-      const col = document.querySelector(".stage-wrap > .steps");
-      if (col) {
-        const H = col.offsetHeight;
-        const cx = col.getBoundingClientRect();
-        const mid = (f.top + f.bottom) / 2;
-        let top = mid - H / 2;
-        const inX = (r) => r.width && r.right > cx.left && r.left < cx.right;
-        for (const el of document.querySelectorAll("#quote, .stage__hud .hud__slot")) {
-          const r = el.getBoundingClientRect();
-          if (inX(r) && r.top < mid && r.bottom + 8 > top) top = r.bottom + 8;
-        }
-        const trust = document.querySelector(".trust");
-        const tr = trust && trust.getBoundingClientRect();
-        const floor = (tr && tr.height && tr.top > mid ? tr.top : wrap.bottom) - 8;
-        if (top + H > floor) top = floor - H;
-        sw.setProperty("--steps-top", `${Math.round(top - wrap.y)}px`);
-      }
+      placeSteps();
       const root = document.documentElement.style;
       root.setProperty("--stage-l", `${Math.round(wrap.x)}px`);
       root.setProperty("--stage-w", `${Math.round(wrap.width)}px`);
@@ -11857,6 +11889,7 @@ ${plate.defs}${plate.body}
         "--bd-room",
         `${Math.max(0, Math.round(clip - a.bottom))}px`
       );
+      placeBreakdown();
     }
     const style = document.documentElement.style;
     const choose2 = document.querySelector(".panel--choose");

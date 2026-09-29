@@ -145,7 +145,10 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   language picker and undo/redo in the wall (circles on a screenshot, 28.8);
   the price card at the DOOR'S top-right corner (27.9, *"it looks bad under the
   lamp, move to near the door, at the up right corner"* — his own 28.8 circle
-  under the lamp, moved by him); the handing card taken off the summary (27.9,
+  under the lamp, moved by him) and then, a second time, off its card and LEFT
+  of the door (28.9, *"not on a white thing but directly on the image … to the
+  left of the door, between the door and the lamp, on the higher end"*); the
+  navigator onto the photograph and the band above the door (28.9); the handing card taken off the summary (27.9,
   *"remove the thing that says to change the direction of the door"* — the
   order keeps `handingWords()`); and they take things OUT as fast — the swing
   bar lock went in on 27.9 and out on 28.9 (*"remove the bar lock quickly"*). A placement they made is theirs: measure it and say what it
@@ -178,6 +181,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** The price on the photograph (4 of 10) — *"not on a white thing …
+  left of the door, between the door and the lamp, on the higher end"*: no
+  ground, figure 2.4 rem, the send a line of ink; `right` 8 px off the casing's
+  left edge, at its head. Ink ≥ 10.6:1 on the picture (gate 4.5, no wash).
+  "מחיר משוער" off the figure (bar 71.3 → 67.0 px). Picker top-RIGHT in every
+  language. In en/ru the column shares that wall: its gaps give (≥ 2 px). Long
+  form: `HISTORY.md`.
 - **28.9** The band on the photograph (3 of 10) — *"on the image and closer to
   the door"*: absolute, `placeBand` sets it 8 px over the casing in the span the
   wall's controls leave. `FIT_TRIM.top` 40 → −162, exactly the wall 1280×720
@@ -214,13 +224,6 @@ lines here. Dates are the day of the change.
   0 he, 0 ru, 1 en paragraph moves. `--mono` off four Hebrew captions (§9
   closed); Russian grille names hyphenate inside their tile (4 → 6 → 0 outside).
   Test 9,440,830 / 5 (sheets). Long form: `HISTORY.md`.
-- **28.9** The digital viewer drawn off the owner's son's photograph (*"make the
-  digital peephole look like this"*, `research/viewer/digital.png`): round black
-  face in a rounded-square bezel, lens, two lights, sensor ring, bell button; the
-  maker's badge left off. Face constant; size still 54 mm (no scale). 0 bare
-  sheets. Then its bezel stopped following the פרזול (*"remove the pirzul effect
-  from them"*, then *"…from the regular peephole too"*): both viewers `#lockUnit`,
-  out of the פרזול tile and its copy; the test sweeps both.
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -284,12 +287,22 @@ undo/redo are 52 px and a floppy-disk save stands beside them (`#save-hud`,
 the summary's own `saveCurrent`).
 
 - **`.quote` — the price and a quiet send — moves with the viewport:** on a
-  desktop at the DOOR'S top-right corner (27.9, the owner's son: *"it looks bad
-  under the lamp, move to near the door, at the up right corner"* — his own
-  28.8 circle under the lamp, moved by him): 8 px outside the casing, level
-  with its head or under the wall chrome, physically right in every language
-  (the drawing does not mirror); a bar at the foot of a phone (at 390 px there
-  are ~140 px of wall and a pill there lands on the door). `fitStage` reads the
+  desktop ON THE PHOTOGRAPH, LEFT of the door, high (28.9, the owner's son:
+  *"The price bigger and not on a white thing but directly on the image …
+  Move the WhatsApp button with the price to the left of the door, between the
+  door and the lamp, on the higher end"* — it was a card at the door's
+  top-right corner from 27.9, under the lamp before; all his placements): no
+  ground, the figure in `--display` at 2.4 rem, the send under it as a line of
+  ink with the mark; its right edge 8 px outside the casing's LEFT edge, level
+  with the head or under the wall chrome, physically left in every language
+  (the drawing does not mirror). The ink on the picture measures ≥ 10.6:1
+  against the darkest 5 % under it at every desktop width (gate 4.5; no wash).
+  Its breakdown hangs centred on the figure, held inside the stage where the
+  wall is narrow (`placeBreakdown`). "מחיר משוער" is off the figure everywhere
+  (the A4 sheet keeps it). The LANGUAGE PICKER stands top-RIGHT in every
+  language since the same day (a left-to-right row runs reversed), so the two
+  never share a corner. A bar at the foot of a phone (at 390 px there are ~140
+  px of wall and a pill there lands on the door). `fitStage` reads the
   frame's SETTLED geometry (`getBBox` through the screen matrix), because
   `#frame`'s own entrance is a 6 px translate.
   **The price is stated once**; the SEND is stated twice (the quiet one and
@@ -299,10 +312,10 @@ the summary's own `saveCurrent`).
   back and next *"moved to the bottom of the page and be seen at all times"*,
   the send *"just send to save space"*): price · "שלחו" · two 44 px icon
   arrows (`.quote__nav`, the word in `aria-label`/`title` from `markSteps`);
-  below 1100 no step shows its `.sect__foot`. The bar's height is unchanged
-  (67.0 px under 360, 71.3 above — `--quote-h` feeds every fold check), a
-  disabled arrow keeps its box, and below 1100 the CAPTION yields
-  (`minmax(min-content, 1fr)` floors the box at the figure), never the send.
+  below 1100 no step shows its `.sect__foot`. The bar is 67.0 px at every
+  width since its caption went (28.9; it was 71.3 above 360 — `--quote-h`
+  feeds every fold check), a disabled arrow keeps its box, and the price's box
+  is floored at the figure (`minmax(min-content, 1fr)`), never the send.
 - **The band above the door** (27.9, *"above the door the name of the section
   we are at, big — moved from the panel … the name of the thing now
   selected"*): `.stage__band`, the live step's title and `nowLabel` of its first
@@ -845,8 +858,10 @@ for the same half of the leaf and `repair` trades between them.
   under its own ink strip). Absolute, 12 px off the stage's panel-facing edge,
   its own ink and `--r-card`, 464 px tall; centred on the door's mid-height
   unless the wall chrome on its side reaches below that, then 8 px under it,
-  never below the trust band (`--steps-top`, computed in `fitStage` off the
-  live rects). The panel is one column again with `scrollbar-gutter: stable`
+  never below the trust band (`--steps-top`, computed by `placeSteps` off the
+  live rects — in English and Russian the price stands on the same wall, and
+  where the room under it is short the column's gaps tighten, never its
+  targets). The panel is one column again with `scrollbar-gutter: stable`
   (the "scroll wheel" was the panel's scrollbar down the old column). Appended
   last in the wrap, so Tab still reaches the steps before the options.
   Measured: on no door, arrow or wall control at any size, 1100–1920, both
@@ -1371,9 +1386,12 @@ are not in `VIEWS`:
 - **the price** — the FIGURE's own box hit-tested against the send and the way
   on, in three languages at 320/360/375/390/834 (*"intersects the viewport"* is
   not *readable*: it read green while ₪3,195 sat under the green pill on every
-  Russian phone); the breakdown readable to its total; the card at the door's
-  head corner (27.9), inside the picture, never on `#frame`, its breakdown
-  centred on it; the פרזול tiles redrawn when the lock furniture changes.
+  Russian phone); the breakdown readable to its total; on a desktop the price
+  on the photograph left of the door (28.9), on no ground, inside the picture,
+  never on `#frame`, under no picker, arrow, column or band, its ink ≥ 4.5:1
+  on the picture under it, its breakdown centred on the figure or held inside
+  the stage (named); the picker top-right in all three languages; the פרזול
+  tiles redrawn when the lock furniture changes.
 - **repairs** — a real repair at every viewport, every sentence on screen, its
   box covering no option; an undo that moves the price names a spec row; a tap
   that would take something away asks first (the Coral against a bar and a
@@ -1652,19 +1670,22 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   photograph and the crop gave 202 units more wall above the door, so every
   door stands lower under the top row and `half` cleared). Ink on `#frame` on
   `extra2`, `halfextra1`, `halfextra2` — worst px² of glyph he/ru, 28.9:
-  extra2 57/0, halfextra1 35/0, halfextra2 261/90 (they were 81/0, 194/74,
-  494/466); the two arrows beside the door are measured with the rest. Gated
+  extra2 57/0, halfextra1 35/0, halfextra2 261/70 (they were 81/0, 194/74,
+  494/466; the Russian 90 → 70 when the picker moved to the right and the save
+  was kept outermost); the two arrows beside the door are measured with the rest. Gated
   for `standard`, `extra1` and `half` everywhere and every door ≥ 1152 px with
   NO named reading since 28.9 (the widest double at 1152×800 read 17/18 px² on
   commit 1b and 0 once the crop moved).
 - **Two controls pinned by rules that mirror differently stand in opposite walls
   in one language and the same wall in another** — the mechanism behind a
   closed fault (the removed grip controls under the price card in Hebrew only).
-  Check it for anything put in the wall next. At 1100–1152 px the wall right
-  of the widest door is 121–147 px: the price card (111–142 px since the send
-  became one word) stands against the casing there since 27.9 — at the door's
-  head corner, never on the door by construction — and the stage's edge cuts
-  it where the wall is narrower than the card. Nothing else fits there.
+  Check it for anything put in the wall next. Since 28.9 both the picker and
+  the price are pinned PHYSICALLY (the picker top-right, the price left of the
+  door), so neither changes walls with the language; the navigator column is
+  the one thing that still does (it faces the panel), and in English and
+  Russian it shares the left wall with the price — at 1100–1152 it stands in
+  the price's x-range and its gaps tighten to fit under it (`placeSteps`, 6 →
+  2.5 px at the worst; the 44 px targets never shrink).
 - **The phone's Back button leaves the guide** (12.9): the whole walk is one
   history entry. The obvious fix — `pushState` per step — was built and
   **thrown away**: the in-page back button then grows the stack and system Back
@@ -1688,8 +1709,10 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   carried was stale: it read 10 at the commit before the move.) Re-measured at
   the end of the round (27.9), after the band above the door moved the frame:
   the same five figures, and the same with the swing bar lock's row added (a
-  fourteen-row door — the window, not the column, is the limit). Raising the
-  46vh cap where the room allows, or two columns, is unmeasured.
+  fourteen-row door — the window, not the column, is the limit). And again
+  on 28.9, when the price moved left of the door: 10 / 10 / 11 / 12 / 13,
+  unchanged. Raising the 46vh cap where the room allows, or two columns, is
+  unmeasured.
 - **A short-and-wide screen shows the question and little answer** (13.9): a
   phone on its side (844×390) and a laptop at 200% zoom (640×360) leave 75–92 px
   under the fixed furniture. Since 27.9 the question is always on screen (the

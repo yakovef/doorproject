@@ -1481,6 +1481,22 @@ svg { direction: ltr; }
   padding-block-start: 6px;
   pointer-events: none;
 }
+/* ⚠ THE LANGUAGE PICKER STANDS TOP-RIGHT IN EVERY LANGUAGE — 28.9.2026. It is
+   the row's START slot, and a row starts on the right in Hebrew and on the
+   left in English and Russian, so the picker changed walls with the language
+   — and since the price moved to the LEFT of the door (physically, it is
+   pinned to the drawing), in English and Russian the two would have stood in
+   one corner. A left-to-right row runs the other way here, so the picker is
+   on the physical right whatever the page's direction, and the undo and save
+   on the left (§9's note on two controls pinned by rules that mirror
+   differently is why this is stated rather than left to the direction). */
+html:not([dir="rtl"]) .stage__hud { flex-direction: row-reverse; }
+/* …and the slot the price now shares a wall with keeps the SAVE outermost, as
+   Hebrew always had it: in Russian at 320 px, with the slot on the left and its
+   own row running left-to-right, the save became the innermost of the three and
+   put 263 px² of its glyph on the door (measured by the audit's wall-ink check
+   the day the picker moved). */
+html:not([dir="rtl"]) .hud__slot--end { flex-direction: row-reverse; }
 /* ⚠ EACH SLOT CARRIES ITS OWN GROUND. The wall is nearly the same colour as
    the paper, so on a wide screen these three read as if they were painted on
    it — which is what was drawn. On a 390 px phone the door is tall and the
@@ -1617,10 +1633,10 @@ svg { direction: ltr; }
   justify-items: start;
   min-inline-size: 0;
 }
-.quote__price .send__label {
-  font-size: .64rem; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--ink-2); line-height: 1.2;
-}
+/* ⚠ THE CAPTION OVER THE FIGURE ("מחיר משוער") WENT ON 28.9.2026 — the
+   owner's son: *"Remove the 'מחיר משוער' text above the price."* Its rules
+   went with it (a rule for a class nothing emits reads as load-bearing); the
+   A4 sheet keeps the words in its own fine print. */
 /* ⚠ 44 px, LIKE EVERYTHING ELSE THAT CAN BE TAPPED, and 44 px WIDE as well as
    tall. An earlier version let this shrink to `min-inline-size: 0` and the
    figure still rendered — text overflow is visible by default — so it LOOKED
@@ -1769,45 +1785,52 @@ html[dir="rtl"] .quote__back .quote__chev { transform: none; }
    the screen with the least of it. */
 @media (max-width: 359px) {
   .quote { padding-inline: 10px; gap: 8px; }
-  .quote__price .send__label { display: none; }
   .quote__price .send__figure { font-size: 1.25rem; }
   .quote__send { padding: 0 11px; font-size: .8rem; }
 }
 
-/* ── ≥1100 px · THE BAR GOES BACK ON THE WALL, AT THE DOOR'S CORNER ──
-   ⚠ MOVED 27.9.2026 — the owner's son: *"move the pricing to another place
-   that is better, it looks bad under the lamp, move to near the door, at the
-   up right corner."* It hung under the right-hand lamp since 28.8, when the
-   same person drew a circle there (*"on the right side below the lamps"*); he
-   is the one moving it. Chosen in chat: the top-right corner of the DOOR, on
-   the wall outside the frame's head, below the language buttons.
-   `--frame-top`, `--frame-right` and `--hud-b` are published by `fitStage`
-   off `#frame`'s own box and the chrome's — a percentage of the stage would
-   be the wrong instrument, as it was for the lamp. 8 px outside the casing,
-   the gap the lamp clamp kept; level with the head, or 8 px under the chrome
-   where the head stands higher than the chrome's foot (the tall doubles).
-   `left`, not `inset-inline-start`, and no translate: this is pinned to a
-   feature of the DRAWING, and the drawing does not mirror when the interface
-   does. `--lamp-*` is still published; nothing here reads it. */
+/* ── ≥1100 px · THE PRICE AND THE SEND STAND ON THE PHOTOGRAPH, LEFT OF THE
+   DOOR, HIGH ────────────────────────────────────────────────────────────
+   ⚠ MOVED 28.9.2026 — the owner's son: *"The price bigger and not on a white
+   thing but directly on the image … Move the WhatsApp button with the price to
+   the left of the door, between the door and the lamp, on the higher end."*
+   It was a paper card at the door's top-right corner (27.9, his *"move to near
+   the door, at the up right corner"*) and under the right-hand lamp before
+   that (28.8, his circle) — every placement his, and he is the one moving it.
+   So: NO GROUND. No card, no border, no shadow; the figure in `--display` at
+   2.4 rem, and the send under it as a line of ink with the WhatsApp mark.
+   Anchored PHYSICALLY, like everything pinned to the drawing (§0c — the
+   drawing does not mirror): its right edge 8 px outside the casing's LEFT edge
+   (`--frame-left`, published by `fitStage` off the frame's settled box), its
+   top level with the casing's head (`--frame-top`) or 8 px under the wall's
+   chrome where that reaches lower (`--hud-b`, the tall doubles). The text is
+   set toward the door — flush right in every language.
+   ⚠ INK ON A PHOTOGRAPH IS A CONTRAST QUESTION, and it was measured, not
+   assumed: `npm run audit` samples the picture under the figure's box and the
+   send's with the element hidden and holds the darkest of it to 4.5:1 against
+   `--ink` at every desktop viewport. The wall there is the lamp-lit plaster
+   left of the door (see the audit for the readings); no wash was needed. */
 @media (min-width: 1100px) {
   .quote {
     position: absolute;
     inset-block-start: max(var(--frame-top, 12%), calc(var(--hud-b, 0px) + 8px));
     inset-block-end: auto;
     inset-inline: auto;
-    left: calc(var(--frame-right, 62%) + 8px);
+    right: calc(100% - var(--frame-left, 38%) + 8px);
     transform: none;
-    flex-direction: column; align-items: center; gap: 7px;
-    padding: 5px 16px 9px;
-    background: var(--paper);
+    flex-direction: column; align-items: flex-end; gap: 0;
+    padding: 0;
+    background: none;
     --surface: var(--paper);
-    border: 0;
-    border-radius: var(--r-card, 16px);
-    box-shadow: 0 1px 2px rgb(0 0 0 / .05);
+    border: 0; border-radius: 0; box-shadow: none;
+    text-align: right;
   }
-  .quote__price { justify-items: center; }
-  .quote__price .send__label { font-size: .66rem; letter-spacing: .16em; }
-  .quote__price .send__figure { font-size: 1.9rem; }
+  /* The column's cross axis follows the writing direction, and the door is on
+     the right in every language — so in Hebrew "flush right" is the START. */
+  html[dir="rtl"] .quote { align-items: flex-start; }
+  .quote__price { justify-items: end; }
+  html[dir="rtl"] .quote__price { justify-items: start; }
+  .quote__price .send__figure { font-size: 2.4rem; line-height: 1; color: var(--ink); }
   /* Back the right way up: there is a whole wall below it here.
      ⚠ AND "A WHOLE WALL" WAS NOT MEASURED, AND ON HALF THE DESKTOP SHAPES IT
      IS NOT THERE — 13.9.2026. `46vh` is a guess at the room under the chip;
@@ -1816,45 +1839,42 @@ html[dir="rtl"] .quote__back .quote__chev { transform: none; }
      else, the column ran 25 px past the foot of the window and took the
      `סה״כ` row with it — and above 1100 `body` is `100dvh; overflow: hidden`,
      so that row was not below the fold, it was unreachable by any gesture.
-     Four of six desktop shapes, two of them audit viewports.
      `--bd-gap` is the margin, said ONCE and subtracted where it is applied.
      The `max()` is a floor: a screen too short to hold four rows under the
-     chip gets a small overhang rather than a popover of zero height, which
-     would be the same fault wearing the fix's clothes. Measured: the tightest
-     shape tried is a 1280x600 window at 165 px of room, so nothing reaches the
-     floor today — it is there for a window nobody has yet dragged that small.
-     ⚠ AND THE COLUMN IS SHORTER FOR THIS, WHICH IS THE HONEST TRADE AND IS
-     RECORDED RATHER THAN FUDGED. A twelve-row door at 1280x720 gets 198 px of
-     column — about five rows and the pinned total — where it used to get 414
-     px of which the last five rows could not be reached at all. Everything is
-     now reachable; less of it is on screen at once. CLAUDE.md §9 carries the
-     residual and what would actually close it, which is a question about where
-     the chip stands rather than a number to nudge. */
+     price gets a small overhang rather than a popover of zero height.
+     ⚠ It hangs off `.quote__price`, whose box is the FIGURE's since the
+     caption went (28.9), so `left: 50%` centres it on the figure. And where
+     the wall left of a wide door is narrower than half the breakdown, the
+     stage's edge would cut it: `placeBreakdown` (js/app.js) moves it inboard
+     by exactly that much (`--bd-shift`), and the audit names every reading
+     where it did. */
   .quote .bd {
     --bd-gap: 8px;
     inset-block-end: auto; inset-block-start: 100%;
-    /* ⚠ `left`, NOT `inset-inline-start`, AND IT HAS BEEN WRONG IN HEBREW
-       SINCE THE WALL PLACEMENT SHIPPED — 14.9.2026. A LOGICAL inset with a
+    /* ⚠ `left`, NOT `inset-inline-start` — 14.9.2026. A LOGICAL inset with a
        PHYSICAL transform does not centre anything: in RTL `inset-inline-start`
-       resolves to `right`, so the popover's right edge landed half the CARD's
-       width in from the card's right and `translateX(-50%)` then moved it half
-       the POPOVER's width further left again. Measured at 1440×900: in English
-       and Russian the two centres agree to 0.0 px; in Hebrew the popover's
-       centre sat **145.6 px** — its own half-width — to the left of the card's,
-       which on this page is straight onto the door. `left: 50%` is measured
-       from `.quote`'s own left edge in both directions, so the pair centres in
-       both. §0c's rule one box further in: the interface mirrors, and a
-       transform does not mirror with it. */
-    inset-inline: auto; left: 50%; transform: translateX(-50%);
+       resolves to `right`, and the popover sat its own half-width off its
+       anchor (145.6 px at 1440×900, straight onto the door). `left: 50%` is
+       measured from the anchor's left edge in both directions. */
+    inset-inline: auto; left: 50%;
+    transform: translateX(calc(-50% + var(--bd-shift, 0px)));
     margin-block-end: 0; margin-block-start: var(--bd-gap);
     max-block-size: max(132px, min(46vh, calc(var(--bd-room, 100vh) - var(--bd-gap) - 12px)));
+    text-align: start;
   }
-  /* ⚠ 44 px HERE TOO. The first draft said 36 — small enough to sit quietly
-     under the price on a wall with room to spare — and `npm run audit` failed
-     it at all four desktop viewports within a minute: `quote__send 136x36`.
-     The floor is a floor, and it does not soften because the control is meant
-     to be quiet. Quiet is a matter of colour and weight, not of size. */
-  .quote__send { font-size: .8rem; min-block-size: 44px; padding: 0 14px; }
+  /* ⚠ A LINE OF INK, NOT A PILL — and still 44 px tall: the floor is a floor,
+     and quiet is a matter of colour and weight, not of size (the first draft
+     of the card said 36 and the audit failed it within a minute). The mark is
+     ink too: the WhatsApp green on lamp-lit plaster is under 2:1, and the word
+     beside it says where it goes. The one green button is still the summary's. */
+  .quote__send {
+    min-block-size: 44px; padding: 0; gap: 6px;
+    background: none; color: var(--ink); box-shadow: none; border: 0;
+    border-radius: 0;
+    font-size: .95rem; font-weight: 600;
+    text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px;
+  }
+  .quote__send:hover { filter: none; text-decoration-thickness: 2px; }
 }
 
 /* ⚠ `.grip-bar`, `.grip-live`, `.grip-bad` AND THE FOCUS RING STOOD HERE —
@@ -3623,35 +3643,20 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    is untouched. */
 @media (max-width: 1099px) { .sect__foot { display: none; } }
 
-/* ⚠ AND BELOW 1100 THE CAPTION YIELDS, NOT THE SEND — 27.9.2026. The 11.9
-   note on `.quote__price` said its grid "stops the CAPTION setting the box's
-   width"; measured, it did not: in Russian "ОРИЕНТИРОВОЧНАЯ ЦЕНА" is 152 px
-   and the box was 152 wide at every width (81 in Hebrew, 103 in English), so
-   at 360-390 the send — "Отправить", 120 px natural, one word now on the
-   owner's son's instruction — was cut to "Отправ…".
-   ⚠ AND THE FLOOR IS REAL, WHICH THE FIRST VERSION'S WAS NOT. It said "never
-   below its min-content, which is the figure"; falsified with a worded back
-   beside a worded next, the box went to 13.6 px under a 57.8 px figure,
-   because a `minmax(0, 1fr)` column has no minimum. Now the column's minimum
-   IS the figure (`minmax(min-content, 1fr)`: the caption may break anywhere,
-   so its own minimum is a letter, and it is clamped to one line with an
-   ellipsis), the box shrinks only down to that, and the one-word send keeps
-   its width. Where even that does not fit the row overflows the bar, which
-   the audit asserts against. Measured in he, en and ru at 320/360/375/390/834,
-   the standard door and an ₪18,085 one: nothing cut but the Russian caption
-   between 360 and about 480 px, the bar 67.0 and 71.3 px as before. The
-   caption still goes below 360 (the rule above). After the base rules (§8). */
+/* ⚠ BELOW 1100 THE PRICE'S BOX IS THE FIGURE, AND IT DOES NOT YIELD — 27.9,
+   restated 28.9.2026. On 27.9 the CAPTION yielded here ("ОРИЕНТИРОВОЧНАЯ ЦЕНА"
+   was 152 px and set the box's width at every width, cutting the one-word send
+   to "Отправ…" at 360-390); the caption itself went on 28.9 (*"Remove the
+   'מחיר משוער' text above the price"*), so what is left of the rule is its
+   floor: the column's minimum IS the figure (`minmax(min-content, 1fr)` — a
+   bare `minmax(0, 1fr)` let the box go to 13.6 px under a 57.8 px figure when
+   it was falsified), and the one-word send keeps its width. Where even that
+   does not fit, the row overflows the bar, which the audit asserts against.
+   After the base rules (§8). */
 @media (max-width: 1099px) {
   .quote__price { flex: 0 1 auto; min-inline-size: min-content;
                   grid-template-columns: minmax(min-content, 1fr); }
   .quote__send { flex-shrink: 0; }
-}
-@media (min-width: 360px) and (max-width: 1099px) {
-  .quote__price .send__label {
-    justify-self: stretch; min-inline-size: 0;
-    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1;
-    overflow: hidden; overflow-wrap: anywhere; white-space: normal;
-  }
 }
 
 /* ⚠ AND ON A DESKTOP THE FOOT IS PINNED TO THE BOTTOM OF THE CARD, because it
@@ -3796,8 +3801,14 @@ html.is-live.is-untouched .wa__ask { display: inline; }
        (see `--steps-top` there). Before the first fit, centred on the stage. */
     inset-block-start: var(--steps-top, calc(50% - 232px));
     z-index: 4;
-    flex-direction: column; align-items: center; gap: 6px;
-    margin: 0; padding: 10px 6px;
+    /* ⚠ THE GAPS GIVE, NEVER THE TARGETS — 28.9, with the price's move. In
+       English and Russian at 1100–1152 the price stands in the column's own
+       x-range and the room between it and the trust band is 436–450 px against
+       the column's 464; `placeSteps` then tightens these two lengths (6 → no
+       less than 2, 10 → no less than 6) by exactly the shortfall. Nine 44 px
+       targets stay nine 44 px targets. */
+    flex-direction: column; align-items: center; gap: var(--steps-gap, 6px);
+    margin: 0; padding: var(--steps-pad, 10px) 6px;
     inline-size: 56px;
     background: var(--ink);
     border: 0; border-radius: var(--r-card);

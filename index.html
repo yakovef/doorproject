@@ -13,7 +13,7 @@
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=6298d3e5">
+<link rel="stylesheet" href="css/app.css?v=d772f34b">
 
 <!-- ⚠ THE PHOTOGRAPHED ROOM, IN TWO CROPS, AND ONLY ONE IS EVER FETCHED.
      The owner supplied the same entrance framed 3:4 and 16:9 and both ship:
@@ -447,8 +447,12 @@
 
     <!-- ── THE QUOTE BAR — what it costs, and how to send it ──────────────
          ⚠ ONE ELEMENT, TWO PLACEMENTS, AND STILL EXACTLY ONE PRICE. Above
-         1100 px it stands in the wall under the right-hand lamp, which is
-         where the owner's son drew a circle and asked for the price to go.
+         1100 px it stands on the photograph LEFT of the door, high, between
+         the casing and the lamp (28.9 — the owner's son: "Move the WhatsApp
+         button with the price to the left of the door, between the door and
+         the lamp, on the higher end"; it was a card at the door's top-right
+         corner from 27.9, and under the right-hand lamp before that — both
+         his placements, and he is the one moving it).
          Below 1100 px it is a slim bar pinned to the foot of the screen,
          because the wall on a 390 px phone is ~140 px of plaster and the pill
          landed ON the leaf — measured, and at 320 px it landed on it every
@@ -471,9 +475,13 @@
          one. Its href is the same "the page did not load for me" message the
          send card rests on, and `paint()` upgrades BOTH the moment there is a
          real door — one writer over `[data-wa]`, never an id. -->
+    <!-- ⚠ NO CAPTION OVER THE FIGURE SINCE 28.9.2026 — the owner's son: "Remove
+         the 'מחיר משוער' text above the price." The key `price.est` stays in
+         copy.js: the A4 sheet's fine print still says what the figure is.
+         And above 1100 this whole element stands ON THE PHOTOGRAPH, left of the
+         door, high, with no card under it (css/app.css, `.quote`). -->
     <div class="quote" id="quote">
       <div class="quote__price">
-        <span class="send__label" data-t="price.est">מחיר משוער</span>
         <button class="send__toggle" id="price-toggle" type="button"
                 aria-expanded="false" aria-controls="breakdown">
           <strong class="send__figure" id="price" data-price>—</strong>
@@ -773,7 +781,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=ad5f71eb"></script>
+<script src="assets/bundle.js?v=67564341"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

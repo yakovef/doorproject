@@ -3453,13 +3453,13 @@ for (const v of VIEWS) {
        CLAUDE.md §5.10 wearing a test. */
     if (!r.qFixed) {
       if (r.qTop < r.boxT - 1 || r.qBot > r.boxB + 1) {
-        fault(v.name, `the price card is outside the stage (${Math.round(r.boxT - r.qTop)} px above `
-          + 'its top) — it is anchored to the door\'s head (27.9; it was a lamp) and the anchor left the picture');
+        fault(v.name, `the price is outside the stage (${Math.round(r.boxT - r.qTop)} px above `
+          + 'its top) — it is anchored to the door\'s head (left of it since 28.9; the right corner 27.9, a lamp before) and the anchor left the picture');
       }
       if (!r.hudCount) {
         fault(v.name, 'no .hud__slot on the wall — the overlap check has nothing to compare against');
       } else if (r.hudOverlap > 0) {
-        fault(v.name, `the price card covers ${r.hudOverlap} px² of the wall chrome `
+        fault(v.name, `the price covers ${r.hudOverlap} px² of the wall chrome `
           + '(the language buttons, or undo/redo)');
       }
     }
@@ -6579,18 +6579,33 @@ for (const v of VIEWS) {
   }
 }
 
-/* ── THE PRICE CARD STAYS INSIDE THE PICTURE IT IS PINNED TO ─────────────
-   ⚠ RESTATED 27.9.2026 FOR A NEW ANCHOR, SAME SUBJECT. The card hung under the
-   right-hand lamp (below); the owner's son moved it — *"it looks bad under the
-   lamp, move to near the door, at the up right corner"* — to the door's head
-   corner: `left: calc(var(--frame-right) + 8px)`, `top: max(var(--frame-top),
-   var(--hud-b) + 8px)`, no translate. The three clauses below keep their
-   subject (whole where the wall holds it; never on the leaf; the breakdown
-   centred on it) and a FOURTH asserts the anchor itself, because a card
-   quietly drifting back to the lamp would pass the other three. Every reading
-   now waits for the page's finite animations first: `#frame`'s own arrival is
-   a 6 px translate, and a card placed during it was placed by it (§7 — the
-   page reads the frame's settled geometry for exactly that reason).
+/* ── THE PRICE STANDS ON THE PHOTOGRAPH, LEFT OF THE DOOR, AND ON NOTHING ──
+   ⚠ RESTATED 28.9.2026 FOR A THIRD ANCHOR, SAME SUBJECTS. The owner's son:
+   *"The price bigger and not on a white thing but directly on the image …
+   Move the WhatsApp button with the price to the left of the door, between the
+   door and the lamp, on the higher end."* It was a paper card at the door's
+   top-right corner (27.9) and under the right-hand lamp before that (28.8).
+   Now there is no card: the figure and a line of ink under it, anchored
+   PHYSICALLY — `right` 8 px outside the casing's LEFT edge, `top` at the
+   casing's head or 8 px under the wall chrome. The clauses keep their subject
+   and are asked of the new anchor:
+     1 whole where the wall can hold it — the wall is the LEFT one now;
+     2 never on the door, at any reading (ungated, §5.22);
+     3 its breakdown centred on the FIGURE (its anchor since the caption went),
+       or moved inboard by exactly what keeps it 8 px inside the stage — every
+       such reading is NAMED in the summary line, and a shift that is not the
+       clamp is a fault;
+     4 the anchor itself, so a price drifting back to the right would fail;
+   and three are new:
+     5 never under the picker, an arrow, the navigator column or the band;
+     6 READABLE ON THE PICTURE: with its ink made transparent, the photograph
+       under the figure's box and the send's is sampled and its darkest 5 %
+       held to 4.5:1 against `--ink` — at every reading of the standard door
+       (the picture behind the price does not change with the door's size,
+       only its position does, and the sizes are swept for placement);
+     7 the language picker stands at the stage's physical top-RIGHT in all
+       three languages (the price took the left; in English and Russian the
+       picker was there).
 
    Measured 14.9 by walking as the customer who has a QUESTION halfway through
    — the one who taps the quiet send from a question step rather than the green
@@ -6653,17 +6668,15 @@ try {
   const SHAPES = [[1100, 800], [1152, 800], [1200, 800], [1280, 720], [1366, 768],
                   [1440, 900], [1536, 864], [1680, 950], [1920, 918]];
   const GAP = 8;                 // the same 8 px the vertical clamp keeps
-  /* The readings where the card stands on the door and that is known. EMPTY
-     since 27.9.2026: there were four (en 1100x800 halfextra2, ru 1100x800
-     halfextra1 and halfextra2, ru 1152x800 halfextra2), 1-22 px onto the leaf
-     with a 184-207 px card. The phone's send became "Send" (7b9dc43) and the
-     card is 113-142 px there now, 0 px on the door on all four — measured on
-     that commit alone, before the icon commit on top of it. The clause below
-     now fires for EVERY reading; the set stays so a future known overlap has a
-     place to be named, and the stale-exemption check still walks it. */
+  /* The readings where the price stands on the door and that is known — empty
+     since 27.9 (the four there were went with the one-word send); kept so a
+     future known overlap has a place to be named. */
   const ON_DOOR_OK = new Set();
   const stillOverlapping = new Set();
-  let room = 0, tight = [], measured = 0, popovers = 0, anchored = 0;
+  const rel = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+  const INK = 0.2126 * rel(0x1C) + 0.7152 * rel(0x1A) + 0.0722 * rel(0x17);   // --ink
+  let room = 0, tight = [], measured = 0, popovers = 0, anchored = 0, contrasts = 0, lowest = 99, lowestAt = '';
+  const shifted = [];
   const p = await b.newPage();
   for (const lang of ['he', 'en', 'ru']) {
     for (const [w, h] of SHAPES) {
@@ -6681,79 +6694,105 @@ try {
             .filter(a => a.effect && a.effect.getComputedTiming().iterations !== Infinity);
           await Promise.race([Promise.all(finite.map(a => a.finished.catch(() => {}))),
             new Promise(res => setTimeout(res, 3000))]);
-          const r = q.getBoundingClientRect(), rw = wrap.getBoundingClientRect();
-          const f = fr.getBoundingClientRect();
+          const R = e => { const r = e.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height }; };
+          const r = R(q), rw = R(wrap), f = R(fr), st = R(document.querySelector('#stage'));
           const hudB = Math.max(0, ...[...document.querySelectorAll('.stage__hud .hud__slot')]
             .map(e => e.getBoundingClientRect().bottom));
-          /* the box that actually PAINTS the card: its clipping ancestor, itself
-             inside the window. Above 1100 the page cannot scroll, so anything
-             outside this is gone rather than reachable. */
+          const ov = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
+          const under = [...document.querySelectorAll('.stage__hud .hud__slot, .stage__arrow, .stage-wrap > .steps, .stage__band')]
+            .filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden')
+            .map(e => [e.id || e.className.split(' ')[0], ov(r, R(e))]).filter(x => x[1]);
+          const langs = document.querySelector('#langs');
+          const lr = langs ? R(langs) : null;
+          /* the box that actually PAINTS the price: its clipping ancestor,
+             itself inside the window. Above 1100 the page cannot scroll. */
           const vis = { l: Math.max(rw.left, 0), r: Math.min(rw.right, innerWidth) };
-          const mid = (f.left + f.right) / 2;
-          const wall = (r.left + r.right) / 2 > mid
-            ? vis.r - f.right : f.left - vis.l;
           return {
+            pos: getComputedStyle(q).position,
+            ground: getComputedStyle(q).backgroundColor,
             card: Math.round(r.width),
-            wall: Math.round(wall),
+            wall: Math.round(f.left - vis.l),
             cut: Math.round(Math.max(0, r.right - vis.r) + Math.max(0, vis.l - r.left)),
-            onDoor: Math.round(Math.max(0, Math.min(r.right, f.right) - Math.max(r.left, f.left))),
-            /* the anchor: 8 px outside the casing's right edge, level with its
+            onDoor: ov(r, f),
+            /* the anchor: 8 px outside the casing's LEFT edge, level with its
                head or 8 px under the wall chrome, whichever is lower */
-            dx: Math.round((r.left - (f.right + 8)) * 10) / 10,
+            dx: Math.round((r.right - (f.left - 8)) * 10) / 10,
             dy: Math.round((r.top - Math.max(f.top, hudB + 8)) * 10) / 10,
-            hudClear: Math.round(r.top - hudB),
+            under,
+            picker: lr ? { right: Math.round(st.right - lr.right), left: Math.round(lr.left - st.left) } : null,
+            fig: R(q.querySelector('.send__figure')), send: R(q.querySelector('.quote__send')),
           };
         });
         const tag = `${lang} ${w}x${h} ${size}`;
-        if (!m) { fault('quote-wall', `${tag}: no price card, stage wrap or #frame on the `
+        if (!m) { fault('quote-wall', `${tag}: no price, stage wrap or #frame on the `
           + 'page — this sweep has no subject'); continue; }
         measured++;
-        /* 1 — where there is room, the card must be whole */
+        if (m.pos !== 'absolute') fault('quote-wall', `${tag}: the price is ${m.pos} — it is not on the wall`);
+        if (!/rgba\(0, 0, 0, 0\)|transparent/.test(m.ground)) fault('quote-wall', `${tag}: the price stands on a ground (${m.ground}) — "not on a white thing but directly on the image"`);
+        /* 1 — where there is room, the price must be whole */
         if (m.wall >= m.card + 2 * GAP) {
           room++;
           if (m.cut > 0) {
-            fault('quote-wall', `${tag}: ${m.cut} px of the price card is cut off by the edge `
-              + `of the stage, in a wall ${m.wall} px wide holding a ${m.card} px card. The `
-              + 'card is pinned to the lamp and nothing holds it inside the picture');
+            fault('quote-wall', `${tag}: ${m.cut} px of the price is cut off by the edge `
+              + `of the stage, in a wall ${m.wall} px wide holding a ${m.card} px price`);
           }
         } else if (m.cut > 0) {
           tight.push(`${tag} ${m.cut}px`);
         }
-        /* 4 — and it stands at the door's head corner, not under the lamp */
-        /* 1.2 px: the three published lengths are whole pixels, so rounding
-           accounts for up to 1; the 2 px of a card placed during the frame's
-           entrance (the fault `fitStage`'s settled geometry fixed) must fire */
+        /* 4 — and it stands left of the door, high */
+        /* 1.2 px: the published lengths are whole pixels, so rounding accounts
+           for up to 1; a price placed during the frame's entrance (2 px) fires */
         if (Math.abs(m.dx) > 1.2 || Math.abs(m.dy) > 1.2) {
-          fault('quote-wall', `${tag}: the price card is ${m.dx} px across and ${m.dy} px down from `
-            + 'the door\'s top-right corner (8 px outside the casing, at its head or under the wall '
+          fault('quote-wall', `${tag}: the price is ${m.dx} px across and ${m.dy} px down from `
+            + 'the door\'s top-left corner (8 px outside the casing, at its head or under the wall '
             + 'chrome) — it is not where the owner\'s son asked for it');
         } else anchored++;
-        if (m.hudClear < 0) {
-          fault('quote-wall', `${tag}: the price card reaches ${-m.hudClear} px up into the wall chrome`);
-        }
-        /* 2 — and nowhere at all may it be pulled onto the leaf */
+        /* 2 — and nowhere at all may it stand on the leaf */
         if (m.onDoor > 0) {
           if (ON_DOOR_OK.has(tag)) stillOverlapping.add(tag);
-          else fault('quote-wall', `${tag}: the price card stands ${m.onDoor} px into the door `
-            + `(${m.wall} px of wall for a ${m.card} px card). Pulling the card in off the edge `
-            + 'must not push it onto the leaf');
+          else fault('quote-wall', `${tag}: the price stands ${m.onDoor} px² on the door `
+            + `(${m.wall} px of wall for a ${m.card} px price)`);
+        }
+        /* 5 — and under nothing else on the wall */
+        for (const [n, x] of m.under) fault('quote-wall', `${tag}: the price and the ${n} overlap by ${x} px²`);
+        /* 7 — the picker at the top right, physically */
+        if (!m.picker) fault('quote-wall', `${tag}: no #langs on the wall — the picker clause has no subject`);
+        else if (m.picker.right > 16 || m.picker.left < m.picker.right) {
+          fault('quote-wall', `${tag}: the language picker stands ${m.picker.right} px from the stage's right `
+            + `edge and ${m.picker.left} from its left — it belongs top-RIGHT in every language`);
+        }
+        /* 6 — readable on the picture: the standard door at every shape */
+        if (size === 'standard') {
+          await p.addStyleTag({ content: '.quote .send__figure, .quote .send__chev, .quote .quote__send '
+            + '{ color: transparent !important; text-decoration-color: transparent !important; } '
+            + '.quote .quote__ico { visibility: hidden !important; }' });
+          await p.waitForTimeout(60);
+          for (const [k, bx] of [['figure', m.fig], ['send', m.send]]) {
+            const x0 = Math.max(0, bx.left), clip = { x: x0, y: Math.max(0, bx.top),
+              width: Math.max(1, Math.min(bx.right, w) - x0), height: Math.max(1, bx.height) };
+            await p.screenshot({ path: '/tmp/audit-price-ground.png', clip });
+            const im = load('/tmp/audit-price-ground.png');
+            const ls = [];
+            for (let i = 0; i < im.d.length; i += 4) ls.push(0.2126 * rel(im.d[i]) + 0.7152 * rel(im.d[i + 1]) + 0.0722 * rel(im.d[i + 2]));
+            ls.sort((a2, c2) => a2 - c2);
+            const cr = (ls[Math.floor(ls.length * 0.05)] + 0.05) / (INK + 0.05);
+            contrasts++;
+            if (cr < lowest) { lowest = cr; lowestAt = `${tag} ${k}`; }
+            if (cr < 4.5) fault('quote-wall', `${tag}: the ${k} is ink on a picture whose darkest 5 % reads `
+              + `${cr.toFixed(2)}:1 against it — under 4.5, so it needs a wash there (css/app.css, \`.quote\`)`);
+          }
         }
       }
-      /* 3 — and the popover that hangs off the card is centred on it */
-      await p.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=standard`);
+      /* 3 — and the breakdown hangs centred on the figure, or held inside */
+      await p.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=halfextra2`);
       await p.waitForTimeout(260);
       const bd = await p.evaluate(async () => {
         const t = document.querySelector('#price-toggle');
         if (!t) return null;
         t.click();
-        /* ⚠ NOT A FIXED WAIT — 27.9.2026. This slept 240 ms and measured, and
-           the breakdown's `fitPart` entrance was still running then: re-read
-           five times at 1920x918 it came back 0.5-3.8 px off, 9.7 once under
-           the audit's load (a fault), and exactly 0 in every language once the
-           animation had finished. §7: an instrument that measures during an
-           animation measures the animation. So: two frames for the animations
-           to start, then every finite one must finish — and one that never
-           does inside three seconds is a fault of its own. */
+        /* ⚠ NOT A FIXED WAIT — 27.9.2026: two frames for the animations to
+           start, then every finite one must finish (§7: an instrument that
+           measures during an animation measures the animation). */
         await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
         const finite = document.getAnimations()
           .filter(a => a.effect && a.effect.getComputedTiming().iterations !== Infinity);
@@ -6761,55 +6800,63 @@ try {
           Promise.all(finite.map(a => a.finished.catch(() => {}))).then(() => true),
           new Promise(r => setTimeout(() => r(false), 3000))]);
         if (!settled) return { unsettled: true };
-        const b = document.querySelector('#breakdown'), q = document.querySelector('.quote');
-        if (!b || !q) return null;
-        const rb = b.getBoundingClientRect(), rq = q.getBoundingClientRect();
+        /* the figure's own button (the figure and its chevron) is what it
+           hangs from and what a customer tapped */
+        const bx = document.querySelector('#breakdown'), fig = document.querySelector('#price-toggle');
+        const wrap = document.querySelector('.stage-wrap');
+        if (!bx || !fig || !wrap) return null;
+        const rb = bx.getBoundingClientRect(), rf = fig.getBoundingClientRect(), rw = wrap.getBoundingClientRect();
         if (!rb.width) return { shut: true };
-        return { off: Math.round(((rb.left + rb.right) / 2 - (rq.left + rq.right) / 2) * 10) / 10 };
+        const lo = Math.max(rw.left, 0) + 8, hi = Math.min(rw.right, innerWidth) - 8;
+        return { off: Math.round(((rb.left + rb.right) / 2 - (rf.left + rf.right) / 2) * 10) / 10,
+                 atLo: Math.abs(rb.left - lo) < 1.5, atHi: Math.abs(rb.right - hi) < 1.5,
+                 inside: rb.left >= lo - 1 && rb.right <= hi + 1 };
       });
+      const where = `${lang} ${w}x${h}`;
       if (bd && bd.unsettled) {
-        fault('quote-wall', `${lang} ${w}x${h}: the price breakdown was still animating three `
+        fault('quote-wall', `${where}: the price breakdown was still animating three `
           + 'seconds after it was opened — its placement cannot be read');
       } else if (!bd || bd.shut) {
-        fault('quote-wall', `${lang} ${w}x${h}: the price breakdown would not open, so its `
+        fault('quote-wall', `${where}: the price breakdown would not open, so its `
           + 'placement is measuring nothing');
       } else {
         popovers++;
-        if (Math.abs(bd.off) > 8) {
-          fault('quote-wall', `${lang} ${w}x${h}: the price breakdown's centre is ${bd.off} px `
-            + 'from the price card it hangs off — a logical inset with a physical transform '
-            + 'does not centre anything in RTL, and what it hangs over here is the door');
+        if (!bd.inside) fault('quote-wall', `${where}: the price breakdown leaves the stage — its edge is cut`);
+        if (Math.abs(bd.off) > 1.5) {
+          if (bd.atLo || bd.atHi) shifted.push(`${where} ${bd.off}px`);
+          else fault('quote-wall', `${where}: the price breakdown's centre is ${bd.off} px from the figure `
+            + 'it hangs off, and it is not held at the stage\'s edge either');
         }
       }
     }
   }
   await p.close();
   /* §5.15: if the wall never has room, every clause above passes by having no
-     subject — which is what a narrower card or a wider door range would do to
-     this check without anybody coming back to it. */
+     subject. */
   if (room < measured / 2) {
-    fault('quote-wall', `the wall had room for the card on only ${room} of ${measured} readings — `
+    fault('quote-wall', `the wall had room for the price on only ${room} of ${measured} readings — `
       + 'this sweep is measuring almost nothing');
   }
   if (popovers < 27) {
     fault('quote-wall', `only ${popovers} of 27 price breakdowns opened — the placement clause `
       + 'is measuring almost nothing');
   }
+  if (contrasts < 54) fault('quote-wall', `only ${contrasts} of 54 contrast readings were made`);
   /* and the exemption cannot outlive the fault */
   for (const tag of ON_DOOR_OK) {
     if (!stillOverlapping.has(tag)) {
-      fault('quote-wall', `${tag} is named as a reading where the price card stands on the door `
-        + 'and it no longer does. If the wall has been fixed, take it off the list here and out '
-        + 'of CLAUDE.md §9 — an exemption nobody removes is how a fault becomes a feature');
+      fault('quote-wall', `${tag} is named as a reading where the price stands on the door `
+        + 'and it no longer does — take it off the list here and out of CLAUDE.md §9');
     }
   }
   if (faults === before) {
     console.log(`    ${measured} readings in three languages x nine desktop widths x all six `
-      + `sizes: the price card stands at the door's head corner on ${anchored}, is whole on all ${room} `
-      + `where the wall can hold it, it stands on `
-      + `the door on ${ON_DOOR_OK.size ? `none but the ${ON_DOOR_OK.size} §9 names` : 'none'}, and its breakdown is centred on `
-      + `it in all ${popovers}. ${tight.length} cut where the wall cannot hold it (§9): `
-      + tight.slice(0, 4).join(', ') + (tight.length > 4 ? ` +${tight.length - 4} more` : ''));
+      + `sizes: the price stands left of the door, high, on no ground, on ${anchored}; whole on all ${room} `
+      + `where the wall can hold it, on the door on none, under no picker, arrow, column or band; `
+      + `the picker top-right in all three languages; the ink at least ${lowest.toFixed(1)}:1 on the picture `
+      + `(${lowestAt}, ${contrasts} readings); the breakdown centred on the figure in ${popovers - shifted.length} `
+      + `of ${popovers} and held inside the stage on ${shifted.length}${shifted.length ? ` (${shifted.join(', ')})` : ''}. `
+      + `${tight.length} cut where the wall cannot hold it${tight.length ? ': ' + tight.slice(0, 4).join(', ') + (tight.length > 4 ? ` +${tight.length - 4} more` : '') : ''}`);
   }
 } catch (e) {
   /* ⚠ THE LONGEST BLOCK IN THIS FILE AND THE LAST, so a renderer death here
