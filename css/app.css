@@ -430,6 +430,15 @@ svg { direction: ltr; }
   color: var(--ink-3);
 }
 .iconbtn .btn__ico { inline-size: 22px; block-size: 22px; }
+/* The save in the wall, in the undo pills' bronze (29.9 — see `.undo-pill`):
+   a filled disc, white glyph. It is never disabled. */
+.stage__hud .iconbtn {
+  background: var(--accent-ink); border-color: var(--accent-ink); color: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .18), 0 0 0 3px rgb(255 255 255 / .55);
+}
+.stage__hud .iconbtn:hover:not(:disabled) { background: #6A5129; border-color: #6A5129; color: #fff; }
+.stage__hud .iconbtn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.stage__hud .iconbtn .btn__ico { stroke-width: 2.1; }
 
 .langs { display: flex; gap: 2px; align-items: center; min-inline-size: 0; overflow-x: auto; }
 .lang {
@@ -1239,6 +1248,20 @@ html:not([dir="rtl"]) .stage__undo[data-mode="icon"] { flex-direction: column-re
 .undo-pill .btn__ico { inline-size: 19px; block-size: 19px; }
 .undo-pill:hover { filter: brightness(1.25); }
 .undo-pill:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
+/* ⚠ BRONZE, 29.9.2026 — the owner's son: *"make them more noticeable, make
+   them a different color … on both phone and pc."* The pills were ink, the
+   same ink as the navigator column beside them; they are the page's bronze
+   now (`--accent-ink`, #7E6134) with white — 6.1:1 — and a thin paper halo so
+   they hold on the photograph. No other control on the wall wears it: the
+   navigator is ink, the send green, the arrows paper. The save above wears
+   it too (`.stage__hud .iconbtn` below), so the three read as one set. */
+.undo-pill {
+  background: var(--accent-ink); color: #fff;
+  box-shadow: 0 4px 14px rgb(0 0 0 / .22), 0 0 0 3px rgb(255 255 255 / .55);
+}
+.undo-pill:hover { filter: none; background: #6A5129; }
+.undo-pill:focus-visible { outline-color: var(--ink); }
+.undo-pill .btn__ico { stroke-width: 2.1; }
 .stage__undo[data-mode="icon"] .undo-pill,
 .stage__undo[data-mode="iconrow"] .undo-pill { padding: 0; inline-size: 44px; }
 .stage__undo[data-mode="icon"] .undo-pill__w,

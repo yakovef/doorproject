@@ -12257,7 +12257,7 @@ ${plate.defs}${plate.body}
       }
       return !obstacles.some((o) => hits(g, o));
     };
-    const SHAPES = ["row", "stack", "iconrow", "icon"];
+    const SHAPES = matchMedia("(max-width: 1099px)").matches ? ["stack", "icon", "iconrow"] : ["row", "stack", "iconrow", "icon"];
     if (!SHAPES.some(place)) place("icon");
     const now = box.getBoundingClientRect();
     if (now.top !== was.top || now.left !== was.left || now.height !== was.height) placeSteps();

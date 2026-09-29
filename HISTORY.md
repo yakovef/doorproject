@@ -26,6 +26,37 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **29.9 — UNDO, REDO AND SAVE IN BRONZE; UNDO STACKED ON THE PHONE.** The
+  owner's son: *"On the phone I want you to make the undo and save buttons
+  vertical and make them more noticeable, make them a different color and maybe
+  redo them on both phone and pc."*
+  · **Two sessions, one control.** This session first built its own answer — a
+    bronze column of undo/redo/save down the phone's top-left wall — and found,
+    on rebasing, that the other session had shipped `2547c4f` from a sibling
+    instruction (*"not noticeable on pc and in the way on the phone — more
+    noticeable, but not colliding with the door"*): labelled ink pills at the
+    stage's bottom-right corner, placed by `placeUndo` off the real obstacles,
+    and a save that opens a dialog. Asked, the owner's son chose **merge
+    both**: their placement and dialog stay; this adds the colour and the
+    vertical. The first build (session branch `c5456d7`) is not on the main
+    branch.
+  · **Colour, both widths:** `.undo-pill` and the wall's save (`.stage__hud
+    .iconbtn`) are `--accent-ink` (#7E6134) with white at 6.1:1, a 3 px paper
+    halo, the glyph at stroke 2.1. The pills were ink, the navigator's colour;
+    nothing else on the wall is bronze.
+  · **Vertical on the phone:** below 1100 `placeUndo` offers `stack` then
+    `icon` (glyphs stacked), and the glyphs side by side (`iconrow`) only
+    where neither stacked shape clears the door and the arrow; the labelled
+    row never. Above 1100 the four shapes as before. At 320 the pair was
+    `iconrow` and is `icon` now; at 390 `stack` as before. ⚠ The audit run
+    beside upstream found the one place the stacked-only first build lost:
+    320 × `half`, both stacked shapes on the arrow by 21 px², where upstream's
+    side-by-side glyphs had cleared it — hence the last-resort `iconrow`.
+    The audit's shape clause is restated at the same strength — the first
+    shape that touches nothing, in the order for the width — and adds that a
+    phone never gets the labelled row.
+  · **Gates** in the commit message.
+
 - **29.9 — THE CROP GIVES EACH VIEWPORT EXACTLY THE WALL ITS BAND NEEDS.**
   Chosen by the owner's son over the one crop for every viewport, after both
   were measured side by side.
@@ -450,6 +481,7 @@ oldest lines move to the top of the "moved" section.
     with the ball on `nickelSoft` and the rose on `gripSoft` all three fail.
   · **Not changed:** the escutcheon (§9 — it varies door to door, it is every
     lockset's) and the 105 mm knob-to-keyway (this door 96-99, the corpus 102-105).
+
 - **28.9 — THE HALF DOOR'S FACE FOLLOWS THE MAIN LEAF'S (9 of 10).** The owner's
   son: *"On the half door the proportions between windows and panels need to be
   the same as on the main door — a window and a panel at the same width, just
@@ -2929,6 +2961,39 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.9** The half door's face follows the main leaf's (9 of 10) — *"a window
+  and a panel at the same width … with 3 panels there should be 3 panels on the
+  half door too"*: the fixed leaf asks `faceRowsOn` of its own width — pair and
+  trio drawn solid (it was bare), kept rows under glass; its glass the main
+  light's fractions (the 110 mm clamp gone). Under glass its panels take the
+  casing's width (ours, §0a). The face charged once, the ironwork per pane.
+  Long form: `HISTORY.md`.
+- **28.9** A first visit gets a tour (8 of 10) — *"a grey overlay on everything
+  but the thing described, an arrow from the text to the thing"*: `js/tour.js`,
+  a modal `<dialog>` of four cut-outs (door, navigator, options, save + undo),
+  the callout off every cut-out, arrows edge to edge, remembered in
+  `localStorage` (`dm.tour.v1`). Never on a link, bare or the sheet. Every
+  instrument opens the page `tourless`; one audit block drives it. Long form:
+  `HISTORY.md`.
+- **28.9** The extra lock's own step (7 of 10) — *"as a separate section, right
+  after the pirzul section"*: `xlock` after `pz`, the קודן's case its mark, the
+  lock's old explainer with it. Ten marks make the column 514 px; at 1100–1152
+  (en, ru) under the price it fits only because its floor is now the trust
+  band's WORDS, not its box. The audit's sixteen typed 8s and 9s read
+  `QUESTIONS`/`STEPS`. Long form: `HISTORY.md`.
+- **28.9** Four small page things (6 of 10): the arrows walk the tiles in the
+  order they are DRAWN (the colour step jumped); the window designs split
+  regular / special (surcharge per window in the heading), twins side by side;
+  the finish group only with a bar or the bow — a lone bell is nickel
+  (`bellFinish`), a stale finish goes home with a sentence (reverses our 27.9
+  extension); the step's `<h2>` shown above the options, not under 500 px tall.
+  Long form: `HISTORY.md`.
+- **28.9** Undo you can see, a save that asks (5 of 10) — two labelled ink pills
+  at the stage's foot (`placeUndo`: the first of four shapes touching no door,
+  arrow or price; over the trust words where they reach). `#save-hud` opens
+  `#savedlg` (save / "my saved doors (N)"); the list is `<dialog id="saved">`.
+  Named: at 320 beside the two widest doors the redo touches the arrow (§9).
+  The full audit: 46 faults, the instruments' (one of them commit 2's miss).
 - **28.9** The type's two promises, asserted (1c, an audit block only): no
   request leaves the folder (a Google Fonts `<link>` → 6 caught), and the swap
   moves no block by more than a line and at most 2 in 100 readings at all (6 of

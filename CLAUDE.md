@@ -204,6 +204,11 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **29.9** Undo, redo and save in BRONZE (`--accent-ink`, white glyph, 6.1:1)
+  — *"more noticeable, make them a different color … on both phone and pc"* —
+  and on a phone undo/redo STACKED (*"vertical"*; `placeUndo` offers `stack`,
+  `icon`, then side by side only where neither fits — 320 × `half`). Merged onto the other session's pills
+  at the foot and save dialog, the owner's son's choice. Long form: `HISTORY.md`.
 - **29.9** The crop gives each viewport exactly the wall its band needs
   (`fitCrop`, `data-head-y`): above 1100 the standard leaf is 502.6 / 437.0 /
   564.0 / 576.5 px at 1100 / 1280 / 1440 / 1920 (was 492.6 / 436.9 / 556.0 /
@@ -235,39 +240,6 @@ lines here. Dates are the day of the change.
   angled product shot, on its `domeKnob` (retired). Footprint 41/41/48 →
   35/35/35. The escutcheon (covered, round) left as §9 says. Long form:
   `HISTORY.md`.
-- **28.9** The half door's face follows the main leaf's (9 of 10) — *"a window
-  and a panel at the same width … with 3 panels there should be 3 panels on the
-  half door too"*: the fixed leaf asks `faceRowsOn` of its own width — pair and
-  trio drawn solid (it was bare), kept rows under glass; its glass the main
-  light's fractions (the 110 mm clamp gone). Under glass its panels take the
-  casing's width (ours, §0a). The face charged once, the ironwork per pane.
-  Long form: `HISTORY.md`.
-- **28.9** A first visit gets a tour (8 of 10) — *"a grey overlay on everything
-  but the thing described, an arrow from the text to the thing"*: `js/tour.js`,
-  a modal `<dialog>` of four cut-outs (door, navigator, options, save + undo),
-  the callout off every cut-out, arrows edge to edge, remembered in
-  `localStorage` (`dm.tour.v1`). Never on a link, bare or the sheet. Every
-  instrument opens the page `tourless`; one audit block drives it. Long form:
-  `HISTORY.md`.
-- **28.9** The extra lock's own step (7 of 10) — *"as a separate section, right
-  after the pirzul section"*: `xlock` after `pz`, the קודן's case its mark, the
-  lock's old explainer with it. Ten marks make the column 514 px; at 1100–1152
-  (en, ru) under the price it fits only because its floor is now the trust
-  band's WORDS, not its box. The audit's sixteen typed 8s and 9s read
-  `QUESTIONS`/`STEPS`. Long form: `HISTORY.md`.
-- **28.9** Four small page things (6 of 10): the arrows walk the tiles in the
-  order they are DRAWN (the colour step jumped); the window designs split
-  regular / special (surcharge per window in the heading), twins side by side;
-  the finish group only with a bar or the bow — a lone bell is nickel
-  (`bellFinish`), a stale finish goes home with a sentence (reverses our 27.9
-  extension); the step's `<h2>` shown above the options, not under 500 px tall.
-  Long form: `HISTORY.md`.
-- **28.9** Undo you can see, a save that asks (5 of 10) — two labelled ink pills
-  at the stage's foot (`placeUndo`: the first of four shapes touching no door,
-  arrow or price; over the trust words where they reach). `#save-hud` opens
-  `#savedlg` (save / "my saved doors (N)"); the list is `<dialog id="saved">`.
-  Named: at 320 beside the two widest doors the redo touches the arrow (§9).
-  The full audit: 46 faults, the instruments' (one of them commit 2's miss).
 ---
 
 ## 0c. Where it stands today — 28.9.2026
@@ -347,6 +319,12 @@ change (a disabled pill is not painted), redo only while there is something to
 redo. `placeUndo` picks the first shape the wall beside the door's foot can
 hold — side by side, stacked, or the glyph alone (a phone beside a wide door)
 — and the column (Hebrew, same corner) and the toast stand above them.
+⚠ **Since 29.9 they and the save are BRONZE** (`--accent-ink`, white, a paper
+halo — *"more noticeable … a different color … on both phone and pc"*), and
+**below 1100 the stacked shapes come first** (`stack`, then the glyphs
+stacked — *"on the phone … vertical"*; the glyphs side by side only where
+neither clears the door and the arrow, 320 beside `half`); the audit asserts both. The pills'
+placement is the other session's, merged at the owner's son's choice.
 
 - **`.quote` — the price and a quiet send — moves with the viewport:** on a
   desktop ON THE PHOTOGRAPH, LEFT of the door, high (28.9, the owner's son:

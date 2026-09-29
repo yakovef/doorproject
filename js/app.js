@@ -3820,7 +3820,15 @@ function placeUndo() {
     }
     return !obstacles.some(o => hits(g, o));
   };
-  const SHAPES = ['row', 'stack', 'iconrow', 'icon'];
+  /* ⚠ ON A PHONE THE STACKED SHAPES FIRST, 29.9.2026 — the owner's son: *"on the
+     phone … make the undo and save buttons vertical"* (merged with the pills
+     at the foot, his choice). Below 1100 the pair is `stack` (redo over undo,
+     labelled) or `icon` (the glyphs stacked); the glyphs side by side only
+     where neither stacked shape clears the door and the arrow (320 beside
+     the `half` door: both stacked shapes touched the arrow, 21 px²), the
+     labelled row never. */
+  const SHAPES = matchMedia('(max-width: 1099px)').matches
+    ? ['stack', 'icon', 'iconrow'] : ['row', 'stack', 'iconrow', 'icon'];
   if (!SHAPES.some(place)) place('icon');
   const now = box.getBoundingClientRect();
   if (now.top !== was.top || now.left !== was.left || now.height !== was.height) placeSteps();

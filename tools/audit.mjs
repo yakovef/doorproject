@@ -5310,7 +5310,9 @@ for (const v of VIEWS) {
        band's words, the price, the arrows, the navigator column, the band;
      · its SHAPE is the first of row / stack / iconrow / icon that touches
        neither the door, an arrow nor the price (each earlier shape is put back
-       in place, re-measured, and must touch one of them);
+       in place, re-measured, and must touch one of them) — below 1100 of
+       stack / icon (29.9: *"on the phone … vertical"*), the glyphs side by
+       side only where neither stacked shape fits (the loop below asserts it);
      · and the undo's own toast stacks above it, never on it.
    ⚠ The first run of this block found two faults in the first build, which
    placed by the wall's WIDTH alone: the pills on the trust band's words at
@@ -5409,7 +5411,11 @@ for (const v of VIEWS) {
       }
       if (m.toastOn === null) fault('undo-pill', `${tag}: the undo raised no toast — the stacking clause has no subject`);
       else if (m.toastOn) fault('undo-pill', `${tag}: the undo's own toast covers ${m.toastOn} px² of the pills — it stacks above them`);
-      const order = ['row', 'stack', 'iconrow', 'icon'];
+      /* ⚠ Below 1100 the order is stack, icon only (29.9, the owner's son: undo
+         vertical on the phone) — so a phone is ASSERTED to get a stacked
+         shape, and within it the first that touches nothing, as before. */
+      const order = v.w < 1100 ? ['stack', 'icon', 'iconrow'] : ['row', 'stack', 'iconrow', 'icon'];
+      if (!order.includes(m.mode)) fault('undo-pill', `${tag}: the shape is "${m.mode}" — below 1100 the pair is stacked (stack, icon; iconrow only where neither fits)`);
       for (const k of order.slice(0, order.indexOf(m.mode))) {
         if (!m.touches[k]) fault('undo-pill', `${tag}: the shape is "${m.mode}" but "${k}" touches nothing — the first shape that fits is "${k}"`);
       }
