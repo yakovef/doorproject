@@ -187,9 +187,9 @@
        follow only a NON-nickel פרזול, and the פעמון, which has two metals of
        the four and says so on its own tile. */
     "step.pz.l": [
-      "הגוון של הידית, חור המנעול, הצירים והעינית. לא משנה את גוון ידית המשיכה ולא את המנעול הנוסף.",
-      "The tone of the lever, the keyhole, the hinges and the viewer. It changes neither the pull handle nor the additional lock.",
-      "Оттенок нажимной ручки, замочной скважины, петель и глазка. Ручку-скобу и дополнительный замок не меняет."
+      "הגוון של הידית, חור המנעול והצירים. לא משנה את גוון ידית המשיכה ולא את המנעול הנוסף.",
+      "The tone of the lever, the keyhole and the hinges. It changes neither the pull handle nor the additional lock.",
+      "Оттенок нажимной ручки, замочной скважины и петель. Ручку-скобу и дополнительный замок не меняет."
     ],
     "step.sum.t": ["סיכום", "Your door", "Итог"],
     "step.sum.s": ["הדלת שלכם, והמחיר", "The door you built, and the price", "Собранная дверь и цена"],
@@ -248,9 +248,9 @@
     "g.bell": ["פעמון", "Doorbell", "Звонок"],
     "g.peephole": ["עינית", "Peephole", "Глазок"],
     "g.pirzul.h": [
-      "הגוון של הידית, חור המנעול, הצירים והעינית.",
-      "The tone of the lever, the keyhole, the hinges and the viewer.",
-      "Оттенок ручки, замочной скважины, петель и глазка."
+      "הגוון של הידית, חור המנעול והצירים.",
+      "The tone of the lever, the keyhole and the hinges.",
+      "Оттенок ручки, замочной скважины и петель."
     ],
     /* ⚠ THIS DESCRIBED THE FITTING THE DRAWING NO LONGER HAD. It said "a bell
        push" for as long as the renderer drew one; the owner's three photographs
@@ -500,9 +500,9 @@
          The two names come through {0} (the כדור) and {1} (the ספיר), out of
          LOCKSETS, so a renamed knob cannot leave this paragraph behind. */
     "exp.pz.a": [
-      "את הגוון של הידית שמסובבים (וגם של ידית ה{0}), חור המנעול, הצירים, העינית הרגילה וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה, את המאחז האופקי ואת הפעמון — לשלושתם גימור משלהם, שנבחר בהמשך, בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את ידית ה{1}: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
-      "The tone of the lever you turn (and of the {0} knob), the keyhole, the hinges, the regular peephole and the security latch — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle, the horizontal bow or the doorbell — those three have a finish of their own, chosen later, on the pull-handle step — nor the safe lock, the keypad, or the {1} handle: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
-      "Оттенок нажимной ручки (и ручки «{0}»), замочной скважины, петель, обычного глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу, горизонтальную скобу и звонок — у них своя отделка, которую выбирают дальше, на шаге ручки-скобы, — и не меняет сейфовый и кодовый замки и ручку «{1}»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
+      "את הגוון של הידית שמסובבים (וגם של ידית ה{0}), חור המנעול, הצירים וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה, את המאחז האופקי ואת הפעמון — לשלושתם גימור משלהם, שנבחר בהמשך, בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את ידית ה{1}: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
+      "The tone of the lever you turn (and of the {0} knob), the keyhole, the hinges and the security latch — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle, the horizontal bow or the doorbell — those three have a finish of their own, chosen later, on the pull-handle step — nor the safe lock, the keypad, or the {1} handle: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
+      "Оттенок нажимной ручки (и ручки «{0}»), замочной скважины, петель и предохранительной защёлки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу, горизонтальную скобу и звонок — у них своя отделка, которую выбирают дальше, на шаге ручки-скобы, — и не меняет сейфовый и кодовый замки и ручку «{1}»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
     ],
     "exp.sum.q": [
       "מה קורה אחרי שאני שולח?",
@@ -8321,7 +8321,7 @@ ${plate.defs}${plate.body}
        data-cx="${cx}" data-cy="${cy}" data-r="${R}">
       <ellipse cx="${cx}" cy="${cy + R * 0.18}" rx="${(R * 0.95).toFixed(1)}"
                ry="${(R * 0.88).toFixed(1)}" fill="#000" opacity="0.18"/>
-      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#nickel)"
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#lockUnit)"
               stroke="#000" stroke-opacity=".26"/>
       ${/* the glass inside the ring — dark, because behind it is an unlit hall,
         which is the same reasoning the obscured glazing is drawn on */
@@ -8845,7 +8845,6 @@ ${plate.defs}${plate.body}
     const make = FITTING_GLYPH[lockset.style] || FITTING_GLYPH.lever;
     const { box, art } = make(lockset);
     const [bx0, by0, bx1, by1] = box;
-    const viewer = state2.peephole && state2.peephole !== "nopeep";
     const top = -86;
     return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
     <defs>
@@ -8864,10 +8863,6 @@ ${plate.defs}${plate.body}
       <rect x="38" y="4" width="18" height="30" rx="5"/>
       <rect x="45" y="-36" width="4" height="76" rx="2" fill="#000" fill-opacity=".28" stroke="none"/>
     </g>
-    ${viewer ? `<g data-pz="viewer">
-      <circle cx="47" cy="66" r="13" fill="url(#${id})" stroke="#000" stroke-opacity=".26"/>
-      <circle cx="47" cy="66" r="6.5" fill="#000" fill-opacity=".58"/>
-    </g>` : ""}
   </svg>`;
   }
   function handleFinishGlyph(hf) {

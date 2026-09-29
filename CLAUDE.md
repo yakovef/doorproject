@@ -205,7 +205,8 @@ lines here. Dates are the day of the change.
   face in a rounded-square bezel, lens, two lights, sensor ring, bell button; the
   maker's badge left off. Face constant; size still 54 mm (no scale). 0 bare
   sheets. Then its bezel stopped following the פרזול (*"remove the pirzul effect
-  from them"*): `#lockUnit` constant steel; copy says "the regular peephole".
+  from them"*, then *"…from the regular peephole too"*): both viewers `#lockUnit`,
+  out of the פרזול tile and its copy; the test sweeps both.
 - **28.9** **כדור על אורך** (`knobplate`) redrawn off ONE photograph (*"i only
   have one image of this but i want it in … refine it"*): a waisted plate 90 ×
   216 (waist 70 at 0.54 — the עילי's family, 8 mm narrower), a 54 mm knob on a
@@ -967,7 +968,7 @@ before it picks a fill.**
 |---|---|
 | `gripHard` `gripSoft` | the pull bar and the bow, in the handle finish (`hf=`) |
 | `nickel` `nickelSoft` `plateFace` `domeKnob` `rotemFace` `rotemLever` `knobBall` | the פרזול — nickel is its **own** warm ramp, `FINISH_TONES.nickel` (27.9, measured off the Coral doors: 20% darker than `steel`, hue ≈40°); `steel` stays the pull bar's nickel, the extra locks' and the derivation reference. `domeKnob` (the כדור's ball) through `domeRamp` since 26.9, the measured dome kept literal on nickel |
-| `lockUnit` `lockUnitFace` `lockUnitSoft` `mirrorKnob` | the bought-in extra locks, the ספיר and the DIGITAL viewer's bezel (28.9) — a constant steel |
+| `lockUnit` `lockUnitFace` `lockUnitSoft` `mirrorKnob` | the bought-in extra locks, the ספיר and both viewers' rings (28.9) — a constant steel |
 | `euroSteel` `euroRim` | the cylinder, following the פרזול at its own stand-off (`cylinderRamp`) — derived on nickel too since 27.9, so every finish's plug stands 2–16% off its plate |
 | `bellMetal` | the פעמון, following the pull handle's finish (`bellRamp` keeps Peretz's older *"nickel and gold only"* beside the instruction that overruled it) |
 
@@ -978,8 +979,8 @@ at least once, always silently.
 
 | | |
 |---|---|
-| follows it | the lever and its furniture, the כדור's ball and shank (26.9 — the owner's son called the constant ball a bug, overruling 31.8), the keyhole, the hinges, the OPTICAL peephole (the digital one stopped 28.9: *"remove the pirzul effect from them"*), the security latch (in his list; not drawn — it is fitted inside, and the choice offered 27.9 was withdrawn 28.9), the metal strips. The כדור על אורך (`knobplate`) too — d092 is bronze. The פרזול tiles show these on THIS door since 27.9 — its lock furniture, the hinges and the viewer when chosen — redrawn when they change (`composite`) |
-| never | the pull handle, the bow and the פעמון (their own `hf=`) · the extra lock and the digital viewer (`#lockUnit`) · the ספיר (the maker's finish, 31.8) |
+| follows it | the lever and its furniture, the כדור's ball and shank (26.9 — the owner's son called the constant ball a bug, overruling 31.8), the keyhole, the hinges, the security latch (in his list; not drawn — it is fitted inside, and the choice offered 27.9 was withdrawn 28.9), the metal strips. The כדור על אורך (`knobplate`) too — d092 is bronze. The פרזול tiles show these on THIS door since 27.9 — its lock furniture, the hinges and the viewer when chosen — redrawn when they change (`composite`) |
+| never | the pull handle, the bow and the פעמון (their own `hf=`) · the extra lock and BOTH viewers (`#lockUnit`, 28.9: *"remove the pirzul effect from them"*, then *"from the regular peephole too"*) · the ספיר (the maker's finish, 31.8) |
 
 ### The lock furniture's measurements (`npm run lockset`, 19.9)
 

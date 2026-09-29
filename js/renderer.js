@@ -10366,6 +10366,10 @@ const keyway = (kx, ky, s = 1) => `
    Those two are bought-in units that arrive in whatever finish the
    manufacturer ships, and Peretz said so in as many words. Nobody has ever
    said that about a viewer. */
+/* ⚠ AND SINCE 28.9.2026 THE RING IS #lockUnit, A CONSTANT STEEL — the owner's
+   son, after the digital viewer stopped following the פרזול: *"remove it from
+   the regular peephole too."* That reverses the note above on his word; the
+   note stays as the record of why it had been #nickel. */
 const peephole = (cx, cy) => {
   const R = PEEPHOLE_R;          // one statement of it; see the constant
   return `
@@ -10373,7 +10377,7 @@ const peephole = (cx, cy) => {
        data-cx="${cx}" data-cy="${cy}" data-r="${R}">
       <ellipse cx="${cx}" cy="${cy + R * 0.18}" rx="${(R * 0.95).toFixed(1)}"
                ry="${(R * 0.88).toFixed(1)}" fill="#000" opacity="0.18"/>
-      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#nickel)"
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#lockUnit)"
               stroke="#000" stroke-opacity=".26"/>
       ${/* the glass inside the ring — dark, because behind it is an unlit hall,
             which is the same reasoning the obscured glazing is drawn on */''
@@ -11171,7 +11175,7 @@ export const locksetGlyph = handleGlyph;
  * chosen lockset, the silhouette its own tile draws), a pair of hinge
  * knuckles (the "pins" — the door does not draw its hinges, they are in the
  * rebate of a door opening inwards, but they take this finish and the tile
- * may show them) and the viewer when chosen, every piece in THIS tile's
+ * may show them), every piece in THIS tile's
  * metal. `app.js` redraws the four when the lock furniture or the viewer
  * changes (`composite`), never the panel.
  * The ramp is the same `FINISH_TONES` the door uses, so the tile and the
@@ -11186,7 +11190,6 @@ export function pirzulGlyph(pz, state = {}) {
   const make = FITTING_GLYPH[lockset.style] || FITTING_GLYPH.lever;
   const { box, art } = make(lockset);
   const [bx0, by0, bx1, by1] = box;
-  const viewer = state.peephole && state.peephole !== 'nopeep';
   const top = -86;
   return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
     <defs>
@@ -11205,10 +11208,6 @@ export function pirzulGlyph(pz, state = {}) {
       <rect x="38" y="4" width="18" height="30" rx="5"/>
       <rect x="45" y="-36" width="4" height="76" rx="2" fill="#000" fill-opacity=".28" stroke="none"/>
     </g>
-    ${viewer ? `<g data-pz="viewer">
-      <circle cx="47" cy="66" r="13" fill="url(#${id})" stroke="#000" stroke-opacity=".26"/>
-      <circle cx="47" cy="66" r="6.5" fill="#000" fill-opacity=".58"/>
-    </g>` : ''}
   </svg>`;
 }
 

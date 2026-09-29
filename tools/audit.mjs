@@ -6162,7 +6162,8 @@ for (const v of VIEWS) {
 
 /* ── THE פרזול TILES ARE THIS DOOR'S — 27.9.2026 ───────────────────────────
    The owner's son: *"in the pirzul icons show the lever the person chose …
-   the peephole if chosen."* The tiles are redrawn when the door they picture
+   the peephole if chosen."* (The peephole came out of them 28.9, when it
+   stopped taking the finish.) The tiles are redrawn when the door they picture
    changes — a paint-time refresh, not a build-time one (the 8.9 lesson).
    (It carried the swing bar lock's price-to-follow clauses for a day; the
    latch was withdrawn 28.9 and they went with it.) Hebrew and Russian.
@@ -6186,7 +6187,10 @@ for (const v of VIEWS) {
     const a = await read();
     readings++;
     if (!a.pz) { fault('pirzul', `${lang}: no פרזול tile — this check has lost its subject`); await pg.close(); continue; }
-    if (!a.viewer) fault('pirzul', `${lang}: the פרזול tiles do not show the viewer this door carries`);
+    /* Reversed 28.9: no viewer takes the finish any longer (*"remove it from
+       the regular peephole too"*), so the tiles must NOT show the one this
+       door carries (`?ey=peep` is kept so the clause still has a subject). */
+    if (a.viewer) fault('pirzul', `${lang}: the פרזול tiles show the viewer, which no finish recolours`);
     await go('lock'); await pg.waitForTimeout(200);
     await pg.evaluate(() => document.querySelector('.field[data-group="lockset"] [data-id="coral"]')?.click());
     await pg.waitForTimeout(300);
@@ -6198,7 +6202,7 @@ for (const v of VIEWS) {
     else if (d.pz === a.pz) fault('pirzul', `${lang}: the lock furniture changed to the Coral and the פרזול tiles still draw the old one`);
     await pg.close();
   }
-  if (faults === before) console.log(`    ${readings} readings in two languages: the tiles show the viewer, then the Coral once chosen`);
+  if (faults === before) console.log(`    ${readings} readings in two languages: the tiles leave the viewer out, then show the Coral once chosen`);
 }
 
 /* ── THE WALL CHROME'S OWN INK STAYS OFF THE DOOR ────────────────────────

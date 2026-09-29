@@ -26,6 +26,15 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — NEITHER VIEWER FOLLOWS THE פרזול.** *"remove it from the regular
+  peephole too."* The optical ring is `#lockUnit` too (its 26.8 note — Peretz's
+  list names the עינית — kept above it as the record, reversed on the owner's
+  son's word). The פרזול tile no longer draws the viewer (asked for 27.9, *"the
+  peephole if chosen"*: drawn in the tile's metal it would now promise a
+  recolouring nobody gets); `exp.pz.a`, `step.pz.l` and `g.pirzul.h` drop it in
+  all three languages. The test that required the viewer in the tile is
+  reversed and now sweeps every PEEPHOLES entry, plus a check that each drawn
+  viewer is `#lockUnit` and not `#nickel`.
 - **28.9 — WHAT THE NEW FACE MOVED, PUT BACK (1b).** No new instruction: this is
   `npm run audit` answering commit 1, which it ran after, as the order has it.
   Eleven faults, every one a WIDTH the new face changed — the order named four
