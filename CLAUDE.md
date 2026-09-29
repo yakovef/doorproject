@@ -181,6 +181,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **29.9** Undo, redo and save made loud (*"more noticeable … a different color
+  … on both phone and pc"*): filled `--accent-ink` bronze discs, white glyph
+  (6.1:1), a disabled one washed not hidden. On a phone a COLUMN down the wall
+  (*"vertical"*), 44 px under 700 px tall; the band gets the line back, and an
+  arrow that would meet the column drops 8 px under it (fitStage). The audit's
+  band-centring line now asserts its own rule exactly (`--band-lo`). Long form:
+  `HISTORY.md`.
 - **28.9** The price on the photograph (4 of 10) — *"not on a white thing …
   left of the door, between the door and the lamp, on the higher end"*: no
   ground, figure 2.4 rem, the send a line of ink; `right` 8 px off the casing's
@@ -209,21 +216,6 @@ lines here. Dates are the day of the change.
   109.7 → 128.3 px (the old fallback drew Latin at 89%); weight 400, 5/4 px, `.75/
   .74rem` clears every gate. **Landscape:** grip now shows an answer too — the
   exemption narrows. Long form: `HISTORY.md`.
-- **28.9** **The bow** (`grab`) redrawn off four installed doors (*"now i want
-  you to copy the horizontal handle"*): 300 tip to tip (was 280), a 25.5 shaft
-  (was 18.7), posts at 0.175/0.825 confirmed, 42 mm roses with 28 mm balls, a
-  double-cone finial and a knob at each end (`GRAB`, `GRAB_END`). Footprint
-  `in` + 10 → + 5 (the trio's field, §9); channel + Coral + bow no longer fits
-  on two sizes. Sheets: `against-grab` only.
-- **28.9** The page's own type, in its folder (1 of 10) — *"change the font …
-  Hebrew first"*: **Rubik** for the text (the face Peretz's own site uses),
-  **Bona Nova** for the price, `<h1>` and band — the only candidates with
-  Cyrillic (`research/fonts/contact.png`, rejections by name). Nine woff2 in
-  `assets/fonts/`, 165 KB, stamped; the Google script gone, no request leaves
-  the folder. Fallback re-measured PER SCRIPT (one value lost 5 en / 8 ru lines):
-  0 he, 0 ru, 1 en paragraph moves. `--mono` off four Hebrew captions (§9
-  closed); Russian grille names hyphenate inside their tile (4 → 6 → 0 outside).
-  Test 9,440,830 / 5 (sheets). Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -284,7 +276,10 @@ by Hebrew readers.
 The page has no header. The language picker and undo/redo stand in the wall
 beside the door, placed by the owner with circles on a screenshot; since 27.9
 undo/redo are 52 px and a floppy-disk save stands beside them (`#save-hud`,
-the summary's own `saveCurrent`).
+the summary's own `saveCurrent`). Since 29.9 the three are filled bronze discs
+(`--accent-ink`, white glyph) and on a phone a column down the wall — 44 px
+where the screen is under 700 px tall — with the arrow beside the door dropped
+under the column wherever the two would meet.
 
 - **`.quote` — the price and a quiet send — moves with the viewport:** on a
   desktop ON THE PHOTOGRAPH, LEFT of the door, high (28.9, the owner's son:

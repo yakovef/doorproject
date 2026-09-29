@@ -26,6 +26,48 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **29.9 — UNDO, REDO AND SAVE, LOUD, AND A COLUMN ON THE PHONE.** The owner's
+  son: *"On the phone I want you to make the undo and save buttons vertical and
+  make them more noticeable, make them a different color and maybe redo them on
+  both phone and pc."*
+  · **The look, both widths:** they were hairline rings in `--ink-2` on a pale
+    wall. Now a solid `--accent-ink` disc (#7E6134, the page's bronze) with a
+    white glyph at stroke 2.1 — 6.1:1 — and a 3 px paper halo so they sit on
+    the photograph. No other wall control wears it: the navigator is ink, the
+    send green, the arrows paper. Disabled keeps the disc, washed 26% into the
+    paper, so the set always reads as three. Scoped to `.stage__hud`.
+  · **The phone (< 1100):** a column, undo · redo · save, down the wall on the
+    inline end (the left in Hebrew). In a row the three took 172 px of the
+    band's line and cut the step's name ("מבנה הד…"); in a column 52 px, and
+    `placeBand` — which reads the slots' boxes — gives the name the rest. Under
+    700 px tall (320×568: a 239 px stage) they are the 44 px floor, 6 apart.
+  · **Measured over 8 viewports × 6 sizes** (`tools/_hudx.mjs`, overlap of the
+    three with the arrows, `#frame` and the band's title): the column met the
+    arrow at 320 and 360 on the wider doors, up to 540 px²; `fitStage` now
+    drops an arrow 8 px under the column wherever the two meet, and the sweep
+    reads 0/0/0 on all 48.
+  · **An audit line restated, not loosened.** The band check said *off-centre
+    only where the band fills its whole span* — a proxy for its own rule
+    (*centred wherever its span lets it be, else moved only as far as the span
+    requires*) that held while every span was tight. The column made the span
+    lopsided on a phone (narrow column one side, the language picker the
+    other), `placeBand` moved the title just clear of the picker (8–26 px at
+    390), and the proxy failed it 11 times. The line now computes the one
+    position the rule allows off `--band-lo` (new, published by `placeBand`)
+    and pins the band there to 1.5 px: identical to the old line wherever the
+    band can be centred or fills its span. Falsified: the band pushed 12 px →
+    54 of 54 readings fail; as shipped 0 of 54.
+  · **English and Russian:** the round before this (`8bbd134`) turned the
+    wall's row round in left-to-right pages (`html:not([dir="rtl"])
+    .hud__slot--end { row-reverse }`, specificity 0,2,1), which outranked the
+    column and left the save BESIDE the pair, the pair on the door (up to 3,489
+    px² at 360). The phone rule is `html .stage__hud …` now; the sweep reads
+    0/0/0 in all three languages × 8 viewports × 6 sizes.
+  · **Gates:** test 9,440,833 / 0; sheets 0 bare, 0 lockset. The audit reads
+    35 faults on `8bbd134` alone and the SAME 35 with this commit (signatures
+    compared line by line) — the navigator's live mark at 1100–1536, the tap
+    walk, the photographed floor at 1100: the navigator round in progress,
+    none of it touched here.
 - **28.9 — THE PRICE AND THE SEND STAND ON THE PHOTOGRAPH, LEFT OF THE DOOR
   (4 of 10).** The owner's son: *"The price bigger and not on a white thing but
   directly on the image; change the font … Remove the 'מחיר משוער' text above
@@ -2112,6 +2154,21 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.9** **The bow** (`grab`) redrawn off four installed doors (*"now i want
+  you to copy the horizontal handle"*): 300 tip to tip (was 280), a 25.5 shaft
+  (was 18.7), posts at 0.175/0.825 confirmed, 42 mm roses with 28 mm balls, a
+  double-cone finial and a knob at each end (`GRAB`, `GRAB_END`). Footprint
+  `in` + 10 → + 5 (the trio's field, §9); channel + Coral + bow no longer fits
+  on two sizes. Sheets: `against-grab` only.
+- **28.9** The page's own type, in its folder (1 of 10) — *"change the font …
+  Hebrew first"*: **Rubik** for the text (the face Peretz's own site uses),
+  **Bona Nova** for the price, `<h1>` and band — the only candidates with
+  Cyrillic (`research/fonts/contact.png`, rejections by name). Nine woff2 in
+  `assets/fonts/`, 165 KB, stamped; the Google script gone, no request leaves
+  the folder. Fallback re-measured PER SCRIPT (one value lost 5 en / 8 ru lines):
+  0 he, 0 ru, 1 en paragraph moves. `--mono` off four Hebrew captions (§9
+  closed); Russian grille names hyphenate inside their tile (4 → 6 → 0 outside).
+  Test 9,440,830 / 5 (sheets). Long form: `HISTORY.md`.
 - **28.9** The digital viewer drawn off the owner's son's photograph (*"make the
   digital peephole look like this"*, `research/viewer/digital.png`): round black
   face in a rounded-square bezel, lens, two lights, sensor ring, bell button; the

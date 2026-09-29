@@ -436,6 +436,35 @@ svg { direction: ltr; }
 }
 .iconbtn .btn__ico { inline-size: 22px; block-size: 22px; }
 
+/* ⚠ FILLED, IN THE BRONZE, SINCE 29.9.2026 — the owner's son: *"make them
+   more noticeable, make them a different color … on both phone and pc."*
+   They were hairline rings in the ink-2 grey on a pale wall, the quietest
+   things in the room. Now a solid disc of `--accent-ink` (the page's bronze,
+   #7E6134) with a white glyph — 6.1:1, where a graphic wants 3 — which is a
+   colour nothing else on the wall wears: the navigator is ink, the send is
+   green, the arrows are paper. A disabled one keeps its disc, washed into the
+   paper, so the three always read as one set and the one that cannot act
+   says so by fading, not by vanishing (the older rule below took the ring
+   away; there is no ring now). Only the three in the wall: `.stage__hud`. */
+.stage__hud .iconbtn {
+  background: var(--accent-ink); border-color: var(--accent-ink);
+  color: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .18), 0 0 0 3px rgb(255 255 255 / .55);
+}
+.stage__hud .iconbtn:hover:not(:disabled) {
+  background: #6A5129; border-color: #6A5129; color: #fff;
+}
+.stage__hud .iconbtn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.stage__hud .iconbtn:disabled {
+  background: color-mix(in srgb, var(--accent-ink) 26%, var(--paper-up));
+  border-color: transparent; color: #fff;
+  box-shadow: 0 0 0 3px rgb(255 255 255 / .45);
+}
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+  .stage__hud .iconbtn:disabled { background: #C9BCA6; }
+}
+.stage__hud .iconbtn .btn__ico { stroke-width: 2.1; }
+
 .langs { display: flex; gap: 2px; align-items: center; min-inline-size: 0; overflow-x: auto; }
 .lang {
   appearance: none; background: none; border: 0;
@@ -1557,6 +1586,29 @@ html:not([dir="rtl"]) .hud__slot--end { flex-direction: row-reverse; }
 .hud__slot--end { display: flex; justify-content: flex-end; }
 .hud__slot--start, .hud__slot--end { flex: 0 0 auto; }
 .stage__hud .langs, .stage__hud .steps-back { flex-wrap: nowrap; }
+/* ⚠ STACKED ON A PHONE, 29.9.2026 — the owner's son: *"on the phone make
+   the undo and save buttons vertical."* In a row the three took 172 px of the
+   band's line above the door and cut the step's name short ("מבנה הד…"); in a
+   column down the wall they take 52 px of it, and `placeBand` — which reads
+   the slots' boxes, not their layout — gives the name the rest. Undo, redo,
+   save, top to bottom, down the wall on the interface's inline end. The
+   desktop keeps its row: its corner has 400 px of plaster. */
+@media (max-width: 1099px) {
+  /* `html .stage__hud …` so it outranks the left-to-right row-reverse above
+     (0,2,1) — without it English and Russian kept the save BESIDE the pair
+     and the pair stood on the door, up to 3,489 px² at 360 (measured 29.9) */
+  html .stage__hud .hud__slot--end, html .stage__hud .steps-back { flex-direction: column; align-items: center; }
+  .hud__slot--end { gap: 8px; }
+  .stage__hud .steps-back { gap: 8px; }
+}
+/* On a short phone the stage is ~240 px tall (320x568) and the column of
+   three 52s reached the arrow at the door's mid-height; there the three are
+   the page's floor, 44, 6 apart — 144 px. */
+@media (max-width: 1099px) and (max-height: 700px) {
+  .stage__hud .iconbtn { inline-size: 44px; block-size: 44px; }
+  .stage__hud .iconbtn .btn__ico { inline-size: 20px; block-size: 20px; }
+  .hud__slot--end, .stage__hud .steps-back { gap: 6px; }
+}
 .stage__hud .lang { white-space: nowrap; }
 
 /* The language buttons lose their pill chrome up here — on a wall they are

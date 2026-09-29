@@ -3665,6 +3665,10 @@ function placeBand() {
   }
   band.style.setProperty('--band-top', `${top}px`);
   band.style.setProperty('--band-w', `${Math.max(0, Math.floor(R - L))}px`);
+  /* the span's own left edge, wrap-relative: not read by the stylesheet, but by
+     `npm run audit`, which asserts the band is exactly as far off the door's
+     centre as this span requires and no further (29.9) */
+  band.style.setProperty('--band-lo', `${Math.round(L)}px`);
   const w = band.offsetWidth;
   band.style.setProperty('--band-l', `${Math.round(Math.max(L, Math.min(cx - w / 2, R - w)))}px`);
 }
@@ -4023,6 +4027,22 @@ function fitStage() {
     sw.setProperty('--frame-mid', `${Math.round((f.top + f.bottom) / 2 - wrap.y)}px`);
     sw.setProperty('--hud-b', `${Math.round(hudB - wrap.y)}px`);
     placeBand();
+
+    /* ⚠ AN ARROW NEVER STANDS UNDER THE UNDO COLUMN (29.9). On a phone the
+       undo, redo and save stand in a column down the wall (the owner's son:
+       *"make the undo and save buttons vertical"*), and on 320–360 px screens
+       beside the widest doors the wall is narrower than the column, so the
+       arrow at the door's mid-height landed on it (up to 540 px² measured).
+       There the arrow drops to 8 px under the column; everywhere else it
+       stands where the stylesheet puts it. Read off the page, never listed. */
+    const undoCol = document.querySelector('.stage__hud .hud__slot--end')?.getBoundingClientRect();
+    for (const a of document.querySelectorAll('.stage__arrow')) {
+      a.style.removeProperty('inset-block-start');
+      if (!undoCol || !undoCol.width) continue;
+      const r = a.getBoundingClientRect();
+      const meets = r.left < undoCol.right && r.right > undoCol.left && r.top < undoCol.bottom && r.bottom > undoCol.top;
+      if (meets) a.style.setProperty('inset-block-start', `${Math.round(undoCol.bottom - wrap.y + 8 + r.height / 2)}px`);
+    }
 
     /* the navigator column, after the variables above so the price is already
        where they put it (see `placeSteps`) */

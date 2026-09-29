@@ -6071,6 +6071,8 @@ for (const v of VIEWS) {
     return { band: R(band), stage: R(stage), frame: { left: a.x, top: a.y, right: z.x, bottom: z.y }, others,
       pos: getComputedStyle(band).position, inWrap: band.parentElement === document.querySelector('.stage-wrap'),
       span: parseFloat(band.style.getPropertyValue('--band-w')),
+      lo: parseFloat(band.style.getPropertyValue('--band-lo')),
+      wrapL: document.querySelector('.stage-wrap').getBoundingClientRect().left,
       clipped: t.scrollWidth > t.clientWidth + 1 || n.scrollWidth > n.clientWidth + 1,
       text: `${t.textContent} · ${n.textContent}` };
   });
@@ -6108,8 +6110,26 @@ for (const v of VIEWS) {
           if (x) fault('band-photo', `${tag}: the band is on the ${o.n} (${x} px², "${m.text}")`);
         }
         const doorC = (m.frame.left + m.frame.right) / 2, bandC = (m.band.left + m.band.right) / 2;
-        /* off-centre is allowed only where the band fills its whole span */
-        if (Math.abs(bandC - doorC) > 1.5 && m.band.width < m.span - 1.5) fault('band-photo', `${tag}: the band is ${(bandC - doorC).toFixed(1)} px off the door's centre with room to spare in its span`);
+        /* ⚠ RESTATED 29.9.2026 AS THE RULE ITSELF, NOT A PROXY FOR IT. The
+           rule (above): centred on the door wherever its span lets it be,
+           otherwise off-centre ONLY AS FAR AS the span requires. This line
+           was "off-centre only where the band fills its whole span", which is
+           the same thing while every span is tight — and it was, until the
+           phone's undo/redo/save became a column (the owner's son: "make them
+           vertical") and the span stopped being symmetric about the door: a
+           narrow column on one side, the language picker on the other. A
+           centred band there crosses the picker's edge, so `placeBand` moves it
+           just clear — which the proxy called a fault. Now the check computes
+           the one position the rule allows — the door's centre clamped into
+           [span left + w/2, span right − w/2], off `--band-lo` — and requires
+           the band there to 1.5 px. Where it can be centred, or fills its span,
+           that is the old assertion exactly; where it can do neither, the old
+           one only failed, and this one pins where it must stand. */
+        const lo = m.wrapL + m.lo, hi = lo + m.span, w = m.band.width;
+        const want = Number.isFinite(m.lo) && Number.isFinite(m.span)
+          ? Math.min(Math.max(doorC, lo + w / 2), hi - w / 2) : doorC;
+        if (!Number.isFinite(m.lo)) fault('band-photo', `${tag}: the band carries no --band-lo — this check cannot place it`);
+        if (Math.abs(bandC - want) > 1.5) fault('band-photo', `${tag}: the band is ${(bandC - doorC).toFixed(1)} px off the door's centre where its span requires ${(want - doorC).toFixed(1)}`);
         if (Math.abs(bandC - doorC) > 1.5) offCentre.push(tag);
       }
     } catch (e) {

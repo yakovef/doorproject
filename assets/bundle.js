@@ -11731,6 +11731,7 @@ ${plate.defs}${plate.body}
     }
     band.style.setProperty("--band-top", `${top}px`);
     band.style.setProperty("--band-w", `${Math.max(0, Math.floor(R - L2))}px`);
+    band.style.setProperty("--band-lo", `${Math.round(L2)}px`);
     const w = band.offsetWidth;
     band.style.setProperty("--band-l", `${Math.round(Math.max(L2, Math.min(cx - w / 2, R - w)))}px`);
   }
@@ -11860,6 +11861,14 @@ ${plate.defs}${plate.body}
       sw.setProperty("--frame-mid", `${Math.round((f.top + f.bottom) / 2 - wrap.y)}px`);
       sw.setProperty("--hud-b", `${Math.round(hudB - wrap.y)}px`);
       placeBand();
+      const undoCol = document.querySelector(".stage__hud .hud__slot--end")?.getBoundingClientRect();
+      for (const a of document.querySelectorAll(".stage__arrow")) {
+        a.style.removeProperty("inset-block-start");
+        if (!undoCol || !undoCol.width) continue;
+        const r = a.getBoundingClientRect();
+        const meets = r.left < undoCol.right && r.right > undoCol.left && r.top < undoCol.bottom && r.bottom > undoCol.top;
+        if (meets) a.style.setProperty("inset-block-start", `${Math.round(undoCol.bottom - wrap.y + 8 + r.height / 2)}px`);
+      }
       placeSteps();
       const root = document.documentElement.style;
       root.setProperty("--stage-l", `${Math.round(wrap.x)}px`);
