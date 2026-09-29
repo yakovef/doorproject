@@ -11,12 +11,12 @@ import {
   bellGlyph, bowGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
   bellFits, bowFeet, bowFits, bowHome, bowPlacement, locksetGlyph, mashkofGlyph, panelUnderGlass, spawnIndexOf, spawnSpots, peepholeFits,
-  peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph, stripesGlyph, TRIO_RAIL,
+  peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph, stripeTileGlyph, TRIO_RAIL,
   windowGlyph,
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
-import { bowObstacle, conflicts, detailWorked, displacedBy, fallbackLockset, gripObstacle, repair } from '../js/rules.js';
+import { bowObstacle, conflicts, detailWorked, displacedBy, fallbackLockset, faceTile, gripObstacle, repair, STRIPE_TILE } from '../js/rules.js';
 import { describeSentence, handingWords, specLines, specRows, summaryLine } from '../js/spec.js';
 import { WORKS } from '../js/works.js';
 import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery, VERSION } from '../js/url-state.js';
@@ -2213,28 +2213,32 @@ group('every option tile draws its own picture');
       ok(nones[i][1] !== nones[j][1], `the ${nones[i][0]} and ${nones[j][0]} tiles are one picture for two different absences`);
   }
   /* The stripe control's three pills, 23.9.2026 — not an option list, but
-     three pictures a customer chooses between, which is this loop's subject. */
-  for (const d of ['none', 'h', 'v']) check('stripes', d, stripesGlyph(d));
+     three pictures a customer chooses between, which is this loop's subject.
+     ⚠ RESTATED 29.9.2026: the stripes are two TILES of the face group now, so
+     they are checked under the face group's own key — each must differ from
+     every face tile as well as from the other (the composite list the page
+     draws). The "none" pill's picture is gone with the pill: the plain face is
+     the tile that says it, and it is already in this loop. */
+  for (const [d, id] of Object.entries(STRIPE_TILE)) check('detail', id, stripeTileGlyph(d));
 }
 
 /* ── 6b1b. THE STRIPE PICTURES ARE THE DOOR'S OWN LINES ──
    Peretz, 20.9.2026: *"add icons for the stripes to make them more visible."*
-   `stripesGlyph` draws a window on the standard leaf in the leaf's own
-   millimetres, so a line's coordinate in the icon IS where the door draws that
-   band. This reads both out of the markup — the icon's lines, and the band
-   bodies the door emits for the same count — and requires them to be the same
-   set inside the window, in both directions: an icon line with no band under
-   it is a picture of a door we do not build, and a band inside the window with
-   no line is a picture that has drifted off its door. §5.15: both sides must
-   have found lines, or this is comparing two empty sets. Falsified by giving
-   the icon a pitch and a column offset of its own: 15 of 22 fail. ⚠ Moving the
-   WINDOW falsifies nothing, and correctly — the window only crops, so every
-   line it keeps is still on a band. */
+   ⚠ RESTATED 29.9.2026 onto the stripe TILES (`stripeTileGlyph`), which draw
+   the whole leaf as a face tile does, the lines at the tile's count. The
+   subject is unchanged — a line in the picture is where the door draws a band
+   — and it is asked more strongly: the pills' pictures were a 420 mm window
+   and only had to agree INSIDE it; the tile is the whole leaf, so every band
+   the door draws for that count must have its line and every line its band,
+   as fractions of the frame against fractions of the leaf. §5.15: both sides
+   must have found lines, or this is comparing two empty sets. Falsified by
+   giving the tile a pitch of its own (0.15 for 0.19): every horizontal line
+   fails. */
 group('the stripe pictures are the door\'s own lines');
 {
-  const leafAt = svg => {
-    const m = svg.match(/<g id="leaf"[\s\S]*?<rect[^>]*?x="([-\d.]+)"[^>]*?y="([-\d.]+)"/);
-    return m && { x: +m[1], y: +m[2] };
+  const leafBox = svg => {
+    const m = svg.match(/<g id="leaf"[\s\S]*?<rect[^>]*?x="([-\d.]+)"[^>]*?y="([-\d.]+)"[^>]*?width="([\d.]+)"[^>]*?height="([\d.]+)"/);
+    return m && { x: +m[1], y: +m[2], w: +m[3], h: +m[4] };
   };
   const bodies = svg => {
     const g = (svg.match(/<g data-detail="strips"[\s\S]*?<\/g>/) || [''])[0];
@@ -2243,29 +2247,82 @@ group('the stripe pictures are the door\'s own lines');
     return r.filter((_, i) => i % 3 === 1);          // shadow, BODY, highlight
   };
   const hingeLeft = HANDINGS.find(h => h.hinge === 'left').id;
-  for (const [dir, n] of [['h', STRIPE_MAX.h], ['v', STRIPE_MAX.v]]) {
-    const icon = stripesGlyph(dir);
-    const [x0, y0, C] = icon.match(/viewBox="([-\d.]+) ([-\d.]+) ([\d.]+)/).slice(1).map(Number);
+  for (const dir of ['h', 'v']) {
+    const icon = stripeTileGlyph(dir);
+    const n = +(icon.match(/data-count="(\d+)"/) || [])[1];
+    const frame = icon.match(/<rect x="0" y="0" width="([\d.]+)" height="([\d.]+)"/);
+    const [W, H] = frame ? [+frame[1], +frame[2]] : [0, 0];
     const lines = [...icon.matchAll(/<line x1="([-\d.]+)" y1="([-\d.]+)" x2="([-\d.]+)" y2="([-\d.]+)"/g)]
-      .map(m => dir === 'h' ? +m[2] : +m[1]);
+      .map(m => dir === 'h' ? +m[2] / H : +m[1] / W);
     const svg = render({ ...DEFAULTS, size: 'standard', handing: hingeLeft, detail: 'plain', window: 'none',
                          stripeDir: dir, stripeCount: n, stripeTight: false });
-    const leaf = leafAt(svg), bs = bodies(svg);
+    const leaf = leafBox(svg), bs = bodies(svg);
+    ok(n >= 2 && W && H && lines.length === n,
+       `${dir}: the tile says ${n} stripes on a ${W}x${H} frame and draws ${lines.length} lines — this check is reading nothing`);
     ok(leaf && bs.length === n, `${dir}: found the leaf ${!!leaf} and ${bs.length} band bodies for ${n} stripes — this check is reading nothing`);
-    if (!leaf || !bs.length) continue;
-    const door = bs.map(b => dir === 'h' ? b.y + b.h / 2 - leaf.y : b.x + b.w / 2 - leaf.x)
-      .filter(v => dir === 'h' ? v > y0 && v < y0 + C : v > x0 && v < x0 + C);
-    ok(lines.length >= 2 && door.length >= 2,
-       `${dir}: the icon draws ${lines.length} lines and the door has ${door.length} bands in its window — too few to be a picture of stripes`);
+    if (!leaf || !bs.length || !lines.length) continue;
+    const door = bs.map(b => dir === 'h' ? (b.y + b.h / 2 - leaf.y) / leaf.h : (b.x + b.w / 2 - leaf.x) / leaf.w);
     for (const v of lines) {
-      ok(door.some(d => Math.abs(d - v) < 0.6),
-         `${dir}: the icon draws a line at ${v} mm and the door has no band there (${door.map(d => d.toFixed(1))})`);
+      ok(door.some(d => Math.abs(d - v) < 0.004),
+         `${dir}: the tile draws a line at ${v.toFixed(3)} of the leaf and the door has no band there (${door.map(d => d.toFixed(3))})`);
     }
     for (const d of door) {
-      ok(lines.some(v => Math.abs(d - v) < 0.6),
-         `${dir}: the door draws a band at ${d.toFixed(1)} mm inside the icon's window and the icon has no line there`);
+      ok(lines.some(v => Math.abs(d - v) < 0.004),
+         `${dir}: the door draws a band at ${d.toFixed(3)} of the leaf and the tile has no line there`);
     }
   }
+}
+
+/* ── 6b1c. THE STRIPES ARE TILES, AND THEIR IDS NEVER LEAVE THE SCREEN ──
+   29.9.2026, the owner's son: *"The stripes get square buttons like every
+   other option."* `STRIPE_TILE`'s two ids are the page's names for a
+   direction; the state, the link and the code still carry `stripeDir` and
+   `stripeCount`. Asserted: `faceTile` names the stripe tile exactly while
+   there is line work and the face otherwise; `toQuery` never emits either
+   id, whatever the door; and a link that puts one where a face goes is
+   noticed, never decoded into a door. And the greying: the stripe tiles are
+   greyed by a window on the leaf and by nothing else — never by a panel, and
+   no panel for the stripes (they are one radio group's alternatives) — while
+   the window list is still greyed by the stripes (it asks, the other way). */
+group('the stripes are tiles, and their ids never leave the screen');
+{
+  const ids = Object.values(STRIPE_TILE);
+  ok(ids.length === 2 && ids.every(id => !DETAILS.some(d => d.id === id)),
+     `the stripe tiles are [${ids}] — two, and none of them a DETAILS id`);
+  let seen = 0;
+  for (const dir of ['none', 'h', 'v']) for (const d of DETAILS) for (const w of WINDOWS) {
+    const st = { ...DEFAULTS, detail: d.id, window: w.id, stripeDir: dir, stripeCount: dir === 'none' ? 0 : 3 };
+    const q = toQuery(st);
+    ok(!ids.some(id => q.includes(id)), `${dir}/${d.id}/${w.id}: the link carries a stripe tile's id — ${q}`);
+    const want = dir === 'none' ? d.id : STRIPE_TILE[dir];
+    ok(faceTile(st) === want, `${dir}/${d.id}/${w.id}: faceTile says ${faceTile(st)}, the tile on is ${want}`);
+    seen++;
+  }
+  ok(seen === 3 * DETAILS.length * WINDOWS.length, `the id sweep saw ${seen} doors`);
+  for (const id of ids) {
+    const r = fromQuery(`?d=${id}`);
+    ok(r.notice, `a link with d=${id} opened with no notice — a screen-only id was read as a door`);
+    ok(r.state.detail !== id && !ids.includes(faceTile(r.state)),
+       `a link with d=${id} decoded into a door with the stripe tile ${faceTile(r.state)} on`);
+  }
+  for (const w of WINDOWS) for (const d of DETAILS) {
+    const st = repair({ ...DEFAULTS, window: w.id }).state;
+    const c = conflicts({ ...st, detail: d.id });
+    const glazed = w.id !== 'none';
+    for (const id of ids) {
+      ok(!!c.detail[id] === glazed,
+         `${w.id}/${d.id}: the stripe tile ${id} is ${c.detail[id] ? 'greyed' : 'free'} — it is greyed by a window and nothing else`);
+      if (glazed) ok(c.detail[id] === T('why.stripesWindow'), `${w.id}: the stripe tile's reason is "${c.detail[id]}"`);
+    }
+  }
+  for (const d of DETAILS) {
+    const striped = { ...DEFAULTS, detail: 'plain', stripeDir: 'h', stripeCount: 3 };
+    ok(!conflicts(striped).detail[d.id], `${d.id}: greyed on a striped door — "${conflicts(striped).detail[d.id]}"`);
+    ok(!conflicts({ ...DEFAULTS, detail: d.id }).detail[STRIPE_TILE.h], `${d.id}: the stripe tile is greyed for this face`);
+  }
+  const lined = conflicts({ ...DEFAULTS, stripeDir: 'v', stripeCount: 3 });
+  ok(lined.window.rect === T('why.windowStripes') && lined.window.strip === T('why.windowStripes'),
+     'with stripes on the door the windows are no longer greyed — the window over stripes would not ask');
 }
 
 /* ── 6b2. THE משקוף TILES SAY THE NUMBER, AND THE MARK IS THAT LONG ──
@@ -6738,6 +6795,7 @@ group('ironwork is counted, and the drawing agrees with the bill');
    does not keep the option at all, is not a question the dialog can ask. */
 group('a tap that would take something away asks first');
 {
+  const isLine = st => st.stripeDir !== 'none' && st.stripeCount > 0;
   const plan = (base, change, key) => {
     const s = repair({ ...DEFAULTS, ...base }).state;
     const r = repair({ ...s, ...change }, key).state;
@@ -6749,8 +6807,12 @@ group('a tap that would take something away asks first');
     ['the square window beside a peephole', { peephole: 'peep' }, { window: 'rect' }, 'window', 'peephole'],
     ['a doorbell on a glazed door', { window: 'rect' }, { bell: 'bell' }, 'bell', 'window'],
     ['the square window beside a doorbell', { bell: 'bell' }, { window: 'rect' }, 'window', 'bell'],
-    ['two panels over stripes', { stripeDir: 'h', stripeCount: 3 }, { detail: 'panel2' }, 'detail', 'stripeCount'],
-    ['stripes over two panels', { detail: 'panel2' }, { stripeDir: 'h', stripeCount: 2 }, 'stripes', 'detail'],
+    /* ⚠ ADDED 29.9.2026 — the pair this list did not have: the window and
+       the stripes, each over the other. A stripe tile tapped beside a window
+       takes the window (it is greyed, and the dry run asks), and a window
+       tapped on a striped door takes the stripes. */
+    ['the square window over stripes', { stripeDir: 'h', stripeCount: 3 }, { window: 'rect' }, 'window', 'stripeCount'],
+    ['stripes over the square window', { window: 'rect' }, { stripeDir: 'h', stripeCount: 2, detail: 'plain' }, 'stripes', 'window'],
     ['the tall slot over two panels', { detail: 'panel2' }, { window: 'strip' }, 'window', 'detail'],
     ['the Coral against an Idan beside the slot', { window: 'strip', handle: 'idan', lockset: 'cylinder' }, { lockset: 'coral' }, 'lockset', 'handle'],
     ['an Idan against the Coral beside the slot', { window: 'strip', lockset: 'coral' }, { handle: 'idan' }, 'handle', 'lockset'],
@@ -6770,10 +6832,26 @@ group('a tap that would take something away asks first');
     ['a bar shortened by a smaller size', { size: 'extra2', handle: 'idan', handleLen: 2000 }, { size: 'standard' }, 'size'],
     ['a new colour', {}, { colour: 'rb-9016d' }, 'colour'],
     ['two panels on a plain door', {}, { detail: 'panel2' }, 'detail'],
+    /* ⚠ MOVED HERE FROM THE LIST ABOVE, 29.9.2026: a face and the stripes are
+       tiles of ONE radio group now (*"the stripes get square buttons like every
+       other option"*), so a swap inside it is the customer's answer, not a
+       loss — it lands on the tile tapped with the other cleared and asks
+       nothing. The change is what the page plans for each tile (js/app.js,
+       the face group's `plan`). Their old subject — the face and the stripes
+       cannot share a door — is asserted below as where each swap LANDS. */
+    ['two panels over stripes', { stripeDir: 'h', stripeCount: 3 }, { detail: 'panel2', stripeDir: 'none', stripeCount: 0 }, 'detail'],
+    ['stripes over two panels', { detail: 'panel2' }, { stripeDir: 'h', stripeCount: 2, detail: 'plain' }, 'stripes'],
   ];
   for (const [name, base, change, key] of QUIET) {
-    const { lost } = plan(base, change, key);
+    const { s, r, lost } = plan(base, change, key);
+    for (const [k, v] of Object.entries(base)) ok(s[k] === v, `${name}: the fixture arrived with ${k}=${s[k]}, not ${v} — this case has no subject`);
     ok(lost.length === 0, `${name}: nothing is taken away and the dialog would ask about [${lost}]`);
+    if (key === 'detail' || key === 'stripes') {
+      ok(faceTile(r) === (change.stripeDir && change.stripeDir !== 'none' ? STRIPE_TILE[change.stripeDir] : change.detail)
+         && !(isLine(r) && byId(DETAILS, r.detail).panel),
+         `${name}: the swap landed on ${faceTile(r)} (${r.detail}, stripes ${r.stripeDir}×${r.stripeCount}) — `
+       + 'it should land on the tile tapped with the other cleared');
+    }
   }
   /* §5.22 — the refusal beside the question: a face beside the tall slot
      does not stick (the window stays, 26.9), so it is refused with its reason

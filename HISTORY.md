@@ -26,6 +26,102 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **29.9 — THE STRIPES ARE TWO TILES ON THE FACE STEP; ONE CYCLE OF SIX
+  (prompt B, 3 of 3).** The owner's son: *"If a user chooses a window, in the
+  face section the stripes are greyed out; with no window the arrows go through
+  the stripes as well — 2 panel, 3 panel, greek set, then horizontal stripes,
+  then vertical stripes, then nothing, and the cycle repeats. The stripes get
+  square buttons like every other option — make an icon for them."*
+  · **What was wrong.** The stripes were not tiles: three direction PILLS, a
+    −/+ and a tight toggle under the face tiles (`buildStripes`). The arrows
+    beside the door walk the first group's `[role="radio"]` tiles, so they
+    never reached a stripe; and `conflicts` greyed the stripes for a panel
+    (`why.stripesPanel`) and the panels for the stripes (`why.panelStripes`),
+    so an arrow from a panelled face would have skipped them anyway, and every
+    swap between the two asked "this will remove …".
+  · **What changed.** The face group is ONE radio group of six: plain ·
+    [פאנלים] panel2 panel3 classic · [פסי מתכת] `stripes-h` `stripes-v`
+    (`DETAIL_SUBS` gained the heading). The two stripe ids are SCREEN-ONLY:
+    `STRIPE_TILE` in js/rules.js, stated once for its two readers (`conflicts`
+    greys them, the page draws them — `STRIPE_TILES` in js/app.js, names read
+    through `T` at render time by a getter per language), never `DETAILS`
+    entries, never in `d=`, `sp=` or the code; the state still carries a
+    direction and a count. The group's `value` (`faceTile`) says which tile is
+    on — read by `markGroup`, `nowLabel` (so the band says "horizontal
+    strips") and the arrows through one `valueOf` — and its `plan` what a tap
+    changes: a stripe tile `{ stripeDir, stripeCount: max(1, count || 2),
+    stripeTight: v ? false : tight, detail: 'plain' }` under the `stripes`
+    key, a face `{ detail, stripeDir: 'none', stripeCount: 0 }` under
+    `detail`. `tilePrice` prices the planned state (a stripe tile its stripes,
+    ₪300 / ₪600 at two). The pills went; the −/+ and the tight pill stay,
+    drawn under the tiles only while a stripe tile is on, committing as before.
+  · **The swap asks nothing.** `OWNED` gives both keys the four face fields
+    (`ownedBy`), so `displacedBy` counts none of them lost and `commitChoice`
+    records none of them in the give-back memory — "plain" after a panel over
+    stripes means plain, as a radio group does. What a stripe tile takes from
+    OUTSIDE — the window — still asks: the tile is greyed by the window
+    (`why.stripesWindow`, the one statement read by the grey, the reason, the
+    arrows, which skip it, and the tap, which goes through the dry run), and a
+    window over stripes asks too (the window list stays greyed by the stripes,
+    `why.windowStripes`). `conflicts` stopped greying panels and stripes for
+    each other; `repair`'s A11 branch stays, for links.
+  · **The pictures.** `stripeTileGlyph(dir)` draws what `detailGlyph` draws for
+    a face — the leaf's frame, pad and outline — with its lines where the door
+    puts its bands (`STRIP_H`, `STRIP_EVEN_W`; `STRIP_V`, `STRIP_V_RUN`,
+    `stripVAt`, hinge left): seven across at stroke 80, five upright at 40.
+    Not the most — the pills' pictures showed the most each axis takes
+    cropped to a 420 mm window, and on a whole-leaf tile eleven rows or six
+    columns read as a hatch — and not five across either: the audit's raster
+    floor found five thin rows 39% apart from the plain face at the 54 px the
+    tile ships at (floor 50%). Rasterised at 54 px, seven at 80 read 57–62%
+    against every face and the upright tile; the upright lines keep 40
+    because their 69-unit pitch closes into one bar at 80 (they read 58–61%). `stripesGlyph` went with all
+    its readers (the pills, the summary's stripes row — which draws the tile
+    now — and the tests, restated). The CSS for `.stripes__dirs`,
+    `.stripes__dir`, `.stripes__ico` and `.stripes__why` went with the markup;
+    `why.stripesPanel`, `why.panelStripes` and `stripes.none` with their last
+    readers; `stripes.tile.h`/`.v` are new, in three languages.
+  · **The cycle, measured on the page** (1280 he, 390 ru): no window — plain →
+    panel2 → panel3 → classic → stripes-h → stripes-v → plain, no dialog;
+    the square window — plain → panel2 → panel3 → classic → plain. ⚠ **The
+    brief expected the tall slot to walk panel2 → plain; it cannot.** Beside
+    the slot the PAIR is refused too (`why.noRoomBelow` — no room for the
+    panel under a 0.79-high slot), as are the trio (`why.winPlate`), the set
+    and the stripes, so from plain nothing else is free and the arrow opens the
+    one-button "nothing else fits" dialog with the door unchanged. The audit
+    asserts that, and says why.
+  · **Restated, each keeping its subject:** units — the tile-coverage loop
+    checks the stripe tiles under the face group's own key (distinct from
+    every face and each other); the "pictures are the door's own lines" group
+    onto the tile, STRONGER (every band for that count has its line and every
+    line its band across the whole leaf, where the window only cropped);
+    "two panels over stripes" and "stripes over two panels" moved from ASKS to
+    QUIET, each asserted to LAND on the tile tapped with the other cleared;
+    added the pair nothing had — the window over stripes asks, stripes over the
+    window asks; a new group holds `faceTile`, the ids' absence from every
+    link, a `d=stripes-h` link noticed and not decoded, and the greying (the
+    window only). Audit — the 14.9 "stripe control on the face step in every
+    state" block onto the tiles on a panelled door (free, lands without a
+    question, the stepper appears) and a glazed one (greyed with its reason,
+    `aria-disabled`, asks, lands, the toast names the window); the give-back
+    memory clauses: face → panel2 → plain now LANDS on plain (its old claim
+    reversed on purpose — one radio group), the stripes' give-back moved to
+    the window that still takes them, and "a deliberate choice beats the
+    memory" re-aimed onto that window memory; the pill-picture block onto the
+    tiles (each against the other and every face tile at the size shipped, and
+    the tiles fitting 320 in Russian); the tap-scroll `PICK` lost the pill
+    selector; the arrow-order walk takes the window off before the face (the
+    glass walk, now first, left the slot on the door and would have left the
+    face walk nothing to press); a new block walks the three cycles above.
+  · **Falsified,** each in a throwaway copy: the tile's pitch 0.15 for 0.19 →
+    8 line/band pairs disagree; the stripes greyed for a panel again → 6
+    greyings wrong, and on the page the cycle skips the stripes (classic →
+    plain); the arrow walking the array's faces alone → the same break at
+    classic → stripes-h; `OWNED` as before → both in-group swaps ask.
+  · **Not done:** no `VERSION` — the tiles' ids never enter `d=`, `sp=` or the
+    code, and the screen's order of a list is not the array's (§3). No sheet
+    moves (the stripe tiles are tile art; `render()` untouched).
+
 - **29.9 — PROMPT A, 5 OF 5: THE SAVED LIST SHOWS THE DOORS.** The owner's son:
   *"In the save menu, if you choose to view the doors you already made, show
   how they look and their price, that's it."* Answered in chat: the rows keep
@@ -190,6 +286,7 @@ oldest lines move to the top of the "moved" section.
     `inert` removed from the page (a modal is what keeps a finger off the
     targets); a smaller callout at every width (only where it did not fit).
 
+
 - **29.9 — PROMPT A, 2 OF 5: UNDO AND REDO PAINTED FROM THE FIRST PAINT, GREYED.**
   The owner's son: *"At the tutorial's fourth step the undo button is not shown
   yet, so it looks strange — available but greyed out at the start, because
@@ -258,6 +355,7 @@ oldest lines move to the top of the "moved" section.
     shared corner in Hebrew (a product question — the pills' corner is the
     other session's, merged at the owner's son's choice); `aria-disabled` on a
     pill (there is nothing to explain — it is not refused, it is empty).
+
 - **29.9 — THE WINDOW'S DESIGNS UNLOCK WITH A WINDOW (prompt B, 2 of 3).** The
   owner's son: *"The window section split in 2: the main one with the window
   types (the only 2 we have), and if they choose a window, a sub-section
@@ -3327,6 +3425,29 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **29.9** The window step before the face (B, 1 of 3) — *"The window section
+  before the face section"*: `SECTIONS` · `glass` · `face` ·, adjacent still
+  (§3); `WANT_ORDER` and the audit's arrows walk with it. No copy claimed the
+  old order (grepped in three languages: none to correct). No `VERSION` —
+  a step key is `data-step`. Long form: `HISTORY.md`.
+- **29.9** The band's two lines BIGGER (*"especially the one that represents the
+  option that is now chosen"*): title 26–36 px, the option 19–27 px in the
+  title's face (Bona Nova 700, his answer) and ink; the phone keeps its sizes
+  (+0.8 px of line box). The band 54.8 → 72.0 px at 1440/1920; `fitCrop` gave
+  the tallest door that wall, the leaf 437.0 → 426.6 / 564.0 → 551.4 / 576.5 →
+  563.9 — the floors restated there. Long form: `HISTORY.md`.
+- **29.9** The crop gives each viewport exactly the wall its band needs
+  (`fitCrop`, `data-head-y`): above 1100 the standard leaf is 502.6 / 437.0 /
+  564.0 / 576.5 px at 1100 / 1280 / 1440 / 1920 (was 492.6 / 436.9 / 556.0 /
+  567.4); at 320×568 the band stands 8 px over the tallest casings, not 2.5
+  (leaf 160.4 → 156.2). Below 1100 `FIT_TRIM` is the floor — exactly the need
+  there put `halfextra2` under the picker by 224 px² at 390. `halfextra1`
+  cleared; the phone exemptions have ceilings. Long form: `HISTORY.md`.
+- **29.9** Undo, redo and save in BRONZE (`--accent-ink`, white glyph, 6.1:1)
+  — *"more noticeable, make them a different color … on both phone and pc"* —
+  and on a phone undo/redo STACKED (*"vertical"*; `placeUndo` offers `stack`,
+  `icon`, then side by side only where neither fits — 320 × `half`). Merged onto the other session's pills
+  at the foot and save dialog, the owner's son's choice. Long form: `HISTORY.md`.
 - **29.9** ברזל מחושל is BACK, as `iron` and `iron-light` (black, and the
   door's colour) — the owner's son sent three photographs of doors installed
   since 26.8 (`research/ironwork/`), which makes thirteen doors against one

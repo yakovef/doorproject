@@ -198,6 +198,20 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
     at the same width"* against the order's own `PANEL_INSET` line, which on a
     350 mm leaf gives a 189 mm panel under a 288 mm casing. d122's photograph
     shows it that way.
+  **Taken for them in the flow round (29.9, prompt B)**, each reversible in a
+  line:
+  · the designs group hides through the finish group's `when`, and the "none"
+    window tile stays;
+  · the face group is ONE radio group of six and a swap inside it asks
+    nothing — the panel/stripes greying left the interface (A11 stays a
+    repair rule for links);
+  · the count's −/+ and the tight pill appear under the tiles only while a
+    stripe tile is on;
+  · a stripe tile is greyed by the WINDOW only; a direct tap still asks "this
+    will remove the window" (his 27.9 rule), and the arrows skip it;
+  · the stripe tiles draw the leaf with its lines (seven across, five
+    upright — a representative count), as the face tiles draw the leaf with
+    its panels.
   Settled with them in chat, not ours: where the new "ask before removing"
   rule meets Peretz's refusal — a pull handle or bow with no room beside the
   window or the face — **Peretz's rule stands**, refused with its reason and
@@ -212,6 +226,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **29.9** The stripes are two tiles on the face step; one cycle of six (B, 3
+  of 3) — *"2 panel, 3 panel, greek set, then horizontal stripes, then vertical
+  stripes, then nothing … square buttons like every other option"*: screen-only
+  `stripes-h`/`-v` (`STRIPE_TILE`, never in the link or code), `stripeTileGlyph`;
+  the pills gone, the count under the tiles while on; greyed by the window only;
+  a swap in the group asks nothing (`ownedBy`). Long form: `HISTORY.md`.
 - **29.9** The saved doors SHOW THE DOORS (*"show how they look and their
   price, that's it"*): each row the door drawn (`copyOf`, 132 px) and its
   price, the summary its accessible name, a small × in the corner; two across
@@ -240,29 +260,6 @@ lines here. Dates are the day of the change.
   arrows walk none → slot → square. A linked design still brings its window.
   Units hold it to the rules; the audit to the page (links, taps, arrows); its
   every-option walk now unlocks a `when` group first (§5.28). Long form: `HISTORY.md`.
-- **29.9** The band's two lines BIGGER (*"especially the one that represents the
-  option that is now chosen"*): title 26–36 px, the option 19–27 px in the
-  title's face (Bona Nova 700, his answer) and ink; the phone keeps its sizes
-  (+0.8 px of line box). The band 54.8 → 72.0 px at 1440/1920; `fitCrop` gave
-  the tallest door that wall, the leaf 437.0 → 426.6 / 564.0 → 551.4 / 576.5 →
-  563.9 — the floors restated there. Long form: `HISTORY.md`.
-- **29.9** The window step before the face (B, 1 of 3) — *"The window section
-  before the face section"*: `SECTIONS` · `glass` · `face` ·, adjacent still
-  (§3); `WANT_ORDER` and the audit's arrows walk with it. No copy claimed the
-  old order (grepped in three languages: none to correct). No `VERSION` —
-  a step key is `data-step`. Long form: `HISTORY.md`.
-- **29.9** Undo, redo and save in BRONZE (`--accent-ink`, white glyph, 6.1:1)
-  — *"more noticeable, make them a different color … on both phone and pc"* —
-  and on a phone undo/redo STACKED (*"vertical"*; `placeUndo` offers `stack`,
-  `icon`, then side by side only where neither fits — 320 × `half`). Merged onto the other session's pills
-  at the foot and save dialog, the owner's son's choice. Long form: `HISTORY.md`.
-- **29.9** The crop gives each viewport exactly the wall its band needs
-  (`fitCrop`, `data-head-y`): above 1100 the standard leaf is 502.6 / 437.0 /
-  564.0 / 576.5 px at 1100 / 1280 / 1440 / 1920 (was 492.6 / 436.9 / 556.0 /
-  567.4); at 320×568 the band stands 8 px over the tallest casings, not 2.5
-  (leaf 160.4 → 156.2). Below 1100 `FIT_TRIM` is the floor — exactly the need
-  there put `halfextra2` under the picker by 224 px² at 390. `halfextra1`
-  cleared; the phone exemptions have ceilings. Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 28.9.2026
@@ -483,14 +480,14 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | **9,441,238 assertions, 0 failed** with the כדור redrawn, on the round's 9 of 10 (28.9). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 28.9 |
-| `npm run audit` | the full run at the end of the 28.9 round read **4 faults, all fixed in commit 10** (§0b). ⚠ **The re-run after the fix did not finish** — the container restarted under it — and was clean through every block up to the navigator's (the undo and landscape blocks among them); the blocks after that were clean on the first run, before the fix, and are not re-run ⚠ **On `629f7d0` (the כדור merged onto 10 of 10): 6 faults, every one the saved-designs drawer's** — its toggle not on the page in ru at 390×844 and 834×1112, the stale design not reaching the drawer (he, ru), 8 of 10 cases opened, 24 of 30 rows. The drawer is the 5-of-10 save dialog's; the כדור touched no page code. Not fixed here ⚠ **And a COMPLETE run on `629f7d0` + the ironwork port (29.9, every block to the end) read no faults at all, the drawer's 30 rows at 5 shapes in two languages included** — so those 6 did not reproduce once; treat them as unexplained, not as fixed, and not as settled either | 28.9 |
-| `npm run collide` | `all` (1,638 designs — 1,468 base, 602 with the bow, plus 170 face-detail) and `boxes` clean with the כדור redrawn (28.9: drawn 33/33/33, declared 35/35/35; the bow 0/300/21 in 4/305/26; the knob-plate 46/46/155 in 48/48/157; the deepest mount 109, the עילי's) | 28.9 |
-| `npm run fuzz` | 30,000 designs over every field (the latch among them), 1,800 clicks, 141 of them met the confirm dialog — 65 yes, 76 no, the door unchanged after every no — nothing broke (the big round's commit 7). ⚠ **Not run in the 28.9 round** (the tour, the dialogs and the extra lock's step are unfuzzed) | 27.9 |
-| `npm run latency` | **420 ms** worst door against a 600 ms gate (28.9, a container just restarted) — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · 531 · 656 for default · sidelight+ironwork · the heaviest, unchanged through the round (217 ms on 27.9 on another container). Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 28.9 |
+| `npm test` | **10,595,593 assertions, 0 failed** with the stripes as tiles, prompt B's 3 of 3 on the A round's five (29.9; 10,595,605 before that rebase, 10,595,466 on B's 2 of 3, 10,595,363 on its 1). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 29.9 |
+| `npm run audit` | ⚠ **On prompt B's 3 of 3 (29.9): 5 faults, none in its rows** — the 320×568 `halfextra1` redo-on-arrow reading GONE in he and ru (the band commit `08a59ed` made the side-by-side glyphs fit there: 37 → 0 px², measured on `d3b54e6` against `08a59ed`; its region, and the exemption asks to come out) and 3 of the saved-designs drawer's (its toggle off the page in one case — the unexplained fault below, again). Its own blocks — the six-tile cycle, the designs unlocking, the stripe tiles' pictures (closest 58%) and fit — clean. the full run at the end of the 28.9 round read **4 faults, all fixed in commit 10** (§0b). ⚠ **The re-run after the fix did not finish** — the container restarted under it — and was clean through every block up to the navigator's (the undo and landscape blocks among them); the blocks after that were clean on the first run, before the fix, and are not re-run ⚠ **On `629f7d0` (the כדור merged onto 10 of 10): 6 faults, every one the saved-designs drawer's** — its toggle not on the page in ru at 390×844 and 834×1112, the stale design not reaching the drawer (he, ru), 8 of 10 cases opened, 24 of 30 rows. The drawer is the 5-of-10 save dialog's; the כדור touched no page code. Not fixed here ⚠ **And a COMPLETE run on `629f7d0` + the ironwork port (29.9, every block to the end) read no faults at all, the drawer's 30 rows at 5 shapes in two languages included** — so those 6 did not reproduce once; treat them as unexplained, not as fixed, and not as settled either | 28.9 |
+| `npm run collide` | re-read clean on prompt B's 3 of 3 (29.9), the same 1,638 — `all` (1,638 designs — 1,468 base, 602 with the bow, plus 170 face-detail) and `boxes` clean with the כדור redrawn (28.9: drawn 33/33/33, declared 35/35/35; the bow 0/300/21 in 4/305/26; the knob-plate 46/46/155 in 48/48/157; the deepest mount 109, the עילי's) | 28.9 |
+| `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, 195 of them met the confirm dialog — 107 yes, 88 no, the door unchanged after every no — nothing broke (prompt B's 3 of 3, 29.9: the face group's six tiles among the clicks, and the tour, the dialogs and the extra lock's step that went unfuzzed on 28.9) | 29.9 |
+| `npm run latency` | **413 ms** worst door against a 600 ms gate (29.9, prompt B's 3 of 3) — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · **1,017** · 656 for default · sidelight+ironwork · the heaviest. ⚠ The middle one was 531 until the ironwork port (`d797065`): that door is `g=iron`, aliased onto `grid` before and drawn as its own bars since — 532 → 1,018 tags in `render()`, measured at `4fbb96c` against `d797065` (prompt B moved nothing there). Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 29.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
-| `npm run sheets` | the bare sheet files and 6 `lockset` sheets byte-stable across commits that do not touch the drawing. ⚠ The Rotem (27.9) moved 33, every one ONLY in a lever-sized patch at lock height: 10 `against-` by 231 px at their edge (they set no lockset, so they carry the default Rotem), 8 `corpus-`, 6 `recreate-`, `lockset-coral`, `lockset-plate` and 7 `shot`. The big round (27.9), run once after its commit 7 with the prediction written first: **0 bare and 0 lockset moved**, as predicted — the 12 `shot` sheets, `.stamps.json` and `corpus-links.md` (v=26, `lt=`) only. The knob-plate (28.9): exactly the two that show it, `corpus-06` (d092) and `lockset-knobplate`. The bow (28.9): `against-grab` only — no gallery door carries it. The 28.9 round, predicted first: exactly `recreate-d122` (the half door's fixed leaf) | 28.9 |
+| `npm run sheets` | the bare sheet files and 6 `lockset` sheets byte-stable across commits that do not touch the drawing. ⚠ The Rotem (27.9) moved 33, every one ONLY in a lever-sized patch at lock height: 10 `against-` by 231 px at their edge (they set no lockset, so they carry the default Rotem), 8 `corpus-`, 6 `recreate-`, `lockset-coral`, `lockset-plate` and 7 `shot`. The big round (27.9), run once after its commit 7 with the prediction written first: **0 bare and 0 lockset moved**, as predicted — the 12 `shot` sheets, `.stamps.json` and `corpus-links.md` (v=26, `lt=`) only. The knob-plate (28.9): exactly the two that show it, `corpus-06` (d092) and `lockset-knobplate`. The bow (28.9): `against-grab` only — no gallery door carries it. The 28.9 round, predicted first: exactly `recreate-d122` (the half door's fixed leaf). Prompt B (29.9), 0 predicted on each of its three commits: 0 bare moved each time — the stripe tiles are tile art | 29.9 |
 
 ⚠ **When a bare sheet moves on a commit that could not have moved it, find out
 what did** — that is how chrome painted across every sheet was found once. And
@@ -882,15 +879,24 @@ derived from the WINDOW rather than from another face.
   of the leaf under a 0.34 window — measured, overruled, kept in the comment. Priced as before: the face once, the ironwork per pane (asserted).
   Stripes are not a face and stay on the main leaf only.
 
-**The stripes are a COUNT and a DIRECTION, not tiles** (27.8), priced per
-stripe. `metalStrips` places them from four measured tables, doors named beside
+**The stripes are a COUNT and a DIRECTION** (27.8), priced per stripe — and
+since 29.9 the direction is TWO TILES of the face group (the owner's son:
+*"The stripes get square buttons like every other option — make an icon for
+them"*): `stripes-h` and `stripes-v`, SCREEN-ONLY ids (`STRIPE_TILE` in
+`rules.js`, never in `d=`, `sp=` or the code — asserted), after the panels
+under their own heading, drawn by `stripeTileGlyph` as the leaf with its lines (seven across,
+five upright — the raster floor's count) off the same tables (`stripesGlyph`, the pills' window pictures, is
+gone). The count's −/+ and the tight pill are drawn under the tiles only while
+a stripe tile is on (ours, §0a). `metalStrips` places them from four measured tables, doors named beside
 each: `STRIP_H` (pitch `min(0.19, 0.80/(n−1))` centred on 0.52, width 0.88),
 `STRIP_H_TIGHT` (pitch 0.033 centred on 0.55; horizontal only, d081 d045),
 `STRIP_V`/`STRIP_V_RUN` (pitch 0.073 of the width, centred 0.33 from the hinge
 edge, 0.098–0.945 of the height; d037 d038 d043). `STRIPE_MAX` caps the count
 (11, 8 tight, 6 vertical) and `repair` enforces it (§5.21). Panels and stripes
-are exclusive (A11); the stripe control stays on screen with its pills blocked
-when panels are chosen.
+are exclusive (A11) — as ALTERNATIVES of one radio group since 29.9: neither is
+greyed for the other, a tap on one lands on it with the other cleared and asks
+nothing; `repair` keeps A11 for links. The stripe tiles are greyed by a window
+on the leaf and by nothing else (`why.stripesWindow`).
 
 ### The Greek set (`classic`, סט יווני)
 
@@ -1029,6 +1035,16 @@ for the same half of the leaf and `repair` trades between them.
   every design on a solid door — hidden through the finish group's mechanism.
   The arrows walk the window list alone. A LINK with a design and no window
   still brings the window (`SAID.windowAdded`).
+- **The face step is ONE radio group of six** (29.9, the owner's son: *"…the
+  arrows go through the stripes as well — 2 panel, 3 panel, greek set, then
+  horizontal stripes, then vertical stripes, then nothing, and the cycle
+  repeats"*): plain · [פאנלים] panel2 panel3 classic · [פסי מתכת] stripes-h
+  stripes-v. The group's `value` (`faceTile`) says which tile is on and its
+  `plan` what a tap changes; `markGroup`, `nowLabel` and the arrows read
+  `valueOf`. The arrows walk the drawn order: no window, the whole cycle with
+  no dialog; the square window skips the stripes; beside the slot every other
+  tile is greyed (the pair too, `why.noRoomBelow`) and the arrow says nothing
+  else fits.
 - A bare load opens step 01; a shared link or a code opens the summary (T11).
 - ⚠ **A first bare visit gets a TOUR** (28.9, the owner's son: *"A little
   tutorial when a person first joins … Only on the first visit"*; `js/tour.js`):
@@ -1078,9 +1094,14 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
   asks *"{x}? זה יסיר את {y}"*, `y` the spec rows' values; Yes (`--danger`
   red) commits the same plan, No (ink), Escape and the backdrop change
   nothing. The lever against a bar asks too now (it was a one-button
-  "cannot be together"); the stripes control goes through it; the arrows'
-  "nothing else fits" is its one-button form. Links and codes still repair
-  silently with the notice.
+  "cannot be together"); the arrows' "nothing else fits" is its one-button
+  form. Links and codes still repair silently with the notice.
+  ⚠ **A swap inside the face group asks NOTHING** (29.9): a face and the
+  stripes are one radio group's tiles, so both keys a face-group tap is
+  planned under (`detail`, `stripes`) OWN the four face fields (`ownedBy`) —
+  never counted as lost, never recorded by the give-back memory, so "plain"
+  after a panel over stripes means plain. The window and the stripes still
+  take each other, and each asks (asserted both ways).
 - ⚠ **`faceWorked` takes a STATE**; `detailWorked` takes a DETAILS entry
   (§5.24).
 
@@ -1458,7 +1479,9 @@ door is buildable; the drawn keyhole is where the photograph puts it.
     `plain` tap does not disarm the memory either, because the guard asks whether
     the field still holds what the repair made it and a tap on that same value
     changes nothing — so it moved to the stripes, the one field where a
-    deliberate different value is reachable.
+    deliberate different value is reachable. (And on 29.9 onto the WINDOW's
+    memory of the stripes: a panel over the stripes stopped displacing them —
+    one radio group — so it records nothing for a choice to beat.)
 
 28. **A GATE ADDED TO THE PAGE, AND EVERY WALK THAT DID NOT KNOW IT WAS
     THERE (27.9).** The confirm dialog made a tap that takes something away
@@ -1565,7 +1588,10 @@ are not in `VIEWS`:
   tiles redrawn when the lock furniture changes.
 - **repairs** — a real repair at every viewport, every sentence on screen, its
   box covering no option; an undo that moves the price names a spec row (the
-  pill is what it presses); the undo pills painted from load and greyed while
+  pill is what it presses); the face step's arrows walking one cycle of six
+  with no dialog, the square window skipping the stripes and the slot saying
+  nothing else fits (29.9), a stripe tile on a panelled door landing without a
+  question and on a glazed one asking; the undo pills painted from load and greyed while
   disabled (29.9), at the stage's corner, ≥ 44, on no door and nothing else on
   the wall, the first shape that fits and the same one across an undo, the
   toast above them — a save's before any change included (every viewport,
@@ -1609,7 +1635,8 @@ are not in `VIEWS`:
 - **pictures** — the navigator's ten marks (21 px) and the spec's fourteen
   (28 px since 27.9 — the summary's fallback for a row whose step has no tile
   glyph, the משקוף and the handing), rasterised at the size the stylesheet
-  gives them inside their container and compared pairwise (floor 0.50); the stripe pills; the
+  gives them inside their container and compared pairwise (floor 0.50); the stripe tiles (29.9 —
+  each against the other and every face tile, at the size they ship); the
   gallery grid never one column, no tile under 132 px; the photographed floor
   and sconces measured in pixels against the drawn ones.
 - **copy** — no explainer contradicts the price on its step; the

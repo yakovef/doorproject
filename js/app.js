@@ -38,10 +38,10 @@ import { breakdownRows, deltaLabel, formatAgorot, priceAgorot, priceLabel, price
 import {
   describe, detailGlyph, grilleGlyph, handleGlyph, locksetGlyph,
   bellGlyph, bowGlyph, handleFinishGlyph, copyOf, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
-  panelUnderGlass, specialLockGlyph, stripesGlyph,
+  panelUnderGlass, specialLockGlyph, stripeTileGlyph,
   windowGlyph,
 } from './renderer.js';
-import { conflicts, displacedBy, repair } from './rules.js';
+import { conflicts, displacedBy, faceTile, isLineWork, ownedBy, repair, STRIPE_TILE } from './rules.js';
 /* The navigator's circles and the summary's row marks. They live in their own
    file because a `const` in here can only be read by the browser, and two
    pictures that share a shape can only be found by rasterising them — see the
@@ -82,6 +82,21 @@ let state = { ...DEFAULTS };
    the same note over `SAID`, because it is the same trap and this file walked
    into it twice. The readers call `T()` at render time — `markSteps`,
    `buildSection`, `buildGroup`. */
+/* The face group's two stripe tiles (29.9.2026) — screen-only, their ids
+   `STRIPE_TILE`'s, their names read through `T` at render time (a getter per
+   language, never a sentence frozen at import — §0c). `sub` puts them under
+   the second heading of `DETAIL_SUBS`. */
+const STRIPE_TILES = Object.entries(STRIPE_TILE).map(([dir, id]) => {
+  const o = { id, dir, sub: 'stripes' };
+  for (const l of LANGS) {
+    Object.defineProperty(o, l.id, { enumerable: true, get: () => withLang(l.id, () => T(`stripes.tile.${dir}`)) });
+  }
+  return o;
+});
+/** The option a group has on: its `value` where the state does not hold it
+ *  under the group's key (the face group's stripe tiles), otherwise the key. */
+const valueOf = g => (g.value ? g.value(state) : state[g.key]);
+
 const GROUPS = [
   /* `label` and `meta` used to sit here and nothing read either of them; `meta`
      also spelled the chart code "RAL", which it is not — see `colourCode`. */
@@ -144,9 +159,27 @@ const GROUPS = [
      tiles are built. If a listing rule is ever wanted again it goes in
      `markGroup` and not in `list()` — the hook there is deleted with this
      one, because a hook nothing uses is a branch nothing tests. */
+  /* ⚠ ONE RADIO GROUP OF SIX SINCE 29.9.2026 — the owner's son: *"with no
+     window the arrows go through the stripes as well — 2 panel, 3 panel, greek
+     set, then horizontal stripes, then vertical stripes, then nothing, and the
+     cycle repeats. The stripes get square buttons like every other option."*
+     The four faces, then the two stripe tiles under their own heading
+     (`DETAIL_SUBS`). A stripe tile is a DIRECTION, not a face: its id is
+     screen-only (`STRIPE_TILE`, never in `d=`, `sp=` or the code), so the
+     group says which tile is on through `value` (`faceTile`) and what a tap
+     changes through `plan` — a face clears the stripes, a stripe tile clears
+     the face and keeps the count the stepper had (at least one; two from
+     none). The count's −/+ and the tight pill are drawn under the tiles only
+     while a stripe tile is on (`buildStripes`). */
   { key: 'detail', title: 'g.detail', in: 'face', kind: 'tile',
-    list: () => DETAILS,
-    glyph: detailGlyph, subs: DETAIL_SUBS, hint: 'g.detail.h' },
+    list: () => [...DETAILS, ...STRIPE_TILES],
+    glyph: o => o.dir ? stripeTileGlyph(o.dir) : detailGlyph(o),
+    subs: DETAIL_SUBS, hint: 'g.detail.h',
+    value: faceTile,
+    plan: (o, st) => o.dir
+      ? ['stripes', { stripeDir: o.dir, stripeCount: Math.max(1, st.stripeCount || 2),
+                      stripeTight: o.dir === 'v' ? false : st.stripeTight, detail: 'plain' }]
+      : ['detail', { detail: o.id, stripeDir: 'none', stripeCount: 0 }] },
 
   /* ⚠ THE HORIZONTAL BOW, ON THE FACE STEP SINCE 26.9.2026 — the owner's son:
      *"I want the horizontal pull handle to be with the panels and stripes …
@@ -1606,6 +1639,13 @@ function buildPanel() {
  * customer already has instead of the one under their finger.
  */
 function tilePrice(g, o, state) {
+  /* A group with a `plan` (the face group, 29.9) prices the state its tap
+     would plan — a stripe tile its stripes, a face its face with the stripes
+     cleared — read off `priceParts` under the row that carries it. */
+  if (g.plan) {
+    const [key, change] = g.plan(o, state);
+    return tileAgorot(o.dir ? 'stripes' : g.key, { ...repair({ ...state, ...change }, key).state, ...change });
+  }
   const after = { ...repair({ ...state, [g.key]: o.id }).state, [g.key]: o.id };
   /* ⚠ `tileAgorot`, not `priceParts(after)[g.key]`, and the difference is the
      size. A size no longer has a price of its own — it multiplies the door and
@@ -1933,110 +1973,55 @@ function markMashkof(g) {
 }
 
 /**
- * THE STRIPES — a direction, a number, and how they are arranged.
+ * THE STRIPES' COUNT — a number, and how they are arranged.
  *
- * ⚠ THIS REPLACED FOURTEEN TILES. Peretz prices per stripe — ₪150 horizontal,
- * ₪300 vertical — so a grid of named compositions could not express what he
- * sells, and he asked for the complicated ones removed. What survives the test
- * ("more than two distinct stripe lengths") is recorded in
+ * ⚠ THIS REPLACED FOURTEEN TILES (27.8). Peretz prices per stripe — ₪150
+ * horizontal, ₪300 vertical — so a grid of named compositions could not express
+ * what he sells, and he asked for the complicated ones removed. What survives
+ * the test ("more than two distinct stripe lengths") is recorded in
  * `research/works/INVENTORY.md` §5a; what is left is a count.
  *
- * Three controls, and the third only when it means something:
- *   - direction — none / horizontal / vertical, as pills
+ * ⚠ AND THE DIRECTION IS TWO TILES AGAIN, 29.9.2026 — the owner's son: *"The
+ * stripes get square buttons like every other option."* The three direction
+ * pills (none / horizontal / vertical) are gone: the face group's two stripe
+ * tiles choose the direction, the plain face is "none", and a greyed tile says
+ * why (the window, `conflicts().detail`) — so this control no longer carries a
+ * sentence of its own. What is left here is drawn ONLY WHILE A STRIPE TILE IS
+ * ON (ours, CLAUDE.md §0a):
  *   - how many  — a stepper, capped by what the leaf holds
  *   - tight     — a toggle, HORIZONTAL ONLY, because nothing in the 129
  *                 photographs is a tight vertical group and offering one would
  *                 be inventing geometry (REALISM.md §6)
- *
- * ⚠ AND IT SAYS WHY WHEN IT CANNOT BE USED. `conflicts(state).stripes` is a
- * SENTENCE rather than a map of blocked ids, because there are no ids left to
- * block. A control that is simply dead tells the customer nothing; one that
- * says "לא משלבים פסי מתכת עם חלון" tells them what to change.
+ * Both commit as they always did; neither can take anything off the door.
  */
 function buildStripes(host) {
   const old = host.querySelector('.stripes');
   if (old) old.remove();
-  const why = conflicts(state).stripes;
+  if (!isLineWork(state)) return;
   const dir = state.stripeDir, n = state.stripeCount;
   const max = dir === 'v' ? STRIPE_MAX.v : (state.stripeTight ? STRIPE_MAX.hTight : STRIPE_MAX.h);
 
   const box = document.createElement('div');
   box.className = 'stripes';
-  /* ⚠ THE CONTROL IS ALWAYS HERE NOW, AND IT SAYS WHY RATHER THAN VANISHING —
-     14.9.2026. Peretz: the stripes disappear when panels are chosen.
-     They did, completely: the whole control was replaced by its label and one
-     sentence, so a customer who had picked a panel could not see that stripes
-     exist, what they cost, or that one tap would trade the panel for them.
-     The old comment on `.stripes__why` argued "a dead button tells a customer
-     nothing, a sentence tells them what to change", and that reasoning is
-     right about DEAD buttons — which is why this is not one. It is the tile
-     idiom, which every other group in this flow has used all along and
-     `PLAN.md` §10.5 states: blocked options stay focusable and clickable and
-     say why, and where there is an obvious repair the click performs it.
-     So the pills are rendered in every state, marked `aria-disabled` and
-     `.is-blocked` when the face is in the way, with the reason under them —
-     and a tap runs the same `repair(…, 'stripes')` every other tap runs, which
-     clears the panels and says so. Nothing here decides anything: the rule
-     table is still the only thing that knows what can go with what.
-     ⚠ WHAT WAS REJECTED. A second `.opts__sub` heading over the missing
-     control — that is the present fault with a label on it. Moving stripes to
-     a step of their own — a ninth question for a ₪150 line, and the flow has
-     just had `mk` moved for being one question too many. */
   box.innerHTML = `
-    <span class="stripes__label" id="stripes-l">${T('stripes.label')}</span>
-    <div class="stripes__dirs" role="group" aria-labelledby="stripes-l">
-      ${[['none', 'stripes.none'], ['h', 'stripes.h'], ['v', 'stripes.v']].map(([id, k]) => `
-        <button type="button" class="pill stripes__dir${dir === id ? ' is-on' : ''}${why && id !== 'none' ? ' is-blocked' : ''}"
-                data-dir="${id}" aria-pressed="${dir === id}"
-                aria-disabled="${!!why && id !== 'none'}">${stripesGlyph(id)}<span>${T(k)}</span></button>`).join('')}
+    <span class="stripes__label" id="stripes-l">${T(`stripes.tile.${dir}`)}</span>
+    <div class="blen__row">
+      <button type="button" class="blen__b" data-n="-1" aria-label="${T('stripes.fewer')}"
+              ${n <= 1 ? 'disabled' : ''}>−</button>
+      ${/* ⚠ THROUGH `counted`, NOT `${n} ${T('stripes.noun')}`. Russian has
+            three plural forms — 1 полоса, 3 полосы, 5 полос — and 21 takes
+            the singular again while 11 does not. A count pasted beside a
+            fixed noun is right in Hebrew, right in English, and wrong in
+            Russian four times out of ten. */''}
+      <output class="blen__v" aria-labelledby="stripes-l">${counted(n, 'stripes.noun')}</output>
+      <button type="button" class="blen__b" data-n="1" aria-label="${T('stripes.more')}"
+              ${n >= max ? 'disabled' : ''}>+</button>
     </div>
-    ${why ? `<p class="stripes__why">${why}</p>` : ''}
+    ${dir === 'h' ? `
+      <button type="button" class="pill stripes__tight${state.stripeTight ? ' is-on' : ''}"
+              data-tight="1" aria-pressed="${state.stripeTight}">${T('stripes.tight')}</button>` : ''}
+    <span class="stripes__cost">${priceLabel(priceParts(state).stripes)}</span>`;
 
-    ${dir === 'none' ? '' : `
-      <div class="blen__row">
-        <button type="button" class="blen__b" data-n="-1" aria-label="${T('stripes.fewer')}"
-                ${n <= 1 ? 'disabled' : ''}>−</button>
-        ${/* ⚠ THROUGH `counted`, NOT `${n} ${T('stripes.noun')}`. Russian has
-              three plural forms — 1 полоса, 3 полосы, 5 полос — and 21 takes
-              the singular again while 11 does not. A count pasted beside a
-              fixed noun is right in Hebrew, right in English, and wrong in
-              Russian four times out of ten. */''}
-        <output class="blen__v" aria-labelledby="stripes-l">${counted(n, 'stripes.noun')}</output>
-        <button type="button" class="blen__b" data-n="1" aria-label="${T('stripes.more')}"
-                ${n >= max ? 'disabled' : ''}>+</button>
-      </div>
-      ${dir === 'h' ? `
-        <button type="button" class="pill stripes__tight${state.stripeTight ? ' is-on' : ''}"
-                data-tight="1" aria-pressed="${state.stripeTight}">${T('stripes.tight')}</button>` : ''}
-      <span class="stripes__cost">${priceLabel(priceParts(state).stripes)}</span>`}`;
-
-  /* ⚠ AND IT SAYS WHAT IT TOOK AWAY — 14.9.2026. This discarded `said` and
-     kept only `.state`, so a tap here performed its repairs in SILENCE: on a
-     panelled door it cleared the face, on a glazed one it removed the window,
-     and the customer was told neither. Every other control in this flow goes
-     through `choose`, which has joined the sentences with ' · ' since 9.9;
-     the stripes are the one control that is not a tile and so had its own
-     handler, and the handler never got that fix.
-     It was nearly unreachable while a blocked door showed no pills at all —
-     which is how it stayed hidden — and this round makes the blocked tap the
-     normal way to trade a panel for stripes, so it has to speak. */
-  /* ⚠ AND SINCE 27.9.2026 IT ASKS FIRST, like every tile (the confirm dialog):
-     a stripe pill on a panelled door would clear the panels, so the same dry
-     run and the same dialog stand in front of it. It goes through
-     `planChoice`/`commitChoice` under the `stripes` intent, so the give-back
-     memory treats the stripes as one control, as `repair` does. */
-  for (const b of box.querySelectorAll('[data-dir]')) {
-    b.addEventListener('click', () => {
-      const d = b.dataset.dir;
-      noteEngaged();
-      const p = planChoice('stripes', { stripeDir: d,
-                   stripeCount: d === 'none' ? 0 : Math.max(1, state.stripeCount || 2),
-                   stripeTight: d === 'v' ? false : state.stripeTight });
-      const name = b.querySelector('span')?.textContent || d;
-      if (p.lost.length) askConfirm(confirmSentence(name, p.lost), () => commitChoice('stripes', p));
-      else commitChoice('stripes', p);
-    });
-  }
   for (const b of box.querySelectorAll('[data-n]')) {
     b.addEventListener('click', () => {
       const next = state.stripeCount + Number(b.dataset.n);
@@ -2441,7 +2426,7 @@ function stepBy(d) {
  * each side of the door that change the option (the next available one; if
  * none is compatible, a window: 'there is no compatible x with your build')."*
  * The live step's FIRST group (`size` on fit, `mashkof` on mk, `detail` on the
- * face — the stripes keep their own control), one option on or back in the
+ * face — its six tiles since 29.9, the stripes among them), one option on or back in the
  * list's own order, WRAPPING, skipping every option `conflicts` greys — ours to
  * have decided, recorded in CLAUDE.md §0a: a refused option would open the
  * confirm dialog, and an arrow is for browsing. The move is `choose`, exactly
@@ -2467,10 +2452,13 @@ function arrowStep(dir) {
     .map(b => all.find(o => o.id === b.dataset.id)).filter(Boolean);
   const list = drawn.length === all.length ? drawn : all;
   const blocked = conflicts(state)[g.key] || {};
-  const at = list.findIndex(o => o.id === state[g.key]);
+  /* `valueOf`, not `state[g.key]` (29.9): on the face step the tile that is on
+     may be a stripe tile, which the state holds as a direction. */
+  const cur = valueOf(g);
+  const at = list.findIndex(o => o.id === cur);
   for (let k = 1; k < list.length; k++) {
     const o = list[(((at + dir * k) % list.length) + list.length) % list.length];
-    if (o.id !== state[g.key] && !blocked[o.id]) { choose(g, o.id); return; }
+    if (o.id !== cur && !blocked[o.id]) { choose(g, o.id); return; }
   }
   const title = T(g.title);
   tellOne(T('dlg.noFit', lang() === 'en' ? title.toLowerCase() : title));
@@ -2833,11 +2821,21 @@ function choose(g, id) {
      stays as it is. Asked of `panelUnderGlass` so only the window's refusals
      are gated — a face greyed for the stripes still clears them on a tap, as
      every other greyed tile performs its repair. */
-  if (g.key === 'detail' && id !== state.detail && panelUnderGlass({ ...state, detail: id })) {
+  /* ⚠ A STRIPE TILE IS NOT A FACE (29.9): only a FACE the window refuses is
+     gated here. A stripe tile greyed by the window goes on to the dry run,
+     which removes the window, and the dialog asks first — his 27.9 rule. */
+  const opt = g.plan ? g.list().find(o => o.id === id) : null;
+  if (g.key === 'detail' && !(opt && opt.dir) && id !== state.detail && panelUnderGlass({ ...state, detail: id })) {
     const why = conflicts(state).detail[id];
     if (why) { toast(why); return; }
   }
-  const p = planChoice(g.key, { [g.key]: id });
+  /* ⚠ A GROUP WITH A `plan` (the face group, 29.9) plans the tap's whole
+     change under its own key — a face under `detail`, a stripe tile under
+     `stripes` — so a swap inside the group owns every field it moves
+     (`ownedBy`) and asks nothing; what it takes from OUTSIDE (the window, for
+     a stripe tile) still asks. */
+  const [pkey, change] = opt ? g.plan(opt, state) : [g.key, { [g.key]: id }];
+  const p = planChoice(pkey, change);
   /* ⚠ ASK BEFORE TAKING ANYTHING AWAY — 27.9.2026, the owner's son: *"things
      like a peephole can't remove a window with one click, for all things that
      are not compatible i want a window to pop up before you remove the other
@@ -2849,10 +2847,10 @@ function choose(g, id) {
      the door byte-identical. A tap that only ADDS (a grille brings its window)
      or only changes the tapped control commits as before. */
   if (p.lost.length) {
-    askConfirm(confirmSentence(optionName(g, id), p.lost), () => commitChoice(g.key, p));
+    askConfirm(confirmSentence(optionName(g, id), p.lost), () => commitChoice(pkey, p));
     return;
   }
-  commitChoice(g.key, p);
+  commitChoice(pkey, p);
 }
 
 /**
@@ -2908,8 +2906,12 @@ function commitChoice(key, { fixed, said, stood, memo }) {
      has to speak. Objects are skipped — `grip` is a position and two of them
      are never `===` — and the field the customer touched is skipped because
      they chose that. */
+  /* ⚠ AND THE FACE GROUP'S OWN FIELDS ARE NEVER RECORDED (29.9): a face tap
+     clears the stripes as its own answer, not as a displacement, so going back
+     to "plain" must not hand them back. The handle keeps its length memory. */
+  const own = new Set(key === 'detail' || key === 'stripes' ? ownedBy(key) : [key]);
   for (const k of Object.keys(fixed)) {
-    if (k === key || stood.includes(k)) continue;
+    if (own.has(k) || stood.includes(k)) continue;
     if (typeof fixed[k] === 'object' || typeof state[k] === 'object') continue;
     if (state[k] === fixed[k]) continue;
     if (!displaced.has(key)) displaced.set(key, {});
@@ -3248,7 +3250,7 @@ function columnCount(wrap, items) {
 /** What a closed category shows: the choice that has been made in it. */
 function nowLabel(g) {
   const list = g.list();
-  const hit = list.find(o => o.id === state[g.key]) || list[0];
+  const hit = list.find(o => o.id === valueOf(g)) || list[0];
   return hit ? L(hit) : '';
 }
 
@@ -3367,7 +3369,7 @@ function paint() {
   if (table) {
     const pictureOf = r => {
       if (r.key === 'colour') return `<span class="spec__swatch" style="--chip:${r.hex}"></span>`;
-      if (r.key === 'stripes') return stripesGlyph(state.stripeDir);
+      if (r.key === 'stripes') return stripeTileGlyph(state.stripeDir);
       const g = GROUPS.find(x => x.key === (r.key === 'glazing' ? 'window' : r.key));
       const o = g && g.list().find(x => x.id === (r.key === 'glazing' ? state.window : r.id));
       if (g && g.glyph && o) return copyOf(g.glyph(o), `spec-${r.key}`);
@@ -3510,7 +3512,7 @@ function markGroup(g, blocked) {
     const field = document.querySelector(`.field[data-group="${g.key}"]`);
     if (field) field.hidden = !g.when(state);
   }
-  const chosen = [state[g.key]];
+  const chosen = [valueOf(g)];
 
   /* ⚠ A LISTING RULE BELONGS HERE, LIVE, AND NOT IN `list()` — and since
      27.9.2026 there is one again, a whole GROUP's (`when`, above). Per-option

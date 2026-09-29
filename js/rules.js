@@ -80,6 +80,24 @@ const viewerOn = st => !!st.peephole && st.peephole !== 'nopeep';
 export const isLineWork = state =>
   !!(state && state.stripeDir && state.stripeDir !== 'none' && state.stripeCount);
 
+/**
+ * ⚠ THE STRIPES ARE TWO TILES ON THE FACE STEP, 29.9.2026 — the owner's son:
+ * *"with no window the arrows go through the stripes as well — 2 panel, 3
+ * panel, greek set, then horizontal stripes, then vertical stripes, then
+ * nothing … The stripes get square buttons like every other option."* So the
+ * face group is ONE radio group of six: the four faces and these two.
+ * ⚠ SCREEN-ONLY IDS. They are not `DETAILS` entries and never enter `d=`,
+ * `sp=` or the code — the state still says a direction and a count
+ * (`stripeDir`, `stripeCount`), and `faceTile` reads the tile that is on off
+ * it. Stated HERE, once, because two readers need them: `conflicts` greys
+ * them and the page draws them (`STRIPE_TILES` in js/app.js). §5.26: a second
+ * spelling of an id is a rule for that spelling only.
+ */
+export const STRIPE_TILE = { h: 'stripes-h', v: 'stripes-v' };
+/** The face group's tile that is on: a stripe tile while there is line work,
+ *  otherwise the face. */
+export const faceTile = state => isLineWork(state) ? STRIPE_TILE[state.stripeDir] : state.detail;
+
 /** Does this door put ANYTHING on the face — moulding or line work alike?
  *  ⚠ A STATE, LIKE `isLineWork` ABOVE — AND THREE CALLERS HANDED IT A DETAIL
  *  UNTIL 20.9.2026. `faceWorked(byId(DETAILS, state.detail))` reads
@@ -256,11 +274,11 @@ export function conflicts(state) {
                 peephole: {}, bell: {},
                 /* The horizontal bow, a field of its own since 26.9.2026. */
                 grab: {},
-                /* ⚠ A STRING, NOT A MAP OF IDS, because the stripes are no
-                   longer options with ids. Every other key here is
-                   `{ optionId: reason }`; this one is either null or the one
-                   reason the stripe controls cannot be used on this door. */
-                stripes: null };
+                /* GONE, 29.9.2026: `stripes`, a sentence rather than a map,
+                   "because the stripes are no longer options with ids". They
+                   are tiles again (`STRIPE_TILE`), greyed in `detail` like
+                   every face, and the one sentence moved there. */
+              };
   const grip = byId(HANDLES, state.handle);
 
   /* The finish rule that used to live here is gone with the group it gated.
@@ -401,11 +419,21 @@ export function conflicts(state) {
     if (viewerOn(st) && !peepholeFits(st)) out.peephole[p.id] = T('why.peepWindow');
   }
   if (!bellFits(state))     out.bell.bell     = T('why.bellWindow');
-  if (onLeaf) out.stripes = T('why.stripesWindow');
-  else if (byId(DETAILS, state.detail).panel) out.stripes = T('why.stripesPanel');
+  /* ⚠ THE STRIPE TILES ARE GREYED BY THE WINDOW AND BY NOTHING ELSE — 29.9.2026,
+     *"If a user chooses a window, in the face section the stripes are greyed
+     out; with no window the arrows go through the stripes as well."* One
+     statement, read by the tile's grey, its reason, the arrows (which skip it)
+     and the tap (which still goes through the dry run and asks "this will
+     remove the window" — his 27.9 rule).
+     ⚠ AND PANELS AND STRIPES NO LONGER GREY EACH OTHER. They are tiles of one
+     radio group now, so each is simply the other's alternative: a tap on one
+     lands on it with the other cleared and asks nothing (`OWNED` below). The
+     greying would have made the arrows SKIP the stripes from a panelled face,
+     and the cycle he asked for is face → face → stripes. A11 is unchanged as a
+     RULE: `repair` still refuses both on one door, for a link. */
+  if (onLeaf) for (const id of Object.values(STRIPE_TILE)) out.detail[id] = T('why.stripesWindow');
   if (lined) {
     for (const w of WINDOWS) if (glassRows(w)) out.window[w.id] = T('why.windowStripes');
-    for (const d of DETAILS) if (d.panel) out.detail[d.id] = T('why.panelStripes');
   }
 
   /* ⚠ TWO RULES CAME OUT OF THIS TABLE ON 14.9.2026 AND NOTHING REPLACED
@@ -763,10 +791,19 @@ const BOW_WHY = { window: 'why.bowWindow', face: 'why.bowFace', door: 'why.bowDo
  * `restored` are fields the page's own give-back memory put back on purpose.
  */
 const NOTHING = /^(none|no[a-z]*)$/;
-const OWNED = { stripes: ['stripeDir', 'stripeCount', 'stripeTight'], handle: ['handle', 'handleLen'] };
+/* ⚠ THE FACE GROUP OWNS FOUR FIELDS SINCE 29.9.2026: a face and the stripes are
+   tiles of one radio group, so a tap on either moves the other as its own
+   answer, never as a loss — the swap asks nothing. Both keys the page plans a
+   face-group tap under (`detail` for a face, `stripes` for a stripe tile) own
+   the same four. */
+const FACE_FIELDS = ['detail', 'stripeDir', 'stripeCount', 'stripeTight'];
+const OWNED = { stripes: FACE_FIELDS, detail: FACE_FIELDS, handle: ['handle', 'handleLen'] };
+/** The fields a tap under this key answers for itself — never counted as
+ *  taken away, and never recorded by the page's give-back memory. */
+export const ownedBy = key => OWNED[key] || [key];
 const NOT_A_LOSS = new Set(['handleLen', 'stripeTight', 'handleFinish']);
 export function displacedBy(before, after, tapped, restored = []) {
-  const own = new Set(OWNED[tapped] || [tapped]);
+  const own = new Set(ownedBy(tapped));
   return Object.keys(after).filter(k => !own.has(k) && !restored.includes(k) && !NOT_A_LOSS.has(k)
     && typeof after[k] !== 'object' && before[k] !== after[k]
     && !(typeof before[k] === 'string' && NOTHING.test(before[k]))

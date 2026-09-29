@@ -18,7 +18,7 @@
 
 import { bellFinish, BOWS, byId, COLOURS, DETAILS, FINISHES, gripFinish, GRILLES, HANDINGS, HANDLES,
          glassRows, handleLength, LOCKSETS, MASHKOF_MAX, MASHKOF_PARTS, MASHKOFS, PEEPHOLES, PIRZUL,
-         REBATE, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS } from './catalog.js';
+         REBATE, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
 import { L, T } from './copy.js';
 import { describeSentence } from './spec.js';
 import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
@@ -11807,8 +11807,9 @@ export function detailGlyph(detail) {
      any of those flags since, and every branch drew nothing. One of them was
      worse than dead: STRIP_ROWS is defined nowhere in this file, so the even
      branch was a ReferenceError waiting for the first entry to carry the flag
-     (the same landmine GLAZINGS was in describe). The stripe control's own
-     pictures are stripesGlyph, below, built from the tables the door uses. */
+     (the same landmine GLAZINGS was in describe). The stripes are tiles on this
+     step again since 29.9 — as a direction, not a face — and draw through
+     stripeTileGlyph, below, built from the tables the door uses. */
   return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
     <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
     ${panels}
@@ -11822,68 +11823,66 @@ export function detailGlyph(detail) {
 }
 
 /**
- * THE STRIPE CONTROL'S THREE PICTURES — none, horizontal, vertical. Peretz,
- * 20.9.2026: *"add icons for the stripes to make them more visible."* The
- * three direction pills were words alone.
+ * THE STRIPE TILES' TWO PICTURES — 29.9.2026, the owner's son: *"The stripes get
+ * square buttons like every other option — make an icon for them."* They are
+ * tiles on the face step now, beside the panels, so each draws what
+ * `detailGlyph` draws for a face: THE LEAF WITH THE OPTION ON IT — the same
+ * frame, pad and outline, the lines where the door puts its bands.
  *
- * A WINDOW ON THE LEAF, IN THE LEAF'S OWN MILLIMETRES. The viewBox is a
- * square of the standard leaf, centred where the stripes stand — across, at
- * STRIP_V.mid from the hinge edge; down, at STRIP_H.mid — so every line below
- * is placed by the same tables metalStrips draws the door from, and a
- * coordinate in this picture IS a coordinate on the leaf. Nothing is typed.
+ * Every line is placed by the tables `metalStrips` draws the door from —
+ * `STRIP_H` (pitch min(0.19, 0.80/(n−1)) centred on 0.52, `STRIP_EVEN_W` wide)
+ * and `STRIP_V`/`STRIP_V_RUN` through `stripVAt`, hinge on the left — as
+ * fractions of the frame, so a line's place in the tile IS where the door
+ * draws that band (`npm test` holds every line to a band and every band to a
+ * line). Nothing is typed.
  *
- * ⚠ A WINDOW, NOT THE WHOLE LEAF, AND THE 2 px RULE IS WHY (15.9). The
- * vertical pitch is 0.073 of the leaf's width — 62 mm — and on a whole-leaf
- * icon 26 px tall that is under a pixel, so the columns would be a grey smear:
- * the speciallock mark's fault, which closed eight dots into a haze. At
- * STRIPE_ICON_WINDOW the columns come out about 4 px apart at the shipped
- * size and the rows about 11.
+ * ⚠ AT A REPRESENTATIVE COUNT, NOT THE MOST (`STRIPE_TILE_COUNT`: seven
+ * across, five upright). The pills' window pictures drew the most each axis
+ * takes, cropped to a 420 mm window so the vertical pitch (62 mm) cleared 2 px;
+ * a tile is the whole leaf, and eleven rows or six columns on it read as a
+ * hatch. The count the door gets is the stepper's, under the tiles.
  *
- * The COUNTS are the most each axis takes (STRIPE_MAX), because the most is
- * what shows the pitch; the pill picks a direction, not a count. The frame is
- * the edge of the window — a piece of the leaf's face — so "none" is that
- * piece with nothing on it, which is exactly what the plain leaf is. Strokes
- * do not scale, like the rail's marks: a 16 mm band is under a pixel here.
+ * GONE WITH THIS: `stripesGlyph`, the three pills' window pictures (none, h,
+ * v). Its readers were the direction pills (gone — the tiles choose the
+ * direction), the summary's stripes row (it draws this now, as every row
+ * draws its tile) and the tests that held it to the door (restated onto this).
+ * "None" has no picture of its own any more: the plain face is the tile that
+ * says it.
  */
-const STRIPE_ICON_WINDOW = 420;   // mm, square
-export function stripesGlyph(dir) {
-  const lw = SIZES.standard.w - REBATE * 2, lh = SIZES.standard.h - REBATE;
-  const C = STRIPE_ICON_WINDOW;
-  const x0 = lw * STRIP_V.mid - C / 2, y0 = lh * STRIP_H.mid - C / 2;
-  /* Where a line's ENDS stop: inside the window's rounded frame. The door's
-     bands run on past the window, so the window is what cuts them; stopping
-     them a tenth in keeps a band from poking through a rounded corner, and it
-     moves no line — only how far each one is drawn. */
-  const m = C * 0.1;
+/* ⚠ SEVEN ACROSS AT 80, FIVE UPRIGHT AT 40 — MEASURED, NOT CHOSEN (29.9). Five
+   horizontal lines at 40 put 39% of the pixels apart from the plain face at the
+   54 px the tile ships at, under the audit's 0.50 floor: short thin lines are
+   too little ink beside the leaf's outline. Rasterised at 54 px (tools/_stw),
+   seven at 80 read 57–62% against every face and the upright tile; the upright
+   ones keep 40, because their pitch is 69 units and a thicker stroke closes
+   them into one bar (they read 56–61% as they are). Seven is still the door's
+   own rule — pitch min(0.19, 0.80/6), centred on 0.52. */
+const STRIPE_TILE_COUNT = { h: 7, v: 5 };
+const STRIPE_TILE_STROKE = { h: 80, v: 40 };
+export function stripeTileGlyph(dir) {
+  const W = 950, H = 2100, pad = 40;
+  const n = STRIPE_TILE_COUNT[dir] || 0;
   const f1 = v => v.toFixed(1);
   const lines = [];
   if (dir === 'h') {
-    const n = STRIPE_MAX.h;
     const pitch = Math.min(STRIP_H.pitch, STRIP_H.span / Math.max(1, n - 1));
     const top = STRIP_H.mid - (n - 1) * pitch / 2;
-    const xa = Math.max(x0 + m, lw * (1 - STRIP_EVEN_W) / 2);
-    const xb = Math.min(x0 + C - m, lw * (1 + STRIP_EVEN_W) / 2);
+    const xa = W * (1 - STRIP_EVEN_W) / 2, xb = W * (1 + STRIP_EVEN_W) / 2;
     for (let i = 0; i < n; i++) {
-      const y = lh * (top + i * pitch);
-      if (y > y0 && y < y0 + C) {
-        lines.push(`<line x1="${f1(xa)}" y1="${f1(y)}" x2="${f1(xb)}" y2="${f1(y)}" vector-effect="non-scaling-stroke"/>`);
-      }
+      const y = H * (top + i * pitch);
+      lines.push(`<line x1="${f1(xa)}" y1="${f1(y)}" x2="${f1(xb)}" y2="${f1(y)}"/>`);
     }
   } else if (dir === 'v') {
-    const n = STRIPE_MAX.v;
-    const ya = Math.max(y0 + m, lh * STRIP_V_RUN.top), yb = Math.min(y0 + C - m, lh * STRIP_V_RUN.foot);
+    const ya = H * STRIP_V_RUN.top, yb = H * STRIP_V_RUN.foot;
     for (let i = 0; i < n; i++) {
-      const x = lw * stripVAt(i, n);
-      if (x > x0 && x < x0 + C) {
-        lines.push(`<line x1="${f1(x)}" y1="${f1(ya)}" x2="${f1(x)}" y2="${f1(yb)}" vector-effect="non-scaling-stroke"/>`);
-      }
+      const x = W * stripVAt(i, n);
+      lines.push(`<line x1="${f1(x)}" y1="${f1(ya)}" x2="${f1(x)}" y2="${f1(yb)}"/>`);
     }
   }
-  return `<svg viewBox="${f1(x0)} ${f1(y0)} ${C} ${C}" class="stripes__ico" aria-hidden="true"
-    data-dir="${dir}" fill="none" stroke="currentColor" stroke-linecap="butt">
-    <rect x="${f1(x0)}" y="${f1(y0)}" width="${C}" height="${C}" rx="${C * 0.12}"
-          stroke-width="1" vector-effect="non-scaling-stroke"/>
-    <g stroke-width="1.6">${lines.join('')}</g>
+  return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true"
+    data-stripes="${dir}" data-count="${n}">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
+    <g stroke="currentColor" stroke-width="${STRIPE_TILE_STROKE[dir] || 40}" stroke-linecap="butt">${lines.join('')}</g>
   </svg>`;
 }
 

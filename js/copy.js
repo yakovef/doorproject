@@ -281,7 +281,7 @@ export const UI = {
   'redo.short':       ['חזרה', 'Redo', 'Вернуть'],
   /* ⚠ WHAT AN UNDO SAYS WHEN IT TOOK SOMETHING OFF THE DOOR. `specRows` omits
      a row whose option is "none", so a field the step removed has no row to
-     print a value from — and `stripes.none` beside it is not reusable, its
+     print a value from — and `stripes.none` (gone 29.9) was not reusable, its
      Russian being "Без полос", about stripes. This one is the general word. */
   'undo.gone':        ['ללא', 'None', 'Нет'],
 
@@ -646,7 +646,13 @@ export const UI = {
 
   /* ── the strip counter ────────────────────────────────────────── */
   'stripes.label':    ['פסי מתכת', 'Metal strips', 'Металлические полосы'],
-  'stripes.none':     ['ללא', 'None', 'Без полос'],
+  /* GONE 29.9.2026: `stripes.none`, the "none" direction pill — the plain
+     face is the tile that says it. The two tiles' own names follow. */
+  /* ⚠ THE STRIPE TILES' NAMES, 29.9.2026 — two tiles beside the panels on the
+     face step (*"the stripes get square buttons like every other option"*).
+     `stripes.h`/`.v` stay: the order's row reads them after the heading. */
+  'stripes.tile.h':   ['פסים אופקיים', 'Horizontal strips', 'Горизонтальные полосы'],
+  'stripes.tile.v':   ['פסים אנכיים', 'Vertical strips', 'Вертикальные полосы'],
   'stripes.h':        ['אופקיים', 'Horizontal', 'Горизонтальные'],
   'stripes.v':        ['אנכיים', 'Vertical', 'Вертикальные'],
   'stripes.tight':    ['צפופים', 'Close together', 'Плотно'],
@@ -885,9 +891,10 @@ export const UI = {
   'why.setNoSlot':       ['הסט היווני לא משתלב עם צוהר אנכי', 'The Greek set does not go with a vertical slot', 'Греческий комплект не сочетается с вертикальным окном'],
   'why.setOwnWindow':    ['הסט היווני מגיע עם חלון מלבני משלו', 'The Greek set comes with a rectangular window of its own', 'У греческого комплекта своё прямоугольное окно'],
   'why.stripesWindow':   ['לא משלבים פסי מתכת עם חלון', 'Metal strips do not go with a window', 'Металлические полосы не сочетаются с окном'],
-  'why.stripesPanel':    ['לא משלבים פסי מתכת עם פאנל', 'Metal strips do not go with a panel', 'Металлические полосы не сочетаются с панелью'],
   'why.windowStripes':   ['לא משלבים חלון עם קווי מתכת', 'A window does not go with metal strips', 'Окно не сочетается с металлическими полосами'],
-  'why.panelStripes':    ['לא משלבים פאנל עם פסי מתכת', 'A panel does not go with metal strips', 'Панель не сочетается с металлическими полосами'],
+  /* GONE 29.9.2026: `why.stripesPanel` and `why.panelStripes`. A panel and the
+     stripes are tiles of one radio group now — each the other's alternative,
+     neither greyed for the other (js/rules.js, `conflicts`). */
   /* `why.rectNeedsPanel` and `why.panelOwnPull` are withdrawn with the two
      rules they explained, 14.9.2026 — the forced bottom panel and the pull a
      face brought with it. Neither sentence was wrong; both stopped describing

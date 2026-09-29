@@ -1487,7 +1487,11 @@ export const HANDINGS = [
    rather than as options in this list. The heading survives in the interface;
    what is gone is the idea that a stripe composition is a thing you pick off
    a grid. */
-export const DETAIL_SUBS = [['panel', 'g.panels']];
+/* ⚠ AND A SECOND HEADING SINCE 29.9.2026: the stripes are two tiles after the
+   panels (`STRIPE_TILES` in js/app.js, screen-only ids — never entries of the
+   list below). Each is still a DIRECTION on the state and a count on its
+   stepper; the tile only says which way. */
+export const DETAIL_SUBS = [['panel', 'g.panels'], ['stripes', 'stripes.label']];
 
 export const DETAILS = [
   { id: 'plain',  he: 'חלק',            en: 'Plain', ru: 'Гладкая',              panel: false, groove: false },

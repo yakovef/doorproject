@@ -120,7 +120,7 @@
     "redo.short": ["חזרה", "Redo", "Вернуть"],
     /* ⚠ WHAT AN UNDO SAYS WHEN IT TOOK SOMETHING OFF THE DOOR. `specRows` omits
        a row whose option is "none", so a field the step removed has no row to
-       print a value from — and `stripes.none` beside it is not reusable, its
+       print a value from — and `stripes.none` (gone 29.9) was not reusable, its
        Russian being "Без полос", about stripes. This one is the general word. */
     "undo.gone": ["ללא", "None", "Нет"],
     /* ── the flow: the eight steps ────────────────────────────────── */
@@ -544,7 +544,13 @@
     ],
     /* ── the strip counter ────────────────────────────────────────── */
     "stripes.label": ["פסי מתכת", "Metal strips", "Металлические полосы"],
-    "stripes.none": ["ללא", "None", "Без полос"],
+    /* GONE 29.9.2026: `stripes.none`, the "none" direction pill — the plain
+       face is the tile that says it. The two tiles' own names follow. */
+    /* ⚠ THE STRIPE TILES' NAMES, 29.9.2026 — two tiles beside the panels on the
+       face step (*"the stripes get square buttons like every other option"*).
+       `stripes.h`/`.v` stay: the order's row reads them after the heading. */
+    "stripes.tile.h": ["פסים אופקיים", "Horizontal strips", "Горизонтальные полосы"],
+    "stripes.tile.v": ["פסים אנכיים", "Vertical strips", "Вертикальные полосы"],
     "stripes.h": ["אופקיים", "Horizontal", "Горизонтальные"],
     "stripes.v": ["אנכיים", "Vertical", "Вертикальные"],
     "stripes.tight": ["צפופים", "Close together", "Плотно"],
@@ -826,9 +832,10 @@
     "why.setNoSlot": ["הסט היווני לא משתלב עם צוהר אנכי", "The Greek set does not go with a vertical slot", "Греческий комплект не сочетается с вертикальным окном"],
     "why.setOwnWindow": ["הסט היווני מגיע עם חלון מלבני משלו", "The Greek set comes with a rectangular window of its own", "У греческого комплекта своё прямоугольное окно"],
     "why.stripesWindow": ["לא משלבים פסי מתכת עם חלון", "Metal strips do not go with a window", "Металлические полосы не сочетаются с окном"],
-    "why.stripesPanel": ["לא משלבים פסי מתכת עם פאנל", "Metal strips do not go with a panel", "Металлические полосы не сочетаются с панелью"],
     "why.windowStripes": ["לא משלבים חלון עם קווי מתכת", "A window does not go with metal strips", "Окно не сочетается с металлическими полосами"],
-    "why.panelStripes": ["לא משלבים פאנל עם פסי מתכת", "A panel does not go with metal strips", "Панель не сочетается с металлическими полосами"],
+    /* GONE 29.9.2026: `why.stripesPanel` and `why.panelStripes`. A panel and the
+       stripes are tiles of one radio group now — each the other's alternative,
+       neither greyed for the other (js/rules.js, `conflicts`). */
     /* `why.rectNeedsPanel` and `why.panelOwnPull` are withdrawn with the two
        rules they explained, 14.9.2026 — the forced bottom panel and the pull a
        face brought with it. Neither sentence was wrong; both stopped describing
@@ -2349,7 +2356,7 @@
     { id: "right-in", he: "ימין, פנימה", en: "Right, inward", ru: "Правая, внутрь", hinge: "right" },
     { id: "left-in", he: "שמאל, פנימה", en: "Left, inward", ru: "Левая, внутрь", hinge: "left" }
   ];
-  var DETAIL_SUBS = [["panel", "g.panels"]];
+  var DETAIL_SUBS = [["panel", "g.panels"], ["stripes", "stripes.label"]];
   var DETAILS = [
     { id: "plain", he: "חלק", en: "Plain", ru: "Гладкая", panel: false, groove: false },
     /* ── PANELS ───────────────────────────────────────────────────────
@@ -9288,47 +9295,40 @@ ${plate.defs}${plate.body}
           fill="none" stroke="currentColor" stroke-width="18"/>` : ""}
   </svg>`;
   }
-  var STRIPE_ICON_WINDOW = 420;
-  function stripesGlyph(dir) {
-    const lw = SIZES.standard.w - REBATE * 2, lh = SIZES.standard.h - REBATE;
-    const C = STRIPE_ICON_WINDOW;
-    const x0 = lw * STRIP_V.mid - C / 2, y0 = lh * STRIP_H.mid - C / 2;
-    const m = C * 0.1;
+  var STRIPE_TILE_COUNT = { h: 7, v: 5 };
+  var STRIPE_TILE_STROKE = { h: 80, v: 40 };
+  function stripeTileGlyph(dir) {
+    const W = 950, H = 2100, pad = 40;
+    const n = STRIPE_TILE_COUNT[dir] || 0;
     const f1 = (v) => v.toFixed(1);
     const lines = [];
     if (dir === "h") {
-      const n = STRIPE_MAX.h;
       const pitch = Math.min(STRIP_H.pitch, STRIP_H.span / Math.max(1, n - 1));
       const top = STRIP_H.mid - (n - 1) * pitch / 2;
-      const xa = Math.max(x0 + m, lw * (1 - STRIP_EVEN_W) / 2);
-      const xb = Math.min(x0 + C - m, lw * (1 + STRIP_EVEN_W) / 2);
+      const xa = W * (1 - STRIP_EVEN_W) / 2, xb = W * (1 + STRIP_EVEN_W) / 2;
       for (let i = 0; i < n; i++) {
-        const y = lh * (top + i * pitch);
-        if (y > y0 && y < y0 + C) {
-          lines.push(`<line x1="${f1(xa)}" y1="${f1(y)}" x2="${f1(xb)}" y2="${f1(y)}" vector-effect="non-scaling-stroke"/>`);
-        }
+        const y = H * (top + i * pitch);
+        lines.push(`<line x1="${f1(xa)}" y1="${f1(y)}" x2="${f1(xb)}" y2="${f1(y)}"/>`);
       }
     } else if (dir === "v") {
-      const n = STRIPE_MAX.v;
-      const ya = Math.max(y0 + m, lh * STRIP_V_RUN.top), yb = Math.min(y0 + C - m, lh * STRIP_V_RUN.foot);
+      const ya = H * STRIP_V_RUN.top, yb = H * STRIP_V_RUN.foot;
       for (let i = 0; i < n; i++) {
-        const x = lw * stripVAt(i, n);
-        if (x > x0 && x < x0 + C) {
-          lines.push(`<line x1="${f1(x)}" y1="${f1(ya)}" x2="${f1(x)}" y2="${f1(yb)}" vector-effect="non-scaling-stroke"/>`);
-        }
+        const x = W * stripVAt(i, n);
+        lines.push(`<line x1="${f1(x)}" y1="${f1(ya)}" x2="${f1(x)}" y2="${f1(yb)}"/>`);
       }
     }
-    return `<svg viewBox="${f1(x0)} ${f1(y0)} ${C} ${C}" class="stripes__ico" aria-hidden="true"
-    data-dir="${dir}" fill="none" stroke="currentColor" stroke-linecap="butt">
-    <rect x="${f1(x0)}" y="${f1(y0)}" width="${C}" height="${C}" rx="${C * 0.12}"
-          stroke-width="1" vector-effect="non-scaling-stroke"/>
-    <g stroke-width="1.6">${lines.join("")}</g>
+    return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true"
+    data-stripes="${dir}" data-count="${n}">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
+    <g stroke="currentColor" stroke-width="${STRIPE_TILE_STROKE[dir] || 40}" stroke-linecap="butt">${lines.join("")}</g>
   </svg>`;
   }
 
   // js/rules.js
   var viewerOn = (st) => !!st.peephole && st.peephole !== "nopeep";
   var isLineWork = (state2) => !!(state2 && state2.stripeDir && state2.stripeDir !== "none" && state2.stripeCount);
+  var STRIPE_TILE = { h: "stripes-h", v: "stripes-v" };
+  var faceTile = (state2) => isLineWork(state2) ? STRIPE_TILE[state2.stripeDir] : state2.detail;
   var faceWorked = (state2) => !!byId(DETAILS, state2.detail).panel || isLineWork(state2);
   var detailWorked = (d) => !!d.panel;
   var locksetFits = (state2, id) => state2.grab !== "grab" || bowFits({ ...state2, lockset: id });
@@ -9400,12 +9400,11 @@ ${plate.defs}${plate.body}
       peephole: {},
       bell: {},
       /* The horizontal bow, a field of its own since 26.9.2026. */
-      grab: {},
-      /* ⚠ A STRING, NOT A MAP OF IDS, because the stripes are no
-         longer options with ids. Every other key here is
-         `{ optionId: reason }`; this one is either null or the one
-         reason the stripe controls cannot be used on this door. */
-      stripes: null
+      grab: {}
+      /* GONE, 29.9.2026: `stripes`, a sentence rather than a map,
+         "because the stripes are no longer options with ids". They
+         are tiles again (`STRIPE_TILE`), greyed in `detail` like
+         every face, and the one sentence moved there. */
     };
     const grip = byId(HANDLES, state2.handle);
     if (!glazed) {
@@ -9432,11 +9431,9 @@ ${plate.defs}${plate.body}
       if (viewerOn(st) && !peepholeFits(st)) out.peephole[p.id] = T("why.peepWindow");
     }
     if (!bellFits(state2)) out.bell.bell = T("why.bellWindow");
-    if (onLeaf) out.stripes = T("why.stripesWindow");
-    else if (byId(DETAILS, state2.detail).panel) out.stripes = T("why.stripesPanel");
+    if (onLeaf) for (const id of Object.values(STRIPE_TILE)) out.detail[id] = T("why.stripesWindow");
     if (lined) {
       for (const w of WINDOWS) if (glassRows(w)) out.window[w.id] = T("why.windowStripes");
-      for (const d of DETAILS) if (d.panel) out.detail[d.id] = T("why.panelStripes");
     }
     const CHANNEL = HANDLES.find((h) => h.style === "channel");
     if (CHANNEL) {
@@ -9541,10 +9538,12 @@ ${plate.defs}${plate.body}
   var WHY_UNDER_GLASS = { top: "why.winTakesTop", plate: "why.winPlate", room: "why.noRoomBelow" };
   var BOW_WHY = { window: "why.bowWindow", face: "why.bowFace", door: "why.bowDoor" };
   var NOTHING = /^(none|no[a-z]*)$/;
-  var OWNED = { stripes: ["stripeDir", "stripeCount", "stripeTight"], handle: ["handle", "handleLen"] };
+  var FACE_FIELDS = ["detail", "stripeDir", "stripeCount", "stripeTight"];
+  var OWNED = { stripes: FACE_FIELDS, detail: FACE_FIELDS, handle: ["handle", "handleLen"] };
+  var ownedBy = (key) => OWNED[key] || [key];
   var NOT_A_LOSS = /* @__PURE__ */ new Set(["handleLen", "stripeTight", "handleFinish"]);
   function displacedBy(before, after, tapped, restored2 = []) {
-    const own = new Set(OWNED[tapped] || [tapped]);
+    const own = new Set(ownedBy(tapped));
     return Object.keys(after).filter((k) => !own.has(k) && !restored2.includes(k) && !NOT_A_LOSS.has(k) && typeof after[k] !== "object" && before[k] !== after[k] && !(typeof before[k] === "string" && NOTHING.test(before[k])) && !(typeof before[k] === "number" && before[k] === 0));
   }
   function repair(state2, intent = null) {
@@ -10448,6 +10447,14 @@ ${plate.defs}${plate.body}
   // js/app.js
   var $ = (sel) => document.querySelector(sel);
   var state = { ...DEFAULTS };
+  var STRIPE_TILES = Object.entries(STRIPE_TILE).map(([dir, id]) => {
+    const o = { id, dir, sub: "stripes" };
+    for (const l of LANGS) {
+      Object.defineProperty(o, l.id, { enumerable: true, get: () => withLang(l.id, () => T(`stripes.tile.${dir}`)) });
+    }
+    return o;
+  });
+  var valueOf = (g) => g.value ? g.value(state) : state[g.key];
   var GROUPS = [
     /* `label` and `meta` used to sit here and nothing read either of them; `meta`
        also spelled the chart code "RAL", which it is not — see `colourCode`. */
@@ -10510,15 +10517,34 @@ ${plate.defs}${plate.body}
          tiles are built. If a listing rule is ever wanted again it goes in
          `markGroup` and not in `list()` — the hook there is deleted with this
          one, because a hook nothing uses is a branch nothing tests. */
+    /* ⚠ ONE RADIO GROUP OF SIX SINCE 29.9.2026 — the owner's son: *"with no
+       window the arrows go through the stripes as well — 2 panel, 3 panel, greek
+       set, then horizontal stripes, then vertical stripes, then nothing, and the
+       cycle repeats. The stripes get square buttons like every other option."*
+       The four faces, then the two stripe tiles under their own heading
+       (`DETAIL_SUBS`). A stripe tile is a DIRECTION, not a face: its id is
+       screen-only (`STRIPE_TILE`, never in `d=`, `sp=` or the code), so the
+       group says which tile is on through `value` (`faceTile`) and what a tap
+       changes through `plan` — a face clears the stripes, a stripe tile clears
+       the face and keeps the count the stepper had (at least one; two from
+       none). The count's −/+ and the tight pill are drawn under the tiles only
+       while a stripe tile is on (`buildStripes`). */
     {
       key: "detail",
       title: "g.detail",
       in: "face",
       kind: "tile",
-      list: () => DETAILS,
-      glyph: detailGlyph,
+      list: () => [...DETAILS, ...STRIPE_TILES],
+      glyph: (o) => o.dir ? stripeTileGlyph(o.dir) : detailGlyph(o),
       subs: DETAIL_SUBS,
-      hint: "g.detail.h"
+      hint: "g.detail.h",
+      value: faceTile,
+      plan: (o, st) => o.dir ? ["stripes", {
+        stripeDir: o.dir,
+        stripeCount: Math.max(1, st.stripeCount || 2),
+        stripeTight: o.dir === "v" ? false : st.stripeTight,
+        detail: "plain"
+      }] : ["detail", { detail: o.id, stripeDir: "none", stripeCount: 0 }]
     },
     /* ⚠ THE HORIZONTAL BOW, ON THE FACE STEP SINCE 26.9.2026 — the owner's son:
        *"I want the horizontal pull handle to be with the panels and stripes …
@@ -11351,6 +11377,10 @@ ${plate.defs}${plate.body}
     placeNav();
   }
   function tilePrice(g, o, state2) {
+    if (g.plan) {
+      const [key, change] = g.plan(o, state2);
+      return tileAgorot(o.dir ? "stripes" : g.key, { ...repair({ ...state2, ...change }, key).state, ...change });
+    }
     const after = { ...repair({ ...state2, [g.key]: o.id }).state, [g.key]: o.id };
     return tileAgorot(g.key, after);
   }
@@ -11542,53 +11572,30 @@ ${plate.defs}${plate.body}
   function buildStripes(host) {
     const old = host.querySelector(".stripes");
     if (old) old.remove();
-    const why = conflicts(state).stripes;
+    if (!isLineWork(state)) return;
     const dir = state.stripeDir, n = state.stripeCount;
     const max = dir === "v" ? STRIPE_MAX.v : state.stripeTight ? STRIPE_MAX.hTight : STRIPE_MAX.h;
     const box = document.createElement("div");
     box.className = "stripes";
     box.innerHTML = `
-    <span class="stripes__label" id="stripes-l">${T("stripes.label")}</span>
-    <div class="stripes__dirs" role="group" aria-labelledby="stripes-l">
-      ${[["none", "stripes.none"], ["h", "stripes.h"], ["v", "stripes.v"]].map(([id, k]) => `
-        <button type="button" class="pill stripes__dir${dir === id ? " is-on" : ""}${why && id !== "none" ? " is-blocked" : ""}"
-                data-dir="${id}" aria-pressed="${dir === id}"
-                aria-disabled="${!!why && id !== "none"}">${stripesGlyph(id)}<span>${T(k)}</span></button>`).join("")}
-    </div>
-    ${why ? `<p class="stripes__why">${why}</p>` : ""}
-
-    ${dir === "none" ? "" : `
-      <div class="blen__row">
-        <button type="button" class="blen__b" data-n="-1" aria-label="${T("stripes.fewer")}"
-                ${n <= 1 ? "disabled" : ""}>−</button>
-        ${/* ⚠ THROUGH `counted`, NOT `${n} ${T('stripes.noun')}`. Russian has
+    <span class="stripes__label" id="stripes-l">${T(`stripes.tile.${dir}`)}</span>
+    <div class="blen__row">
+      <button type="button" class="blen__b" data-n="-1" aria-label="${T("stripes.fewer")}"
+              ${n <= 1 ? "disabled" : ""}>−</button>
+      ${/* ⚠ THROUGH `counted`, NOT `${n} ${T('stripes.noun')}`. Russian has
         three plural forms — 1 полоса, 3 полосы, 5 полос — and 21 takes
         the singular again while 11 does not. A count pasted beside a
         fixed noun is right in Hebrew, right in English, and wrong in
         Russian four times out of ten. */
     ""}
-        <output class="blen__v" aria-labelledby="stripes-l">${counted(n, "stripes.noun")}</output>
-        <button type="button" class="blen__b" data-n="1" aria-label="${T("stripes.more")}"
-                ${n >= max ? "disabled" : ""}>+</button>
-      </div>
-      ${dir === "h" ? `
-        <button type="button" class="pill stripes__tight${state.stripeTight ? " is-on" : ""}"
-                data-tight="1" aria-pressed="${state.stripeTight}">${T("stripes.tight")}</button>` : ""}
-      <span class="stripes__cost">${priceLabel(priceParts(state).stripes)}</span>`}`;
-    for (const b of box.querySelectorAll("[data-dir]")) {
-      b.addEventListener("click", () => {
-        const d = b.dataset.dir;
-        noteEngaged();
-        const p = planChoice("stripes", {
-          stripeDir: d,
-          stripeCount: d === "none" ? 0 : Math.max(1, state.stripeCount || 2),
-          stripeTight: d === "v" ? false : state.stripeTight
-        });
-        const name = b.querySelector("span")?.textContent || d;
-        if (p.lost.length) askConfirm(confirmSentence(name, p.lost), () => commitChoice("stripes", p));
-        else commitChoice("stripes", p);
-      });
-    }
+      <output class="blen__v" aria-labelledby="stripes-l">${counted(n, "stripes.noun")}</output>
+      <button type="button" class="blen__b" data-n="1" aria-label="${T("stripes.more")}"
+              ${n >= max ? "disabled" : ""}>+</button>
+    </div>
+    ${dir === "h" ? `
+      <button type="button" class="pill stripes__tight${state.stripeTight ? " is-on" : ""}"
+              data-tight="1" aria-pressed="${state.stripeTight}">${T("stripes.tight")}</button>` : ""}
+    <span class="stripes__cost">${priceLabel(priceParts(state).stripes)}</span>`;
     for (const b of box.querySelectorAll("[data-n]")) {
       b.addEventListener("click", () => {
         const next = state.stripeCount + Number(b.dataset.n);
@@ -11722,10 +11729,11 @@ ${plate.defs}${plate.body}
     const drawn = [...document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"][data-id]`)].map((b) => all.find((o) => o.id === b.dataset.id)).filter(Boolean);
     const list = drawn.length === all.length ? drawn : all;
     const blocked = conflicts(state)[g.key] || {};
-    const at2 = list.findIndex((o) => o.id === state[g.key]);
+    const cur = valueOf(g);
+    const at2 = list.findIndex((o) => o.id === cur);
     for (let k = 1; k < list.length; k++) {
       const o = list[((at2 + dir * k) % list.length + list.length) % list.length];
-      if (o.id !== state[g.key] && !blocked[o.id]) {
+      if (o.id !== cur && !blocked[o.id]) {
         choose(g, o.id);
         return;
       }
@@ -11898,19 +11906,21 @@ ${plate.defs}${plate.body}
         return;
       }
     }
-    if (g.key === "detail" && id !== state.detail && panelUnderGlass({ ...state, detail: id })) {
+    const opt = g.plan ? g.list().find((o) => o.id === id) : null;
+    if (g.key === "detail" && !(opt && opt.dir) && id !== state.detail && panelUnderGlass({ ...state, detail: id })) {
       const why = conflicts(state).detail[id];
       if (why) {
         toast(why);
         return;
       }
     }
-    const p = planChoice(g.key, { [g.key]: id });
+    const [pkey, change] = opt ? g.plan(opt, state) : [g.key, { [g.key]: id }];
+    const p = planChoice(pkey, change);
     if (p.lost.length) {
-      askConfirm(confirmSentence(optionName(g, id), p.lost), () => commitChoice(g.key, p));
+      askConfirm(confirmSentence(optionName(g, id), p.lost), () => commitChoice(pkey, p));
       return;
     }
-    commitChoice(g.key, p);
+    commitChoice(pkey, p);
   }
   function planChoice(key, change) {
     const want = { ...state, ...change };
@@ -11930,8 +11940,9 @@ ${plate.defs}${plate.body}
   }
   function commitChoice(key, { fixed, said, stood, memo: memo2 }) {
     for (const k of stood) delete memo2[k];
+    const own = new Set(key === "detail" || key === "stripes" ? ownedBy(key) : [key]);
     for (const k of Object.keys(fixed)) {
-      if (k === key || stood.includes(k)) continue;
+      if (own.has(k) || stood.includes(k)) continue;
       if (typeof fixed[k] === "object" || typeof state[k] === "object") continue;
       if (state[k] === fixed[k]) continue;
       if (!displaced.has(key)) displaced.set(key, {});
@@ -12050,7 +12061,7 @@ ${plate.defs}${plate.body}
   }
   function nowLabel(g) {
     const list = g.list();
-    const hit = list.find((o) => o.id === state[g.key]) || list[0];
+    const hit = list.find((o) => o.id === valueOf(g)) || list[0];
     return hit ? L(hit) : "";
   }
   function paint() {
@@ -12075,7 +12086,7 @@ ${plate.defs}${plate.body}
     if (table) {
       const pictureOf = (r) => {
         if (r.key === "colour") return `<span class="spec__swatch" style="--chip:${r.hex}"></span>`;
-        if (r.key === "stripes") return stripesGlyph(state.stripeDir);
+        if (r.key === "stripes") return stripeTileGlyph(state.stripeDir);
         const g = GROUPS.find((x) => x.key === (r.key === "glazing" ? "window" : r.key));
         const o = g && g.list().find((x) => x.id === (r.key === "glazing" ? state.window : r.id));
         if (g && g.glyph && o) return copyOf(g.glyph(o), `spec-${r.key}`);
@@ -12129,7 +12140,7 @@ ${plate.defs}${plate.body}
       const field = document.querySelector(`.field[data-group="${g.key}"]`);
       if (field) field.hidden = !g.when(state);
     }
-    const chosen = [state[g.key]];
+    const chosen = [valueOf(g)];
     let anyBlocked = false;
     document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"]`).forEach((el) => {
       const id = el.dataset.id;

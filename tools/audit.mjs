@@ -23,7 +23,7 @@ import { load, lum } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
 import { deltaLabel, formatAgorot, priceAgorot, priceLabel, priceParts } from '../js/price.js';
 import { DETAILS, GRILLES, SIZES } from '../js/catalog.js';
-import { detailGlyph, stripesGlyph } from '../js/renderer.js';
+import { detailGlyph, stripeTileGlyph } from '../js/renderer.js';
 import { SECTION_ICON, SPEC_ICON } from '../js/icons.js';
 import { L, setLang, T, withLang } from '../js/copy.js';
 import { specRows, summaryLine } from '../js/spec.js';
@@ -784,21 +784,17 @@ for (const v of VIEWS) {
       await p.waitForTimeout(320);
       return yes();
     };
-    /* The direction pills are not tiles and carry no `data-id`; a blocked one is
-       `aria-disabled` and Playwright refuses it, so this clicks it outright (§8). */
-    const tapDir = async dir => {
-      await p.evaluate(d => {
-        const e = document.querySelector(`.stripes__dirs .pill[data-dir="${d}"]`);
-        if (e) e.click();
-      }, dir);
-      await p.waitForTimeout(320);
-      return yes();
-    };
-    const now = () => p.evaluate(() => ({
-      face: (document.querySelector('.field[data-group="detail"] [aria-checked="true"]')
-             || {}).dataset?.id,
-      dir: (document.querySelector('.stripes__dirs .pill.is-on') || {}).dataset?.dir,
-    }));
+    /* ⚠ RESTATED 29.9.2026: the stripes are TILES of the face group
+       (`stripes-h`, `stripes-v`), so a direction is tapped as a tile — through
+       `tap`, which answers the dialog — and read off the one checked tile: the
+       face is what it is when it is not a stripe tile, and the direction is
+       what the stripe tile says, `none` otherwise. */
+    const tapDir = dir => tap('detail', dir === 'none' ? 'plain' : `stripes-${dir}`);
+    const now = () => p.evaluate(() => {
+      const on = (document.querySelector('.field[data-group="detail"] [aria-checked="true"]') || {}).dataset?.id;
+      const m = /^stripes-(h|v)$/.exec(on || '');
+      return { face: on, dir: m ? m[1] : 'none' };
+    });
     const fresh = async q => {
       await p.goto('file://' + process.cwd() + '/index.html' + q);
       await p.waitForSelector('#stage svg');
@@ -848,17 +844,39 @@ for (const v of VIEWS) {
       }
     }
 
+    /* ⚠ RESTATED 29.9.2026, AND ITS OLD CLAIM REVERSED ON PURPOSE. It asserted
+       that face → panel2 → plain gave the stripes BACK: a face tap displaced
+       them, and the memory restored them. The face and the stripes are tiles of
+       ONE radio group now (*"the stripes get square buttons like every other
+       option"*), so panel2 over stripes is the customer's answer, not a loss —
+       it asks nothing and records nothing (`ownedBy`), and "plain" afterwards
+       means plain. The memory's claim that must stay true moves to the field
+       that still displaces the stripes, the WINDOW: stripes → square window
+       (asks, takes them) → no window gives them back. */
     await fresh('?sp=13&d=plain&w=none&n=none&k=coral&lang=he');
+    const s0 = await now();
     await tap('detail', 'panel2');
     const tookS = await now();
     await tap('detail', 'plain');
     const gaveS = await now();
-    if (tookS.dir !== 'none') {
-      fault(v.name, `a panelled face left the stripes at ${tookS.dir} — this half of the `
-        + 'check has lost its subject');
-    } else if (gaveS.dir !== 'h') {
-      fault(v.name, `face → panel2 → plain left the stripes at ${gaveS.dir} and they were `
-        + 'horizontal before — the memory is only working for the window');
+    if (s0.dir !== 'h') {
+      fault(v.name, `the stripe fixture arrived at ${s0.dir}, not horizontal — this clause has lost its subject`);
+    } else if (tookS.face !== 'panel2' || tookS.dir !== 'none') {
+      fault(v.name, `two panels over the stripes landed on ${tookS.face} (stripes ${tookS.dir}) — the swap should land on the tile tapped`);
+    } else if (gaveS.face !== 'plain' || gaveS.dir !== 'none') {
+      fault(v.name, `face → panel2 → plain landed on ${gaveS.face} (stripes ${gaveS.dir}) — a swap inside the face `
+        + 'group is the customer\'s answer and must not hand the stripes back');
+    }
+    await fresh('?sp=13&d=plain&w=none&n=none&k=coral&lang=he');
+    if (!(await tap('window', 'rect'))) fault(v.name, 'the square window took the stripes without asking — the confirm dialog did not open');
+    const tookW = await now();
+    await tap('window', 'none');
+    const gaveW = await now();
+    if (tookW.dir !== 'none') {
+      fault(v.name, `the square window left the stripes at ${tookW.dir} — this half of the check has lost its subject`);
+    } else if (gaveW.dir !== 'h') {
+      fault(v.name, `stripes → square window → none left the stripes at ${gaveW.dir} and they were `
+        + 'horizontal before — going back does not give them back');
     }
 
     /* ⚠ AND THE MEMORY MUST YIELD TO A DELIBERATE CHOICE — ON THE STRIPES,
@@ -878,25 +896,32 @@ for (const v of VIEWS) {
        tap on a stripe pill performs its own repair (the panel goes, §3), so the
        deliberate `v` and the remembered `h` collide in one gesture — and `v`
        must win, both immediately and after the face is set back to plain. */
+    /* ⚠ AND RE-AIMED 29.9.2026 ONTO THE WINDOW, for the reason above: a panel
+       over the stripes no longer displaces them, so it records no memory for a
+       deliberate choice to beat. The window does: stripes → the square window
+       (it takes them) → the vertical stripe TILE on purpose (greyed by the
+       window; its tap asks and takes the window) → the window list's "none".
+       The remembered `h` and the deliberate `v` meet at that last tap, and `v`
+       must win — the guard that the field still holds what the repair left. */
     await fresh('?sp=13&d=plain&w=none&n=none&k=coral&lang=he');
     const dir0 = await now();
-    await tap('detail', 'panel2');
+    await tap('window', 'rect');
     const hid = await now();
     await tapDir('v');
     const chose = await now();
-    await tap('detail', 'plain');
+    await tap('window', 'none');
     const kept = await now();
     if (dir0.dir !== 'h') {
       fault(v.name, `the stripe fixture arrived at ${dir0.dir}, not horizontal — this clause `
         + 'has lost its subject before it starts');
     } else if (hid.dir !== 'none') {
-      fault(v.name, `a panelled face left the stripes at ${hid.dir} — nothing was displaced, `
+      fault(v.name, `the square window left the stripes at ${hid.dir} — nothing was displaced, `
         + 'so there is no memory to yield');
     } else if (chose.dir !== 'v') {
-      fault(v.name, `a deliberate tap on the vertical pill landed on ${chose.dir}`);
+      fault(v.name, `a deliberate tap on the vertical stripe tile landed on ${chose.dir}`);
     } else if (kept.dir !== 'v') {
       fault(v.name, `a direction chosen on purpose (v) was overwritten with ${kept.dir} `
-        + 'when the face went back to plain — the memory must yield to a deliberate choice');
+        + 'when the window list went to "none" — the memory must yield to a deliberate choice');
     }
 
     /* And nothing of it rides in the address — driven on the SLOT, the window
@@ -914,75 +939,79 @@ for (const v of VIEWS) {
      Peretz: the stripes disappear when panels are chosen. They did — the whole
      control was replaced by its label and one sentence, so a customer who had
      picked a panel could not see that stripes exist, what they cost, or that
-     one tap would trade the panel for them. It is the tile idiom now: the
-     pills are always rendered, the blocked ones are `aria-disabled` and
-     `.is-blocked`, the reason sits under them, and a tap performs the repair.
-     Three things, and the third is the one that would rot quietly:
-       · the three direction pills are in the DOM on a panelled door,
-       · the blocked ones say so to a screen reader AND carry a reason,
-       · and a tap on one still WORKS — it clears the face, turns the stripes
-         on, and says what it took away.
-     That last clause is a second fault this found: the handler discarded
-     `said` and performed its repairs in silence, which no tile has done since
-     9.9. It was unreachable while the control vanished.
+     one tap would trade the panel for them.
+     ⚠ RESTATED 29.9.2026 ONTO TWO TILES — the owner's son: *"The stripes get
+     square buttons like every other option."* The direction pills are gone
+     (none of them may come back); the two stripe tiles stand in the face
+     group, and the subject — the stripes are always on the step, and a tap on
+     them WORKS and SAYS what it took — is kept on both doors that used to
+     block them:
+       · on a PANELLED door the two tiles are there and NOT greyed — the panel
+         and the stripes are one group's alternatives now — and a tap lands on
+         the stripes with the face cleared, asking nothing, the count's stepper
+         appearing under the tiles;
+       · on a GLAZED door they are greyed with the window's reason, as
+         `aria-disabled` and never `disabled` (PLAN.md §10.5), and a tap still
+         works: it asks first (it takes the window), YES lands on the stripes
+         with the window gone, and the toast names what went — the second
+         fault this block found on 14.9 (a handler that repaired in silence).
      This is a DOM fact and a behaviour, so `npm test` cannot see it.
-     Falsified by putting the `why ? … : …` replace back in `buildStripes`
-     (the first clause fails), by using `disabled` instead of `aria-disabled`
-     (the third), or by dropping `toast(said…)` again (the fourth). */
+     Falsified by greying the stripe tiles for a panel again (the first
+     clause), by `disabled` instead of `aria-disabled` (the second), or by
+     dropping `toast(said…)` (the third). */
   {
-    await p.goto('file://' + process.cwd() + '/index.html?d=panel2&w=none&n=none&k=coral&lang=he');
-    await p.waitForSelector('#stage svg');
-    await p.waitForTimeout(400);
-    await p.evaluate(() => {
+    const face = () => p.evaluate(() => {
       const c = [...document.querySelectorAll('[data-step]')].find(e => e.dataset.step === 'face');
       if (c) c.click();
     });
-    await p.waitForTimeout(350);
-    const before = await p.evaluate(() => {
-      const pills = [...document.querySelectorAll('.stripes__dirs .pill')];
-      return { n: pills.length,
-               dirs: pills.map(e => e.dataset.dir).join(','),
-               blocked: pills.filter(e => e.getAttribute('aria-disabled') === 'true')
-                             .map(e => e.dataset.dir).join(','),
-               dead: pills.filter(e => e.disabled).map(e => e.dataset.dir).join(','),
-               why: (document.querySelector('.stripes__why') || {}).textContent || '',
-               face: (document.querySelector('.field[data-group="detail"] [aria-checked="true"]')
-                      || {}).dataset?.id };
+    const read = () => p.evaluate(() => {
+      const tiles = [...document.querySelectorAll('.field[data-group="detail"] [data-id^="stripes-"]')];
+      return { ids: tiles.map(e => e.dataset.id).join(','),
+               blocked: tiles.filter(e => e.getAttribute('aria-disabled') === 'true').map(e => e.dataset.id).join(','),
+               dead: tiles.filter(e => e.disabled).map(e => e.dataset.id).join(','),
+               why: tiles.map(e => (e.querySelector('.tile__why:not([hidden])') || {}).textContent || '').join('|'),
+               pills: document.querySelectorAll('.stripes__dirs, .stripes__dir').length,
+               stepper: !!document.querySelector('.field[data-group="detail"] .stripes .blen__row'),
+               on: (document.querySelector('.field[data-group="detail"] [aria-checked="true"]') || {}).dataset?.id,
+               win: (document.querySelector('.field[data-group="window"] [aria-checked="true"]') || {}).dataset?.id,
+               toast: (() => { const t = document.querySelector('#toast');
+                               return t && !t.hidden ? t.textContent.trim() : ''; })() };
     });
-    if (before.n !== 3) {
-      fault(v.name, `the face step shows ${before.n} stripe direction pills on a panelled `
-        + 'door and there are three — the control vanishes instead of saying why');
-    } else {
-      if (before.blocked !== 'h,v') {
-        fault(v.name, `the blocked stripe directions are "${before.blocked}" and should be `
-          + '"h,v" — a panelled door cannot take stripes and the pills must say so');
-      }
-      if (before.dead) {
-        fault(v.name, `stripe pills ${before.dead} use \`disabled\` — blocked options stay `
-          + 'focusable and clickable (PLAN.md §10.5); they are aria-disabled');
-      }
-      if (before.why.trim().length < 10) {
-        fault(v.name, 'the blocked stripe control shows no reason under it');
-      }
-      await p.evaluate(() => document.querySelector('.stripes__dirs .pill[data-dir="h"]').click());
+    for (const [q, glazed] of [['?d=panel2&w=none&n=none&k=coral&lang=he', false],
+                               ['?d=plain&w=rect&n=none&k=coral&lang=he', true]]) {
+      await p.goto('file://' + process.cwd() + '/index.html' + q);
+      await p.waitForSelector('#stage svg');
+      await p.waitForTimeout(400);
+      await face();
       await p.waitForTimeout(350);
-      /* ⚠ SINCE 27.9.2026 THE TRADE ASKS FIRST — the confirm dialog names the
-         panel it would take; YES commits the trade this clause is about. */
-      if (!(await yes())) fault(v.name, 'a blocked stripe pill traded the panel without asking — the confirm dialog did not open');
-      const after = await p.evaluate(() => ({
-        face: (document.querySelector('.field[data-group="detail"] [aria-checked="true"]')
-               || {}).dataset?.id,
-        dir: (document.querySelector('.stripes__dirs .pill.is-on') || {}).dataset?.dir,
-        toast: (() => { const t = document.querySelector('#toast');
-                        return t && !t.hidden ? t.textContent.trim() : ''; })(),
-      }));
-      if (after.dir !== 'h' || after.face === before.face) {
-        fault(v.name, `tapping a blocked stripe pill left the door at face=${after.face} `
-          + `dir=${after.dir} — it should trade the panel for the stripes`);
+      const before = await read();
+      const door = glazed ? 'a glazed door' : 'a panelled door';
+      if (before.pills) fault(v.name, `the face step still draws ${before.pills} direction pill(s) — the tiles choose the direction`);
+      if (before.ids !== 'stripes-h,stripes-v') {
+        fault(v.name, `the face step shows the stripe tiles "${before.ids}" on ${door} — two, always there`);
+        continue;
       }
-      if (!after.toast) {
-        fault(v.name, 'the stripe control cleared the face and said nothing — every other '
-          + 'control in this flow names what a repair took away');
+      if (before.stepper) fault(v.name, `${door} with no stripes shows the stripe count's stepper`);
+      if (glazed) {
+        if (before.blocked !== 'stripes-h,stripes-v') fault(v.name, `on ${door} the greyed stripe tiles are "${before.blocked}" — both, for the window`);
+        if (before.dead) fault(v.name, `stripe tiles ${before.dead} use \`disabled\` — blocked options stay focusable and clickable (PLAN.md §10.5); they are aria-disabled`);
+        if (before.why.split('|').some(w => w.trim().length < 10)) fault(v.name, `the greyed stripe tiles on ${door} show no reason`);
+      } else if (before.blocked) {
+        fault(v.name, `on ${door} the stripe tiles "${before.blocked}" are greyed — a panel and the stripes are alternatives of one group now`);
+      }
+      await p.evaluate(() => document.querySelector('.field[data-group="detail"] [data-id="stripes-h"]').click());
+      await p.waitForTimeout(350);
+      const asked = await yes();
+      if (glazed && !asked) fault(v.name, `a greyed stripe tile on ${door} took the window without asking — the confirm dialog did not open`);
+      if (!glazed && asked) fault(v.name, `the horizontal stripe tile on ${door} asked first — a swap inside the face group takes nothing`);
+      const after = await read();
+      if (after.on !== 'stripes-h' || (glazed && after.win !== 'none')) {
+        fault(v.name, `tapping the horizontal stripe tile on ${door} left the door on ${after.on} with window ${after.win} — `
+          + 'it should land on the stripes with the other cleared');
+      }
+      if (!after.stepper) fault(v.name, `the stripes are on (${door}) and the count's stepper is not under the tiles`);
+      if (glazed && !after.toast) {
+        fault(v.name, 'the stripe tile took the window and said nothing — every control in this flow names what a repair took away');
       }
     }
     await p.goto('file://' + process.cwd() + '/index.html');
@@ -6403,7 +6432,9 @@ for (const v of VIEWS) {
   console.log('\na tap does not scroll the panel it is in');
   const TAP = [[1100, 800, 'ru', true], [1280, 720, 'he', true], [1440, 900, 'he', true],
                [1536, 730, 'en', true], [320, 568, 'he', false], [390, 844, 'ru', false]];
-  const PICK = '.sect.is-live [role="radio"], .sect.is-live .stripes__dirs .pill, .sect.is-live .blen__b, .sect.is-live .stripes__tight';
+  /* 29.9.2026: the stripe direction pills are gone — the two stripe tiles are
+     `[role="radio"]` like every tile, so the first selector reaches them. */
+  const PICK = '.sect.is-live [role="radio"], .sect.is-live .blen__b, .sect.is-live .stripes__tight';
   const snap = () => {
     const pn = document.querySelector('.panel--choose');
     return { y: Math.round(scrollY), top: Math.round(pn.scrollTop), sh: pn.scrollHeight };
@@ -6513,19 +6544,23 @@ for (const v of VIEWS) {
   }
 }
 
-/* ── THE STRIPE PILLS CARRY THREE PICTURES, AND NONE IS THE PLAIN FACE ────
+/* ── THE STRIPE TILES CARRY TWO PICTURES, AND NEITHER IS A FACE ──────────
    Peretz, 20.9.2026: *"add icons for the stripes to make them more visible."*
-   `stripesGlyph` draws each as a window on the leaf at the door's own pitch.
-   `npm test` asserts the lines are the door's lines; only a rasteriser can say
-   they are three PICTURES at the size they ship at — the 15.9 marks sweep found
-   two marks that differed in every character and were the same rectangle.
-   The size is read off the page, through the icon the pill actually renders,
-   and the page's icons are checked to be the renderer's before anything is
-   compared (§5.15), so this cannot pass on three pictures nobody sees. The
-   plain face tile is in the comparison because it is the picture beside them
-   on the same step. */
+   ⚠ RESTATED 29.9.2026 onto the two stripe TILES (*"the stripes get square
+   buttons like every other option — make an icon for them"*): the pills'
+   three window pictures are gone. `stripeTileGlyph` draws each as the leaf
+   with its lines, as a face tile draws the leaf with its panels; `npm test`
+   asserts the lines are the door's lines, and only a rasteriser can say they
+   are PICTURES at the size they ship at — the 15.9 marks sweep found two marks
+   that differed in every character and were the same rectangle. The subject
+   is unchanged and the comparison is wider: each stripe tile against the other
+   AND against every face tile beside it on the step (the plain face stood in
+   for all of them before). The size is read off the page, through the art the
+   tile actually renders, and the page's pictures are checked to be the
+   renderer's before anything is compared (§5.15). And the tiles fit a 320 px
+   screen in Russian — the longest names on the narrowest phone. */
 {
-  console.log('\nthe stripe pills carry three pictures, and none of them is the plain face');
+  console.log('\nthe stripe tiles carry two pictures, and neither is a face');
   const FLOOR = 0.50;
   const before0 = faults;
   const p = await b.newPage({ viewport: { width: 1280, height: 720 } });
@@ -6534,37 +6569,38 @@ for (const v of VIEWS) {
     await p.waitForTimeout(700);
     await p.evaluate(() => document.querySelector('.steps__step[data-step="face"]')?.click());
     await p.waitForTimeout(500);
-    const shown = await p.evaluate(() => [...document.querySelectorAll('.stripes__dir')].map(e => {
-      const i = e.querySelector('.stripes__ico');
-      return { dir: e.dataset.dir, px: i ? Math.round(i.getBoundingClientRect().width) : 0,
+    const shown = await p.evaluate(() => [...document.querySelectorAll('.field[data-group="detail"] [data-id^="stripes-"]')].map(e => {
+      const i = e.querySelector('.tile__art svg');
+      return { id: e.dataset.id, dir: i ? i.dataset.stripes : '', px: i ? Math.round(i.getBoundingClientRect().height) : 0,
                lines: i ? i.querySelectorAll('line').length : -1, vb: i ? i.getAttribute('viewBox') : '' };
     }));
-    const want = ['none', 'h', 'v'];
-    if (shown.length !== 3 || want.some(d => !shown.find(s => s.dir === d))) {
-      fault('stripes', `the face step shows ${shown.length} direction pills (${shown.map(s => s.dir)}) — expected none, h and v`);
+    if (shown.length !== 2 || !shown.find(s => s.id === 'stripes-h') || !shown.find(s => s.id === 'stripes-v')) {
+      fault('stripes', `the face step shows ${shown.length} stripe tiles (${shown.map(s => s.id)}) — expected stripes-h and stripes-v`);
     }
     for (const s of shown) {
-      const g = stripesGlyph(s.dir);
+      const g = stripeTileGlyph(s.dir);
       const n = (g.match(/<line/g) || []).length, vb = (g.match(/viewBox="([^"]*)"/) || [])[1];
-      if (s.px < 16) fault('stripes', `the "${s.dir}" pill's picture is ${s.px} px — it is not being drawn`);
-      if (s.lines !== n || s.vb !== vb) {
-        fault('stripes', `the "${s.dir}" pill draws ${s.lines} lines in ${s.vb} and stripesGlyph makes ${n} in ${vb} — this check is not reading what the page shows`);
+      if (s.px < 16) fault('stripes', `the "${s.id}" tile's picture is ${s.px} px — it is not being drawn`);
+      if (`stripes-${s.dir}` !== s.id || s.lines !== n || s.vb !== vb) {
+        fault('stripes', `the "${s.id}" tile draws ${s.lines} lines in ${s.vb} (${s.dir}) and stripeTileGlyph makes ${n} in ${vb} — this check is not reading what the page shows`);
       }
     }
     const px = Math.max(...shown.map(s => s.px));
-    const plain = DETAILS.find(d => d.id === 'plain');
-    const arts = { none: stripesGlyph('none'), h: stripesGlyph('h'), v: stripesGlyph('v'), 'plain face': detailGlyph(plain) };
+    const arts = { 'stripes-h': stripeTileGlyph('h'), 'stripes-v': stripeTileGlyph('v') };
+    for (const d of DETAILS) arts[d.id] = detailGlyph(d);
+    const stripeIds = new Set(Object.keys(arts).filter(k => k.startsWith('stripes-')));
     const res = await p.evaluate(async ([arts, px, DSF]) => {
       const ink = async art => {
         const svg = art.replace(/currentColor/g, '#000')
-          .replace('<svg ', `<svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" `);
+          .replace('<svg ', `<svg xmlns="http://www.w3.org/2000/svg" height="${px}" `);
         const img = new Image();
         await new Promise((ok2, no) => {
           img.onload = ok2; img.onerror = no;
           img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
         });
+        const w = Math.max(1, Math.round(px * img.naturalWidth / img.naturalHeight));
         const cv = document.createElement('canvas');
-        cv.width = px * DSF; cv.height = px * DSF;
+        cv.width = w * DSF; cv.height = px * DSF;
         const g = cv.getContext('2d');
         g.drawImage(img, 0, 0, cv.width, cv.height);
         const d = g.getImageData(0, 0, cv.width, cv.height).data;
@@ -6578,6 +6614,7 @@ for (const v of VIEWS) {
       for (let i = 0; i < ids.length; i++) {
         for (let j = i + 1; j < ids.length; j++) {
           const a = fam.get(ids[i]), c = fam.get(ids[j]);
+          if (a.length !== c.length) { pairs.push({ a: ids[i], b: ids[j], d: 1 }); continue; }
           let diff = 0, uni = 0;
           for (let k = 0; k < a.length; k++) { if (a[k] | c[k]) uni++; if (a[k] !== c[k]) diff++; }
           pairs.push({ a: ids[i], b: ids[j], d: uni ? diff / uni : 0 });
@@ -6585,16 +6622,19 @@ for (const v of VIEWS) {
       }
       return pairs.sort((x, y) => x.d - y.d);
     }, [arts, px, 3]);
-    for (const r of res) {
+    /* Only the pairs with a stripe tile in them: the faces among themselves
+       are the tile-picture checks' subject, not this block's. */
+    const mine = res.filter(r => stripeIds.has(r.a) || stripeIds.has(r.b));
+    if (mine.length !== 1 + 2 * DETAILS.length) fault('stripes', `${mine.length} picture pairs compared — this check is measuring less than it says`);
+    for (const r of mine) {
       if (r.d < FLOOR) {
         fault('stripes', `"${r.a}" and "${r.b}" differ on only ${(r.d * 100).toFixed(0)}% of the pixels `
           + `they ink at ${px}px (floor ${FLOOR * 100}%) — at that size they are one picture`);
       }
     }
-    /* ⚠ AND THE PICTURE COSTS WIDTH: three pills that each gained 34 px, in
-       the longest copy on the narrowest screen. They may wrap — the row is a
-       wrapping flex row on purpose — but they may not push the page sideways
-       or run off it. */
+    /* ⚠ AND THE TILES COST WIDTH: two more tiles, in the longest names on the
+       narrowest screen. They may wrap onto a row of their own — the tiles are a
+       grid — but they may not push the page sideways or run off it. */
     const q = await b.newPage({ viewport: { width: 320, height: 568 } });
     try {
       await q.goto(`file://${process.cwd()}/index.html?lang=ru`, { waitUntil: 'load' });
@@ -6603,22 +6643,25 @@ for (const v of VIEWS) {
       await q.waitForTimeout(500);
       const fit = await q.evaluate(() => ({
         sw: document.documentElement.scrollWidth, iw: innerWidth,
-        pills: [...document.querySelectorAll('.stripes__dir')].map(e => {
-          const r = e.getBoundingClientRect();
-          return { dir: e.dataset.dir, l: Math.round(r.left), r: Math.round(r.right) };
+        tiles: [...document.querySelectorAll('.field[data-group="detail"] [data-id^="stripes-"]')].map(e => {
+          const r = e.getBoundingClientRect(), n = e.querySelector('.tile__name');
+          const nr = n ? n.getBoundingClientRect() : r;
+          return { id: e.dataset.id, l: Math.round(r.left), r: Math.round(r.right),
+                   nameOut: Math.round(Math.max(0, r.left - nr.left, nr.right - r.right)) };
         }),
       }));
-      if (fit.pills.length !== 3) fault('stripes 320 ru', `${fit.pills.length} direction pills on the face step — this clause has no subject`);
-      if (fit.sw > fit.iw) fault('stripes 320 ru', `the page is ${fit.sw} px wide on a ${fit.iw} px screen with the stripe pills on it`);
-      for (const pl of fit.pills) {
-        if (pl.l < 0 || pl.r > fit.iw) fault('stripes 320 ru', `the "${pl.dir}" pill runs from ${pl.l} to ${pl.r} on a ${fit.iw} px screen`);
+      if (fit.tiles.length !== 2) fault('stripes 320 ru', `${fit.tiles.length} stripe tiles on the face step — this clause has no subject`);
+      if (fit.sw > fit.iw) fault('stripes 320 ru', `the page is ${fit.sw} px wide on a ${fit.iw} px screen with the stripe tiles on it`);
+      for (const tl of fit.tiles) {
+        if (tl.l < 0 || tl.r > fit.iw) fault('stripes 320 ru', `the "${tl.id}" tile runs from ${tl.l} to ${tl.r} on a ${fit.iw} px screen`);
+        if (tl.nameOut > 1) fault('stripes 320 ru', `the "${tl.id}" tile's name runs ${tl.nameOut} px outside it`);
       }
     } finally {
       await q.close().catch(() => {});
     }
     if (faults === before0) {
-      console.log(`    three pictures at ${px}px and the plain face beside them: closest is `
-        + `${res[0].a} ~ ${res[0].b} at ${(res[0].d * 100).toFixed(0)}%; the pills fit a 320 px screen in Russian`);
+      console.log(`    two pictures at ${px}px beside the ${DETAILS.length} faces: closest is `
+        + `${mine[0].a} ~ ${mine[0].b} at ${(mine[0].d * 100).toFixed(0)}%; the tiles fit a 320 px screen in Russian`);
     }
   } catch (e) {
     if (!crashed(e)) throw e;
@@ -6895,6 +6938,16 @@ for (const v of VIEWS) {
       await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
       await pg.waitForTimeout(500);
       for (const step of ['fit', 'colour', 'lock', 'pz', 'glass', 'face', 'grip']) {
+        /* ⚠ 29.9.2026: the glass step comes BEFORE the face now and its walk
+           leaves a window on the door — beside the slot every face tile is
+           greyed and the face walk would press nothing. The window goes first,
+           so the face step walks its six tiles (the cycle's own block below
+           walks it beside each window). */
+        if (step === 'face') {
+          await pg.evaluate(() => document.querySelector('.field[data-group="window"] [data-id="none"]')?.click());
+          await pg.waitForTimeout(200);
+          await pg.evaluate(() => { const d = document.querySelector('#confirm'); if (d && d.open) document.querySelector('#confirm-yes:not([hidden]), #confirm-ok')?.click(); });
+        }
         await pg.evaluate(k => document.querySelector(`.steps__step[data-step="${k}"]`)?.click(), step);
         await pg.waitForTimeout(350);
         const read = () => pg.evaluate(() => {
@@ -6950,6 +7003,87 @@ for (const v of VIEWS) {
   }
   if (walkedSteps < 14) fault('arrow-order', `only ${walkedSteps} of 14 steps walked — this check is measuring less than it says`);
   if (faults === before) console.log(`    ${presses} presses over ${walkedSteps} steps in two languages: every "next" the next free tile drawn, wrapping, every "prev" the one before (${asked} presses asked first and were answered yes)`);
+}
+
+/* ── THE FACE STEP'S ARROWS: ONE CYCLE OF SIX, AND WHAT A WINDOW TAKES OUT OF IT
+   29.9.2026, the owner's son: *"If a user chooses a window, in the face section
+   the stripes are greyed out; with no window the arrows go through the stripes
+   as well — 2 panel, 3 panel, greek set, then horizontal stripes, then vertical
+   stripes, then nothing, and the cycle repeats."* Walked on the page, at 1280
+   in Hebrew and 390 in Russian, with the "next" arrow beside the door:
+     · no window: plain → panel2 → panel3 → classic → stripes-h → stripes-v →
+       plain, and NO dialog at any step — a swap inside the group takes nothing;
+     · the square window: plain → panel2 → panel3 → classic → plain — the
+       stripe tiles greyed (`why.stripesWindow`) and skipped;
+     · the tall slot: every other tile greyed — the pair for want of room
+       under it (`why.noRoomBelow`), the trio by the plate (`why.winPlate`),
+       the set (it brings its own window), the stripes — so the arrow opens the
+       one-button "nothing else fits" dialog and the door does not change.
+   ⚠ THE BRIEF SAID the slot walks panel2 → plain. Measured, it cannot: the
+   pair is refused beside the slot (337 mm of leaf under it), so from plain no
+   other tile is free. The clause asserts what the page does and says so.
+   §5.15: every walk asserts its first reading found the six tiles.
+   Falsified by walking the ARRAY's order again (the cycle breaks at classic →
+   stripes-h — the stripes are last on screen and absent from the array) and by
+   greying the stripes for a panel again (the arrow skips them from panel3). */
+{
+  console.log('\nthe face step\'s arrows walk one cycle of six, and a window takes the stripes out of it');
+  const before = faults;
+  let walks = 0;
+  const CYCLES = [['', ['panel2', 'panel3', 'classic', 'stripes-h', 'stripes-v', 'plain'], 'no window'],
+                  ['&w=rect', ['panel2', 'panel3', 'classic', 'plain'], 'the square window'],
+                  ['&w=strip', [], 'the tall slot']];
+  for (const [w, h, lang] of [[1280, 720, 'he'], [390, 844, 'ru']]) {
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      for (const [q, want, what] of CYCLES) {
+        await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&d=plain&n=none&k=plate${q}`);
+        await pg.waitForTimeout(400);
+        await pg.evaluate(() => document.querySelector('.steps__step[data-step="face"]')?.click());
+        await pg.waitForTimeout(350);
+        const read = () => pg.evaluate(() => {
+          const tiles = [...document.querySelectorAll('.field[data-group="detail"] [role="radio"][data-id]')];
+          return { ids: tiles.map(e => e.dataset.id).join(','),
+                   on: tiles.find(e => e.getAttribute('aria-checked') === 'true')?.dataset.id,
+                   code: document.getElementById('code')?.textContent };
+        });
+        const r0 = await read();
+        if (r0.ids !== 'plain,panel2,panel3,classic,stripes-h,stripes-v' || r0.on !== 'plain') {
+          fault('face-cycle', `${lang} ${w}x${h} ${what}: the face group reads "${r0.ids}" with "${r0.on}" on — six tiles, plain on, or this walk has no subject`);
+          continue;
+        }
+        walks++;
+        const got = [], asked = [];
+        const presses = want.length || 1;
+        for (let k = 0; k < presses; k++) {
+          await pg.evaluate(() => document.querySelector('.stage__arrow--next').click());
+          await pg.waitForTimeout(180);
+          const dlg = await pg.evaluate(() => {
+            const d = document.querySelector('#confirm');
+            if (!d || !d.open) return null;
+            const yesShown = !document.querySelector('#confirm-yes').hidden;
+            document.querySelector(yesShown ? '#confirm-no' : '#confirm-ok')?.click();
+            return yesShown ? 'asked' : 'told';
+          });
+          if (dlg) { asked.push(`${k + 1}:${dlg}`); await pg.waitForTimeout(200); }
+          got.push((await read()).on);
+        }
+        if (want.length) {
+          if (got.join(',') !== want.join(',')) fault('face-cycle', `${lang} ${w}x${h} ${what}: next walks plain → ${got.join(' → ')} — it should be plain → ${want.join(' → ')}`);
+          if (asked.length) fault('face-cycle', `${lang} ${w}x${h} ${what}: the arrows opened a dialog at press ${asked.join(', ')} — a swap inside the face group takes nothing`);
+        } else {
+          const r1 = await read();
+          if (asked.join() !== '1:told') fault('face-cycle', `${lang} ${w}x${h} ${what}: with no other tile free the arrow should say so in the one-button dialog — it ${asked.length ? `opened ${asked.join()}` : 'opened nothing'}`);
+          if (r1.on !== 'plain' || r1.code !== r0.code) fault('face-cycle', `${lang} ${w}x${h} ${what}: the arrow moved the door (${r0.on} → ${r1.on}, ${r0.code} → ${r1.code}) with nothing free`);
+        }
+      }
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('face-cycle', `${lang} ${w}x${h}: chromium died during the walk`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (walks < 6) fault('face-cycle', `only ${walks} of 6 walks taken — this check is measuring less than it says`);
+  if (faults === before) console.log(`    ${walks} walks: no window plain → panel2 → panel3 → classic → stripes-h → stripes-v → plain with no dialog; the square window skips the stripes; beside the slot nothing else is free and the arrow says so`);
 }
 
 /* ── THE WINDOW DESIGNS: REGULAR, THEN SPECIAL, EACH ONE'S TWO COLOURS TOGETHER
