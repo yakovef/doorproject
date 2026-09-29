@@ -400,17 +400,12 @@ svg { direction: ltr; }
    with it — which is what happened, and which is also exactly how the
    navigator circles did it one screen further down. These two lines mean this
    control can never do that again, whatever a fourth language is called. */
-/* ── undo / redo, under the door ─────────────────────────────────────
-   Two circles, no words. `disabled` rather than hidden, and the row keeps its
-   height either way: anything that appears in the strip under the leaf takes
-   its height out of the door above — measured at 23,021 pixels the one time
-   it was allowed to. */
-/* ⚠ 52 px, UP FROM 44 — 27.9.2026, the owner's son: *"make the undo buttons
+/* ── the wall's round buttons ───────────────────────────────────────
+   ⚠ 52 px, UP FROM 44 — 27.9.2026, the owner's son: *"make the undo buttons
    bigger and put a save button near them."* 44 is the floor this page keeps
-   everywhere, not a size; these are the only two controls in their corner and
-   the first a customer reaches for after a tap they regret. The glyph grows
-   with them (20 → 22 px). The third button, `#save-hud`, is the same class. */
-.steps-back { display: flex; gap: 6px; align-items: center; }
+   everywhere, not a size. Undo and redo were this class until 28.9, when they
+   became labelled pills at the stage's foot (`.undo-pill`, below the arrows);
+   the save is what is left of the round trio. */
 .hud__slot--end { gap: 6px; }
 .iconbtn {
   appearance: none; background: none; cursor: pointer;
@@ -1203,6 +1198,50 @@ svg { direction: ltr; }
 @supports not (background: color-mix(in srgb, red 50%, transparent)) {
   .stage__arrow { background: var(--paper); }
 }
+
+/* ── UNDO YOU CAN SEE, AT THE STAGE'S FOOT — 28.9.2026 ──────────────────
+   The owner's son: *"The undo option rethought: not noticeable on pc and in
+   the way on the phone — more noticeable, but not colliding with the door."*
+   Two labelled pills, paper on ink, 8 px inside the stage's bottom-right
+   corner — physically right in every language, the picker's side — shown from
+   the first change (a disabled pill takes no room and paints nothing; the
+   group's own 44 px box is kept, so the navigator column above it does not
+   jump on the first tap). `placeUndo` (js/app.js) publishes `--undo-b` and
+   `--undo-r` off the stage's rect and picks the shape: `row`, `stack` (redo
+   above undo), `iconrow` or `icon` (the glyph alone, the word in
+   `aria-label`/`title`), the first that touches neither the door, an arrow
+   nor the price — standing above the trust band's words where they reach the
+   corner. The undo
+   is always the one in the corner. Absolute, for `.stage__hud`'s reason. */
+.stage__undo {
+  position: absolute; z-index: 4;
+  inset-block-end: var(--undo-b, 8px);
+  right: var(--undo-r, 8px);
+  display: flex; gap: 6px; align-items: flex-end; flex-direction: row;
+  min-inline-size: 44px; min-block-size: 44px;
+  pointer-events: none;
+}
+html:not([dir="rtl"]) .stage__undo { flex-direction: row-reverse; }
+.stage__undo[data-mode="stack"], .stage__undo[data-mode="icon"],
+html:not([dir="rtl"]) .stage__undo[data-mode="stack"],
+html:not([dir="rtl"]) .stage__undo[data-mode="icon"] { flex-direction: column-reverse; }
+.undo-pill {
+  pointer-events: auto; appearance: none; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-block-size: 44px; min-inline-size: 44px; padding: 0 16px 0 13px;
+  border: 0; border-radius: var(--r-pill, 999px);
+  background: var(--ink); color: var(--paper);
+  font: 600 .9rem/1 var(--sans); white-space: nowrap;
+  box-shadow: 0 4px 14px rgb(0 0 0 / .22);
+}
+.undo-pill:disabled { display: none; }
+.undo-pill .btn__ico { inline-size: 19px; block-size: 19px; }
+.undo-pill:hover { filter: brightness(1.25); }
+.undo-pill:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
+.stage__undo[data-mode="icon"] .undo-pill,
+.stage__undo[data-mode="iconrow"] .undo-pill { padding: 0; inline-size: 44px; }
+.stage__undo[data-mode="icon"] .undo-pill__w,
+.stage__undo[data-mode="iconrow"] .undo-pill__w { display: none; }
 .stage__arrow:hover { border-color: var(--ink-3); background: var(--paper); }
 .stage__chev {
   inline-size: 20px; block-size: 20px;
@@ -1556,7 +1595,7 @@ html:not([dir="rtl"]) .hud__slot--end { flex-direction: row-reverse; }
    `nowrap` is what stops any of them growing downward instead of sideways. */
 .hud__slot--end { display: flex; justify-content: flex-end; }
 .hud__slot--start, .hud__slot--end { flex: 0 0 auto; }
-.stage__hud .langs, .stage__hud .steps-back { flex-wrap: nowrap; }
+.stage__hud .langs { flex-wrap: nowrap; }
 .stage__hud .lang { white-space: nowrap; }
 
 /* The language buttons lose their pill chrome up here — on a wall they are
@@ -2973,6 +3012,26 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
 .confirm .confirm__no, .confirm .confirm__ok { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .is-bare .works, .is-bare .works-open, .is-bare .confirm { display: none; }
 
+/* ── the save's two dialogs — 28.9.2026 ─────────────────────────────
+   The confirm dialog's card and backdrop (they carry `.confirm`, so the bare
+   rule above covers them too, and they animate as little as it does). The
+   save dialog is three stacked choices — the first the ink primary, the list
+   a quiet outline carrying its count, then a plain close — and the list is
+   the drawer's own rows (`.saved`, above) in a wider card. */
+.savedlg__col { display: grid; gap: 10px; }
+.savedlg .savedlg__save, .savedlg .savedlg__list, .savedlg .savedlg__close {
+  min-block-size: 48px; justify-content: center;
+}
+.savedlg .savedlg__save { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.savedlg .savedlg__list { background: none; color: var(--ink); border-color: var(--rule); }
+.savedlg .savedlg__close { min-block-size: 44px; background: none; border-color: transparent; color: var(--ink-2); }
+.saved-dlg { inline-size: min(560px, 94vw); }
+.saved-dlg .saved {
+  padding: 0; margin-block-end: 14px;
+  background: none; border: 0;
+  max-block-size: 60vh;
+}
+
 /* ── swatches ─────────────────────────────────────────────── */
 
 /* ── COLOURS AS CIRCLES ─────────────────────────────────────────────
@@ -3818,11 +3877,10 @@ html.is-live.is-untouched .wa__ask { display: inline; }
   }
 }
 
-/* `.btn--undo` and its `is-off` twin are GONE. Undo is two icon circles now —
-   `.iconbtn`, defined up beside the language picker — always on the page and
-   `disabled` when there is nothing to take back, so the strip below the door
-   holds one height for ever instead of two. The 23,021-pixel lesson that made
-   `is-off` necessary is what keeps them both mounted. */
+/* `.btn--undo` and its `is-off` twin are GONE, and so are the two icon circles
+   that replaced them (28.9: `.undo-pill` at the stage's foot). The 23,021-pixel
+   lesson that made `is-off` necessary still holds — nothing in the flow — and
+   the pills are absolute for exactly that reason. */
 .btn__ico {
   inline-size: 18px; block-size: 18px;
   stroke-linecap: round; stroke-linejoin: round;
@@ -4218,7 +4276,7 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    it. Anything added to the stage wrap belongs here the same day. */
 .is-bare .bar, .is-bare .strip, .is-bare .panel, .is-bare .stage__bar,
 .is-bare .stage__h1, .is-bare .steps, .is-bare .trust, .is-bare .saved,
-.is-bare .stage__hud, .is-bare .quote, .is-bare .stage__band, .is-bare .stage__arrow,
+.is-bare .stage__hud, .is-bare .quote, .is-bare .stage__band, .is-bare .stage__arrow, .is-bare .stage__undo,
 /* ⚠ `.brand` JOINS THE LIST THE DAY IT IS ADDED, which is the standing rule
    for anything put inside `.stage-wrap` — the one page element `?bare=1`
    keeps. Bare mode exists so the harnesses photograph THE DRAWING and no page

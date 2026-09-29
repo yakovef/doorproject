@@ -2218,11 +2218,19 @@ for (const v of VIEWS) {
      DERIVED, same discipline as `small` above: every pair of operable
      elements inside `.stage__hud`, not a named list of the three slots, so a
      fourth control added later is covered without anyone remembering to. */
+  /* ⚠ WIDENED 28.9.2026, SAME SUBJECT: the wall holds more than `.stage__hud`
+     now — the price (left of the door), the undo pills (at the stage's foot),
+     the two arrows and, above 1100, the navigator column — so every operable
+     element on the WALL is paired, not only the hud's. */
   const hudOverlaps = await p.evaluate(() => {
     const hud = document.querySelector('.stage__hud');
     if (!hud) return [];
-    const els = [...hud.querySelectorAll(
-      'button, a[href], input, select, [role="radio"], [role="button"]')]
+    const wallEls = ['.stage__hud', '.stage__undo', '#quote', '.stage-wrap > .steps']
+      .map(q => document.querySelector(q)).filter(Boolean);
+    const els = [...wallEls.flatMap(w => [...w.querySelectorAll(
+      'button, a[href], input, select, [role="radio"], [role="button"]')]),
+      ...document.querySelectorAll('.stage__arrow')]
+      .filter(el => !(el.closest('#quote') && getComputedStyle(document.querySelector('#quote')).position === 'fixed'))
       .map(el => ({ el, r: el.getBoundingClientRect() }))
       .filter(({ r }) => r.width && r.height);
     const out = [];
@@ -2818,9 +2826,21 @@ for (const v of VIEWS) {
     await p.goto(`file://${process.cwd()}/index.html`
                + '?c=rb-0097d&w=rect&g=none&n=idan&k=cylinder&d=plain&s=extra2&h=right-in');
     await p.waitForTimeout(400);
+    /* ⚠ ONE CHANGE FIRST, SINCE 28.9: the undo pill is not shown until there is
+       something to undo (a link arrives with no history), and a wall check
+       that cannot see it would pass by skipping it. A colour, then a second
+       one, then an undo: both pills live. */
+    await p.evaluate(() => document.querySelector('.steps__step[data-step="colour"]')?.click());
+    await p.waitForTimeout(300);
+    for (const k of [2, 4]) {
+      await p.evaluate(n => [...document.querySelectorAll('.sect.is-live [role="radio"]')][n]?.click(), k);
+      await p.waitForTimeout(220);
+    }
+    await p.evaluate(() => document.querySelector('#undo-btn')?.click());
+    await p.waitForTimeout(350);
     const wall = await p.evaluate(() => {
       const seen = [], bad = [];
-      for (const sel of ['#price-toggle', '#quote-wa',
+      for (const sel of ['#price-toggle', '#quote-wa', '#save-hud',
                          '#undo-btn', '#redo-btn']) {
         const el = document.querySelector(sel);
         if (!el) continue;
@@ -2839,7 +2859,7 @@ for (const v of VIEWS) {
        guard is now on the two that remain, and it is the same guard. A wall
        check that finds nothing in the wall is an empty loop whatever is
        missing from it. */
-    for (const need of ['#price-toggle', '#undo-btn']) {
+    for (const need of ['#price-toggle', '#save-hud', '#undo-btn', '#redo-btn']) {
       if (!wall.seen.includes(need)) {
         fault(v.name, `the wall check never saw ${need} — it is measuring nothing`);
       }
@@ -3290,9 +3310,15 @@ for (const v of VIEWS) {
        behind it, which is exactly what `?bare=1` does for the drawing.
        `visibility`, not `display`, so nothing reflows and the stage keeps the
        size the rest of this block already measured. */
+    /* ⚠ AND SINCE 28.9 THE WALL CARRIES MORE THAN THE HUD: the navigator
+       column, the band, the arrows and the undo pills all stand on the
+       photograph. The column's foot is a hard ink edge a few px above the
+       floor at 1100 px, and it read as the floor line (−18.6 px at `cusp`,
+       the first full audit after it moved). Occluders out of the frame, the
+       rule this block already states. */
     await pg.addStyleTag({ content:
-      '.trust, .stage__hud, .quote, .hint, .toast '
-      + '{ visibility: hidden !important; }' });
+      '.trust, .stage__hud, .quote, .hint, .toast, .stage-wrap > .steps, .stage__band, '
+      + '.stage__arrow, .stage__undo { visibility: hidden !important; }' });
     await pg.waitForTimeout(60);
     await pg.screenshot({ path: '/tmp/audit-floor.png',
       clip: { x: g.x, y: g.y, width: g.w, height: g.h } });
@@ -4735,7 +4761,11 @@ for (const v of VIEWS) {
        is narrower than the stack it replaced, so the grip step's question is a
        line shorter and an answer reaches the screen. Narrowed, as the clause
        below asks, never widened. */
-    { name: '844x390 a phone on its side', w: 844, h: 390, shows: ['glass', 'grip'] },
+    /* ⚠ AND pz, face AND mk JOINED AT 844x390 ON 28.9 (the full audit after
+       commit 5): the band left the stage's flow and the phone bar lost its
+       caption line (71.3 → 67.0 px), so three more questions reach an answer
+       on a phone on its side. 640x360 is unchanged. */
+    { name: '844x390 a phone on its side', w: 844, h: 390, shows: ['pz', 'face', 'glass', 'grip', 'mk'] },
     { name: '640x360 a 1280 laptop at 200% zoom', w: 640, h: 360, shows: ['glass', 'grip'] },
   ];
 
@@ -4842,7 +4872,7 @@ for (const v of VIEWS) {
   if (steps < 8 * MUST.length) fault('answer', `only ${steps} steps were measured of ${8 * MUST.length} — the sweep is not walking the guide`);
   if (!faults) {
     console.log(`    ${steps} steps across ${MUST.length} viewports show an answer; a phone on its `
-      + 'side and a laptop at 200% zoom show one (glass) of eight, and are the two named exemptions');
+      + `side and a laptop at 200% zoom show ${EXEMPT.map(e => `${e.shows.length} (${e.shows.join(', ')})`).join(' and ')} of eight, and are the two named exemptions`);
   }
 }
 
@@ -5161,6 +5191,12 @@ for (const v of VIEWS) {
           if (!moved) break;
           await p.waitForTimeout(320);
         }
+        /* ⚠ AND WHAT IT PRESSES IS THE PILL (28.9): `#undo-btn` left the
+           wall's top row for the labelled pill at the stage's foot, and this
+           walk is the customer pressing the thing they can see. */
+        if (!(await p.evaluate(() => !!document.querySelector('#undo-btn')?.closest('.stage__undo')))) {
+          fault('undo', `${lang} ${s.name}: #undo-btn is not the pill at the stage's foot — this walk presses something else`);
+        }
         const bare = await p.evaluate(() => document.querySelector('#undo-btn')?.disabled);
         if (bare === undefined) {
           fault('undo', `${lang} ${s.name}: no undo button — this check has lost its subject`);
@@ -5237,7 +5273,223 @@ for (const v of VIEWS) {
   }
 }
 
-/* ── THE SAVED-DESIGNS DRAWER FITS THE CARD IT HANGS IN ──────────────────
+/* ── UNDO YOU CAN SEE, AT THE STAGE'S FOOT, AND OFF THE DOOR ──────────────
+   28.9.2026, the owner's son: *"The undo option rethought: not noticeable on
+   pc and in the way on the phone — more noticeable, but not colliding with the
+   door."* Two labelled ink pills, 8 px inside the stage's bottom-right corner
+   in every language (the picker's side, physically). Asked at every `VIEWS`
+   viewport, Hebrew and Russian, all six sizes — a door that arrives by link,
+   then two colour taps and one undo:
+     · NOTHING until there is something to undo (a link carries no history),
+       and the redo only once there is something to redo;
+     · the group at the corner — its right edge 8 px inside the stage, its
+       foot 8 px above the stage's, or 8 px above the trust band's words where
+       those reach the corner (a desktop) — and every pill ≥ 44 px both ways;
+     · never on `#frame`, and on none of the wall's other things: the trust
+       band's words, the price, the arrows, the navigator column, the band;
+     · its SHAPE is the first of row / stack / iconrow / icon that touches
+       neither the door, an arrow nor the price (each earlier shape is put back
+       in place, re-measured, and must touch one of them);
+     · and the undo's own toast stacks above it, never on it.
+   ⚠ The first run of this block found two faults in the first build, which
+   placed by the wall's WIDTH alone: the pills on the trust band's words at
+   1100–1280 (Russian) and 1100–1152 (Hebrew), up to 1,646 px², and at 320 the
+   stacked redo on the arrow beside the door, up to 943 px².
+   ⚠ ONE NAMED READING, asserted STILL NEEDED: at 320×568 beside the two widest
+   doors, with undo AND redo showing, the wall is 93 px — an arrow and one pill
+   wide — and the stage 239 px tall, so the stacked redo reaches the arrow by
+   66 (halfextra1) and 115 px² (halfextra2) in both languages. No shape clears
+   it without standing on the door. Named with its number (+10), never
+   widened; the day it clears, this fails and the name comes out. */
+{
+  console.log('\nundo stands at the stage\'s foot, labelled, and off the door');
+  const before = faults;
+  let read = 0, lifted = 0; const modes = { row: 0, stack: 0, iconrow: 0, icon: 0 };
+  const ARROW_KNOWN = { '320x568 halfextra1': 66, '320x568 halfextra2': 115 };
+  const arrowSeen = new Set();
+  for (const v of VIEWS) for (const lang of ['he', 'ru']) for (const size of Object.keys(SIZES)) {
+    const tag = `${lang} ${v.w}x${v.h} ${size}`;
+    const pg = await b.newPage({ viewport: { width: v.w, height: v.h } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=${size}`);
+      await pg.waitForTimeout(450);
+      const shownAt = () => pg.evaluate(() => [...document.querySelectorAll('.stage__undo .undo-pill')]
+        .filter(x => x.getBoundingClientRect().width > 0).map(x => x.id));
+      const fresh = await shownAt();
+      if (fresh.length) fault('undo-pill', `${tag}: ${fresh.join(', ')} painted before anything could be undone`);
+      await pg.evaluate(() => document.querySelector('.steps__step[data-step="colour"]')?.click());
+      await pg.waitForTimeout(300);
+      for (const k of [2, 4]) {
+        await pg.evaluate(n => [...document.querySelectorAll('.sect.is-live [role="radio"]')][n]?.click(), k);
+        await pg.waitForTimeout(200);
+      }
+      const once = await shownAt();
+      if (once.join() !== 'undo-btn') fault('undo-pill', `${tag}: after two changes the pills shown are [${once.join(', ')}] — the undo alone`);
+      await pg.evaluate(() => document.querySelector('#undo-btn')?.click());
+      await pg.waitForTimeout(450);
+      const m = await pg.evaluate(() => {
+        const R = e => { const r = e.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height }; };
+        const ov = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
+        const box = document.querySelector('.stage__undo');
+        const st = R(document.querySelector('#stage')), fr = document.querySelector('.door-svg #frame');
+        if (!box || !fr) return null;
+        const f = R(fr), g = R(box);
+        const pills = [...box.querySelectorAll('.undo-pill')].filter(x => x.getBoundingClientRect().width > 0);
+        const pr = pills.map(x => ({ id: x.id, r: R(x) }));
+        const others = [...document.querySelectorAll('.trust__i, #quote, .stage__arrow, .stage-wrap > .steps, .stage__band')]
+          .filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'
+            && !(e.id === 'quote' && getComputedStyle(e).position === 'fixed'))
+          .map(e => ({ n: e.id || e.className.split(' ')[0], r: R(e) }));
+        const hits = [];
+        for (const pp of pr) for (const o of others) { const x = ov(pp.r, o.r); if (x) hits.push(`${pp.id} on ${o.n} ${x}`); }
+        const onDoor = pr.reduce((a, pp) => a + ov(pp.r, f), 0);
+        const t = document.querySelector('#toast');
+        const toastOn = t && !t.hidden ? pr.reduce((a, pp) => a + ov(pp.r, R(t)), 0) : null;
+        /* the trust band's words, and the foot the group should have */
+        const words = [...document.querySelectorAll('.trust__i')].map(R).filter(r => r.width && r.bottom > st.top && r.top < st.bottom);
+        const wordsTop = words.length ? Math.min(...words.map(r => r.top)) : null;
+        const lifted = wordsTop !== null && words.some(w => w.left < g.right && w.right > g.left);
+        const foot = lifted ? wordsTop - 8 : st.bottom - 8;
+        /* the shape: put each earlier shape back in place and ask what it touches */
+        const obst = [f, ...others.filter(o => o.n === 'quote' || o.n.startsWith('stage__arrow')).map(o => o.r)];
+        const mode = box.dataset.mode, b0 = box.style.getPropertyValue('--undo-b'), touches = {};
+        const wrapB = document.querySelector('.stage-wrap').getBoundingClientRect().bottom;
+        for (const k of ['row', 'stack', 'iconrow', 'icon']) {
+          box.dataset.mode = k;
+          box.style.setProperty('--undo-b', `${Math.round(wrapB - st.bottom + 8)}px`);
+          let gg = R(box);
+          if (wordsTop !== null && words.some(w => w.left < gg.right && w.right > gg.left)) {
+            box.style.setProperty('--undo-b', `${Math.round(wrapB - wordsTop + 8)}px`);
+            gg = R(box);
+          }
+          touches[k] = obst.some(o => ov(gg, o) > 0);
+        }
+        box.dataset.mode = mode; box.style.setProperty('--undo-b', b0);
+        return { mode, touches, lifted, onDoor, hits, toastOn, pills: pr.map(pp => ({ id: pp.id, w: pp.r.width, h: pp.r.height })),
+          dr: Math.round((st.right - 8 - g.right) * 10) / 10, db: Math.round((foot - g.bottom) * 10) / 10 };
+      });
+      if (!m) { fault('undo-pill', `${tag}: no undo group or no #frame — this check has lost its subject`); continue; }
+      read++;
+      modes[m.mode] = (modes[m.mode] || 0) + 1;
+      const ids = m.pills.map(x => x.id).join();
+      if (ids !== 'undo-btn,redo-btn') fault('undo-pill', `${tag}: after an undo the pills shown are [${ids}] — both, undo first`);
+      for (const x of m.pills) if (x.w < 44 || x.h < 44) fault('undo-pill', `${tag}: ${x.id} is ${Math.round(x.w)}x${Math.round(x.h)} — the floor is 44`);
+      if (Math.abs(m.dr) > 1.5 || Math.abs(m.db) > 1.5) fault('undo-pill', `${tag}: the group stands ${m.dr} px off 8 px in from the stage's right and ${m.db} px off 8 px above ${m.lifted ? "the trust band's words" : "the stage's foot"}`);
+      if (m.onDoor) fault('undo-pill', `${tag}: the undo pills stand on the door — ${m.onDoor} px² of #frame (shape "${m.mode}")`);
+      if (m.lifted) lifted++;
+      for (const h of m.hits) {
+        const k = `${v.w}x${v.h} ${size}`, px = +h.split(' ').pop();
+        if (h.startsWith('redo-btn on stage__arrow') && ARROW_KNOWN[k] !== undefined) {
+          arrowSeen.add(`${lang} ${k}`);
+          if (px > ARROW_KNOWN[k] + 10) fault('undo-pill', `${tag}: the named redo-on-arrow reading grew to ${px} px² (named at ${ARROW_KNOWN[k]})`);
+          continue;
+        }
+        fault('undo-pill', `${tag}: ${h} px²`);
+      }
+      if (m.toastOn === null) fault('undo-pill', `${tag}: the undo raised no toast — the stacking clause has no subject`);
+      else if (m.toastOn) fault('undo-pill', `${tag}: the undo's own toast covers ${m.toastOn} px² of the pills — it stacks above them`);
+      const order = ['row', 'stack', 'iconrow', 'icon'];
+      for (const k of order.slice(0, order.indexOf(m.mode))) {
+        if (!m.touches[k]) fault('undo-pill', `${tag}: the shape is "${m.mode}" but "${k}" touches nothing — the first shape that fits is "${k}"`);
+      }
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('undo-pill', `${tag}: chromium died before the pills were measured`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  const want = VIEWS.length * 2 * Object.keys(SIZES).length;
+  if (read < want) fault('undo-pill', `read ${read} of ${want} doors — this check is measuring less than it says`);
+  for (const lang of ['he', 'ru']) for (const k of Object.keys(ARROW_KNOWN)) {
+    if (!arrowSeen.has(`${lang} ${k}`)) fault('undo-pill', `${lang} ${k}: the named redo-on-arrow reading is gone — the pills clear the arrow there now; take it out of ARROW_KNOWN and CLAUDE.md §9`);
+  }
+  if (faults === before) console.log(`    ${read} readings (${VIEWS.length} viewports x he/ru x ${Object.keys(SIZES).length} sizes): none painted before a change, the undo alone after two, both after an undo; at the corner (above the trust band's words on ${lifted}), ≥ 44, on no door and on nothing else on the wall, the toast above them; shapes row ${modes.row}, stack ${modes.stack}, iconrow ${modes.iconrow}, icon ${modes.icon}, each the first that touches nothing`);
+}
+
+/* ── THE SAVE ASKS, AND BOTH ITS DIALOGS CLOSE THE WAY A DIALOG DOES ───────
+   28.9.2026 — *"on clicking, a window with two options, save or view a saved
+   door."* The wall's save opens `#savedlg`: a modal (`:modal`), focus inside
+   it, its choices ≥ 44 px. "שמירת הדלת" saves (one more design in storage, a
+   toast) and closes; the second choice carries the count and opens `#saved`
+   as a modal; Escape and the backdrop close either, and focus comes back to
+   the save button in the wall. The summary's own save still saves at once. */
+{
+  console.log('\nthe save asks, and its dialogs close the way a dialog does');
+  const before = faults;
+  let walked = 0;
+  for (const [w, h] of [[390, 844], [320, 568], [1280, 720], [1920, 918]]) for (const lang of ['he', 'en', 'ru']) {
+    const tag = `${lang} ${w}x${h}`;
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
+      await pg.evaluate(() => localStorage.removeItem('dm.saved.v1'));
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
+      await pg.waitForTimeout(450);
+      const st = () => pg.evaluate(() => {
+        const d = document.querySelector('#savedlg'), l = document.querySelector('#saved');
+        const small = [...document.querySelectorAll('dialog[open] button')].filter(x => { const r = x.getBoundingClientRect(); return r.width && (r.width < 44 || r.height < 44); }).map(x => x.id || x.className);
+        let n = 0; try { n = JSON.parse(localStorage.getItem('dm.saved.v1') || '[]').length; } catch {}
+        return { dlg: !!d?.open, dlgModal: !!d?.matches(':modal'), list: !!l?.open, listModal: !!l?.matches(':modal'),
+          focusIn: !!document.activeElement?.closest('dialog[open]'), focus: document.activeElement?.id || '',
+          count: d?.querySelector('[data-saved-count]')?.textContent, stored: n, small,
+          toast: !document.querySelector('#toast').hidden, rows: document.querySelectorAll('#saved .saved__row').length };
+      });
+      await pg.click('#save-hud');
+      await pg.waitForTimeout(200);
+      const a = await st();
+      if (!a.dlg || !a.dlgModal) fault('save-dlg', `${tag}: the wall's save did not open its dialog as a modal`);
+      if (!a.focusIn) fault('save-dlg', `${tag}: the save dialog opened and focus stayed outside it`);
+      if (a.small.length) fault('save-dlg', `${tag}: dialog buttons under 44 px: ${a.small.join(', ')}`);
+      if (a.stored !== 0) fault('save-dlg', `${tag}: opening the dialog saved something — it asks first`);
+      if (a.count !== '0') fault('save-dlg', `${tag}: the list's choice counts "${a.count}" with nothing saved`);
+      await pg.click('#savedlg-save');
+      await pg.waitForTimeout(300);
+      const b2 = await st();
+      if (b2.dlg) fault('save-dlg', `${tag}: "save" did not close the dialog`);
+      if (b2.stored !== 1 || !b2.toast) fault('save-dlg', `${tag}: "save" stored ${b2.stored} and ${b2.toast ? 'said so' : 'said nothing'}`);
+      if (b2.focus !== 'save-hud') fault('save-dlg', `${tag}: focus went to "${b2.focus}" on closing, not back to the wall's save`);
+      await pg.click('#save-hud');
+      await pg.waitForTimeout(200);
+      const c = await st();
+      if (c.count !== '1') fault('save-dlg', `${tag}: the list's choice counts "${c.count}" with one door saved`);
+      await pg.click('#savedlg-list');
+      await pg.waitForTimeout(300);
+      const d = await st();
+      if (d.dlg || !d.list || !d.listModal) fault('save-dlg', `${tag}: the second choice did not replace the dialog with the saved doors as a modal`);
+      if (d.rows !== 1) fault('save-dlg', `${tag}: the saved doors show ${d.rows} rows for one saved door`);
+      await pg.keyboard.press('Escape');
+      await pg.waitForTimeout(200);
+      const e2 = await st();
+      if (e2.list) fault('save-dlg', `${tag}: Escape did not close the saved doors`);
+      if (e2.focus !== 'save-hud') fault('save-dlg', `${tag}: after the list closed focus is on "${e2.focus}", not the wall's save it was reached from`);
+      await pg.click('#save-hud');
+      await pg.waitForTimeout(200);
+      await pg.mouse.click(3, h - 3);
+      await pg.waitForTimeout(200);
+      const f2 = await st();
+      if (f2.dlg) fault('save-dlg', `${tag}: a tap on the backdrop did not close the save dialog`);
+      walked++;
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('save-dlg', `${tag}: chromium died during the walk`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (walked < 12) fault('save-dlg', `only ${walked} of 12 walks finished`);
+  if (faults === before) console.log(`    ${walked} walks (four shapes x three languages): the wall's save opens a modal with focus inside, saves only when asked, counts, opens the list as a modal, closes on Escape and on the backdrop, and gives focus back to the save`);
+}
+
+/* ── THE SAVED DOORS: A DIALOG, AND THE CARD UNDER IT DOES NOT MOVE ───────
+   ⚠ RESTATED 28.9.2026 FOR A DIALOG, SAME SUBJECTS. The list was a drawer
+   inside the summary's send card; the owner's son: *"The save button's
+   function changed: on clicking, a window with two options, save or view a
+   saved door."* So it is `<dialog id="saved">` now, opened by the summary's
+   "העיצוב שלי" and by the save dialog's second choice. Every clause below keeps
+   its subject — the page does not widen, the summary card and `#spec` do not
+   move while it is open, every row names its price and is distinguishable by
+   what is PAINTED on it, every × is whole on screen and is what
+   `elementFromPoint` returns — and one is new: it opens as a MODAL (the page
+   behind it inert, `:modal` matching it), so nothing on the card can move
+   under a finger while it is up.
+
    Measured 13.9 by walking as the customer who cannot decide between two
    doors — save one, build another, come back. Nothing in this repository had
    ever put a design IN that drawer, so nothing had ever opened it with rows.
@@ -5313,8 +5565,8 @@ for (const v of VIEWS) {
           if (!btn || btn.hidden) return { noBtn: true };
           btn.click();
           const box = document.querySelector('#saved');
-          if (!box || box.hidden) return { noDrawer: true };
-          box.scrollIntoView({ block: 'center' });
+          if (!box || !box.open) return { noDrawer: true };
+          const modal = box.matches(':modal');
           const W = innerWidth, H = innerHeight;
           /* ⚠ WHAT IS PAINTED, NOT WHAT IS IN THE NODE. The description is
              elided, so `textContent` is the whole `summaryLine` whatever the
@@ -5354,7 +5606,7 @@ for (const v of VIEWS) {
             };
           });
           return {
-            shut,
+            shut, modal,
             open: {
               side: doc.scrollWidth - doc.clientWidth,
               card: document.querySelector('.panel--send .send')?.getBoundingClientRect().width,
@@ -5372,12 +5624,13 @@ for (const v of VIEWS) {
           continue;
         }
         if (m.noDrawer) {
-          fault('saved', `${lang} ${s.name}: the toggle did not open the drawer`);
+          fault('saved', `${lang} ${s.name}: the toggle did not open the saved doors' dialog`);
           await p.close().catch(() => {});
           continue;
         }
         opened++;
         rowsSeen += m.rows.length;
+        if (!m.modal) fault('saved', `${lang} ${s.name}: the saved doors opened, but not as a modal — the card under them is live`);
         if (m.rows.length !== DOORS.length) {
           fault('saved', `${lang} ${s.name}: ${m.rows.length} rows for ${DOORS.length} saved `
             + 'designs — the sweep is not measuring what it names');
@@ -5703,12 +5956,19 @@ for (const v of VIEWS) {
            navigator's box on both axes AND inside what the panel shows (the
            viewport below 1100, where the row is fixed and the panel is the
            page). */
+        /* ⚠ RESTATED 28.9.2026, SAME SUBJECT, AND LATE: since commit 2 of that
+           day the column stands ON THE PHOTOGRAPH, a child of `.stage-wrap`, so
+           above 1100 the box that shows it is the STAGE, not the panel it no
+           longer stands in. Commit 2's record said this clause had been
+           restated; it had not, and the first full audit after it failed every
+           desktop step here. */
         const inRow = await p.evaluate(() => {
           const row = document.querySelector('.steps'), c = document.querySelector('.steps__step.is-on');
-          const pn = document.querySelector('.panel--choose');
-          if (!row || !c || !pn) return null;
+          const st = document.querySelector('#stage');
+          if (!row || !c || !st) return null;
           const r = row.getBoundingClientRect(), k = c.getBoundingClientRect();
-          const wide = innerWidth >= 1100, v = pn.getBoundingClientRect();
+          const wide = innerWidth >= 1100, v = st.getBoundingClientRect();
+          if (wide && !row.parentElement.classList.contains('stage-wrap')) return false;
           const box = wide ? v : { left: 0, right: innerWidth, top: 0, bottom: innerHeight };
           return k.left >= r.left - 1 && k.right <= r.right + 1
             && k.top >= r.top - 1 && k.bottom <= r.bottom + 1
@@ -5716,7 +5976,7 @@ for (const v of VIEWS) {
             && k.left >= box.left - 1 && k.right <= box.right + 1;
         });
         if (inRow === null) fault(where, `step "${live}": no navigator row or no live circle — the circle clause has no subject`);
-        else if (!inRow) fault(where, `step "${live}": the live mark is cut by the edge of the navigator or of the panel it stands in — a navigator whose current position is off its own edge is not a navigator`);
+        else if (!inRow) fault(where, `step "${live}": the live mark is cut by the edge of the navigator or of the picture it stands on — a navigator whose current position is off its own edge is not a navigator`);
         else circles++;
         if (taps) {
           for (const at of ['mid', 'bottom']) {
@@ -6146,7 +6406,15 @@ for (const v of VIEWS) {
       .filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden')
       .map(e => ({ n: e.id || e.className.split(' ')[0], r: R(e) }));
     const t = band.querySelector('[data-band-title]'), n = band.querySelector('[data-band-now]');
-    return { band: R(band), stage: R(stage), frame: { left: a.x, top: a.y, right: z.x, bottom: z.y }, others,
+    /* the span's two edges, derived here the way the page must have: the
+       stage's inset and every control on the band's own rows */
+    const bb0 = band.getBoundingClientRect(), st0 = stage.getBoundingClientRect(), cx0 = (a.x + z.x) / 2;
+    let L = st0.left + 8, Rr = st0.right - 8;
+    for (const o of others) {
+      if (o.r.bottom <= bb0.top || o.r.top >= bb0.bottom) continue;
+      if (o.r.right <= cx0) L = Math.max(L, o.r.right + 8); else if (o.r.left >= cx0) Rr = Math.min(Rr, o.r.left - 8);
+    }
+    return { band: R(band), stage: R(stage), frame: { left: a.x, top: a.y, right: z.x, bottom: z.y }, others, L, Rr,
       pos: getComputedStyle(band).position, inWrap: band.parentElement === document.querySelector('.stage-wrap'),
       span: parseFloat(band.style.getPropertyValue('--band-w')),
       clipped: t.scrollWidth > t.clientWidth + 1 || n.scrollWidth > n.clientWidth + 1,
@@ -6186,8 +6454,14 @@ for (const v of VIEWS) {
           if (x) fault('band-photo', `${tag}: the band is on the ${o.n} (${x} px², "${m.text}")`);
         }
         const doorC = (m.frame.left + m.frame.right) / 2, bandC = (m.band.left + m.band.right) / 2;
-        /* off-centre is allowed only where the band fills its whole span */
-        if (Math.abs(bandC - doorC) > 1.5 && m.band.width < m.span - 1.5) fault('band-photo', `${tag}: the band is ${(bandC - doorC).toFixed(1)} px off the door's centre with room to spare in its span`);
+        /* off-centre is allowed only where centring would cross an edge of its
+           span — so the band abuts that edge. ⚠ RESTATED 28.9 (commit 5): it
+           asked "does the band fill its span", which is the special case of a
+           span symmetric about the door; with the save alone in its corner the
+           phone's span became asymmetric and roomy, and 11 correct placements
+           read as faults. */
+        const abuts = Math.abs(m.band.left - m.L) < 1.5 || Math.abs(m.band.right - m.Rr) < 1.5;
+        if (Math.abs(bandC - doorC) > 1.5 && !abuts) fault('band-photo', `${tag}: the band is ${(bandC - doorC).toFixed(1)} px off the door's centre and touches neither edge of its span`);
         if (Math.abs(bandC - doorC) > 1.5) offCentre.push(tag);
       }
     } catch (e) {

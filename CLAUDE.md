@@ -142,7 +142,8 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   then report what changed with a picture. It does not touch **"Don't deploy"**,
   which still stands, nor the rules in §1.
 - **They place the page's furniture themselves, and move it themselves.** The
-  language picker and undo/redo in the wall (circles on a screenshot, 28.8);
+  language picker and undo/redo in the wall (circles on a screenshot, 28.8 —
+  undo went to the stage's foot as a labelled pill on 28.9, their words);
   the price card at the DOOR'S top-right corner (27.9, *"it looks bad under the
   lamp, move to near the door, at the up right corner"* — his own 28.8 circle
   under the lamp, moved by him) and then, a second time, off its card and LEFT
@@ -181,6 +182,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** Undo you can see, a save that asks (5 of 10) — two labelled ink pills
+  at the stage's foot (`placeUndo`: the first of four shapes touching no door,
+  arrow or price; over the trust words where they reach). `#save-hud` opens
+  `#savedlg` (save / "my saved doors (N)"); the list is `<dialog id="saved">`.
+  Named: at 320 beside the two widest doors the redo touches the arrow (§9).
+  The full audit: 46 faults, the instruments' (one of them commit 2's miss).
 - **28.9** The type's two promises, asserted (1c, an audit block only): no
   request leaves the folder (a Google Fonts `<link>` → 6 caught), and the swap
   moves no block by more than a line and at most 2 in 100 readings at all (6 of
@@ -221,15 +228,6 @@ lines here. Dates are the day of the change.
   double-cone finial and a knob at each end (`GRAB`, `GRAB_END`). Footprint
   `in` + 10 → + 5 (the trio's field, §9); channel + Coral + bow no longer fits
   on two sizes. Sheets: `against-grab` only.
-- **28.9** The page's own type, in its folder (1 of 10) — *"change the font …
-  Hebrew first"*: **Rubik** for the text (the face Peretz's own site uses),
-  **Bona Nova** for the price, `<h1>` and band — the only candidates with
-  Cyrillic (`research/fonts/contact.png`, rejections by name). Nine woff2 in
-  `assets/fonts/`, 165 KB, stamped; the Google script gone, no request leaves
-  the folder. Fallback re-measured PER SCRIPT (one value lost 5 en / 8 ru lines):
-  0 he, 0 ru, 1 en paragraph moves. `--mono` off four Hebrew captions (§9
-  closed); Russian grille names hyphenate inside their tile (4 → 6 → 0 outside).
-  Test 9,440,830 / 5 (sheets). Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -287,10 +285,24 @@ by Hebrew readers.
 
 ### The chrome stands on the wall
 
-The page has no header. The language picker and undo/redo stand in the wall
-beside the door, placed by the owner with circles on a screenshot; since 27.9
-undo/redo are 52 px and a floppy-disk save stands beside them (`#save-hud`,
-the summary's own `saveCurrent`).
+The page has no header. The language picker stands in the wall's top-right
+corner in every language (placed by the owner with circles on a screenshot,
+28.8; physically right since 28.9) and a floppy-disk save alone in the other
+(`#save-hud`, 27.9). ⚠ **Since 28.9 the save ASKS** (the owner's son: *"on
+clicking, a window with two options, save or view a saved door"*): it opens
+`<dialog id="savedlg">` — "שמירת הדלת" (`saveCurrent`, its toast, closes) or
+"הדלתות השמורות שלי (N)", which opens `<dialog id="saved">`, the saved doors'
+rows (the summary's drawer until then; the summary's "העיצוב שלי" opens the
+same dialog, and its "שמירת העיצוב" still saves at once). Both modal, Escape
+and the backdrop close them, focus returns to the save.
+⚠ **Undo and redo left that row on 28.9** (*"not noticeable on pc and in the
+way on the phone — more noticeable, but not colliding with the door"*): two
+labelled ink pills (`.undo-pill`, "↶ ביטול", "↷ חזרה") 8 px inside the stage's
+bottom-right corner, the picker's side in every language, shown from the first
+change (a disabled pill is not painted), redo only while there is something to
+redo. `placeUndo` picks the first shape the wall beside the door's foot can
+hold — side by side, stacked, or the glyph alone (a phone beside a wide door)
+— and the column (Hebrew, same corner) and the toast stand above them.
 
 - **`.quote` — the price and a quiet send — moves with the viewport:** on a
   desktop ON THE PHOTOGRAPH, LEFT of the door, high (28.9, the owner's son:
@@ -1400,7 +1412,14 @@ are not in `VIEWS`:
   the stage (named); the picker top-right in all three languages; the פרזול
   tiles redrawn when the lock furniture changes.
 - **repairs** — a real repair at every viewport, every sentence on screen, its
-  box covering no option; an undo that moves the price names a spec row; a tap
+  box covering no option; an undo that moves the price names a spec row (the
+  pill is what it presses); the undo pills hidden until there is something to
+  undo, at the stage's corner, ≥ 44, on no door and nothing else on the wall,
+  the first shape that fits, the toast above them (every viewport, he/ru, six
+  sizes); the save's dialog modal, saving only when asked, counting, opening
+  the list as a modal, closing on Escape and the backdrop, focus back on the
+  save; the saved doors' rows priced, distinct and whole, the card under them
+  unmoved; a tap
   that would take something away asks first (the Coral against a bar and a
   peephole on glass: yes/no, red and ink, no/Escape change nothing, yes does
   exactly the tap), while a pull handle or bow against the window stays
@@ -1688,6 +1707,14 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   for `standard`, `extra1` and `half` everywhere and every door ≥ 1152 px with
   NO named reading since 28.9 (the widest double at 1152×800 read 17/18 px² on
   commit 1b and 0 once the crop moved).
+- **At 320×568 beside the two widest doors the undo pills cannot clear the
+  arrow** (28.9). With undo AND redo showing, the wall right of the door is
+  93 px — one arrow and one pill wide — and the stage 239 px tall; no shape
+  (side by side, stacked, the glyphs alone) clears both the door and the arrow,
+  so the stacked redo touches the arrow by 66 px² (`halfextra1`) and 115
+  (`halfextra2`), he and ru. A named reading in the audit, asserted still
+  needed. What would close it is a product question: the arrows on a phone,
+  or the redo, somewhere other than beside the door.
 - **Two controls pinned by rules that mirror differently stand in opposite walls
   in one language and the same wall in another** — the mechanism behind a
   closed fault (the removed grip controls under the price card in Hebrew only).
@@ -1729,8 +1756,10 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   phone on its side (844×390) and a laptop at 200% zoom (640×360) leave 75–92 px
   under the fixed furniture. Since 27.9 the question is always on screen (the
   band above the door) and the glass step shows an answer at both — and since
-  28.9 the grip step too (Rubik's narrower Hebrew shortened its question): two
-  of eight; the other six still show none. **The layout is
+  28.9 the grip step too (Rubik's narrower Hebrew shortened its question), and
+  at 844×390 the פרזול, face and משקוף steps as well (the band left the stage's
+  flow and the phone bar lost its caption line, 71.3 → 67.0 px): five of eight
+  there, two of eight at 640×360. **The layout is
   chosen by WIDTH and the problem is HEIGHT** — but `max-width: 1099px` is
   read 19 times in the stylesheet alone (the fixed rail, body padding, quote
   bar, sticky stage, `placeSend`, the toast's anchor among them; the

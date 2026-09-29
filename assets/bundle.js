@@ -113,6 +113,11 @@
     "redo": ["החזרת השינוי", "Redo the change", "Вернуть изменение"],
     "redo.done": ["החזרנו את השינוי", "Change restored", "Изменение возвращено"],
     "undo.done": ["הצעד האחרון בוטל", "Last step undone", "Последний шаг отменён"],
+    /* The words ON the two pills at the stage's foot (28.9 — *"the undo option
+       rethought … more noticeable"*); the longer names above stay their
+       `aria-label` and `title`. */
+    "undo.short": ["ביטול", "Undo", "Отменить"],
+    "redo.short": ["חזרה", "Redo", "Вернуть"],
     /* ⚠ WHAT AN UNDO SAYS WHEN IT TOOK SOMETHING OFF THE DOOR. `specRows` omits
        a row whose option is "none", so a field the step removed has no row to
        print a value from — and `stripes.none` beside it is not reusable, its
@@ -627,10 +632,12 @@
     /* ⚠ THE COUNT AND WHERE THE LIST LIVES, 27.9.2026 — the save is also a
        button beside undo now (`#save-hud`), steps away from the drawer that
        holds what it saved, so "saved" alone left the customer asking where. */
+    /* ⚠ AND SINCE 28.9 THE LIST OPENS FROM THE SAVE BUTTON ITSELF (its dialog's
+       second choice), so the toast points there rather than eight steps away. */
     "saved.ok": [
-      'העיצוב נשמר בדפדפן הזה ({0}) — הרשימה בסיכום, תחת "העיצוב שלי"',
-      'Saved in this browser ({0}) — the list is on the summary, under "My designs"',
-      "Сохранено в этом браузере ({0}) — список в итоге, в разделе «Мои дизайны»"
+      "העיצוב נשמר בדפדפן הזה ({0}) — הרשימה נפתחת מכפתור השמירה",
+      "Saved in this browser ({0}) — the list opens from the save button",
+      "Сохранено в этом браузере ({0}) — список открывается кнопкой сохранения"
     ],
     "saved.noun": [
       "עיצוב שמור|עיצובים שמורים",
@@ -649,6 +656,14 @@
       "Door loaded. Change anything you like.",
       "Дверь загружена. Меняйте что угодно."
     ],
+    /* ⚠ THE SAVE ASKS, SINCE 28.9 — the owner's son: *"The save button's function
+       changed: on clicking, a window with two options, save or view a saved
+       door."* The dialog's heading, its two choices (the second carries the
+       count beside it, in markup) and the list's own dialog. */
+    "savedlg.h": ["הדלתות שלכם", "Your doors", "Ваши двери"],
+    "savedlg.save": ["שמירת הדלת", "Save this door", "Сохранить дверь"],
+    "savedlg.list": ["הדלתות השמורות שלי", "My saved doors", "Мои сохранённые двери"],
+    "savedlg.close": ["סגירה", "Close", "Закрыть"],
     /* ── the gallery ──────────────────────────────────────────────── */
     "works.h": ["דלתות שכבר התקנו", "Doors we have fitted", "Установленные нами двери"],
     "works.close": ["סגירת הגלריה", "Close the gallery", "Закрыть галерею"],
@@ -10437,7 +10452,22 @@ ${plate.defs}${plate.body}
     const saveHud = $("#save-hud");
     if (saveHud) {
       saveHud.innerHTML = hudIcon("save");
-      saveHud.addEventListener("click", saveCurrent);
+      saveHud.addEventListener("click", () => openDialog($("#savedlg")));
+    }
+    $("#savedlg-save").addEventListener("click", () => {
+      saveCurrent();
+      closeDialog($("#savedlg"));
+    });
+    $("#savedlg-list").addEventListener("click", () => {
+      closeDialog($("#savedlg"));
+      openDialog($("#saved"));
+    });
+    $("#savedlg-close").addEventListener("click", () => closeDialog($("#savedlg")));
+    $("#saved-close").addEventListener("click", () => closeDialog($("#saved")));
+    for (const d of [$("#savedlg"), $("#saved")]) {
+      d.addEventListener("click", (ev) => {
+        if (ev.target === ev.currentTarget) closeDialog(d);
+      });
     }
     $("#price-toggle").addEventListener("click", () => {
       const box = $("#breakdown"), btn = $("#price-toggle");
@@ -10482,12 +10512,7 @@ ${plate.defs}${plate.body}
         window.location.href = el.href;
       });
     });
-    $("#saved-btn").addEventListener("click", () => {
-      const box = $("#saved"), btn = $("#saved-btn");
-      const show = box.hidden;
-      box.hidden = !show;
-      btn.setAttribute("aria-expanded", String(show));
-    });
+    $("#saved-btn").addEventListener("click", () => openDialog($("#saved")));
     paintSaved();
     if (typeof ResizeObserver === "function") {
       new ResizeObserver(fitStage).observe($("#stage"));
@@ -10611,6 +10636,18 @@ ${plate.defs}${plate.body}
   function tellOne(text) {
     onYes = null;
     showDialog(text, false);
+  }
+  function openDialog(d) {
+    if (!d) return;
+    if (typeof d.showModal === "function") {
+      if (!d.open) d.showModal();
+    } else d.setAttribute("open", "");
+  }
+  function closeDialog(d) {
+    if (!d) return;
+    if (typeof d.close === "function") {
+      if (d.open) d.close();
+    } else d.removeAttribute("open");
   }
   function closeConfirm(answer) {
     const d = $("#confirm");
@@ -11239,11 +11276,6 @@ ${plate.defs}${plate.body}
     const btn = $("#saved-btn");
     if (!btn) return;
     btn.hidden = !list.length;
-    if (!list.length) {
-      const box2 = $("#saved");
-      if (box2) box2.hidden = true;
-      btn.setAttribute("aria-expanded", "false");
-    }
     document.querySelectorAll("[data-saved-count]").forEach((e) => {
       e.textContent = String(list.length);
     });
@@ -11277,8 +11309,7 @@ ${plate.defs}${plate.body}
       open.addEventListener("click", () => {
         const { state: st, notice, said } = fromQuery(q);
         set(st);
-        $("#saved").hidden = true;
-        $("#saved-btn").setAttribute("aria-expanded", "false");
+        closeDialog($("#saved"));
         if (notice) toast(said && said.length ? said.join(" · ") : T("notice.some"));
       });
       const drop = document.createElement("button");
@@ -11581,6 +11612,7 @@ ${plate.defs}${plate.body}
     announce(describe(state));
     $("#undo-btn").disabled = !canUndo();
     $("#redo-btn").disabled = !canRedo();
+    placeUndo();
   }
   function markGroup(g, blocked) {
     if (g.kind === "mashkof") return markMashkof(g);
@@ -11701,6 +11733,46 @@ ${plate.defs}${plate.body}
     });
     img.src = href;
   }
+  function placeUndo() {
+    const box = document.querySelector(".stage__undo");
+    const wrapEl = document.querySelector(".stage-wrap");
+    const stage = $("#stage");
+    if (!box || !wrapEl || !stage) return;
+    const ws = wrapEl.style;
+    const v = (k) => parseFloat(ws.getPropertyValue(k));
+    const wrap = wrapEl.getBoundingClientRect(), st = stage.getBoundingClientRect();
+    if (!st.width || !Number.isFinite(v("--frame-right"))) return;
+    const frame = {
+      left: wrap.left + v("--frame-left"),
+      right: wrap.left + v("--frame-right"),
+      top: wrap.top + v("--frame-top"),
+      bottom: wrap.top + v("--frame-bot")
+    };
+    const q = document.querySelector("#quote");
+    const obstacles = [
+      frame,
+      ...[...document.querySelectorAll(".stage__arrow")].map((e) => e.getBoundingClientRect()),
+      ...q && getComputedStyle(q).position !== "fixed" ? [q.getBoundingClientRect()] : []
+    ].filter((r) => r.right > r.left);
+    const words = [...document.querySelectorAll(".trust__i")].map((e) => e.getBoundingClientRect()).filter((r) => r.width && r.bottom > st.top && r.top < st.bottom);
+    const wordsTop = words.length ? Math.min(...words.map((r) => r.top)) : null;
+    const hits = (a, c) => a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
+    const was = box.offsetHeight;
+    box.style.setProperty("--undo-r", `${Math.round(wrap.right - st.right + 8)}px`);
+    const place = (m) => {
+      box.dataset.mode = m;
+      box.style.setProperty("--undo-b", `${Math.round(wrap.bottom - st.bottom + 8)}px`);
+      let g = box.getBoundingClientRect();
+      if (wordsTop !== null && words.some((w) => w.left < g.right && w.right > g.left)) {
+        box.style.setProperty("--undo-b", `${Math.round(wrap.bottom - wordsTop + 8)}px`);
+        g = box.getBoundingClientRect();
+      }
+      return !obstacles.some((o) => hits(g, o));
+    };
+    const SHAPES = ["row", "stack", "iconrow", "icon"];
+    if (!SHAPES.some(place)) place("icon");
+    if (box.offsetHeight !== was) placeSteps();
+  }
   function placeBand() {
     const band = document.querySelector(".stage__band");
     const wrapEl = document.querySelector(".stage-wrap");
@@ -11768,7 +11840,10 @@ ${plate.defs}${plate.body}
     }
     const trust = document.querySelector(".trust");
     const tr = trust && trust.getBoundingClientRect();
-    const floor = (tr && tr.height && tr.top > mid ? tr.top : wrap.bottom) - 8;
+    let floor = (tr && tr.height && tr.top > mid ? tr.top : wrap.bottom) - 8;
+    const un = document.querySelector(".stage__undo");
+    const ur = un && un.getBoundingClientRect();
+    if (ur && ur.width && inX(ur) && ur.top > mid) floor = Math.min(floor, ur.top - 8);
     let short = top + H - floor;
     if (short > 0) {
       const g = Math.max(2, 6 - short / 8);
@@ -11858,8 +11933,10 @@ ${plate.defs}${plate.body}
       sw.setProperty("--frame-right", `${Math.round(f.right - wrap.x)}px`);
       sw.setProperty("--frame-left", `${Math.round(f.left - wrap.x)}px`);
       sw.setProperty("--frame-mid", `${Math.round((f.top + f.bottom) / 2 - wrap.y)}px`);
+      sw.setProperty("--frame-bot", `${Math.round(f.bottom - wrap.y)}px`);
       sw.setProperty("--hud-b", `${Math.round(hudB - wrap.y)}px`);
       placeBand();
+      placeUndo();
       placeSteps();
       const root = document.documentElement.style;
       root.setProperty("--stage-l", `${Math.round(wrap.x)}px`);
@@ -11926,7 +12003,17 @@ ${plate.defs}${plate.body}
     if (!text) return;
     const el = $("#toast");
     el.textContent = text;
+    el.style.removeProperty("margin-block-end");
     el.hidden = false;
+    const un = document.querySelector(".stage__undo");
+    const shown = un && un.querySelector(".undo-pill:not(:disabled)");
+    if (shown) {
+      const u = un.getBoundingClientRect();
+      const top = el.offsetTop, bot = top + el.offsetHeight, l = el.offsetLeft, r = l + el.offsetWidth;
+      if (r > u.left && l < u.right && bot > u.top - 8) {
+        el.style.setProperty("margin-block-end", `${Math.ceil(bot - (u.top - 8))}px`);
+      }
+    }
     clearTimeout(toastTimer);
     const ms = Math.min(12e3, Math.max(4e3, 2e3 + 55 * text.length));
     toastTimer = setTimeout(() => {

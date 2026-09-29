@@ -26,6 +26,101 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — UNDO YOU CAN SEE, AND A SAVE THAT ASKS (5 of 10).** The owner's son:
+  *"The undo option rethought: not noticeable on pc and in the way on the phone
+  — more noticeable, but not colliding with the door."* And: *"The save
+  button's function changed: on clicking, a window with two options, save or
+  view a saved door."*
+
+  **WHAT WAS THERE.** Undo and redo were two 52 px ghost circles in the wall's
+  top row beside the save (27.9), disabled rather than hidden; the save saved at
+  once; the saved doors were a drawer inside the summary's send card.
+
+  **UNDO.** Two labelled ink pills ("↶ ביטול", "↷ חזרה" — `undo.short`,
+  `redo.short`; the long names stay their `aria-label`/`title`) in
+  `.stage__undo`, 8 px inside the stage's bottom-right corner, the picker's
+  side in every language. A disabled pill is not painted, so nothing shows
+  until there is something to undo and the redo only while there is something
+  to redo; the group keeps a 44 px box so the navigator column (Hebrew, above
+  1100, the same corner) does not jump on the first tap. `placeUndo` tries four
+  shapes and keeps the first that touches neither the door (`#frame`'s settled
+  box, `--frame-bot` published for it), an arrow nor the price: side by side,
+  stacked, the glyphs side by side, the glyphs stacked. ⚠ **The first build
+  chose by the wall's WIDTH alone, and the new audit block caught it twice**:
+  on a desktop the trust band's words run along that same foot (Russian at
+  1100–1280, Hebrew at 1100–1152: up to 1,646 px² of pill on them), and at 320
+  the stacked redo reached the arrow beside the door (up to 943 px²). Now a
+  shape whose width meets the words stands 8 px above the band, and each shape
+  is tested against the real obstacles. Measured over 8 viewports × he/ru × six
+  sizes: side by side 52, stacked 25, glyphs side by side 12, glyphs stacked 7;
+  lifted over the words on 24. ⚠ **One reading is named**: at 320×568 beside
+  the two widest doors, with both pills up, the wall is 93 px — an arrow and a
+  pill — and the stacked redo touches the arrow by 66 / 115 px² (§9). The toast
+  is lifted clear of the pills (read off its layout box, `offset*`, which its
+  entrance transform does not move).
+
+  **THE SAVE.** `#save-hud`, alone in its slot now, opens `<dialog id="savedlg">`:
+  "שמירת הדלת" (the same `saveCurrent` — its toast, then closes) and "הדלתות
+  השמורות שלי (N)", which opens `<dialog id="saved">`. That list is the drawer's
+  own rows moved into a dialog — the summary's "העיצוב שלי" opens it too, and
+  its "שמירת העיצוב" still saves at once. Both modal (the confirm dialog's card
+  and backdrop), Escape and the backdrop close them, and focus goes back to the
+  save it was reached from — the platform's own dialog focus-restoring does
+  that (the list opens after the save dialog has handed focus back to the
+  save). ⚠ A carried opener was written first; the falsification deleted it and
+  the clause stayed green, so it is gone and the comment says why. The toast now says where the list is:
+  *"— the list opens from the save button"*. No animation (T9, T13); both in
+  the bare hide-list through `.confirm`.
+
+  **ASSERTED.** New: **the undo pills** — every viewport × he/ru × six sizes
+  (96): none painted before a change, the undo alone after two, both after an
+  undo; at the corner (or 8 px over the trust words); ≥ 44; on no door, words,
+  price, arrow, column or band; the first shape that touches nothing (each
+  earlier shape put back and re-measured); the undo's toast above them.
+  **The save asks** — four shapes × three languages: a modal with focus
+  inside, saving only when asked, counting, opening the list as a modal,
+  closing on Escape and the backdrop, focus back on the save. Restated: "an
+  undo says what came back" presses the pill (asserted to be the pill); the
+  drawer block asks its subjects of the dialog and adds that it is modal; the
+  wall-press clause makes a change first so both pills are there to press and
+  requires the save too; the wall-overlap clause pairs every control on the
+  wall (hud, pills, price, arrows, column), not only the hud's. Falsified: a disabled pill painted → "painted before anything could be
+  undone" (48); the pills at the left corner → the corner clause (48); one
+  shape only → "the first shape that fits is …" (43) and the arrow (2); no lift
+  over the words → the words (19) and the foot (14); the toast not lifted →
+  "the toast covers the pills" (29); the wall's save saving at once → "did not
+  open its dialog", "focus stayed outside", the count; `show()` for
+  `showModal()` → "not as a modal". The eighth — the focus return deleted —
+  fired nothing, because the platform does it (above).
+
+  **GATES.** `node --check` (renderer, app, audit); `npm run build`;
+  `npm test` 9,440,902 passed / 5 failed — the five sheet-staleness rows (shot,
+  recreate, corpus, against, lockset). **`npm run audit`, the full run the
+  order asks for after this commit: 46 faults, four families, none of them a
+  fault of this commit's page:**
+  · **the floor detector at 1100 read −18.6 px** — the INSTRUMENT: its
+    screenshot hides the wall's chrome before looking for the floor line, and
+    the navigator column (on the photograph since commit 2) was not on that
+    list; its foot is a hard ink edge just above the floor. The column, the
+    band, the arrows and the pills are hidden now; the floor agrees to 0.0–1.8
+    px at all eight viewports (0.4 at 1100).
+  · **the tap sweep failed every desktop step** ("the live mark is cut by …
+    the panel it stands in") — ⚠ **commit 2's miss, owned here**: its record
+    said the tap sweep's live-target clause had been restated for the column
+    on the photograph; it had not, and it still asked for the mark inside the
+    PANEL. Restated: above 1100 the box is the stage, and the column must be in
+    the wrap. 48 steps whole.
+  · **the band's centring clause (commit 3) fired 11 times at 390** — MY
+    GATE'S logic: it allowed off-centre only when the band FILLS its span,
+    which is right only for a span symmetric about the door; with the save
+    alone in its corner the phone's span became asymmetric and roomy. Now it
+    asks the right thing — off-centre only where the band abuts an edge of its
+    span; falsified (a 12 px nudge → 72 faults).
+  · **the landscape exemption must narrow**: at 844×390 five steps show an
+    answer, not two (pz, face and mk joined — the band out of the flow, the bar
+    4.3 px shorter). Narrowed here and in §9; 640×360 unchanged.
+  Each family's block re-run alone after its fix: clean. The whole audit runs
+  again after commit 10. Sheets: 0 bare.
 - **28.9 — THE TYPE'S TWO PROMISES, ASSERTED (1c, AN AUDIT BLOCK ONLY).**
   Commit 1 (`0f73fb9`) promised two things it measured once and nothing
   asserted: the page makes no request outside its own folder (the reason the
@@ -2159,6 +2254,15 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.9** The page's own type, in its folder (1 of 10) — *"change the font …
+  Hebrew first"*: **Rubik** for the text (the face Peretz's own site uses),
+  **Bona Nova** for the price, `<h1>` and band — the only candidates with
+  Cyrillic (`research/fonts/contact.png`, rejections by name). Nine woff2 in
+  `assets/fonts/`, 165 KB, stamped; the Google script gone, no request leaves
+  the folder. Fallback re-measured PER SCRIPT (one value lost 5 en / 8 ru lines):
+  0 he, 0 ru, 1 en paragraph moves. `--mono` off four Hebrew captions (§9
+  closed); Russian grille names hyphenate inside their tile (4 → 6 → 0 outside).
+  Test 9,440,830 / 5 (sheets). Long form: `HISTORY.md`.
 - **28.9** The digital viewer drawn off the owner's son's photograph (*"make the
   digital peephole look like this"*, `research/viewer/digital.png`): round black
   face in a rounded-square bezel, lens, two lights, sensor ring, bell button; the

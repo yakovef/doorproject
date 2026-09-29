@@ -564,12 +564,28 @@ function init() {
   $('#undo-btn').addEventListener('click', undo);
   $('#redo-btn').addEventListener('click', redo);
   $('#save-btn').addEventListener('click', saveCurrent);
-  /* The wall's save (27.9.2026): the SAME function, so the two buttons cannot
-     save two different things or say two different sentences. */
+  /* The wall's save (27.9.2026) ASKS since 28.9 (*"a window with two options,
+     save or view a saved door"*): it opens `#savedlg`, whose first choice is
+     the SAME `saveCurrent` the summary's button calls — so the two cannot save
+     two different things or say two different sentences — and whose second
+     opens the list. */
   const saveHud = $('#save-hud');
   if (saveHud) {
     saveHud.innerHTML = hudIcon('save');
-    saveHud.addEventListener('click', saveCurrent);
+    saveHud.addEventListener('click', () => openDialog($('#savedlg')));
+  }
+  $('#savedlg-save').addEventListener('click', () => { saveCurrent(); closeDialog($('#savedlg')); });
+  $('#savedlg-list').addEventListener('click', () => {
+    closeDialog($('#savedlg'));
+    openDialog($('#saved'));
+  });
+  $('#savedlg-close').addEventListener('click', () => closeDialog($('#savedlg')));
+  $('#saved-close').addEventListener('click', () => closeDialog($('#saved')));
+  /* A click whose target is the <dialog> itself landed on the backdrop,
+     outside the card — the same "close" as Escape (which the platform gives a
+     modal dialog on its own). */
+  for (const d of [$('#savedlg'), $('#saved')]) {
+    d.addEventListener('click', ev => { if (ev.target === ev.currentTarget) closeDialog(d); });
   }
 
   /* The price opens its own breakdown. `hidden` and `aria-expanded` move
@@ -656,12 +672,9 @@ function init() {
       window.location.href = el.href;
     });
   });
-  $('#saved-btn').addEventListener('click', () => {
-    const box = $('#saved'), btn = $('#saved-btn');
-    const show = box.hidden;
-    box.hidden = !show;
-    btn.setAttribute('aria-expanded', String(show));
-  });
+  /* The summary's "העיצוב שלי" opens the same list, a dialog since 28.9 (it
+     was a drawer inside the send card). */
+  $('#saved-btn').addEventListener('click', () => openDialog($('#saved')));
   paintSaved();
 
   /* The crop depends on the stage's shape, so it has to be recomputed
@@ -1014,6 +1027,26 @@ function showDialog(text, two) {
 }
 function askConfirm(text, yes) { onYes = yes; showDialog(text, true); }
 function tellOne(text) { onYes = null; showDialog(text, false); }
+/**
+ * The save's two dialogs (28.9): `showModal` behind the same guard as the
+ * gallery's and the confirm's (focus trapped, Escape closes, the page behind
+ * inert). Focus goes back to the wall's save when either closes — and that is
+ * the platform's own dialog focus-restoring, not code here: the list is opened
+ * after the save dialog has closed and handed focus back to the save, so the
+ * save is what the list restores to as well. A carried `returnTo` was written
+ * first, and the audit's clause stayed green with it deleted; it is not here.
+ */
+function openDialog(d) {
+  if (!d) return;
+  if (typeof d.showModal === 'function') { if (!d.open) d.showModal(); }
+  else d.setAttribute('open', '');
+}
+function closeDialog(d) {
+  if (!d) return;
+  if (typeof d.close === 'function') { if (d.open) d.close(); }
+  else d.removeAttribute('open');
+}
+
 function closeConfirm(answer) {
   const d = $('#confirm');
   if (!d) return;
@@ -2427,17 +2460,11 @@ function paintSaved() {
   const btn = $('#saved-btn');
   if (!btn) return;
   btn.hidden = !list.length;
-  /* ⚠ AND SHUT THE DRAWER WITH IT. Hiding the toggle used to be all this did,
-     so deleting the last saved design left the open panel pinned under the
-     header — "עדיין לא שמרתם עיצוב." — with its only control removed from the
-     page and `aria-expanded="true"` still claiming it was open. Nothing but a
-     reload could close it. A disclosure whose button is gone has to be shut,
-     not merely orphaned. */
-  if (!list.length) {
-    const box = $('#saved');
-    if (box) box.hidden = true;
-    btn.setAttribute('aria-expanded', 'false');
-  }
+  /* ⚠ THE DRAWER THAT OUTLIVED ITS BUTTON (13.9) cannot happen to a dialog:
+     deleting the last saved design leaves the list open saying
+     "עדיין לא שמרתם עיצוב." with its own close button, Escape and the
+     backdrop — nothing on the page is orphaned by the summary's toggle
+     hiding. */
   document.querySelectorAll('[data-saved-count]').forEach(e => { e.textContent = String(list.length); });
   const box = $('[data-saved-list]');
   const none = $('[data-saved-empty]');
@@ -2486,8 +2513,7 @@ function paintSaved() {
          is standing in front of the drawer having just tapped a row. */
       const { state: st, notice, said } = fromQuery(q);
       set(st);
-      $('#saved').hidden = true;
-      $('#saved-btn').setAttribute('aria-expanded', 'false');
+      closeDialog($('#saved'));
       if (notice) toast(said && said.length ? said.join(' · ') : T('notice.some'));
     });
     const drop = document.createElement('button');
@@ -3331,6 +3357,10 @@ function paint() {
      that at 23,021 pixels. */
   $('#undo-btn').disabled = !canUndo();
   $('#redo-btn').disabled = !canRedo();
+  /* ⚠ SINCE 28.9 A DISABLED PILL IS NOT SHOWN AT ALL (the stylesheet), so the
+     two can appear and go on any paint — and where they stand depends on how
+     many are showing. */
+  placeUndo();
 }
 
 /* ── the handle does not move ─────────────────────────────────────
@@ -3614,6 +3644,65 @@ function armRoom() {
 }
 
 /**
+ * ⚠ UNDO YOU CAN SEE, AT THE STAGE'S FOOT — 28.9.2026. The owner's son: *"The
+ * undo option rethought: not noticeable on pc and in the way on the phone —
+ * more noticeable, but not colliding with the door."* Two labelled ink pills
+ * (a disabled one is not shown), 8 px inside the stage's bottom-right corner —
+ * the picker's side, physically, in every language. The floor band under the
+ * threshold is 13–47 px and a pill is 44, so a pill always reaches up beside
+ * the door's foot. Four shapes, the first that touches nothing:
+ *   row      the two labelled, side by side;
+ *   stack    the two labelled, redo above undo;
+ *   iconrow  the glyphs alone, side by side (the word stays in `aria-label`
+ *            and `title`);
+ *   icon     the glyphs alone, stacked.
+ * "Nothing" is the door (`#frame`, its settled box), the two arrows and the
+ * price on the wall. ⚠ AND ON A DESKTOP THE TRUST BAND'S WORDS RUN ALONG THAT
+ * SAME FOOT — in Russian they reach the corner at 1100–1280, in Hebrew at
+ * 1100–1152, measured by the audit the day this was built (up to 1,646 px²
+ * of pill on "Персональный сервис") — so where a shape's width meets the words
+ * it stands 8 px ABOVE the band instead, still at the corner. The navigator
+ * column (Hebrew, above 1100, the same corner) is placed above the pills, not
+ * the other way round, and the toast is lifted clear of them when it is up.
+ */
+function placeUndo() {
+  const box = document.querySelector('.stage__undo');
+  const wrapEl = document.querySelector('.stage-wrap');
+  const stage = $('#stage');
+  if (!box || !wrapEl || !stage) return;
+  const ws = wrapEl.style;
+  const v = k => parseFloat(ws.getPropertyValue(k));
+  const wrap = wrapEl.getBoundingClientRect(), st = stage.getBoundingClientRect();
+  if (!st.width || !Number.isFinite(v('--frame-right'))) return;
+  const frame = { left: wrap.left + v('--frame-left'), right: wrap.left + v('--frame-right'),
+                  top: wrap.top + v('--frame-top'), bottom: wrap.top + v('--frame-bot') };
+  const q = document.querySelector('#quote');
+  const obstacles = [frame,
+    ...[...document.querySelectorAll('.stage__arrow')].map(e => e.getBoundingClientRect()),
+    ...(q && getComputedStyle(q).position !== 'fixed' ? [q.getBoundingClientRect()] : [])]
+    .filter(r => r.right > r.left);
+  const words = [...document.querySelectorAll('.trust__i')].map(e => e.getBoundingClientRect())
+    .filter(r => r.width && r.bottom > st.top && r.top < st.bottom);
+  const wordsTop = words.length ? Math.min(...words.map(r => r.top)) : null;
+  const hits = (a, c) => a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
+  const was = box.offsetHeight;
+  box.style.setProperty('--undo-r', `${Math.round(wrap.right - st.right + 8)}px`);
+  const place = m => {
+    box.dataset.mode = m;
+    box.style.setProperty('--undo-b', `${Math.round(wrap.bottom - st.bottom + 8)}px`);
+    let g = box.getBoundingClientRect();
+    if (wordsTop !== null && words.some(w => w.left < g.right && w.right > g.left)) {
+      box.style.setProperty('--undo-b', `${Math.round(wrap.bottom - wordsTop + 8)}px`);
+      g = box.getBoundingClientRect();
+    }
+    return !obstacles.some(o => hits(g, o));
+  };
+  const SHAPES = ['row', 'stack', 'iconrow', 'icon'];
+  if (!SHAPES.some(place)) place('icon');
+  if (box.offsetHeight !== was) placeSteps();
+}
+
+/**
  * ⚠ THE BAND STANDS ON THE PHOTOGRAPH, ABOVE THE DOOR'S HEAD — 28.9.2026.
  * The owner's son: *"The header of the section needs to be on the image and
  * closer to the door, in some good font — that also goes for the little text
@@ -3740,7 +3829,13 @@ function placeSteps() {
   }
   const trust = document.querySelector('.trust');
   const tr = trust && trust.getBoundingClientRect();
-  const floor = (tr && tr.height && tr.top > mid ? tr.top : wrap.bottom) - 8;
+  let floor = (tr && tr.height && tr.top > mid ? tr.top : wrap.bottom) - 8;
+  /* the undo pills at the stage's foot, where they share the column's corner
+     (Hebrew): their box is kept even with nothing to undo, so the column does
+     not jump on the first change */
+  const un = document.querySelector('.stage__undo');
+  const ur = un && un.getBoundingClientRect();
+  if (ur && ur.width && inX(ur) && ur.top > mid) floor = Math.min(floor, ur.top - 8);
   /* Short of room below what pushed it down: the eight gaps give first (to
      2 px), then the two paddings (to 6) — by exactly the shortfall, and never
      the 44 px targets. What is still short after that is pulled up, and the
@@ -4021,11 +4116,13 @@ function fitStage() {
     /* and the other edge and the middle, for the two arrows (27.9, commit 4) */
     sw.setProperty('--frame-left', `${Math.round(f.left - wrap.x)}px`);
     sw.setProperty('--frame-mid', `${Math.round((f.top + f.bottom) / 2 - wrap.y)}px`);
+    sw.setProperty('--frame-bot', `${Math.round(f.bottom - wrap.y)}px`);
     sw.setProperty('--hud-b', `${Math.round(hudB - wrap.y)}px`);
     placeBand();
 
-    /* the navigator column, after the variables above so the price is already
-       where they put it (see `placeSteps`) */
+    /* the undo pills, then the navigator column above them, after the
+       variables above so the price is already where they put it */
+    placeUndo();
     placeSteps();
 
     const root = document.documentElement.style;
@@ -4241,7 +4338,22 @@ function toast(text) {
   if (!text) return;
   const el = $('#toast');
   el.textContent = text;
+  el.style.removeProperty('margin-block-end');
   el.hidden = false;
+  /* ⚠ AND IT STACKS ABOVE THE UNDO PILLS (28.9) — they stand at the stage's
+     foot, which is where this hangs on a phone and near where it hangs on a
+     desktop. Read off the LAYOUT box (`offset*`, which a transform does not
+     move — the toast's entrance is one), and lifted by exactly the overlap
+     plus 8 px. */
+  const un = document.querySelector('.stage__undo');
+  const shown = un && un.querySelector('.undo-pill:not(:disabled)');
+  if (shown) {
+    const u = un.getBoundingClientRect();
+    const top = el.offsetTop, bot = top + el.offsetHeight, l = el.offsetLeft, r = l + el.offsetWidth;
+    if (r > u.left && l < u.right && bot > u.top - 8) {
+      el.style.setProperty('margin-block-end', `${Math.ceil(bot - (u.top - 8))}px`);
+    }
+  }
   clearTimeout(toastTimer);
   const ms = Math.min(12000, Math.max(4000, 2000 + 55 * text.length));
   toastTimer = setTimeout(() => { el.hidden = true; }, ms);

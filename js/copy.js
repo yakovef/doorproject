@@ -274,6 +274,11 @@ export const UI = {
   'redo':             ['החזרת השינוי', 'Redo the change', 'Вернуть изменение'],
   'redo.done':        ['החזרנו את השינוי', 'Change restored', 'Изменение возвращено'],
   'undo.done':        ['הצעד האחרון בוטל', 'Last step undone', 'Последний шаг отменён'],
+  /* The words ON the two pills at the stage's foot (28.9 — *"the undo option
+     rethought … more noticeable"*); the longer names above stay their
+     `aria-label` and `title`. */
+  'undo.short':       ['ביטול', 'Undo', 'Отменить'],
+  'redo.short':       ['חזרה', 'Redo', 'Вернуть'],
   /* ⚠ WHAT AN UNDO SAYS WHEN IT TOOK SOMETHING OFF THE DOOR. `specRows` omits
      a row whose option is "none", so a field the step removed has no row to
      print a value from — and `stripes.none` beside it is not reusable, its
@@ -720,9 +725,11 @@ export const UI = {
   /* ⚠ THE COUNT AND WHERE THE LIST LIVES, 27.9.2026 — the save is also a
      button beside undo now (`#save-hud`), steps away from the drawer that
      holds what it saved, so "saved" alone left the customer asking where. */
-  'saved.ok':         ['העיצוב נשמר בדפדפן הזה ({0}) — הרשימה בסיכום, תחת "העיצוב שלי"',
-                       'Saved in this browser ({0}) — the list is on the summary, under "My designs"',
-                       'Сохранено в этом браузере ({0}) — список в итоге, в разделе «Мои дизайны»'],
+  /* ⚠ AND SINCE 28.9 THE LIST OPENS FROM THE SAVE BUTTON ITSELF (its dialog's
+     second choice), so the toast points there rather than eight steps away. */
+  'saved.ok':         ['העיצוב נשמר בדפדפן הזה ({0}) — הרשימה נפתחת מכפתור השמירה',
+                       'Saved in this browser ({0}) — the list opens from the save button',
+                       'Сохранено в этом браузере ({0}) — список открывается кнопкой сохранения'],
   'saved.noun':       ['עיצוב שמור|עיצובים שמורים', 'saved design|saved designs',
                        'сохранённый дизайн|сохранённых дизайна|сохранённых дизайнов'],
   'saved.hud':        ['שמירת העיצוב', 'Save this design', 'Сохранить дизайн'],
@@ -731,6 +738,14 @@ export const UI = {
   'saved.remove':     ['הסרת {0}', 'Remove {0}', 'Удалить {0}'],
   'saved.loaded':     ['טענו את הדלת. אפשר לשנות כל פרט.', 'Door loaded. Change anything you like.',
                        'Дверь загружена. Меняйте что угодно.'],
+  /* ⚠ THE SAVE ASKS, SINCE 28.9 — the owner's son: *"The save button's function
+     changed: on clicking, a window with two options, save or view a saved
+     door."* The dialog's heading, its two choices (the second carries the
+     count beside it, in markup) and the list's own dialog. */
+  'savedlg.h':        ['הדלתות שלכם', 'Your doors', 'Ваши двери'],
+  'savedlg.save':     ['שמירת הדלת', 'Save this door', 'Сохранить дверь'],
+  'savedlg.list':     ['הדלתות השמורות שלי', 'My saved doors', 'Мои сохранённые двери'],
+  'savedlg.close':    ['סגירה', 'Close', 'Закрыть'],
 
   /* ── the gallery ──────────────────────────────────────────────── */
   'works.h':          ['דלתות שכבר התקנו', 'Doors we have fitted', 'Установленные нами двери'],
