@@ -4465,21 +4465,23 @@ group('the finish reaches every piece of metal');
       }
     }
 
-    /* ── AND THE עינית FOLLOWS IT ON ALL FOUR, WHICH IT DID NOT ─────────
-       Peretz's own list of what the פרזול recolours has the עינית in it by
-       name, `ASK-PERETZ.md` §0e rests the whole "כלול" answer on that
-       sentence, and three shipped strings repeat it — while the ring was
-       filled from `#lockUnit` and came out the same grey on all four. Not a
-       crash: a promise the picture did not keep. */
+    /* ── THE עינית FOLLOWS IT ON NONE, SINCE 28.9.2026 ──────────────────
+       It did follow, on Peretz's own list (the עינית by name, `ASK-PERETZ.md`
+       §0e) — this check was written 26.9 to hold the ring to all four
+       finishes after it had been a constant grey. Reversed on the owner's
+       son's word, 28.9: *"remove the pirzul effect from them"* (the digital
+       viewer), then *"remove it from the regular peephole too."* Restated at
+       the same strength the other way: the ring is the constant steel, and
+       no finish moves it. */
     {
       const eye = { ...base, peephole: 'peep' };
       const sel = 'data-hw="peephole"';
       ok(grab(render(eye), sel), 'no peephole group in the markup — this check is dead');
-      ok(!paints(render(eye), sel).ids.includes('lockUnit'),
-         'the עינית is painted from the bought-in unit’s constant ramp again');
+      ok(paints(render(eye), sel).ids.includes('lockUnit'),
+         'the עינית is not painted from the constant steel — it follows the פרזול again');
       for (const z of ['pz-black', 'pz-bronze', 'pz-gold']) {
-        ok(looks(render({ ...eye, pirzul: z }), sel) !== looks(render(eye), sel),
-           `the פרזול "${z}" must recolour the עינית — it is in Peretz's own list`);
+        ok(looks(render({ ...eye, pirzul: z }), sel) === looks(render(eye), sel),
+           `the פרזול "${z}" recolours the עינית — the owner's son took it out of the finish (28.9)`);
       }
     }
   }
@@ -5134,9 +5136,19 @@ group('the פרזול tiles are a composite of this door — 27.9.2026');
   const a = pirzulGlyph(pz, { ...DEFAULTS, lockset: 'plate' });
   const b = pirzulGlyph(pz, { ...DEFAULTS, lockset: 'coral' });
   ok(a !== b, 'the פרזול tile draws the same thing for the Rotem and the Coral — it is not the door\'s lock furniture');
-  ok(/data-pz="viewer"/.test(pirzulGlyph(pz, { ...DEFAULTS, peephole: 'peep' }))
-     && !/data-pz="viewer"/.test(pirzulGlyph(pz, DEFAULTS)),
-     'the פרזול tile does not show the viewer exactly when the door has one');
+  /* ⚠ Reversed 28.9.2026: neither viewer follows the פרזול any longer (*"remove
+     it from the regular peephole too"*), so its tile must not show one — a
+     viewer drawn in the tile's metal would promise the recolouring. */
+  for (const ey of PEEPHOLES.map(x => x.id)) {
+    ok(!/data-pz="viewer"/.test(pirzulGlyph(pz, { ...DEFAULTS, peephole: ey })),
+       `the פרזול tile draws the "${ey}" viewer, which no finish recolours`);
+  }
+  for (const ey of PEEPHOLES.filter(x => x.id !== 'nopeep').map(x => x.id)) {
+    const svg = render({ ...DEFAULTS, peephole: ey });
+    const g = svg.match(/<g data-hw="peephole"[\s\S]*?<\/g>/)?.[0] || '';
+    ok(g && !/url\(#nickel\)/.test(g) && /url\(#lockUnit\)/.test(g),
+       `the "${ey}" viewer is not in the constant steel — it follows the פרזול again`);
+  }
   ok(/data-pz="hinge"/.test(a), 'the פרזול tile does not show the hinges it recolours');
   ok(!/data-pz="latch"/.test(pirzulGlyph(pz, { ...DEFAULTS, latch: 'latch' })), 'the פרזול tile still draws the withdrawn latch');
   const tiles = PIRZUL.map(p => pirzulGlyph(p, DEFAULTS).replace(/pzg-[\w-]+/g, 'ID'));
