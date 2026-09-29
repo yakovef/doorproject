@@ -9,6 +9,7 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import { assertFreshBundle, stampSheets } from './fresh.mjs';
 import { PNG } from 'pngjs';
 import jpeg from 'jpeg-js';
@@ -200,7 +201,7 @@ function scale(src, w, h) {
 
 await assertFreshBundle();
 
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 let bad = 0;
 
 for (const c of CASES) {

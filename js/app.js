@@ -54,6 +54,7 @@ import { canSharePicture, copyMessage, drawingCaveat, fallbackWhatsappUrl,
 import { counted, L, LANGS, lang, pickLang, setLang, T, withLang } from './copy.js';
 import { DEFAULTS, encodeCode, fromQuery, isUntouched, toQuery } from './url-state.js';
 import { WORKS } from './works.js';
+import { startTour } from './tour.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -868,6 +869,15 @@ function init() {
      the message CLAIMS are two questions. */
   if (!document.documentElement.classList.contains('is-sheet')) {
     goStep(carries ? SUMMARY.key : SECTIONS[0].key, false);
+  }
+
+  /* ⚠ THE FIRST-VISIT TOUR (28.9, js/tour.js) — on a bare arrival at the
+     design flow only: never on a link that carries a door (Peretz opening a
+     customer's link is not a first visit), never in bare mode or on the sheet.
+     After the door has assembled, so the cut-out is round a door at rest. */
+  const root0 = document.documentElement.classList;
+  if (!carries && !root0.contains('is-bare') && !root0.contains('is-sheet')) {
+    setTimeout(() => { if (!document.querySelector('dialog[open]')) startTour(); }, 1100);
   }
 
   /* ⚠ M1: THE DOOR ASSEMBLES, ONCE. `is-arriving` is on `<html>` for one

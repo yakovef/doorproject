@@ -16,6 +16,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import jpeg from 'jpeg-js';
 import { PNG } from 'pngjs';
 
@@ -93,7 +94,7 @@ for (const [name, file, f] of PHOTOS) {
 }
 
 /* Ours, shot bare and cropped to the leaf via the renderer's own data hooks. */
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 for (const [name, q] of [
   ['ours  (anthracite, RAL 0097D)', 'c=rb-0097d'],
   ['ours  (white, RAL 9016D)', 'c=rb-9016d'],

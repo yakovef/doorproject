@@ -81,6 +81,7 @@
  */
 import { readFileSync, existsSync } from 'node:fs';
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import { assertFreshBundle, stampSheets } from './fresh.mjs';
 import { load, canvas, blit, save, text, median, smooth } from './imglib.mjs';
 import { LOCKSETS, SIZES } from '../js/catalog.js';
@@ -315,7 +316,7 @@ const row = (who, m) => m.ok
 // ── the sheet ─────────────────────────────────────────────────────────
 
 await assertFreshBundle();
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 const page = await b.newPage({ viewport: { width: 760, height: 1150 }, deviceScaleFactor: 3 });
 
 /** Our own drawing of one door, cropped to its lock furniture at a given

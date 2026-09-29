@@ -37,6 +37,7 @@
  * Run: npm run profile
  */
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import { assertFreshBundle } from './fresh.mjs';
 import { PNG } from 'pngjs';
 
@@ -52,7 +53,7 @@ const TOL = 0.09;
 
 await assertFreshBundle();
 
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 const p = await b.newPage({ viewport: { width: 700, height: 1200 }, deviceScaleFactor: 2 });
 await p.goto(`file://${process.cwd()}/index.html?bare=1`);
 await p.waitForFunction(() => typeof window.__render === 'function');

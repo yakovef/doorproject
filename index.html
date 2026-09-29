@@ -13,7 +13,7 @@
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=ed6cf749">
+<link rel="stylesheet" href="css/app.css?v=1b0e8f28">
 
 <!-- ⚠ THE PHOTOGRAPHED ROOM, IN TWO CROPS, AND ONLY ONE IS EVER FETCHED.
      The owner supplied the same entrance framed 3:4 and 16:9 and both ship:
@@ -231,6 +231,38 @@
   </div>
   <div class="confirm__row">
     <button class="btn confirm__ok" id="saved-close" type="button" data-t="savedlg.close">סגירה</button>
+  </div>
+</dialog>
+
+<!-- ⚠ THE FIRST-VISIT TOUR — 28.9.2026 (js/tour.js). A modal dialog laid
+     over the whole viewport: an ink scrim with cut-outs over each step's live
+     target (the SVG mask `#tour-cut`, written per step), a callout, and an
+     arrow from the callout to each cut-out. Opened only on a first visit to
+     the design flow — never on a link carrying a door, in bare mode, on the
+     sheet, or without script. Hidden in bare mode like everything else. -->
+<dialog class="tour" id="tour" aria-labelledby="tour-t" aria-describedby="tour-n">
+  <svg class="tour__scrim" aria-hidden="true">
+    <defs>
+      <mask id="tour-cut" maskUnits="userSpaceOnUse">
+        <rect x="0" y="0" width="100%" height="100%" fill="#fff"/>
+      </mask>
+    </defs>
+    <rect x="0" y="0" width="100%" height="100%" fill="#171715" fill-opacity=".6" mask="url(#tour-cut)"/>
+  </svg>
+  <svg class="tour__arrows" aria-hidden="true">
+    <defs>
+      <marker id="tour-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+        <path d="M0 0 10 5 0 10Z" fill="#fff"/>
+      </marker>
+    </defs>
+  </svg>
+  <div class="tour__card">
+    <p class="tour__n" id="tour-n"></p>
+    <p class="tour__t" id="tour-t"></p>
+    <div class="tour__row">
+      <button class="btn tour__skip" type="button" data-t="tour.skip">דלגו</button>
+      <button class="btn tour__next" type="button" data-t="tour.next">הבא</button>
+    </div>
   </div>
 </dialog>
 
@@ -826,7 +858,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=4a931c5d"></script>
+<script src="assets/bundle.js?v=b59af25d"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

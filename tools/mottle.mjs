@@ -19,6 +19,7 @@
  *
  * Run: npm run mottle -- <a png of our leaf>
  */
+import { tourless } from './browser.mjs';
 import { readFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import jpeg from 'jpeg-js';
@@ -63,7 +64,7 @@ if (process.argv[2]) {
   const { chromium } = await import('playwright');
   const { assertFreshBundle } = await import('./fresh.mjs');
   await assertFreshBundle();
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+  const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
   const pg = await b.newPage({ viewport: { width: 1000, height: 1400 }, deviceScaleFactor: 1 });
   for (const [label, q] of [
     ['ours, plain', 'c=rb-5103d&w=none&g=none&n=none&k=coral&d=plain&s=standard&h=right-in'],

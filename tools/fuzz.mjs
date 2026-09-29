@@ -30,6 +30,7 @@
  *      npm run fuzz -- --walks=200 --cases=50000 --seed=12345
  */
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import { assertFreshBundle } from './fresh.mjs';
 import { BELLS, BOWS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES, HANDLE_LENS,
          LOCKSETS, MASHKOFS, PEEPHOLES, PIRZUL, SIZES, SPECIAL_LOCKS, STRIPE_SLOTS,
@@ -200,7 +201,7 @@ const VIEWS = [
 console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real browser`);
 {
   await assertFreshBundle();
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+  const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
   const CODE = new RegExp(`^DM-[0-9A-Z]{${encodeCode(DEFAULTS).length - 3}}$`);
   const r = rng(SEED ^ 0x5EED);
   let clicks = 0, dialogs = 0, saidYes = 0, saidNo = 0;

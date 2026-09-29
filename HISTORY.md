@@ -26,6 +26,70 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — A FIRST VISIT GETS A TOUR (8 of 10).** The owner's son: *"A little
+  tutorial when a person first joins: at every step a grey overlay on everything
+  but the thing described, an arrow from the text to the thing. First the door …
+  Then the sections (the black rectangle with the icons) … Then the options …
+  Then save and undo … Only on the first visit; incognito or another user on the
+  same device sees it again."*
+
+  **WHAT IT IS.** `js/tour.js` and `<dialog id="tour">`: an SVG scrim
+  (`#171715` at 0.6 — the page's ink, not a grey) with a MASK, one rounded
+  cut-out per target, 8 px round it; a callout (the step's sentence, "n of 4",
+  Skip, Next/Done) and an arrow per cut-out, from the callout's edge point
+  nearest the cut-out to the cut-out's edge. Four steps: the door's `#frame`;
+  `.steps` (the column above 1100, the fixed row below); the options (the panel
+  above 1100 — on a phone, the live step between the sticky door and the quote
+  bar, scrolled up first); `#save-hud` and `.stage__undo` (the pills are hidden
+  until something can be undone, so their resting corner is what is shown).
+  The sentences are his, one per step, in three languages; the door's carries
+  the illustration note (*"the real door may look a little different: this is a
+  drawing"*) because a tour that says "this is your door" and nothing else
+  makes a promise the page does not.
+
+  **PLACEMENT IS COMPUTED, EVERY STEP AND EVERY RESIZE.** The callout tries
+  below / above / after / before the first cut-out, then the foot and the head
+  of the viewport, and takes the first that is inside the viewport with 12 px
+  and covers no cut-out; "after" is read off `dir`, never assumed — the door
+  never mirrors and the chrome does, so a fixed side would be right in one
+  language only (§9's two-rules-that-mirror-differently, again).
+
+  **MODAL, AND WHY.** `showModal`: the page behind is inert, so a finger on the
+  target through the cut-out does nothing (a tour, not homework), focus is
+  trapped on Next, Escape skips (`oncancel` → `end`). The flag is remembered on
+  Done, Skip and Escape — `localStorage` `dm.tour.v1` behind a try: a window
+  that refuses storage sees it every visit, which is what "first visit" means
+  there, and nothing throws. **Never on a link carrying a door** (Peretz opening
+  a customer's link is not a first visit), bare or the sheet — `init` asks
+  before `startTour`, 1.1 s after arrival, and not over another open dialog.
+
+  **§5.28 AGAIN, ON PURPOSE.** A new modal in the page is a change to every
+  instrument that drives it. `tourless(browser)` in `tools/browser.mjs` wraps
+  `newPage` and `newContext` with an init script that sets the flag, and all
+  sixteen tools that launch Chromium launch through it (the pool too). The
+  audit's own tour block launches a RAW browser, so the one walk that must see
+  the tour does, and it asserts the tour opened — it cannot go quiet.
+
+  **THE AUDIT BLOCK** (1280 he, 390 ru, 320 ru — 12 steps, all measured): a
+  first bare load opens a modal on step 1; on each step a target exists
+  (§5.15), sits whole inside a cut-out, cannot be pressed through the scrim
+  (`elementFromPoint` at the target's centre is inside `#tour`), the callout is
+  inside the viewport and off every cut-out, and every arrow runs callout edge
+  → cut-out edge; after Done the flag is `seen` and a reload shows nothing. Skip
+  and Escape end and remember; a link, `?bare=1` and `?sheet=1` never open it;
+  with `localStorage` throwing it shows, ends and throws nothing.
+  **Falsified three ways**, each restored: started on links too → "the tour
+  opened on a link carrying a door"; the callout placed at the first try
+  regardless → "the callout covers a cut-out"; `remember` a no-op → the flag
+  `null` and "the tour came back on the second visit".
+
+  **FOUND ON THE WAY.** A scrim written `fill="rgb(… / .6)"` in the SVG
+  attribute painted far fainter than the same colour in CSS — `fill` +
+  `fill-opacity` now. The phone's third step had no target at first (the panel
+  is not a box there); it is the live step's visible slice. Pre-existing, not
+  this commit's: in English and Russian the desktop step foot's "Next ›" wraps
+  to two lines at every desktop width.
+
 - **28.9 — THE EXTRA LOCK'S OWN STEP (7 of 10).** The owner's son: *"The extra
   locks as a separate section, right after the pirzul section — they don't fit
   on the screen and I need to scroll for them."*
@@ -2371,6 +2435,20 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.9** The band on the photograph (3 of 10) — *"on the image and closer to
+  the door"*: absolute, `placeBand` sets it 8 px over the casing in the span the
+  wall's controls leave. `FIT_TRIM.top` 40 → −162, exactly the wall 1280×720
+  lacked; the leaf still GREW (426.2 → 436.9 / 550.2 → 556.0 / 562.4 → 567.4),
+  now asserted no smaller. 320's tallest pair: gap 2.5 px, named. `half` and the
+  1152 pair left the wall-ink exemptions. ⚠ Until commit 5 the phone band is
+  ~70 px (the undo trio shares its row). Long form: `HISTORY.md`.
+- **28.9** The navigator on the photograph (2 of 10) — *"not endless … the image
+  needs to be behind it"*: `.stage-wrap > .steps` above 1100 (`placeNav`), its
+  own ink, 12 px off the panel, centred on the door or pushed below the wall's
+  chrome (`--steps-top`); the panel one column with a reserved scrollbar lane.
+  On no door, arrow or wall control at any size or width. ⚠ Until commit 4 the
+  Hebrew price CARD still covers its top at 1100–1152 (≤ 1,982 px²); commit 4
+  takes the card from that corner. Long form: `HISTORY.md`.
 - **28.9** What the new face moved, put back (1b) — the audit on commit 1, eleven
   faults, all widths. **Print:** English's widest double went to two pages
   (276.5 mm), Russian past its 280 ceiling (283.9); rows 6 → 4 px on paper put all

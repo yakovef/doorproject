@@ -3,6 +3,7 @@
  * Tuning by eye against nothing is exactly how this drifted before.
  */
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import { writeFileSync } from 'node:fs';
 
 const cases = [
@@ -27,7 +28,7 @@ writeFileSync('test/compare.html', `<!doctype html><meta charset="utf-8">
  .blur img,.blur iframe{filter:blur(12px)}
 </style>${html}`);
 
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 const p = await b.newPage({ viewport: { width: 1300, height: 980 }, deviceScaleFactor: 2 });
 await p.goto('file://' + process.cwd() + '/test/compare.html');
 await p.waitForTimeout(1200);

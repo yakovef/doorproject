@@ -800,6 +800,27 @@ export const UI = {
   'dlg.noFit':        ['אין אפשרות אחרת של {0} שמתאימה לדלת שלכם', 'No other {0} fits this door',
                        'Для этой двери нет другого варианта: {0}'],
   'dlg.ok':           ['הבנתי', 'OK', 'Понятно'],
+
+  /* ── the first-visit tour, 28.9.2026 (js/tour.js) ─────────────────
+     The Hebrew is the owner's son's own four sentences, word for word as the
+     order gave them; English and Russian are ours. */
+  'tour.label':       ['היכרות קצרה עם הדף', 'A quick tour', 'Краткое знакомство'],
+  'tour.door':        ['זו הדלת שתעצבו — כל בחירה תופיע כאן. (הדלת האמיתית עשויה להיראות מעט אחרת: זה איור.)',
+                       'This is the door you are designing — every choice appears here. (The real door may look a little different: this is an illustration.)',
+                       'Это дверь, которую вы создаёте, — каждый выбор появится здесь. (Настоящая дверь может выглядеть немного иначе: это иллюстрация.)'],
+  'tour.steps':       ['אלה השלבים שתעברו בדרך לדלת שחלמתם עליה.',
+                       'These are the steps you go through on the way to the door of your dreams.',
+                       'Это шаги, которые вы пройдёте на пути к двери своей мечты.'],
+  'tour.options':     ['בכל שלב בוחרים כאן מה שאוהבים — או לוחצים על החצים שליד הדלת כדי לעבור מהר.',
+                       'At each step, choose what you like here — or tap the arrows beside the door to flip through quickly.',
+                       'На каждом шаге выбирайте здесь то, что нравится, — или нажимайте стрелки у двери, чтобы листать быстрее.'],
+  'tour.undo':        ['הכפתורים האלה עוזרים לחזור אחורה או לשמור.',
+                       'These buttons help you go back or save.',
+                       'Эти кнопки помогают вернуться назад или сохранить.'],
+  'tour.count':       ['{0} מתוך {1}', '{0} of {1}', '{0} из {1}'],
+  'tour.next':        ['הבא', 'Next', 'Далее'],
+  'tour.done':        ['סיום', 'Done', 'Готово'],
+  'tour.skip':        ['דלגו', 'Skip', 'Пропустить'],
   'dlg.close':        ['סגירת ההודעה', 'Close this message', 'Закрыть сообщение'],
 
   /* ── the print sheet ──────────────────────────────────────────── */

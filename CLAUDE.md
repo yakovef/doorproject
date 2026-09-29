@@ -187,6 +187,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** A first visit gets a tour (8 of 10) — *"a grey overlay on everything
+  but the thing described, an arrow from the text to the thing"*: `js/tour.js`,
+  a modal `<dialog>` of four cut-outs (door, navigator, options, save + undo),
+  the callout off every cut-out, arrows edge to edge, remembered in
+  `localStorage` (`dm.tour.v1`). Never on a link, bare or the sheet. Every
+  instrument opens the page `tourless`; one audit block drives it. Long form:
+  `HISTORY.md`.
 - **28.9** The extra lock's own step (7 of 10) — *"as a separate section, right
   after the pirzul section"*: `xlock` after `pz`, the קודן's case its mark, the
   lock's old explainer with it. Ten marks make the column 514 px; at 1100–1152
@@ -219,20 +226,6 @@ lines here. Dates are the day of the change.
   "מחיר משוער" off the figure (bar 71.3 → 67.0 px). Picker top-RIGHT in every
   language. In en/ru the column shares that wall: its gaps give (≥ 2 px). Long
   form: `HISTORY.md`.
-- **28.9** The band on the photograph (3 of 10) — *"on the image and closer to
-  the door"*: absolute, `placeBand` sets it 8 px over the casing in the span the
-  wall's controls leave. `FIT_TRIM.top` 40 → −162, exactly the wall 1280×720
-  lacked; the leaf still GREW (426.2 → 436.9 / 550.2 → 556.0 / 562.4 → 567.4),
-  now asserted no smaller. 320's tallest pair: gap 2.5 px, named. `half` and the
-  1152 pair left the wall-ink exemptions. ⚠ Until commit 5 the phone band is
-  ~70 px (the undo trio shares its row). Long form: `HISTORY.md`.
-- **28.9** The navigator on the photograph (2 of 10) — *"not endless … the image
-  needs to be behind it"*: `.stage-wrap > .steps` above 1100 (`placeNav`), its
-  own ink, 12 px off the panel, centred on the door or pushed below the wall's
-  chrome (`--steps-top`); the panel one column with a reserved scrollbar lane.
-  On no door, arrow or wall control at any size or width. ⚠ Until commit 4 the
-  Hebrew price CARD still covers its top at 1100–1152 (≤ 1,982 px²); commit 4
-  takes the card from that corner. Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -544,6 +537,7 @@ works from `file://` and Peretz can open the folder on his own laptop.
 | `js/colour.js` | colour arithmetic: `mix` `darken` `lighten` `scaleTone` `luminance` `contrast` `isLight` `silhouette` |
 | `js/app.js` | the DOM: the flow, the gallery, the sheet, undo. `SECTIONS` and `GROUPS` |
 | `js/icons.js` | the navigator's and the spec's own marks, never tile art (§7). Split out so tests can read them |
+| `js/tour.js` | the first-visit tour (28.9): four cut-outs over live targets, a callout, arrows; `TOUR_KEY` in `localStorage`, every access in a try |
 | `js/works.js` | Peretz's 30 real doors, **generated** by `npm run corpus` |
 | `js/vine.js` | the גפן window design as one traced outline, **generated** by `python3 tools/trace-vine.py` from `research/vine/design.webp` — never hand-edit |
 | `test/units.mjs` | the string-level suite, no framework |
@@ -922,6 +916,18 @@ for the same half of the leaf and `repair` trades between them.
   The summary shows the PICTURES of what was chosen, one button per spec row
   back to its step, at every width (§0c; `#summary` stays, visually hidden).
 - A bare load opens step 01; a shared link or a code opens the summary (T11).
+- ⚠ **A first bare visit gets a TOUR** (28.9, the owner's son: *"A little
+  tutorial when a person first joins … Only on the first visit"*; `js/tour.js`):
+  a modal over the page, an ink scrim at .6 with cut-outs over four live
+  targets — the door's frame, the navigator, the options, the save and the undo
+  pills' corner — a callout that covers none of them inside the viewport, an
+  arrow from its edge to each. Next / Done and Skip on every step, Escape
+  skips; remembered (`dm.tour.v1`) when it ends or is skipped. Never on a link
+  that carries a door, in bare mode, on the sheet or without script; with
+  storage refused it shows every visit and never throws. ⚠ **A modal makes the
+  page inert, so every instrument opens the page `tourless`** (tools/
+  browser.mjs — an init script marks it seen before the page's script runs);
+  one audit block launches without that and drives it.
 - Every step has a `<details>` explainer (`exp.<step>.q/.a`) and every group a
   `hint` (T15).
 
@@ -1456,6 +1462,13 @@ are not in `VIEWS`:
   `specRows`, its short name a part of the row's value; no handing card
   (removed 27.9 — the order keeps `handingWords()`) and, under the green send,
   the telephone reading exactly `PHONE_DISPLAY`.
+- **the tour** — a modal on a first bare load; on each of four steps the
+  target whole in its cut-out and not pressable through the scrim, the callout
+  inside the viewport and off the cut-outs, every arrow edge to edge (1280 he,
+  390 and 320 ru); remembered after the last step, skip and Escape, gone on
+  the second visit; never on a link, bare or the sheet; with storage refused
+  it shows and ends without throwing. Every other block opens the page
+  `tourless`.
 - **routes** — `prefers-reduced-motion` (nothing left running), bare mode,
   no-photo (drawn room still painting), a wrong code says the code was not
   recognised, the language switch leaves no Hebrew behind, the order sheet
@@ -1594,6 +1607,9 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   `npm run build` — resolving it by side once kept three `data-t` keys naming
   copy that no longer existed. **`CLAUDE.md` is not generated either**: never
   resolve it by side; merge both rounds' lines.
+- ⚠ **A new harness launches `tourless(await chromium.launch(…))`** (28.9) or
+  the first-visit tour's modal makes the page inert under it and every walk
+  times out — §5.28's gate, a second time.
 - **Scratch harnesses must live inside the project** (`tools/_*.mjs`) — they
   import `playwright` from its `node_modules`. In this container launch with
   `chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })`; never run

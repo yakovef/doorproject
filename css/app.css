@@ -3027,6 +3027,38 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
 .confirm .confirm__no, .confirm .confirm__ok { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .is-bare .works, .is-bare .works-open, .is-bare .confirm { display: none; }
 
+/* ── THE FIRST-VISIT TOUR — 28.9.2026 (js/tour.js) ──────────────────
+   A modal dialog over the whole viewport with no ground of its own: the scrim
+   is the SVG under it (ink at .6, cut out over the live target), the callout a
+   paper card placed by the script, the arrows white lines from its edge to
+   each cut-out. Its fade is the one animation it has, and it goes under
+   reduced motion and in bare mode with every other (T9, T13). */
+.tour {
+  position: fixed; inset: 0; margin: 0; padding: 0; border: 0;
+  inline-size: 100vw; block-size: 100vh; max-inline-size: none; max-block-size: none;
+  background: transparent; overflow: hidden; color: var(--ink);
+}
+.tour::backdrop { background: transparent; }
+.tour__scrim, .tour__arrows {
+  position: absolute; inset: 0; inline-size: 100%; block-size: 100%;
+  pointer-events: none;
+}
+.tour__arrow { stroke: #fff; stroke-width: 2.5; stroke-linecap: round; }
+.tour__card {
+  position: absolute; inline-size: min(300px, calc(100vw - 32px));
+  padding: 16px 16px 12px; border-radius: var(--r-card);
+  background: var(--paper); box-shadow: 0 10px 30px rgb(0 0 0 / .28);
+  animation: tourIn .25s var(--ease) both;
+}
+.tour__n { margin: 0 0 4px; font: 600 .72rem var(--sans); color: var(--ink-2); letter-spacing: .04em; }
+.tour__t { margin: 0 0 12px; font: 400 .98rem/1.5 var(--sans); }
+.tour__row { display: flex; justify-content: space-between; gap: 10px; }
+.tour .tour__skip, .tour .tour__next { min-block-size: 44px; min-inline-size: 72px; }
+.tour .tour__skip { background: none; color: var(--ink); border-color: var(--rule); }
+.tour .tour__next { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+@keyframes tourIn { from { opacity: 0; } }
+.is-bare .tour { display: none; }
+
 /* ── the save's two dialogs — 28.9.2026 ─────────────────────────────
    The confirm dialog's card and backdrop (they carry `.confirm`, so the bare
    rule above covers them too, and they animate as little as it does). The

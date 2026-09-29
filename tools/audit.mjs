@@ -16,6 +16,7 @@
  * Run: npm run audit
  */
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import { assertFreshBundle } from './fresh.mjs';
 import { crashed } from './browser.mjs';
 import { load, lum } from './imglib.mjs';
@@ -93,7 +94,7 @@ const groupsOn = p => p.$$eval('.field[data-group]', els => els.map(e => ({
 
 await assertFreshBundle();
 
-let b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+let b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 let faults = 0;
 let crashes = 0;
 const fault = (view, msg) => { faults++; console.log(`  ✗ [${view}] ${msg}`); };
@@ -2883,7 +2884,7 @@ for (const v of VIEWS) {
     skipped.push(v.name);
     console.log(`  ⚠ chromium died at ${v.w}x${v.h} — this viewport was NOT audited`);
     await b.close().catch(() => {});
-    b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+    b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
   }
 }
 
@@ -5493,6 +5494,155 @@ for (const v of VIEWS) {
   if (faults === before) console.log(`    ${walked} walks (four shapes x three languages): the wall's save opens a modal with focus inside, saves only when asked, counts, opens the list as a modal, closes on Escape and on the backdrop, and gives focus back to the save`);
 }
 
+/* ── THE FIRST-VISIT TOUR: FOUR CUT-OUTS, ONCE, AND NEVER ON A LINK ──────────
+   28.9.2026, the owner's son: *"A little tutorial when a person first joins:
+   at every step a grey overlay on everything but the thing described, an arrow
+   from the text to the thing … Only on the first visit."* Every other block in
+   this file opens the page `tourless` (tools/browser.mjs); this one launches a
+   browser without that, so the page meets an empty store:
+     · a bare load opens it as a MODAL, within two seconds, on step 1;
+     · on each of its four steps the target — the door's frame, the navigator,
+       the options, the save and the undo pills' corner — is WHOLE inside a
+       cut-out; the callout is inside the viewport and covers no cut-out; each
+       arrow starts on the callout's edge and ends on a cut-out's edge; and the
+       target is not clickable through the scrim (`elementFromPoint` at its
+       centre is the tour);
+     · the last step ends it and marks it seen; a second load shows nothing;
+       skip and Escape each end it and mark it seen;
+     · a link carrying a door, bare mode and the sheet never show it;
+     · with storage refused it shows, ends, and throws nothing.
+   At 1280x720 (he), 390x844 and 320x568 (ru — the longest words in the
+   narrowest callout). */
+{
+  console.log('\nthe first-visit tour: four cut-outs, once, and never on a link');
+  const before = faults;
+  const raw = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+  let steps = 0;
+  const URL0 = `file://${process.cwd()}/index.html`;
+  const state = pg => pg.evaluate(() => {
+    const d = document.querySelector('#tour');
+    let flag = null; try { flag = localStorage.getItem('dm.tour.v1'); } catch { flag = 'no-storage'; }
+    return { open: !!d?.open, modal: !!d?.matches(':modal'), step: d?.dataset.step, flag };
+  });
+  const measure = pg => pg.evaluate(() => {
+    const d = document.querySelector('#tour');
+    const R = e => { const r = e.getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; };
+    const wide = innerWidth >= 1100;
+    const step = +d.dataset.step;
+    const targets = step === 1 ? [document.querySelector('#stage .door-svg #frame')]
+      : step === 2 ? [document.querySelector('.steps')]
+      : step === 3 ? [wide ? document.querySelector('.panel--choose') : document.querySelector('.sect.is-live')]
+      : [document.querySelector('#save-hud'), document.querySelector('.stage__undo')];
+    const holes = [...d.querySelectorAll('.tour__hole')].map(h => ({ left: +h.getAttribute('x'), top: +h.getAttribute('y'),
+      right: +h.getAttribute('x') + +h.getAttribute('width'), bottom: +h.getAttribute('y') + +h.getAttribute('height') }));
+    const card = R(d.querySelector('.tour__card'));
+    const inside = (a, b) => a.left >= b.left - 1 && a.top >= b.top - 1 && a.right <= b.right + 1 && a.bottom <= b.bottom + 1;
+    const meets = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+    const onEdge = (x, y, r) => { const dx = Math.max(r.left - x, 0, x - r.right), dy = Math.max(r.top - y, 0, y - r.bottom);
+      const inX = x >= r.left - 1 && x <= r.right + 1, inY = y >= r.top - 1 && y <= r.bottom + 1;
+      return Math.hypot(dx, dy) <= 1.5 && (Math.abs(x - r.left) <= 1.5 || Math.abs(x - r.right) <= 1.5 || Math.abs(y - r.top) <= 1.5 || Math.abs(y - r.bottom) <= 1.5 || !(inX && inY)); };
+    const arrows = [...d.querySelectorAll('.tour__arrow')].map(l => ({ x1: +l.getAttribute('x1'), y1: +l.getAttribute('y1'), x2: +l.getAttribute('x2'), y2: +l.getAttribute('y2') }));
+    const out = { step, holes: holes.length, targets: 0, whole: 0, clickThrough: [] };
+    for (const t of targets) {
+      if (!t) continue;
+      out.targets++;
+      const r = R(t);
+      /* the part of the target on screen must be inside a cut-out — on a
+         phone the options' on-screen part is what lies between the sticky
+         door and the fixed quote bar */
+      const bar = document.querySelector('.quote');
+      const foot = bar && getComputedStyle(bar).position === 'fixed' ? bar.getBoundingClientRect().top : innerHeight;
+      const sticky = !wide && step === 3 ? document.querySelector('.stage-wrap').getBoundingClientRect().bottom : 0;
+      const vis = { left: Math.max(r.left, 0), top: Math.max(r.top, sticky, 0), right: Math.min(r.right, innerWidth), bottom: Math.min(r.bottom, innerHeight, step === 3 ? foot : innerHeight) };
+      if (holes.some(h => inside(vis, h))) out.whole++;
+      const e = document.elementFromPoint((vis.left + vis.right) / 2, (vis.top + vis.bottom) / 2);
+      if (!e || !e.closest('#tour')) out.clickThrough.push(t.id || t.className.baseVal || String(t.className).split(' ')[0]);
+    }
+    out.cardIn = card.left >= 0 && card.top >= 0 && card.right <= innerWidth && card.bottom <= innerHeight;
+    out.cardOnHole = holes.some(h => meets(card, h));
+    out.arrowsOk = arrows.every(a => onEdge(a.x1, a.y1, card) && holes.some(h => onEdge(a.x2, a.y2, h)));
+    out.arrows = arrows.length;
+    return out;
+  });
+  for (const [w, h, lang] of [[1280, 720, 'he'], [390, 844, 'ru'], [320, 568, 'ru']]) {
+    const tag = `${lang} ${w}x${h}`;
+    const ctx = await raw.newContext({ viewport: { width: w, height: h } });
+    const pg = await ctx.newPage();
+    const errs = []; pg.on('pageerror', e => errs.push(String(e)));
+    try {
+      await pg.goto(`${URL0}?lang=${lang}`);
+      await pg.waitForFunction(() => document.querySelector('#tour')?.open, null, { timeout: 2500 }).catch(() => {});
+      const a = await state(pg);
+      if (!a.open || !a.modal || a.step !== '1') { fault('tour', `${tag}: a first bare load did not open the tour as a modal on step 1 (${JSON.stringify(a)})`); continue; }
+      for (let k = 1; k <= 4; k++) {
+        await pg.waitForTimeout(120);
+        const m = await measure(pg);
+        steps++;
+        if (m.step !== k) fault('tour', `${tag}: expected step ${k}, the tour is on ${m.step}`);
+        if (!m.targets) fault('tour', `${tag} step ${k}: no target on the page — this step has no subject`);
+        if (m.whole < m.targets) fault('tour', `${tag} step ${k}: ${m.targets - m.whole} of ${m.targets} targets are not whole inside a cut-out`);
+        if (m.clickThrough.length) fault('tour', `${tag} step ${k}: ${m.clickThrough.join(', ')} can be pressed through the scrim`);
+        if (!m.cardIn) fault('tour', `${tag} step ${k}: the callout leaves the viewport`);
+        if (m.cardOnHole) fault('tour', `${tag} step ${k}: the callout covers a cut-out`);
+        if (!m.arrows || !m.arrowsOk) fault('tour', `${tag} step ${k}: ${m.arrows} arrow(s), and not every one runs from the callout's edge to a cut-out's edge`);
+        await pg.evaluate(() => document.querySelector('.tour__next').click());
+      }
+      await pg.waitForTimeout(150);
+      const z = await state(pg);
+      if (z.open || z.flag !== 'seen') fault('tour', `${tag}: after the last step the tour is ${z.open ? 'still open' : 'shut'} and the flag is ${z.flag}`);
+      await pg.goto(`${URL0}?lang=${lang}`);
+      await pg.waitForTimeout(1800);
+      if ((await state(pg)).open) fault('tour', `${tag}: the tour came back on the second visit`);
+      if (errs.length) fault('tour', `${tag}: ${errs.join(' | ').slice(0, 120)}`);
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('tour', `${tag}: chromium died during the tour`);
+    } finally { await ctx.close().catch(() => {}); }
+  }
+  /* skip, Escape, and the places it must never open */
+  for (const [how, q] of [['skip', ''], ['escape', ''], ['link', '&c=rb-9016d'], ['bare', '&bare=1'], ['sheet', '&sheet=1']]) {
+    const ctx = await raw.newContext({ viewport: { width: 1280, height: 720 } });
+    const pg = await ctx.newPage();
+    try {
+      await pg.goto(`${URL0}?lang=he${q}`);
+      await pg.waitForTimeout(1700);
+      const a = await state(pg);
+      if (how === 'link' || how === 'bare' || how === 'sheet') {
+        if (a.open) fault('tour', `the tour opened on ${how === 'link' ? 'a link carrying a door' : how === 'bare' ? 'the bare drawing' : 'the order sheet'}`);
+      } else {
+        if (!a.open) { fault('tour', `${how}: the tour did not open`); continue; }
+        if (how === 'skip') await pg.evaluate(() => document.querySelector('.tour__skip').click());
+        else await pg.keyboard.press('Escape');
+        await pg.waitForTimeout(150);
+        const z = await state(pg);
+        if (z.open || z.flag !== 'seen') fault('tour', `${how}: the tour is ${z.open ? 'still open' : 'shut'} and the flag is ${z.flag} — it ends and is remembered`);
+      }
+    } finally { await ctx.close().catch(() => {}); }
+  }
+  /* storage refused: it shows, ends, and throws nothing */
+  {
+    const ctx = await raw.newContext({ viewport: { width: 390, height: 844 } });
+    await ctx.addInitScript(() => {
+      const no = () => { throw new DOMException('denied', 'SecurityError'); };
+      Object.defineProperty(window, 'localStorage', { get: no, configurable: true });
+    });
+    const pg = await ctx.newPage();
+    const errs = []; pg.on('pageerror', e => errs.push(String(e)));
+    await pg.goto(`${URL0}?lang=he`);
+    await pg.waitForTimeout(1700);
+    const a = await state(pg);
+    if (!a.open) fault('tour', 'with storage refused the tour did not show — "first visit" is every visit there');
+    await pg.evaluate(() => document.querySelector('.tour__skip')?.click());
+    await pg.waitForTimeout(150);
+    if ((await state(pg)).open) fault('tour', 'with storage refused the tour would not end');
+    if (errs.length) fault('tour', `with storage refused the page threw: ${errs.join(' | ').slice(0, 120)}`);
+    await ctx.close().catch(() => {});
+  }
+  await raw.close();
+  if (steps < 12) fault('tour', `only ${steps} of 12 tour steps were measured`);
+  if (faults === before) console.log(`    ${steps} steps at three shapes: a modal on a first bare load, every target whole in its cut-out and not pressable through the scrim, the callout inside the viewport and off the cut-outs, every arrow edge to edge; remembered after the last step, skip and Escape; never on a link, bare or the sheet; with storage refused it shows and ends without throwing`);
+}
+
 /* ── THE SAVED DOORS: A DIALOG, AND THE CARD UNDER IT DOES NOT MOVE ───────
    ⚠ RESTATED 28.9.2026 FOR A DIALOG, SAME SUBJECTS. The list was a drawer
    inside the summary's send card; the owner's son: *"The save button's
@@ -7372,7 +7522,7 @@ try {
   console.log('  ⚠ chromium died during the price-card sweep — it was NOT completed');
   fault('quote-wall', 'chromium died before this sweep finished, so the price card is unchecked');
   await b.close().catch(() => {});
-  b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+  b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 }
 
 await b.close();

@@ -6,7 +6,8 @@
  */
 import { chromium } from 'playwright';
 
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+import { tourless } from './browser.mjs';
+const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 const shot = async (name, q, clip) => {
   const p = await b.newPage({ viewport: { width: 760, height: 1120 }, deviceScaleFactor: 2 });
   await p.goto(`file://${process.cwd()}/index.html?bare=1&${q}`);

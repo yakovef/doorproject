@@ -15,6 +15,7 @@
  * Run: npm run hardware
  */
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import { HANDLES, LOCKSETS } from '../js/catalog.js';
 
 /* Both groups, and one pairing of the two — the combination the split exists
@@ -37,7 +38,7 @@ const CASES = [
   ['lock-plate-left',  'n=none&k=plate&h=left-in'],
 ];
 
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 for (const [name, opts] of CASES) {
   const q = `?bare=1&c=rb-0097d&w=none&g=none&d=plain&s=standard&h=right-in&${opts}`
     .replace(/h=right-in&(?=.*\bh=)/, '');   // a per-case h= wins

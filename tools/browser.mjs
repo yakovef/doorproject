@@ -34,6 +34,7 @@
  * And every relaunch PRINTS. A run that needed six of them says so, so nobody
  * reads a sheet regenerated across a dozen crashes as a quiet, healthy run.
  */
+import { TOUR_KEY } from '../js/tour.js';
 import { chromium } from 'playwright';
 
 const LAUNCH = { executablePath: '/opt/pw-browsers/chromium' };
@@ -59,11 +60,30 @@ export const crashed = err => /target crashed|target closed|browser has been clo
  * twice: take the shot, make the measurement, return it. Do not accumulate
  * into an outer array inside `fn`; return the value and let the caller push.
  */
+/**
+ * ⚠ THE FIRST-VISIT TOUR IS SEEN BEFORE ANY INSTRUMENT LOOKS — 28.9.2026.
+ * The page opens a modal tour on a bare first visit (js/tour.js), and a modal
+ * makes everything behind it inert: every walk, tap and measurement in these
+ * tools would meet it and time out or read the scrim. So every browser these
+ * tools launch is `tourless`: each page and context it makes gets an init
+ * script that marks the tour seen before the page's own script runs. One audit
+ * block launches without it, clears the flag and drives the tour itself.
+ * The key is the page's (`TOUR_KEY` in js/tour.js), not a second copy of it.
+ */
+export function tourless(browser) {
+  const seen = k => { try { localStorage.setItem(k, 'seen'); } catch { /* no storage: the page shows it, and says so */ } };
+  const np = browser.newPage.bind(browser);
+  browser.newPage = async (...a) => { const p = await np(...a); await p.addInitScript(seen, TOUR_KEY); return p; };
+  const nc = browser.newContext.bind(browser);
+  browser.newContext = async (...a) => { const c = await nc(...a); await c.addInitScript(seen, TOUR_KEY); return c; };
+  return browser;
+}
+
 export function pagePool({ tries = 5, args } = {}) {
   let b = null;
   let deaths = 0;
 
-  const boot = async () => (b || (b = await chromium.launch(args ? { ...LAUNCH, args } : LAUNCH)));
+  const boot = async () => (b || (b = tourless(await chromium.launch(args ? { ...LAUNCH, args } : LAUNCH))));
   const bury = async () => { const old = b; b = null; await old?.close().catch(() => {}); };
 
   return {
