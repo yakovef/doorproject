@@ -2565,22 +2565,37 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
   border-radius: 3px;
 }
 
-/* The question itself, in the display voice — light and large, one step down
-   from the page's `<h1>`. This is the line a customer reads on every one of
-   nine screens, and it was 16 px semibold.
-   ⚠ AND SINCE 27.9.2026 IT IS READ ABOVE THE DOOR, NOT HERE — the owner's son:
-   *"above the door the name of the section we are at, big — moved from the
-   panel."* The `<h2>` stays, visually hidden: `goStep` still focuses it and a
-   screen reader still hears the step (`.stage__band` is `aria-hidden`). The
-   type is kept for the day it is shown again. */
+/* The question itself. ⚠ HIDDEN FROM 27.9 TO 28.9, AND SHOWN AGAIN — on 27.9
+   the owner's son moved the step's name above the door (*"the name of the
+   section we are at, big — moved from the panel"*) and this `<h2>` was kept
+   only for `goStep`'s focus and a screen reader; on 28.9: *"The title of the
+   section also above the options."* So both: the band over the door and this,
+   in the band's own face and weight, smaller — it heads the answers, it does
+   not compete with the door. Kept compact on purpose: every pixel of it comes
+   out of what a phone shows under the door (the audit's answer-on-screen
+   clauses read it). */
 .sect__title {
-  margin: 0 0 10px;
-  font: 300 clamp(22px, 2.4vw, 30px)/1.15 var(--sans);
-  letter-spacing: -.015em;
+  margin: 0 0 6px;
+  font: 700 clamp(19px, 1.5vw, 22px)/1.2 var(--display);
+  letter-spacing: 0;
   color: var(--ink);
   text-wrap: balance;
-  position: absolute; inline-size: 1px; block-size: 1px;
-  padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+@media (max-width: 1099px) {
+  .sect__title { font-size: 1.12rem; margin-block-end: 4px; }
+}
+/* ⚠ EXCEPT ON A SCREEN UNDER 500 px TALL — a phone on its side, a laptop at
+   200 %. Measured the day it was shown: at 844×390 the steps that showed an
+   answer went 5 → 0, at 640×360 2 → 0 — the title's 25 px was the margin they
+   had. There the band over the door, which stays in the sticky block and is
+   always on screen, is the only place it is read; the `<h2>` goes back to
+   visually hidden (still focused by `goStep`, still heard). Ours to have
+   decided, named in CLAUDE.md §0a. */
+@media (max-width: 1099px) and (max-height: 499px) {
+  .sect__title {
+    position: absolute; inline-size: 1px; block-size: 1px; margin: 0;
+    padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
 }
 /* What the question means, for the customer who does not already know. Capped
    at a readable measure rather than run to the full width of a 380 px card. */

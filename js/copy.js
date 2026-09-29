@@ -470,6 +470,12 @@ export const UI = {
   'g.colour.free':    ['כלול במחיר', 'Included in the price', 'Входит в цену'],
   'g.colour.plus':    ['תוספת {0}', '{0} extra', 'Доплата {0}'],
   'g.colour.plusMany':['בתוספת תשלום', 'At extra cost', 'За доплату'],
+  /* the window designs' two groups, 28.9 — the figure arrives as {0}, and it
+     is PER WINDOW: ironwork is sold by the panel (price.js), so a door with
+     two panes pays it twice and its tiles say so. */
+  'g.grille.free':    ['עיצובים רגילים', 'Regular designs', 'Обычные узоры'],
+  'g.grille.plus':    ['עיצובים מיוחדים · תוספת {0} לחלון', 'Special designs · {0} extra per window', 'Особые узоры · доплата {0} за окно'],
+  'g.grille.plusMany':['עיצובים מיוחדים', 'Special designs', 'Особые узоры'],
   'g.detail.h':       ['לא משלבים פאנלים עם פסי מתכת על אותה דלת.',
                        'Panels and metal strips do not go on the same door.',
                        'Панели и металлические полосы не сочетаются на одной двери.'],
@@ -896,6 +902,7 @@ export const UI = {
   'fix.noPanelRoom':     ['הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום', 'We removed the panel — the tall window leaves no room for it', 'Мы убрали панель — высокому окну не хватает места'],
   'fix.faceCleared':     ['החלקנו את הדלת — ידית שקועה דורשת פנים חלקות', 'We smoothed the face — a recessed channel needs it plain', 'Мы сделали полотно гладким — врезная ручка этого требует'],
   'fix.grilleGone':      ['הסרנו את הסורג — אין חלון', 'We removed the grille — there is no window', 'Мы убрали решётку — окна нет'],
+  'fix.finishHome':      ['גוון הידית חזר לניקל — אין ידית משיכה על הדלת', 'The handle finish is back to nickel — there is no pull handle on the door', 'Отделка ручки снова никель — на двери нет ручки-скобы'],
   'fix.gripGone':        ['הסרנו את ידית המשיכה — אין לה מקום כאן', 'We removed the pull handle — there is no room for it here', 'Мы убрали ручку-скобу — для неё здесь нет места'],
   'fix.bowGone':         ['הסרנו את המאחז האופקי — אין לו מקום כאן', 'We removed the horizontal pull — there is no room for it here', 'Мы убрали горизонтальную скобу — для неё здесь нет места'],
   'fix.locksetSwapped':  ['החלפנו את המנעול — אין לו מקום ליד המאחז', 'We swapped the lockset — there is no room for it beside the grip', 'Мы заменили замок — рядом со скобой ему нет места'],

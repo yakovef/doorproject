@@ -21,7 +21,7 @@ import { crashed } from './browser.mjs';
 import { load, lum } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
 import { deltaLabel, formatAgorot, priceAgorot, priceLabel, priceParts } from '../js/price.js';
-import { DETAILS, SIZES } from '../js/catalog.js';
+import { DETAILS, GRILLES, SIZES } from '../js/catalog.js';
 import { detailGlyph, stripesGlyph } from '../js/renderer.js';
 import { SECTION_ICON, SPEC_ICON } from '../js/icons.js';
 import { L, setLang, T, withLang } from '../js/copy.js';
@@ -4913,8 +4913,15 @@ for (const v of VIEWS) {
              above the door now (the `<h2>` is visually hidden), so the group
              heading is compared with the band — which must name this step. */
           const band = (document.querySelector('.stage__band [data-band-title]')?.textContent || '').trim();
-          const h2 = (live.querySelector('.sect__title')?.textContent || '').trim();
+          const h2el = live.querySelector('.sect__title');
+          const h2 = (h2el?.textContent || '').trim();
           const title = band === h2 ? band : `(band "${band}" is not the step's "${h2}")`;
+          /* ⚠ RESTATED 28.9.2026: the `<h2>` is SHOWN again above the options
+             (*"The title of the section also above the options"*) — the band
+             and it say the step's name twice ON PURPOSE and must agree (the
+             line above); what is still refused is a GROUP heading repeating
+             it (below). So the `<h2>` must be drawn at this 390x844. */
+          const h2Drawn = !!h2el && h2el.getBoundingClientRect().width > 2 && h2el.getBoundingClientRect().height > 8;
           /* DRAWN, not `display` — §0b 11.9: `checkVisibility` calls a clipped
              element visible, so a heading hidden by `sr-only` would pass a
              display test while still being announced. */
@@ -4923,11 +4930,12 @@ for (const v of VIEWS) {
             .map(h => h.textContent.trim());
           const groups = [...live.querySelectorAll('[role="radiogroup"]')]
             .map(g => (g.getAttribute('aria-label') || '').trim());
-          return { step: live.dataset.section, title, heads, groups };
+          return { step: live.dataset.section, title, heads, groups, h2Drawn };
         });
         if (!m) { fault('twice', `${lang}: no live step after ${s} steps`); break; }
         if (m.step === 'sum') break;
         if (m.title.startsWith('(band')) fault('twice', `${lang} step "${m.step}": ${m.title}`);
+        if (!m.h2Drawn) fault('twice', `${lang} step "${m.step}": the step's own title is not drawn above its options — it is asked for there as well as above the door`);
         steps++;
         headings += m.heads.length;
         for (const h of m.heads) {
@@ -6372,6 +6380,128 @@ for (const v of VIEWS) {
   if (faults === before) console.log(`    ${asked} readings: the leaf no smaller than before the band went onto the photograph at 1280, 1440 and 1920, the band one height on all nine steps in he and ru; the arrows step the face and wrap, the band follows, the tall slot's refusal opens the dialog and changes nothing, hidden on the summary`);
 }
 
+/* ── THE ARROWS WALK THE TILES IN THE ORDER THEY ARE DRAWN ────────────────
+   28.9.2026, the owner's son: *"The arrows choose very randomly in the colour
+   section — I want it to go nicely one by one, in every section."* They walked
+   the LIST's order — the code's index order — while the colour step draws its
+   options grouped by price and the glass step its designs with their twins
+   side by side. On every step whose first group is drawn as one tile per
+   option (the משקוף's three rows are not), at 1280x720 in Hebrew and 390x844 in
+   Russian: pressing "next" once per free tile visits the free tiles in DOM
+   order after the chosen one, wrapping, and "prev" from there steps back one.
+   A press that asks (the confirm dialog — a bar against the lever) is answered
+   yes and counted (§5.28). §5.15: the steps walked and presses made are
+   counted. */
+{
+  console.log('\nthe arrows walk the tiles in the order they are drawn');
+  const before = faults;
+  let presses = 0, walkedSteps = 0, asked = 0;
+  for (const [w, h, lang] of [[1280, 720, 'he'], [390, 844, 'ru']]) {
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
+      await pg.waitForTimeout(500);
+      for (const step of ['fit', 'colour', 'lock', 'pz', 'face', 'glass', 'grip']) {
+        await pg.evaluate(k => document.querySelector(`.steps__step[data-step="${k}"]`)?.click(), step);
+        await pg.waitForTimeout(350);
+        const read = () => pg.evaluate(() => {
+          const f = document.querySelector('.sect.is-live .field');
+          if (!f) return null;
+          const tiles = [...f.querySelectorAll('[role="radio"][data-id]')];
+          return { key: f.dataset.group, ids: tiles.map(t => t.dataset.id),
+            free: tiles.filter(t => t.getAttribute('aria-disabled') !== 'true').map(t => t.dataset.id),
+            on: tiles.find(t => t.getAttribute('aria-checked') === 'true')?.dataset.id };
+        });
+        const g0 = await read();
+        if (!g0 || !g0.ids.length) { fault('arrow-order', `${lang} ${w}x${h} ${step}: no first group with tiles — nothing to walk`); continue; }
+        walkedSteps++;
+        const want = [];
+        const at = g0.free.indexOf(g0.on);
+        for (let k = 1; k < g0.free.length; k++) want.push(g0.free[(at + k) % g0.free.length]);
+        const got = [];
+        for (let k = 0; k < want.length; k++) {
+          await pg.evaluate(() => document.querySelector('.stage__arrow--next').click());
+          await pg.waitForTimeout(160);
+          const dlg = await pg.evaluate(() => {
+            const d = document.querySelector('#confirm');
+            if (!d || !d.open) return false;
+            const y = document.querySelector('#confirm-yes');
+            (y && !y.hidden ? y : document.querySelector('#confirm-ok')).click();
+            return true;
+          });
+          if (dlg) { asked++; await pg.waitForTimeout(200); }
+          const gk = await read();
+          got.push(gk && gk.on);
+          presses++;
+        }
+        const n = Math.min(got.length, want.length);
+        const bad = got.slice(0, n).findIndex((id, i) => id !== want[i]);
+        if (bad >= 0) fault('arrow-order', `${lang} ${w}x${h} ${step}: press ${bad + 1} landed on "${got[bad]}", the next tile drawn is "${want[bad]}" — `
+          + `drawn order ${g0.free.join(' ')}, walked ${got.join(' ')}`);
+        /* and back one */
+        const g1 = await read();
+        await pg.evaluate(() => document.querySelector('.stage__arrow--prev').click());
+        await pg.waitForTimeout(160);
+        await pg.evaluate(() => { const d = document.querySelector('#confirm'); if (d && d.open) document.querySelector('#confirm-yes:not([hidden]), #confirm-ok')?.click(); });
+        await pg.waitForTimeout(160);
+        const g2 = await read();
+        presses++;
+        const free1 = g1.free, i1 = free1.indexOf(g1.on);
+        const back = free1[(i1 - 1 + free1.length) % free1.length];
+        if (free1.length > 1 && g2.on !== back) fault('arrow-order', `${lang} ${w}x${h} ${step}: "prev" from "${g1.on}" landed on "${g2.on}", the tile drawn before it is "${back}"`);
+      }
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('arrow-order', `${lang} ${w}x${h}: chromium died during the walk`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (walkedSteps < 14) fault('arrow-order', `only ${walkedSteps} of 14 steps walked — this check is measuring less than it says`);
+  if (faults === before) console.log(`    ${presses} presses over ${walkedSteps} steps in two languages: every "next" the next free tile drawn, wrapping, every "prev" the one before (${asked} presses asked first and were answered yes)`);
+}
+
+/* ── THE WINDOW DESIGNS: REGULAR, THEN SPECIAL, EACH ONE'S TWO COLOURS TOGETHER
+   28.9.2026, the owner's son: *"Put the expensive window designs apart from the
+   regular ones, and keep the same designs in different colours near each
+   other."* On the glass step, in Hebrew and Russian: exactly two headings; the
+   first group every design the list prices at nothing, the second every one it
+   prices at something, its heading carrying that surcharge; every `-light`
+   twin drawn directly after its black design; every design drawn once. */
+{
+  console.log('\nthe window designs: regular, then special, each design\'s two colours together');
+  const before = faults;
+  let read = 0;
+  const priced = new Set(GRILLES.filter(o => o.delta).map(o => o.id));
+  for (const lang of ['he', 'ru']) {
+    const pg = await b.newPage({ viewport: { width: 1280, height: 720 } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&w=rect`);
+      await pg.waitForTimeout(400);
+      await pg.evaluate(() => document.querySelector('.steps__step[data-step="glass"]')?.click());
+      await pg.waitForTimeout(300);
+      const seq = await pg.evaluate(() => [...(document.querySelector('.field[data-group="grille"] .field__opts')?.children || [])]
+        .map(e => e.classList.contains('opts__sub') ? `#${e.textContent.trim()}` : e.dataset.id).filter(Boolean));
+      if (!seq.length) { fault('grille-groups', `${lang}: no grille field on the glass step — nothing to check`); continue; }
+      read++;
+      const heads = seq.map((x, i) => [x, i]).filter(([x]) => x.startsWith('#'));
+      if (heads.length !== 2 || heads[0][1] !== 0) { fault('grille-groups', `${lang}: ${heads.length} headings (${heads.map(h => h[0]).join(' | ')}) — two, the first on top`); continue; }
+      const g1 = seq.slice(1, heads[1][1]), g2 = seq.slice(heads[1][1] + 1);
+      if (g1.some(id => priced.has(id)) || g2.some(id => !priced.has(id))) fault('grille-groups', `${lang}: the groups are not split on price — regular [${g1}] special [${g2}]`);
+      const all = [...g1, ...g2];
+      if (all.length !== GRILLES.length || new Set(all).size !== all.length) fault('grille-groups', `${lang}: ${all.length} designs drawn for ${GRILLES.length} in the list, or one drawn twice`);
+      for (let i = 0; i < all.length; i++) {
+        if (!/-light$/.test(all[i])) continue;
+        if (all[i - 1] !== all[i].replace(/-light$/, '')) fault('grille-groups', `${lang}: "${all[i]}" is drawn after "${all[i - 1]}", not beside its black design`);
+      }
+      if (!/\d/.test(heads[1][0])) fault('grille-groups', `${lang}: the special designs' heading "${heads[1][0]}" names no surcharge`);
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('grille-groups', `${lang}: chromium died`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (read < 2) fault('grille-groups', `only ${read} of 2 languages read`);
+  if (faults === before) console.log(`    ${read} languages: two headings, the included designs then the priced ones with the surcharge in the heading, every door-colour twin beside its black design`);
+}
+
 /* ── THE BAND STANDS ON THE PHOTOGRAPH, OVER THE DOOR AND ON NOTHING ELSE ──
    28.9.2026 — *"The header of the section needs to be on the image and closer
    to the door."* Measured the day it moved, at every size, in the three
@@ -6662,7 +6792,11 @@ for (const v of VIEWS) {
   let asked = 0;
   for (const [q, want, what] of [['', false, 'no pull handle'], ['&n=idan', true, 'an Idan'],
        ['&n=channel', false, 'the recessed channel'], ['&gb=grab', true, 'the bow'],
-       ['&bl=bell', true, 'the doorbell']]) {
+       /* ⚠ RESTATED 28.9.2026: a bell ALONE hides it now (*"the option to
+          choose a colour for a pull handle opens only when there is a pull
+          handle on the door"* — reversing the 27.9 extension we had made), and
+          a bell beside a bar still shows it. */
+       ['&bl=bell', false, 'a doorbell alone'], ['&bl=bell&n=idan', true, 'a doorbell beside an Idan']]) {
     await pg.goto(`file://${process.cwd()}/index.html?lang=he${q}`);
     await pg.waitForTimeout(300);
     await toGrip();
@@ -6689,8 +6823,19 @@ for (const v of VIEWS) {
         + `it should be ${want ? 'shown' : 'hidden'}; the rule ran when the tiles were built, not on the paint`);
     }
   }
+  /* and a link carrying a gold finish with nothing but a bell: the finish goes
+     home to nickel, and the page SAYS so — a link that changes its price in
+     silence is §0's worst failure */
+  await pg.goto(`file://${process.cwd()}/index.html?lang=he&bl=bell&hf=hf-gold`);
+  await pg.waitForTimeout(400);
+  /* read off the door's CODE — the address is not rewritten on arrival */
+  const home = await pg.evaluate(() => ({ code: document.querySelector('#code')?.textContent || '', notice: !document.querySelector('#notice')?.hidden && (document.querySelector('#notice')?.textContent || '') }));
+  asked++;
+  const hfNow = decodeCode(home.code)?.handleFinish;
+  if (hfNow !== 'hf-nickel') fault('finish-group', `a bell alone with hf=hf-gold kept the ${hfNow} finish (code ${home.code}) — nothing on the door can wear it`);
+  if (!home.notice) fault('finish-group', 'a bell alone with hf=hf-gold came back nickel WITHOUT a notice — a link changed its price in silence');
   await pg.close();
-  if (faults === before) console.log(`    ${asked} readings: hidden with nothing to paint, shown with a bar, the bow or the bell, by link and by tap`);
+  if (faults === before) console.log(`    ${asked} readings: hidden with nothing to paint and beside a bell alone, shown with a bar or the bow (a bell beside one too), by link and by tap; a stale gold finish on a lone bell comes home to nickel with a notice`);
 }
 
 /* ── THE פרזול TILES ARE THIS DOOR'S — 27.9.2026 ───────────────────────────

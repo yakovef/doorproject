@@ -1977,22 +1977,30 @@ export function gripFinish(state) {
 export const gripTakesFinish = state => !!byId(HANDLES, state.handle).finishes;
 
 /**
- * Is there anything on this door the pull handle's finish paints?
+ * Is there a PULL HANDLE on this door for the finish to paint?
  *
  * ⚠ ASKED BY THE PAGE, 27.9.2026 — the owner's son: *"in the section with the
  * pull handles make the color options only appear if there is a pull handle,
- * either vertical or horizontal."* The three objects are the three `price.js`
- * charges `finishExtra` on: the bar (when it takes a finish at all — the
- * channel is painted with the door), the horizontal bow, and the פעמון. The
- * bell is the one his sentence does not name; it takes this finish on
- * Peretz's 20.9 word, and hiding the choice while a bell is on the door would
- * strand its metal — a decision recorded as ours in CLAUDE.md §0a, for him to
- * reverse in a line. `npm test` holds this to the price: the group is shown
- * exactly when a finish changes what the door costs.
+ * either vertical or horizontal."* The bar (when it takes a finish at all —
+ * the channel is painted with the door) and the horizontal bow.
+ * ⚠ THE BELL WENT FROM THIS LIST ON 28.9.2026 — *"The option to choose a colour
+ * for a pull handle opens only when there is a pull handle on the door."* It
+ * had been added on 27.9 as a decision taken FOR them (a bell takes this finish
+ * on Peretz's 20.9 word, and hiding the choice would strand its metal), named
+ * in CLAUDE.md §0a for them to reverse in a line, and this is the line. So a
+ * bell ALONE wears nickel — `bellFinish` below — and a bell beside a bar or a
+ * bow still wears theirs. `npm test` holds this to the price: the group is
+ * shown exactly when a finish changes what the door costs.
  */
 export const finishHasSubject = state => gripTakesFinish(state)
-  || (state.grab || 'nograb') !== 'nograb'
-  || (state.bell || 'nobell') !== 'nobell';
+  || (state.grab || 'nograb') !== 'nograb';
+
+/** The finish the פעמון is actually made in: the pull handle's, while there is
+ *  one; nickel (the axis's first entry) when the bell is alone (28.9). One
+ *  answer for the drawing, the price and the order. */
+export const bellFinish = state => finishHasSubject(state)
+  ? byId(HANDLE_FINISHES, state.handleFinish)
+  : HANDLE_FINISHES[0];
 
 /* Aliases count: a superseded id must resolve to its replacement rather than
    silently falling through to the first entry, which is how a stale link

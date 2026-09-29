@@ -164,7 +164,28 @@ const GROUPS = [
      the paint on screen and re-drawn when it changes — `retintOptions`. */
   { key: 'grille', title: 'g.grille', in: 'glass', kind: 'sq', list: () => GRILLES,
     glyph: o => grilleGlyph(o, byId(COLOURS, state.colour).hex), tinted: true,
-    hint: 'g.grille.h' },
+    hint: 'g.grille.h',
+    /* ⚠ TWO HEADED GROUPS, AND EACH DESIGN'S TWO COLOURS SIDE BY SIDE — 28.9,
+       the owner's son: *"Put the expensive window designs apart from the
+       regular ones, and keep the same designs in different colours near each
+       other."* Split on the list's own `delta` (the included designs, then
+       the priced ones with the surcharge in the heading, as the colours do),
+       and inside each the black design then its door-colour twin. The SCREEN's
+       order only: the array is the code's index order and never moves — the
+       `-light` twins were appended at its end, which is why they drew apart. */
+    split: list => {
+      const base = o => o.id.replace(/-light$/, '');
+      const at = id => list.findIndex(o => o.id === id);
+      const paired = items => items.slice().sort((a, b) =>
+        (at(base(a)) - at(base(b))) || (a.light ? 1 : 0) - (b.light ? 1 : 0));
+      const free = paired(list.filter(o => !o.delta));
+      const paid = paired(list.filter(o => o.delta));
+      const deltas = [...new Set(paid.map(o => o.delta))];
+      const plus = deltas.length === 1
+        ? T('g.grille.plus', formatAgorot(deltas[0]))
+        : T('g.grille.plusMany');
+      return [[T('g.grille.free'), free], [plus, paid]];
+    } },
 
   { key: 'handle', title: 'g.handle', in: 'grip', kind: 'hw', list: () => HANDLES,
     glyph: handleGlyph, hint: 'g.handle.h' },
@@ -2386,7 +2407,17 @@ function arrowStep(dir) {
   noteEngaged();
   const g = firstGroup(liveStep);
   if (!g) return;
-  const list = g.list();
+  /* ⚠ IN THE ORDER THE TILES ARE DRAWN — 28.9.2026, the owner's son: *"The
+     arrows choose very randomly in the colour section — I want it to go nicely
+     one by one, in every section."* They walked the LIST's order, which is the
+     code's index order, and on the colour step (grouped by price on screen)
+     and the glass step (twins side by side) that jumps about. So the order is
+     read off the group's live tiles; a group drawn without per-option tiles
+     (the משקוף's rows) keeps the list's. */
+  const all = g.list();
+  const drawn = [...document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"][data-id]`)]
+    .map(b => all.find(o => o.id === b.dataset.id)).filter(Boolean);
+  const list = drawn.length === all.length ? drawn : all;
   const blocked = conflicts(state)[g.key] || {};
   const at = list.findIndex(o => o.id === state[g.key]);
   for (let k = 1; k < list.length; k++) {

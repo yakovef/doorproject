@@ -156,9 +156,10 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   costs, do not relitigate it.
 - **Decisions taken FOR them in the big round (27.9), each named so they can
   reverse it in a line:**
-  · the handle-finish group also shows when only a פעמון is on the door — it
-    takes the finish on Peretz's 20.9 word, and hiding the group would strand
-    it (`finishHasSubject`);
+  · ~~the handle-finish group also shows when only a פעמון is on the door~~ —
+    **REVERSED BY THEM 28.9** (*"The option to choose a colour for a pull
+    handle opens only when there is a pull handle on the door"*): a bell alone
+    is nickel (`bellFinish`), a stale finish goes home with a sentence;
   · the navigator COLUMN is the desktop's; a phone keeps its fixed row in the
     same ink (a 56 px column on a 320 px screen leaves no room for two tiles);
   · the summary's pictures carry the option's short name, and the colour's is
@@ -168,6 +169,10 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
     rule wants the choice);
   · the arrows beside the door SKIP refused options rather than opening the
     dialog (browsing should not ask).
+  Taken for them 28.9: the step's `<h2>`, shown again above the options on
+  their word, stays visually hidden on a screen under 500 px tall (a phone on
+  its side, a laptop at 200 %) — shown there it took every answer off those
+  screens (5 → 0 steps at 844×390) — and the band over the door carries it.
   Settled with them in chat, not ours: where the new "ask before removing"
   rule meets Peretz's refusal — a pull handle or bow with no room beside the
   window or the face — **Peretz's rule stands**, refused with its reason and
@@ -182,6 +187,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** Four small page things (6 of 10): the arrows walk the tiles in the
+  order they are DRAWN (the colour step jumped); the window designs split
+  regular / special (surcharge per window in the heading), twins side by side;
+  the finish group only with a bar or the bow — a lone bell is nickel
+  (`bellFinish`), a stale finish goes home with a sentence (reverses our 27.9
+  extension); the step's `<h2>` shown above the options, not under 500 px tall.
+  Long form: `HISTORY.md`.
 - **28.9** Undo you can see, a save that asks (5 of 10) — two labelled ink pills
   at the stage's foot (`placeUndo`: the first of four shapes touching no door,
   arrow or price; over the trust words where they reach). `#save-hud` opens
@@ -222,12 +234,6 @@ lines here. Dates are the day of the change.
   109.7 → 128.3 px (the old fallback drew Latin at 89%); weight 400, 5/4 px, `.75/
   .74rem` clears every gate. **Landscape:** grip now shows an answer too — the
   exemption narrows. Long form: `HISTORY.md`.
-- **28.9** **The bow** (`grab`) redrawn off four installed doors (*"now i want
-  you to copy the horizontal handle"*): 300 tip to tip (was 280), a 25.5 shaft
-  (was 18.7), posts at 0.175/0.825 confirmed, 42 mm roses with 28 mm balls, a
-  double-cone finial and a knob at each end (`GRAB`, `GRAB_END`). Footprint
-  `in` + 10 → + 5 (the trio's field, §9); channel + Coral + bow no longer fits
-  on two sizes. Sheets: `against-grab` only.
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -337,8 +343,10 @@ hold — side by side, stacked, or the glyph alone (a phone beside a wide door)
 - **The band above the door** (27.9, *"above the door the name of the section
   we are at, big — moved from the panel … the name of the thing now
   selected"*): `.stage__band`, the live step's title and `nowLabel` of its first
-  group, written by `markSteps`; the panel's `<h2>` is visually hidden (goStep
-  still focuses it). ⚠ **Since 28.9 it stands ON THE PHOTOGRAPH** (*"the header
+  group, written by `markSteps`; since 28.9 the step's `<h2>` is ALSO shown
+  above its options (*"the title of the section also above the options"*),
+  compact, in the band's face — the two agree, and a group heading still may
+  not repeat it; under 500 px tall it stays hidden and the band carries it. ⚠ **Since 28.9 it stands ON THE PHOTOGRAPH** (*"the header
   of the section needs to be on the image and closer to the door"*): absolute
   in the wrap, placed by `placeBand` — its foot 8 px above the casing's head,
   centred on the door, given only the free span between the wall's controls on
@@ -355,8 +363,11 @@ hold — side by side, stacked, or the glyph alone (a phone beside a wide door)
   (named in the audit, asserted still needed).
 - **Two arrows beside the door** (27.9): absolute in the wall at the frame's
   mid-height, 8 px outside the casing (`--frame-left/-right/-mid`); they move
-  the live step's FIRST group to the next/previous free option, wrapping,
-  through `choose`; refused options are skipped (ours, §0a); with none free, a
+  the live step's FIRST group to the next/previous free option IN THE ORDER
+  ITS TILES ARE DRAWN (28.9, *"the arrows choose very randomly in the colour
+  section — I want it to go nicely one by one"* — they walked the list's index
+  order, and the colours are drawn grouped by price), wrapping, through
+  `choose`; refused options are skipped (ours, §0a); with none free, a
   one-button dialog and no change. Hidden (box kept) on the summary. The way
   on is on the interface's inline end.
 - ⚠ **`.stage__hud` IS ABSOLUTE AND MUST STAY ABSOLUTE.** Above 1100 px the
@@ -840,6 +851,13 @@ takes the door's paint and the page re-tints it (`retintOptions`). A door's
 `doors` citation is on the twin its photograph shows (d106, d109, d111 pale;
 d114 black). `grillePaths`' `tint` parameter stays: the corpus recreations pass
 photographed bar colours through it.
+⚠ **On screen the designs are two headed groups** (28.9, *"Put the expensive
+window designs apart from the regular ones, and keep the same designs in
+different colours near each other"*): split on the list's `delta` — the
+included ones, then the priced ones with the surcharge PER WINDOW in the
+heading (ironwork is sold by the pane) — each black design with its `-light`
+twin beside it. The array's order is the code's and does not move; the
+twins were appended at its end, which is why they drew apart.
 
 ⚠ **No line round the inside of the glass** (27.9, the owner's son). `aperture`
 drew a two-device-pixel stroke of the paint darkened 0.6 over every pane — a
@@ -1010,7 +1028,8 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
 - **`BELLS` and `PEEPHOLES`** — fittings on the face (`bl=`, `ey=`). The bell is
   a 132 mm **ring knocker on the centre line** (`KNOCKER_AFF` 1470), the
   peephole directly above it; the bell sits on the pull-handle step and takes
-  the handle's finish. The digital viewer is drawn off the owner's son's
+  the pull handle's finish while there is a bar or a bow — alone it is nickel
+  (28.9, `bellFinish`), and a stale finish goes home with a sentence. The digital viewer is drawn off the owner's son's
   photograph (`research/viewer/digital.png`, 28.9): round black face, lens,
   two lights, bell button; its SIZE is still the sourced 54 mm (no scale). **Every viewer is refused beside a window** (`viewerOn`,
   27.9 — the rules had named `'peep'` only). Two LISTS, not a multi-select: the withdrawn add-ons were a
@@ -1030,7 +1049,7 @@ before it picks a fill.**
 | `nickel` `nickelSoft` `plateFace` `domeKnob` `rotemFace` `rotemLever` `knobBall` | the פרזול — nickel is its **own** warm ramp, `FINISH_TONES.nickel` (27.9, measured off the Coral doors: 20% darker than `steel`, hue ≈40°); `steel` stays the pull bar's nickel, the extra locks' and the derivation reference. `domeKnob` (the כדור's ball) through `domeRamp` since 26.9, the measured dome kept literal on nickel |
 | `lockUnit` `lockUnitFace` `lockUnitSoft` `mirrorKnob` | the bought-in extra locks, the ספיר and both viewers' rings (28.9) — a constant steel |
 | `euroSteel` `euroRim` | the cylinder, following the פרזול at its own stand-off (`cylinderRamp`) — derived on nickel too since 27.9, so every finish's plug stands 2–16% off its plate |
-| `bellMetal` | the פעמון, following the pull handle's finish (`bellRamp` keeps Peretz's older *"nickel and gold only"* beside the instruction that overruled it) |
+| `bellMetal` | the פעמון, following the pull handle's finish while there is a pull handle, nickel alone (28.9, `bellFinish`; `bellRamp` keeps Peretz's older *"nickel and gold only"* beside the instruction that overruled it) |
 
 ### ⚠ What the פרזול reaches — the list, both directions
 

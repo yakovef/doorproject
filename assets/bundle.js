@@ -349,6 +349,12 @@
     "g.colour.free": ["כלול במחיר", "Included in the price", "Входит в цену"],
     "g.colour.plus": ["תוספת {0}", "{0} extra", "Доплата {0}"],
     "g.colour.plusMany": ["בתוספת תשלום", "At extra cost", "За доплату"],
+    /* the window designs' two groups, 28.9 — the figure arrives as {0}, and it
+       is PER WINDOW: ironwork is sold by the panel (price.js), so a door with
+       two panes pays it twice and its tiles say so. */
+    "g.grille.free": ["עיצובים רגילים", "Regular designs", "Обычные узоры"],
+    "g.grille.plus": ["עיצובים מיוחדים · תוספת {0} לחלון", "Special designs · {0} extra per window", "Особые узоры · доплата {0} за окно"],
+    "g.grille.plusMany": ["עיצובים מיוחדים", "Special designs", "Особые узоры"],
     "g.detail.h": [
       "לא משלבים פאנלים עם פסי מתכת על אותה דלת.",
       "Panels and metal strips do not go on the same door.",
@@ -829,6 +835,7 @@
     "fix.noPanelRoom": ["הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום", "We removed the panel — the tall window leaves no room for it", "Мы убрали панель — высокому окну не хватает места"],
     "fix.faceCleared": ["החלקנו את הדלת — ידית שקועה דורשת פנים חלקות", "We smoothed the face — a recessed channel needs it plain", "Мы сделали полотно гладким — врезная ручка этого требует"],
     "fix.grilleGone": ["הסרנו את הסורג — אין חלון", "We removed the grille — there is no window", "Мы убрали решётку — окна нет"],
+    "fix.finishHome": ["גוון הידית חזר לניקל — אין ידית משיכה על הדלת", "The handle finish is back to nickel — there is no pull handle on the door", "Отделка ручки снова никель — на двери нет ручки-скобы"],
     "fix.gripGone": ["הסרנו את ידית המשיכה — אין לה מקום כאן", "We removed the pull handle — there is no room for it here", "Мы убрали ручку-скобу — для неё здесь нет места"],
     "fix.bowGone": ["הסרנו את המאחז האופקי — אין לו מקום כאן", "We removed the horizontal pull — there is no room for it here", "Мы убрали горизонтальную скобу — для неё здесь нет места"],
     "fix.locksetSwapped": ["החלפנו את המנעול — אין לו מקום ליד המאחז", "We swapped the lockset — there is no room for it beside the grip", "Мы заменили замок — рядом со скобой ему нет места"],
@@ -2630,7 +2637,8 @@
     return byId(FINISHES, hf.tone);
   }
   var gripTakesFinish = (state2) => !!byId(HANDLES, state2.handle).finishes;
-  var finishHasSubject = (state2) => gripTakesFinish(state2) || (state2.grab || "nograb") !== "nograb" || (state2.bell || "nobell") !== "nobell";
+  var finishHasSubject = (state2) => gripTakesFinish(state2) || (state2.grab || "nograb") !== "nograb";
+  var bellFinish = (state2) => finishHasSubject(state2) ? byId(HANDLE_FINISHES, state2.handleFinish) : HANDLE_FINISHES[0];
   var byId = (list, id) => list.find((o) => o.id === id) || list.find((o) => (o.aliases || []).includes(id)) || list[0];
   var leafGlazed = (state2) => glassRows(byId(WINDOWS, state2.window)) > 0;
   var SIDE_OPENING_MIN = 370;
@@ -2866,8 +2874,12 @@
       /* ⚠ AND THE BELL FOLLOWS THE PULL HANDLE'S FINISH, 20.9.2026 — *"the
          pirzul for it changes its price by 100 or 200"*, the pull-handle finish
          on his son's word, per object: a nickel ring is ₪300, black ₪400, gold
-         ₪500. Nothing on a door with no bell. */
-      bell: byId(BELLS, state2.bell).delta + (state2.bell !== "nobell" ? finishExtra(state2) : 0),
+         ₪500. Nothing on a door with no bell.
+         ⚠ AND ONLY WHILE THERE IS A PULL HANDLE FOR THE FINISH TO BELONG TO, since
+         28.9 (*"the option to choose a colour for a pull handle opens only when
+         there is a pull handle on the door"*): a bell alone is nickel, ₪300
+         (`bellFinish`). */
+      bell: byId(BELLS, state2.bell).delta + (state2.bell !== "nobell" ? bellFinish(state2).delta : 0),
       peephole: byId(PEEPHOLES, state2.peephole).delta,
       /* A grille needs a window to sit in — and so does worked glass, which is
          in the same list now. Neither can be charged on a solid door: the
@@ -3017,7 +3029,7 @@
       rows.push({ key: "speciallock", label: T("row.speciallock"), id: xl.id, value: L(xl) });
     }
     if (bl.id !== "nobell") {
-      rows.push({ key: "bell", label: T("row.bell"), id: bl.id, value: `${L(bl)} · ${L(hf)}` });
+      rows.push({ key: "bell", label: T("row.bell"), id: bl.id, value: `${L(bl)} · ${L(bellFinish(state2))}` });
     }
     if (ep.id !== "nopeep") {
       rows.push({ key: "peephole", label: T("row.peephole"), id: ep.id, value: L(ep) });
@@ -3676,7 +3688,7 @@ ${stops}
     const hwTone = FINISH_TONES[byId(PIRZUL2, state2.pirzul).tone] || FINISH_TONES.steel;
     const cyl = cylinderRamp(hwTone);
     const dome = domeRamp(hwTone);
-    const bellTone = bellRamp(tone);
+    const bellTone = bellRamp(FINISH_TONES[byId(FINISHES, bellFinish(state2).tone).id] || FINISH_TONES.steel);
     const stripeTone = byId(PIRZUL2, state2.pirzul).tone === "nickel" ? tone : hwTone;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const sideW = size.side ? size.side - REBATE : 0;
@@ -9304,13 +9316,15 @@ ${plate.defs}${plate.body}
     trioPlate: "fix.trioPlate",
     /* 26.9.2026: the bow has no home on this door (a link, or a window tapped
        beside it) — see repair. */
-    bowGone: "fix.bowGone"
+    bowGone: "fix.bowGone",
+    /* 28.9.2026: no pull handle left for a finish to belong to — see repair. */
+    finishHome: "fix.finishHome"
   };
   var WHY_UNDER_GLASS = { top: "why.winTakesTop", plate: "why.winPlate", room: "why.noRoomBelow" };
   var BOW_WHY = { window: "why.bowWindow", face: "why.bowFace", door: "why.bowDoor" };
   var NOTHING = /^(none|no[a-z]*)$/;
   var OWNED = { stripes: ["stripeDir", "stripeCount", "stripeTight"], handle: ["handle", "handleLen"] };
-  var NOT_A_LOSS = /* @__PURE__ */ new Set(["handleLen", "stripeTight"]);
+  var NOT_A_LOSS = /* @__PURE__ */ new Set(["handleLen", "stripeTight", "handleFinish"]);
   function displacedBy(before, after, tapped, restored2 = []) {
     const own = new Set(OWNED[tapped] || [tapped]);
     return Object.keys(after).filter((k) => !own.has(k) && !restored2.includes(k) && !NOT_A_LOSS.has(k) && typeof after[k] !== "object" && before[k] !== after[k] && !(typeof before[k] === "string" && NOTHING.test(before[k])) && !(typeof before[k] === "number" && before[k] === 0));
@@ -9418,6 +9432,10 @@ ${plate.defs}${plate.body}
         s.grille = "none";
         change("grille", SAID.grilleGone);
       }
+    }
+    if (!finishHasSubject(s) && s.handleFinish && s.handleFinish !== HANDLE_FINISHES[0].id) {
+      s.handleFinish = HANDLE_FINISHES[0].id;
+      change("handleFinish", SAID.finishHome);
     }
     return { state: s, changed, said };
   }
@@ -10123,7 +10141,25 @@ ${plate.defs}${plate.body}
       list: () => GRILLES,
       glyph: (o) => grilleGlyph(o, byId(COLOURS, state.colour).hex),
       tinted: true,
-      hint: "g.grille.h"
+      hint: "g.grille.h",
+      /* ⚠ TWO HEADED GROUPS, AND EACH DESIGN'S TWO COLOURS SIDE BY SIDE — 28.9,
+         the owner's son: *"Put the expensive window designs apart from the
+         regular ones, and keep the same designs in different colours near each
+         other."* Split on the list's own `delta` (the included designs, then
+         the priced ones with the surcharge in the heading, as the colours do),
+         and inside each the black design then its door-colour twin. The SCREEN's
+         order only: the array is the code's index order and never moves — the
+         `-light` twins were appended at its end, which is why they drew apart. */
+      split: (list) => {
+        const base = (o) => o.id.replace(/-light$/, "");
+        const at = (id) => list.findIndex((o) => o.id === id);
+        const paired = (items) => items.slice().sort((a, b) => at(base(a)) - at(base(b)) || (a.light ? 1 : 0) - (b.light ? 1 : 0));
+        const free = paired(list.filter((o) => !o.delta));
+        const paid = paired(list.filter((o) => o.delta));
+        const deltas = [...new Set(paid.map((o) => o.delta))];
+        const plus = deltas.length === 1 ? T("g.grille.plus", formatAgorot(deltas[0])) : T("g.grille.plusMany");
+        return [[T("g.grille.free"), free], [plus, paid]];
+      }
     },
     {
       key: "handle",
@@ -11224,7 +11260,9 @@ ${plate.defs}${plate.body}
     noteEngaged();
     const g = firstGroup(liveStep);
     if (!g) return;
-    const list = g.list();
+    const all = g.list();
+    const drawn = [...document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"][data-id]`)].map((b) => all.find((o) => o.id === b.dataset.id)).filter(Boolean);
+    const list = drawn.length === all.length ? drawn : all;
     const blocked = conflicts(state)[g.key] || {};
     const at = list.findIndex((o) => o.id === state[g.key]);
     for (let k = 1; k < list.length; k++) {

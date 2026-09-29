@@ -4357,11 +4357,18 @@ group('the finish reaches every piece of metal');
         ok(ring({ pirzul: z.id }) === ring({}),
            `the פרזול "${z.id}" must not move the פעמון — it follows the handle finish now`);
       }
-      /* And on a door with NO pull handle the finish still reaches the ring:
-         the axis is the door's, not the bar's, which is why it is a field
-         whatever is on the leaf. */
-      ok(ring({ handle: 'none', handleFinish: 'hf-gold' }) !== ring({ handle: 'none' }),
-         'a gold finish must gild a פעמון on a door with no pull handle');
+      /* ⚠ RESTATED 28.9.2026, REVERSED BY INSTRUCTION, EQUALLY STRONG. This
+         asserted that on a door with NO pull handle the finish still reached
+         the ring ("the axis is the door's, not the bar's"). The owner's son,
+         28.9: *"The option to choose a colour for a pull handle opens only
+         when there is a pull handle on the door"* — so with no bar and no bow
+         there is no choice, and a lone bell is NICKEL (`bellFinish`), whatever
+         the field says. Both directions: alone, a gold field paints the ring
+         exactly as nickel does; beside the bow, gold still gilds it. */
+      ok(ring({ handle: 'none', handleFinish: 'hf-gold' }) === ring({ handle: 'none', handleFinish: 'hf-nickel' }),
+         'a gold finish gilds a lone פעמון — there is no pull handle for the finish to belong to (28.9)');
+      ok(ring({ handle: 'none', grab: 'grab', handleFinish: 'hf-gold' }) !== ring({ handle: 'none', grab: 'grab', handleFinish: 'hf-nickel' }),
+         'beside the bow a gold finish no longer gilds the פעמון — the bow is a pull handle');
     }
 
     /* ── AND TWO LOCKSETS DO NOT FOLLOW IT AT ALL ──────────────────────
@@ -6626,6 +6633,9 @@ group('a tap that would take something away asks first');
   const QUIET = [
     ['a grille on a solid door (it adds the window)', {}, { grille: 'scroll' }, 'grille'],
     ['a gold finish with a bar and a bell', { handle: 'idan', bell: 'bell' }, { handleFinish: 'hf-gold' }, 'handleFinish'],
+    /* 28.9: the finish goes home to nickel with the bar — it goes WITH the
+       handle, so taking the bar off asks nothing about it */
+    ['taking the gold bar off a door with a bell', { handle: 'idan', bell: 'bell', handleFinish: 'hf-gold' }, { handle: 'none' }, 'handle'],
     ['a bar shortened by a smaller size', { size: 'extra2', handle: 'idan', handleLen: 2000 }, { size: 'standard' }, 'size'],
     ['a new colour', {}, { colour: 'rb-9016d' }, 'colour'],
     ['two panels on a plain door', {}, { detail: 'panel2' }, 'detail'],
@@ -6659,6 +6669,31 @@ group('the handle finish is offered exactly where it costs something');
   }
   ok(shown > 0 && hidden > 0,
      `the sweep saw ${shown} shown and ${hidden} hidden — one half is missing, so it tested nothing`);
+
+  /* ⚠ AND A BELL ALONE IS NICKEL — 28.9.2026 (*"the option to choose a colour
+     for a pull handle opens only when there is a pull handle on the door"*,
+     reversing the 27.9 extension to the bell). For every finish: a bell with
+     no bar and no bow costs the bell and nothing for a finish, the order names
+     nickel on its row, and a state carrying the finish anyway is put back to
+     nickel by `repair` with its sentence — the link that carried it is told.
+     And beside it (§5.22): the same bell beside an Idan still wears, and pays
+     for, the chosen finish. */
+  const bellOnly = { ...DEFAULTS, bell: 'bell' };
+  const bare = priceAgorot(bellOnly);
+  for (const f of HANDLE_FINISHES) {
+    const st = { ...bellOnly, handleFinish: f.id };
+    ok(priceAgorot(st) === bare, `a bell alone in ${f.id} costs ${priceAgorot(st)} against ${bare} in nickel — a finish nobody can choose is being charged`);
+    const row = specRows(st).find(r => r.key === 'bell');
+    ok(row && row.value.includes(HANDLE_FINISHES[0].he), `a bell alone in ${f.id}: its row says "${row && row.value}", not nickel`);
+    const r = repair(st);
+    if (f.id === HANDLE_FINISHES[0].id) ok(r.changed.length === 0, 'a bell alone in nickel was "repaired" — it is already buildable');
+    else ok(r.state.handleFinish === HANDLE_FINISHES[0].id && r.changed.includes('handleFinish') && r.said.length > 0,
+      `a bell alone carrying ${f.id} was not put back to nickel with a sentence (${r.state.handleFinish}; [${r.changed}])`);
+    const withBar = repair({ ...DEFAULTS, bell: 'bell', handle: 'idan', handleLen: 1000, handleFinish: f.id }).state;
+    const withBarNickel = priceAgorot({ ...withBar, handleFinish: HANDLE_FINISHES[0].id });
+    ok(withBar.handleFinish === f.id && priceAgorot(withBar) - withBarNickel === 2 * f.delta,
+       `beside an Idan the bell and the bar in ${f.id} should each pay ${f.delta} (paid ${priceAgorot(withBar) - withBarNickel})`);
+  }
 }
 
 group('a finish is named on the fitting that has one, and nowhere else');
@@ -6706,9 +6741,15 @@ group('a finish is named on the fitting that has one, and nowhere else');
          + 'the renderer\'s fallback is not a specification');
       }
     }
-    /* 4. The bell names the same finish, because it is priced by it. */
-    ok(bellLine && bellLine.includes(hf.he),
-       `the פעמון is in ${hf.he} and its line does not say so: "${bellLine}"`);
+    /* 4. The bell names the finish it WEARS, because it is priced by it —
+          the pull handle's where the door has one, nickel where it does not
+          (28.9, `bellFinish`; this read `hf` for every door until the lone
+          bell went back to nickel, and it is restated to the finish the
+          drawing and the price use, not weakened: it now also asserts the
+          nickel of a lone bell). */
+    const wears = hn.finishes ? hf : HANDLE_FINISHES[0];
+    ok(bellLine && bellLine.includes(wears.he),
+       `the פעמון wears ${wears.he} and its line does not say so: "${bellLine}"`);
   }
   ok(withFinish > 0, 'no grip takes a finish — this group is asserting nothing');
 

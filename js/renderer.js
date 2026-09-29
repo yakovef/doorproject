@@ -16,7 +16,7 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { BOWS, byId, COLOURS, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
+import { bellFinish, BOWS, byId, COLOURS, DETAILS, FINISHES, gripFinish, GRILLES, HANDINGS, HANDLES,
          glassRows, handleLength, LOCKSETS, MASHKOF_MAX, MASHKOF_PARTS, MASHKOFS, PEEPHOLES, PIRZUL,
          REBATE, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS } from './catalog.js';
 import { L, T } from './copy.js';
@@ -1838,7 +1838,9 @@ export function render(state) {
      which of the four cylinders are measured. */
   const cyl      = cylinderRamp(hwTone);
   const dome     = domeRamp(hwTone);
-  const bellTone = bellRamp(tone);
+  /* the bell's own metal: the pull handle's finish while there is one, nickel
+     when it is alone (28.9 — `bellFinish`) */
+  const bellTone = bellRamp(FINISH_TONES[byId(FINISHES, bellFinish(state).tone).id] || FINISH_TONES.steel);
 
   /* ⚠ THE STRIPES FOLLOW THE FINISH, AND WHICH FINISH TOOK DECIDING.
      Peretz gave two sentences on 30.8.2026 and each one alone is satisfiable:

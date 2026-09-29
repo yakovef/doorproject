@@ -26,6 +26,82 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — FOUR SMALL PAGE THINGS (6 of 10).** The owner's son, four
+  sentences: *"The arrows choose very randomly in the colour section — I want
+  it to go nicely one by one, in every section."* · *"Put the expensive window
+  designs apart from the regular ones, and keep the same designs in different
+  colours near each other."* · *"The option to choose a colour for a pull
+  handle opens only when there is a pull handle on the door."* · *"The title
+  of the section also above the options."*
+
+  **THE ARROWS** walked `g.list()` — the code's INDEX order — while the colour
+  step draws its paints grouped by price and the glass step its designs by
+  twin; so "next" jumped about the screen. `arrowStep` reads the order off the
+  group's live tiles (`[role=radio][data-id]` in DOM order), falling back to the
+  list only where a group is not one tile per option (the משקוף's rows).
+  Asserted: on every step, at 1280×720 he and 390×844 ru, each "next" lands on
+  the next FREE tile drawn, wrapping, and "prev" on the one before — 94 presses,
+  4 of them asking first (a bar beside the lever) and answered yes (§5.28).
+  Falsified as the order said: the array's order back → the colour step fails
+  in both languages.
+
+  **THE WINDOW DESIGNS** are two headed groups on screen — split on the list's
+  own `delta` (a `split` like the colours'): "עיצובים רגילים", then "עיצובים
+  מיוחדים · תוספת ₪700 לחלון" (the figure through `{0}`, and PER WINDOW:
+  ironwork is sold by the pane, so a two-pane door's tiles say ₪1,400 and the
+  heading must not pretend otherwise) — each black design with its `-light`
+  twin beside it. The array does not move: it is the code's index order, and
+  the twins drew apart because they were appended at its end on 27.9.
+  Asserted: two headings, the split on price, every twin beside its design,
+  every design once, the surcharge in the heading.
+
+  **THE FINISH GROUP** shows only with a pull handle — a bar that takes a
+  finish, or the bow. ⚠ **This reverses a decision taken FOR them on 27.9**
+  (the bell alone had kept the group, since it takes the finish on Peretz's
+  20.9 word); named in §0a then for exactly this. So a bell alone wears nickel
+  — `bellFinish`, one answer for the drawing (`bellTone`), the price (the bell
+  row) and the order (its row still names the finish: "ניקל") — and a state
+  carrying another finish with nothing to wear it is put back by `repair`, LAST,
+  with a sentence (`fix.finishHome`), so an old link with a gold bell and no
+  bar is told rather than silently repriced. The confirm dialog does not ask
+  about it (`NOT_A_LOSS`: it goes with the handle). The 30 gallery doors all
+  still arrive unrepaired. Asserted (unit): for every finish a lone bell costs
+  the bell alone, its row names nickel, and a non-nickel state is repaired with
+  its sentence; beside an Idan the bell and the bar each still pay the finish
+  (§5.22). The biconditional "shown exactly when a finish moves the price"
+  holds unchanged over every handle × bow × bell. (Audit) a bell alone hides
+  the group, a bell beside an Idan shows it, and `?bl=bell&hf=hf-gold` arrives
+  nickel WITH a notice — read off the door's code (the first draft read
+  `location.search`, which the page does not rewrite on arrival).
+
+  **THE TITLE** — the step's `<h2>`, hidden since 27.9 when the band over the
+  door took the name — is shown again above the options, compact (700 in the
+  band's `--display`, 19–22 px, 1.12 rem on a phone). ⚠ **Measured first on
+  the short screens**: shown there it took every answer off a phone on its
+  side (5 → 0 steps at 844×390) and a zoomed laptop (2 → 0 at 640×360), and
+  that exemption may only narrow — so under 500 px tall it stays visually
+  hidden and the band over the door, always on screen, carries it (a decision
+  of ours, named in §0a). "Name twice" restated: the band and the `<h2>` agree
+  and the `<h2>` is drawn at 390×844; a group heading repeating it is still
+  refused.
+
+  **GATES.** `node --check` (renderer, app, catalog, price, rules, spec,
+  copy, audit, units); `npm run build`; `npm test` **9,440,951 passed / 5
+  failed** — the five sheet-staleness rows. Two unit tests encoded the rule the
+  instruction reversed and are restated to the new rule, equally strong, the
+  reason beside each: "a gold finish gilds a פעמון on a door with no pull
+  handle" is now "…does NOT gild a lone bell, and beside the bow it does"; "the
+  bell's line names the chosen finish" is now "…names the finish it WEARS"
+  (nickel alone). Falsified: `bellFinish` back to the raw field → 53 unit
+  faults (the bell's line, the price biconditional, the lone-bell block); the
+  grille split removed → "0 headings" in both languages; the bell back as a
+  finish subject → the audit's lone-bell, link and notice clauses; the title
+  hidden again → 24 of 24 steps; the arrows on the array → the colour step in
+  both languages. The new and restated audit blocks run alone on this tree:
+  clean. Sheets: none expected to move — a lone bell with a non-nickel finish
+  is a state `repair` no longer keeps, and no committed sheet draws one (the
+  sheet run is after commit 10).
+
 - **28.9 — UNDO YOU CAN SEE, AND A SAVE THAT ASKS (5 of 10).** The owner's son:
   *"The undo option rethought: not noticeable on pc and in the way on the phone
   — more noticeable, but not colliding with the door."* And: *"The save
@@ -2254,6 +2330,12 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.9** **The bow** (`grab`) redrawn off four installed doors (*"now i want
+  you to copy the horizontal handle"*): 300 tip to tip (was 280), a 25.5 shaft
+  (was 18.7), posts at 0.175/0.825 confirmed, 42 mm roses with 28 mm balls, a
+  double-cone finial and a knob at each end (`GRAB`, `GRAB_END`). Footprint
+  `in` + 10 → + 5 (the trio's field, §9); channel + Coral + bow no longer fits
+  on two sizes. Sheets: `against-grab` only.
 - **28.9** The page's own type, in its folder (1 of 10) — *"change the font …
   Hebrew first"*: **Rubik** for the text (the face Peretz's own site uses),
   **Bona Nova** for the price, `<h1>` and band — the only candidates with
