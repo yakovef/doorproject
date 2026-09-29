@@ -15,7 +15,7 @@ import { formatAgorot, priceAgorot } from './price.js';
 import { gripAt, gripHome, render } from './renderer.js';
 import { CUSTOMER_LANG_NOTE, lang, T, withLang } from './copy.js';
 import { handingWords, specLines } from './spec.js';
-import { encodeCode, isUntouched, toQuery } from './url-state.js';
+import { encodeCode, toQuery } from './url-state.js';
 
 export const PHONE_DISPLAY = '053-219-7466';
 /* ⚠ TWO CONSTANTS, BECAUSE THE TWO SCHEMES DISAGREE. `wa.me` wants the digits
@@ -276,46 +276,23 @@ export function gripAddendum(state) {
  * because a line saying "the customer used the Hebrew page" on every single
  * order is noise, and noise is how the useful lines stop being read.
  */
-export function message(state, chosen = false) {
+export function message(state) {
   const spoke = CUSTOMER_LANG_NOTE[lang()];
   return withLang('he', () => [
-    /* ⚠ "בחרתי דלת" IS A FALSE CLAIM ON A DOOR NOBODY HAS TOUCHED. Two sends
-       are live on arrival, and a confused first-timer can fire off the
-       default as though it were a considered order — from Peretz's side
-       indistinguishable from a real one, which is `PLAN.md` §0's failure mode
-       arriving from the other direction (`UX-FINDINGS` §5).
-       The message is not withheld and the button is not removed: what changes
-       is what the first line CLAIMS. Everything under it — the spec, the
-       price, the code, the link — is still exactly the door on screen, so he
-       can price it if that is what they want; he is simply not told they
-       chose it.
-       The precedent is `FALLBACK_TEXT` below, written to be UNMISTAKABLE from
-       a real order. This is the same idea one step earlier, and the label on
-       the button changes with it — see `is-untouched` in `js/app.js`.
-
-       ⚠ AND `isUntouched(state)` ALONE WAS THE WRONG QUESTION, 10.9.2026.
-       It asks whether the DOOR is the one the page opened with, and that is
-       the same thing as "nobody has engaged" at exactly one moment: arrival.
-       Measured by walking the guide forward with the button at 390 px — a
-       customer who taps הבא through all eight steps and accepts the standard
-       ₪3,195 door, the commonest thing Peretz sells, reached him as *"I
-       looked at the door the site opens with and I have a question"*. So did
-       one who changed the colour and changed it back. That is `PLAN.md` §0
-       from the other side again: an order he cannot act on without asking
-       whether it was an order.
-       `chosen` is the second half — a fact about the SESSION, not about the
-       door, which is why it is an ARGUMENT and not a field. It cannot go in
-       the state for the reason `liveStep` cannot: it would reach the URL and
-       the short code, and "which questions somebody read" is not part of a
-       door. It defaults to FALSE so that every caller with no session — node,
-       the tests, the A4 sheet, and Peretz opening a shared link — keeps
-       exactly the conservative answer it has today, and a caller that forgets
-       to pass it fails towards the old behaviour rather than towards a false
-       claim. `js/app.js` is the only place that knows, and it passes the same
-       value to the label and to the text so the two stay one decision. */
-    isUntouched(state) && !chosen
-      ? 'שלום, הסתכלתי על הדלת שהאתר נפתח בה ויש לי שאלה:'
-      : 'שלום, בחרתי דלת באתר:',
+    /* ⚠ ONE OPENER, THE ORDER, ON EVERY DOOR — 29.9.2026. From 30.8 a door
+       nobody had touched opened with a question ("הסתכלתי על הדלת שהאתר נפתח
+       בה ויש לי שאלה") and both sends said "יש לי שאלה", so a first-timer
+       firing off the default could not pass for an order (`UX-FINDINGS` §5);
+       on 10.9 a session argument (`chosen`) stopped a customer who walked the
+       guide and kept the standard door reaching Peretz as a question.
+       Retired by the owner's son: *"Change the 'יש לי שאלה' text on the
+       WhatsApp button near the price to 'הזמינו את הדלת'."* A button that says
+       "order the door" over a message that asks a question is `PLAN.md` §0's
+       worst failure — the label and the message saying two things — so the
+       label and the message are still ONE decision, and it is now the same on
+       every door: the order. Everything under it — the spec, the price, the
+       code, the link — is the door on screen, as it always was. */
+    'שלום, בחרתי דלת באתר:',
     ...(spoke ? [spoke] : []),
     '',
     /* ⚠ THE ROWS, from `js/spec.js`. This function used to assemble the door
@@ -355,8 +332,8 @@ export function message(state, chosen = false) {
 }
 
 /** One tap: opens WhatsApp with the message already written, addressed to Peretz. */
-export const whatsappUrl = (state, chosen = false) =>
-  `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state, chosen))}`;
+export const whatsappUrl = state =>
+  `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state))}`;
 
 /* ── WHAT THE BUTTON DOES WHEN THERE IS NO DOOR ──────────────────────
  *
@@ -485,7 +462,7 @@ export async function doorPng(state, width = 1000) {
  * closes it would have WhatsApp opened for them anyway a moment later. That is
  * the page arguing with somebody who has just said no.
  */
-export async function sendDoor(state, chosen = false) {
+export async function sendDoor(state) {
   if (!canSharePicture()) return 'unavailable';
   let file;
   try {
@@ -493,7 +470,7 @@ export async function sendDoor(state, chosen = false) {
   } catch {
     return 'unavailable';              // no picture; the link still works
   }
-  const payload = { files: [file], text: message(state, chosen) };
+  const payload = { files: [file], text: message(state) };
   if (!navigator.canShare(payload)) return 'unavailable';
   try {
     await navigator.share(payload);
@@ -507,8 +484,8 @@ export async function sendDoor(state, chosen = false) {
   }
 }
 
-export async function copyMessage(state, chosen = false) {
-  const text = message(state, chosen);
+export async function copyMessage(state) {
+  const text = message(state);
   try {
     await navigator.clipboard.writeText(text);
     return true;

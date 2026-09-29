@@ -19,7 +19,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { bowObstacle, conflicts, detailWorked, displacedBy, fallbackLockset, gripObstacle, repair } from '../js/rules.js';
 import { describeSentence, handingWords, specLines, specRows, summaryLine } from '../js/spec.js';
 import { WORKS } from '../js/works.js';
-import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, isUntouched, toQuery, VERSION } from '../js/url-state.js';
+import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery, VERSION } from '../js/url-state.js';
 
 let pass = 0, fail = 0;
 const ok = (cond, msg) => cond ? (pass++, 0) : (fail++, console.error('  ✗ ' + msg));
@@ -5942,65 +5942,43 @@ group('a handle the customer moved reaches the order');
     stripeTight: true,
   };
 
-  /* ── AND THE MESSAGE DOES NOT CLAIM A CHOICE NOBODY MADE ────────────
-     ⚠ TWO SENDS ARE LIVE ON ARRIVAL, ON A DOOR NOBODY HAS TOUCHED, and both
-     opened with "שלום, בחרתי דלת באתר" — I chose a door. A confused
-     first-timer could fire off the default as a considered order, and from
-     Peretz's side that is indistinguishable from a real one, which is
-     `PLAN.md` §0's failure mode arriving from the other direction.
-
-     ⚠ BOTH DIRECTIONS, because either one alone passes on a constant. The
-     untouched door must NOT claim a choice, and any door with one choice on
-     it must. The second is what stops a well-meaning simplification making
-     every order read as a question — which would be the same defect with the
-     customers and Peretz swapped. */
+  /* ── THE LABEL AND THE MESSAGE ARE ONE DECISION, AND IT IS THE ORDER ──
+     ⚠ RESTATED 29.9.2026, SAME SUBJECT, ON THE OWNER'S SON'S WORD: *"Change
+     the 'יש לי שאלה' text on the WhatsApp button near the price to 'הזמינו את
+     הדלת'."* From 30.8 a door nobody had touched opened with a question
+     ("שלום, הסתכלתי…"), both sends read "יש לי שאלה", and this block held the
+     two to each other in both directions (the untouched door must not claim a
+     choice, a touched one must) and, from 10.9, the session's own answer.
+     The button now says "order the door" on every door, so the message must
+     too — a button promising an order over a message asking a question is
+     `PLAN.md` §0's worst failure. What is asserted: the untouched door sends
+     the order; no door, touched or not, carries the question; and no session
+     argument changes the message any more (it would change it behind a label
+     that no longer changes). */
   {
-    ok(message(DEFAULTS).startsWith('שלום, הסתכלתי'),
-       'the message on an untouched door still claims the customer chose it');
-    ok(!message(DEFAULTS).includes('בחרתי דלת'),
-       'the untouched message still contains the phrase "בחרתי דלת"');
-    /* One changed field is enough, and every field is tried: whichever one a
-       customer touches first, the message has to stop asking and start
-       ordering. `handleLen` is skipped — it is a NUMBER that repair derives
-       from the grip, so setting it alone is not a choice a customer can
-       make. */
+    const ORDER = 'שלום, בחרתי דלת באתר:';
+    const ASKS = /יש לי שאלה|הסתכלתי/;
+    ok(message(DEFAULTS).startsWith(ORDER),
+       'the untouched door does not send the order — its button says "order the door" and its message does not');
+    ok(!ASKS.test(message(DEFAULTS)),
+       'the untouched door\'s message still asks a question under a button that orders');
+    /* Every field, one at a time: a touched door sends the order too, and
+       never the question. `handleLen` is skipped — a NUMBER repair derives. */
     for (const k of Object.keys(DEFAULTS)) {
       if (k === 'handleLen') continue;
       const alt = ALT_FOR[k];
       ok(alt !== undefined, `no alternative value known for DEFAULTS.${k} — this `
         + 'check cannot tell whether changing it is noticed');
       const changed = repair({ ...DEFAULTS, [k]: alt }).state;
-      if (isUntouched(changed)) continue;   // repair bounced it straight back
-      ok(message(changed).startsWith('שלום, בחרתי דלת'),
-         `a door with a chosen ${k} still sends the "I have a question" opener`);
+      ok(message(changed).startsWith(ORDER) && !ASKS.test(message(changed)),
+         `a door with a chosen ${k} does not open with the order, or carries the question`);
     }
-
-    /* ⚠ AND THE THIRD DIRECTION, 10.9.2026 — THE DOOR IS NOT THE ONLY THING
-       THAT SAYS WHETHER SOMEBODY CHOSE. `isUntouched(state)` asks whether
-       this is the door the page opened with, and that is only the same
-       question as "has anybody engaged" at arrival. Measured on the real page
-       at 390 px: a customer who walks the guide FORWARD with the button
-       through all eight steps and accepts the standard ₪3,195 door — the
-       commonest thing Peretz sells — reached him as *"I looked at the door
-       the site opens with and I have a question"*, and so did one who changed
-       the colour and changed it back.
-       So `message` takes the session's own answer, and both directions of THAT
-       are asserted here. The default stays FALSE, which is the whole safety of
-       the argument: node, the A4 sheet and a shared link Peretz opens himself
-       keep exactly the answer they had. */
-    ok(message(DEFAULTS, true).startsWith('שלום, בחרתי דלת'),
-       'a customer who walked the guide and kept the standard door still '
-       + 'reaches Peretz as somebody who only had a question');
-    ok(message(DEFAULTS, false).startsWith('שלום, הסתכלתי'),
-       'the untouched opener is gone even when nobody has engaged — the '
-       + 'guard against sending a door nobody chose has been lost');
-    ok(message(DEFAULTS) === message(DEFAULTS, false),
-       'message() no longer defaults to the conservative answer, so every '
-       + 'caller with no session (the sheet, a link, this suite) now claims '
-       + 'a choice nobody made');
-    ok(whatsappUrl(DEFAULTS, true) !== whatsappUrl(DEFAULTS, false),
-       'whatsappUrl swallows the session argument — the label on the page '
-       + 'would move and the message behind it would not');
+    /* The session no longer reaches the message: a second argument (the
+       retired `chosen`) must change nothing, in either value. */
+    ok(message(DEFAULTS, true) === message(DEFAULTS) && message(DEFAULTS, false) === message(DEFAULTS),
+       'message() still reads a session argument — the message would move behind a label that does not');
+    ok(whatsappUrl(DEFAULTS, true) === whatsappUrl(DEFAULTS) && whatsappUrl(DEFAULTS, false) === whatsappUrl(DEFAULTS),
+       'whatsappUrl still reads a session argument');
   }
 
   const LINE = 'מיקום הידית:';

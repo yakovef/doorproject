@@ -1595,7 +1595,13 @@ for (const v of VIEWS) {
      session and the suite has none.
      §5.15: it fails loudly if the send or the way on cannot be found.
      Falsified by dropping the session argument in `paint`: the second half
-     fails at every viewport. */
+     fails at every viewport.
+     ⚠ RESTATED 29.9.2026, SAME SUBJECT (what the send claims before and after
+     a walk), on the owner's son's word — *"Change the 'יש לי שאלה' text … to
+     'הזמינו את הדלת'"*: the question state retired on both sends and in the
+     message, so on arrival the send ALREADY carries the order, after the walk
+     it still does, neither ever asks, and `is-untouched` is gone from the
+     page. It said "on arrival it must still ask". */
   {
     const opener = () => p.evaluate(() => {
       const el = document.querySelector('[data-wa]');
@@ -1629,19 +1635,17 @@ for (const v of VIEWS) {
       fault(v.name, `the guide could only be walked ${walked} of 8 steps forward `
         + 'with the button — this check cannot reach the summary');
     } else {
-      if (!fresh.asks || fresh.claims) {
-        fault(v.name, 'on arrival, before any gesture, the send already claims the '
-          + 'customer chose this door — the guard against firing off the default '
-          + 'as a considered order is gone');
+      if (fresh.asks || !fresh.claims) {
+        fault(v.name, 'on arrival the send asks a question instead of carrying the order — '
+          + 'its button says "order the door" (29.9) and its message says something else');
       }
       if (after.asks || !after.claims) {
         fault(v.name, 'a customer walked all eight steps with the button and the '
           + 'order still reaches Peretz as "I only had a question" — he cannot '
           + 'act on it without asking whether it was an order');
       }
-      if (after.untouched) {
-        fault(v.name, 'the walked door still carries `is-untouched`, so the LABEL '
-          + 'and the message have come apart');
+      if (fresh.untouched || after.untouched) {
+        fault(v.name, 'the page still carries `is-untouched` — the retired question state is back on the label');
       }
     }
     await p.goto('file://' + process.cwd() + '/index.html');
@@ -1827,24 +1831,32 @@ for (const v of VIEWS) {
          The same shape as the check this file already makes one line up
          (`is-live` licensing "send the door" only once the href points at
          one), which was written after the label and the href said opposite
-         things on every page load for the first second. */
+         things on every page load for the first second.
+         ⚠ RESTATED 29.9.2026, SAME SUBJECT: the question state retired (the
+         owner's son: the quiet send says "הזמינו את הדלת"), so the pact is now
+         that NO `.wa__ask` exists, no send's href carries the question, and
+         the quiet send by the price says the order key above 1100 and "שלחו"
+         below — its words read off `.wa__order` / `.wa__on`, never typed. */
       const say = await p.evaluate(() => {
-        const el = document.querySelector('[data-wa]');
+        const el = document.querySelector('#quote-wa');
         if (!el) return null;
         const shown = [...el.querySelectorAll('span')]
           .filter(s => getComputedStyle(s).display !== 'none');
         return {
-          asks: shown.some(s => s.classList.contains('wa__ask')),
-          href: decodeURIComponent(el.getAttribute('href') || ''),
+          askEls: document.querySelectorAll('.wa__ask').length,
+          askHref: [...document.querySelectorAll('[data-wa]')].some(a => /ויש לי שאלה|הסתכלתי/.test(decodeURIComponent(a.getAttribute('href') || ''))),
           label: shown.map(s => s.textContent.trim()).join(' / '),
+          order: el.querySelector('.wa__order')?.textContent.trim(), on: el.querySelector('.wa__on')?.textContent.trim(),
+          wide: innerWidth >= 1100,
         };
       });
-      if (say) {
-        const hrefAsks = say.href.includes('ויש לי שאלה');
-        if (say.asks !== hrefAsks) {
-          fault(v.name, `step "${k}": the send says "${say.label}" and its message `
-            + `${hrefAsks ? 'asks a question' : 'claims a chosen door'} — the label `
-            + 'and the message disagree');
+      if (!say) fault(v.name, `step "${k}": no #quote-wa — the label pact has no subject`);
+      else {
+        if (say.askEls) fault(v.name, `step "${k}": ${say.askEls} .wa__ask element(s) on the page — the question state retired 29.9`);
+        if (say.askHref) fault(v.name, `step "${k}": a send's message asks a question — every send carries the order since 29.9`);
+        const want = say.wide ? say.order : say.on;
+        if (!want || say.label !== want) {
+          fault(v.name, `step "${k}": the quiet send says "${say.label}" — ${say.wide ? 'above 1100 it says the order ("' + say.order + '")' : 'on a phone it says "' + say.on + '"'}`);
         }
       }
       if (!reach.priceSeen || !reach.priceText || reach.priceText === '—') {
@@ -2982,7 +2994,7 @@ for (const v of VIEWS) {
          DEAD label must not be showing at the same time. `.wa__off` is the
          "the page did not load for me" wording, and a page displaying both is
          the label/href contradiction this route exists to catch. */
-      promising: [...document.querySelectorAll('.wa__on, .wa__ask')]
+      promising: [...document.querySelectorAll('.wa__on, .wa__order')]
         .filter(e => getComputedStyle(e).display !== 'none').length,
       resting: [...document.querySelectorAll('.wa__off')]
         .filter(e => getComputedStyle(e).display !== 'none').length,
@@ -4123,9 +4135,13 @@ for (const v of VIEWS) {
       } else if (!walked) {
         fault(where, "the quote bar's way on could not be pressed, so the send never "
           + 'took its long label and this check measured the easy case');
-      } else if (before === after || !onLabel || after !== onLabel) {
-        fault(where, `walking a step changed the send's label from "${before}" to "${after}", `
-          + `not to the on-label "${onLabel}" — this check is pinned to the ENGAGED bar`);
+      } else if (!onLabel || after !== onLabel || before !== onLabel) {
+        /* ⚠ RESTATED 29.9.2026, SAME SUBJECT (the bar measured is the one a
+           customer sees after a step): with the question state retired the
+           label is the on-label on arrival too, so it must be the on-label
+           both before and after — it said the label CHANGED on the walk. */
+        fault(where, `the send's label reads "${before}" on arrival and "${after}" after a step, `
+          + `not the on-label "${onLabel}" both times — this check is pinned to the bar a customer sees`);
       } else if (m.arrows !== 2) {
         fault(where, `the quote bar holds ${m.arrows} of its two arrows — the way back and the way `
           + 'on live in the bar below 1100 (27.9)');

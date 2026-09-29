@@ -702,9 +702,9 @@ export const UI = {
                        'Happy with it? Send it over and we will come back with an exact quote.',
                        'Готовы? Отправьте нам дверь, и мы вернёмся с точным предложением.'],
   /* 27.9.2026, the owner's son: *"the WhatsApp button big, saying 'הזמינו את
-     הדלת דרך נציג'"*. The summary's green send only; the bar keeps "שלחו". The
-     untouched door still asks a question (`send.waAsk`) — the label and the
-     message are one decision and the order has not been claimed yet. */
+     הדלת דרך נציג'"*. The summary's green send only; the bar keeps "שלחו".
+     Since 29.9 in EVERY state, the untouched door's too: the question state
+     retired (see `send.waOrder`). */
   'send.waOn':        ['הזמינו את הדלת דרך נציג', 'Order the door through a representative',
                        'Заказать дверь через представителя'],
   'send.waOff':       ['שלחו לנו הודעה בוואטסאפ', 'Message us on WhatsApp', 'Написать нам в WhatsApp'],
@@ -713,19 +713,17 @@ export const UI = {
      send on the summary keeps its full sentence (`send.waOn`). */
   'send.waOnShort':   ['שלחו', 'Send', 'Отправить'],
   'send.waOffShort':  ['שלחו הודעה', 'Message us', 'Написать нам'],
-  /* ⚠ A THIRD LABEL, FOR A DOOR NOBODY HAS TOUCHED YET. Two sends are live on
-     arrival and both say "send the door" — so a confused first-timer can fire
-     off the default as though it were a considered order, and from Peretz's
-     side that is indistinguishable from a real one.
-     The send is NOT removed: it was taken away once and put back on purpose,
-     and `npm run audit` asserts a visible send on every step at every
-     viewport. What changes is the label, and the MESSAGE changes with it —
-     `js/share.js` opens with a question instead of "בחרתי דלת". Same channel,
-     honestly named, and both halves move together for the same reason
-     `send.waOff` and `FALLBACK_TEXT` do. */
-  'send.waAsk':       ['יש לי שאלה — דברו איתי בוואטסאפ', 'I have a question — talk to me on WhatsApp',
-                       'У меня вопрос — напишите мне в WhatsApp'],
-  'send.waAskShort':  ['יש לי שאלה', 'I have a question', 'У меня вопрос'],
+  /* ⚠ THE DESKTOP'S QUIET SEND, IN EVERY STATE — 29.9.2026, the owner's son:
+     *"Change the 'יש לי שאלה' text on the WhatsApp button near the price to
+     'הזמינו את הדלת'."* Shown above 1100 (the phone bar keeps "שלחו", 27.9,
+     for its room). ⚠ AND THE QUESTION STATE RETIRED ON BOTH SENDS WITH IT:
+     `send.waAsk` / `send.waAskShort` ("יש לי שאלה") went, and the untouched
+     door's message is the ORDER — a button that says "order the door" over a
+     message that says "I have a question" is §0's worst failure, the label
+     and the message saying two things. (It had existed since 30.8 so that a
+     first-timer firing off the default could not pass for an order; the
+     message still carries the whole door, its price, code and link.) */
+  'send.waOrder':     ['הזמינו את הדלת', 'Order the door', 'Заказать дверь'],
   'send.copy':        ['העתקת הפרטים', 'Copy the details', 'Скопировать данные'],
   'send.save':        ['שמירת העיצוב', 'Save this design', 'Сохранить дизайн'],
   'send.code':        ['קוד:', 'Code:', 'Код:'],

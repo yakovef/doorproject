@@ -52,7 +52,7 @@ import { canSharePicture, copyMessage, drawingCaveat, fallbackWhatsappUrl,
          gripAddendum, PHONE_DISPLAY, PHONE_TEL, priceCaveat,
          priceIncludes, sendDoor, whatsappUrl } from './share.js';
 import { counted, L, LANGS, lang, pickLang, setLang, T, withLang } from './copy.js';
-import { DEFAULTS, encodeCode, fromQuery, isUntouched, toQuery } from './url-state.js';
+import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
 import { WORKS } from './works.js';
 import { refreshTour, startTour } from './tour.js';
 
@@ -716,7 +716,7 @@ function init() {
       if (el.dataset.sending === '1') return;
       el.dataset.sending = '1';
       let how = 'unavailable';
-      try { how = await sendDoor(state, engaged); } catch { /* fall through to the link */ }
+      try { how = await sendDoor(state); } catch { /* fall through to the link */ }
       finally { el.dataset.sending = '0'; }
       if (how === 'sent' || how === 'dismissed') return;
       /* The share could not happen, so the order still has to. `location`
@@ -2418,6 +2418,11 @@ function goStep(key, focus = true) {
  * language switch, and marking there would tell Peretz that a shared link he
  * opened himself — which lands on the summary — was a door somebody chose.
  */
+/* ⚠ NO READER SINCE 29.9.2026: it chose the message's opener, and the
+   question opener retired (`message` in js/share.js). The latch and its
+   `noteEngaged()` calls stay for now because the calls sit in the flow's
+   functions (`choose`, `arrowStep`, `buildStripes`), which another session
+   was reworking the same day; take them out together. */
 let engaged = false;
 const noteEngaged = () => { engaged = true; };
 
@@ -3398,7 +3403,7 @@ function paint() {
   const gripOpts = document.querySelector('.field[data-group="handle"] .field__opts');
   if (gripOpts) buildLengthStepper(gripOpts);
 
-  const wa = whatsappUrl(state, engaged);
+  const wa = whatsappUrl(state);
   document.querySelectorAll('[data-wa]').forEach(el => { el.href = wa; });
   /* ⚠ THE LABEL AND THE HREF CHANGE TOGETHER, and this is the line that makes
      that true. The buttons rest on "שלחו לנו הודעה" over the fallback message;
@@ -3406,15 +3411,9 @@ function paint() {
      than at boot: what licenses the sentence is the href on the line above,
      not the fact that a script ran. */
   document.documentElement.classList.add('is-live');
-  /* ⚠ AND A THIRD STATE, ON THE SAME LINE OF REASONING AS THE SECOND.
-     `is-live` licenses "send the door" because the href now points at one.
-     `is-untouched` withdraws that licence again while the door is still the
-     one the page opened with: both sends ask a question instead, and
-     `message()` opens with a question to match. The label and the text are
-     one decision and they are set from one predicate — `isUntouched`, which
-     is derived from `DEFAULTS` rather than from a hand-kept list of fields,
-     so a tenth choice cannot leave it calling a configured door untouched. */
-  document.documentElement.classList.toggle('is-untouched', isUntouched(state) && !engaged);
+  /* (A third state, `is-untouched` — a door nobody had touched asked a
+     question on both sends and in the message — retired 29.9 on the owner's
+     son's word; see `send.waOrder` in js/copy.js and `message` in share.js.) */
   announce(describe(state));
   /* ⚠ ALWAYS ON THE PAGE NOW, AND `disabled` RATHER THAN HIDDEN. Asked for
      from outside: *"i wanna see the reverse last change button at all times."*
@@ -4496,7 +4495,7 @@ function announce(text) {
 // ── actions ───────────────────────────────────────────────────────
 
 async function onCopy() {
-  const ok = await copyMessage(state, engaged);
+  const ok = await copyMessage(state);
   toast(T(ok ? 'copy.ok' : 'copy.fail'));
 }
 

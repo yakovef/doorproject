@@ -183,7 +183,10 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   · the tour never on a link carrying a door, bare or the sheet, and set
     ink at ~~0.6~~ **.8 since 29.9, their word** (*"more black"*) rather than
     a literal grey; the picker held live inside the tour's modal (29.9, ours:
-    the same node moved in, never a copy);
+    the same node moved in, never a copy); the "I have a question" state
+    retired on BOTH sends (29.9, ours) — an untouched door sends the
+    standard door's order, the desktop's quiet send reads "הזמינו את הדלת"
+    in every state, the phone bar keeps "שלחו";
   · the extra lock's step keyed `xlock`;
   · the step's `<h2>`, shown again above the options on their word, stays
     visually hidden under 500 px tall (a phone on its side, a laptop at 200 %)
@@ -208,6 +211,11 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **29.9** The quiet send says **"הזמינו את הדלת"** (*"Change the 'יש לי שאלה'
+  text … to 'הזמינו את הדלת'"*) above 1100 in every state; the phone bar keeps
+  "שלחו". The question state RETIRED on both sends and in the message — an
+  untouched door sends the standard door's ORDER; `is-untouched`, `send.waAsk*`
+  and the `chosen` argument are gone. Long form: `HISTORY.md`.
 - **29.9** The tour: scrim .6 → **.8** (*"more black"*: the wall reads 5.6–6.7 %
   of bare through it), and the language picker LIVE in it (*"there should still
   be an option to change languages"*) — `#langs` itself moves into the dialog,
@@ -350,7 +358,13 @@ placement is the other session's, merged at the owner's son's choice.
   door and the lamp, on the higher end"* — it was a card at the door's
   top-right corner from 27.9, under the lamp before; all his placements): no
   ground, the figure in `--display` at 2.4 rem, the send under it as a line of
-  ink with the mark; its right edge 8 px outside the casing's LEFT edge, level
+  ink with the mark — **"הזמינו את הדלת"** since 29.9 (*"Change the 'יש לי
+  שאלה' text on the WhatsApp button near the price to 'הזמינו את הדלת'"*;
+  `send.waOrder`), in every state: ⚠ the question state a door nobody had
+  touched carried since 30.8 (both sends "יש לי שאלה", the message opening with
+  a question) RETIRED on both sends and in the message — a button that orders
+  over a message that asks is §0's worst failure — so an untouched door sends
+  the standard door's order; its right edge 8 px outside the casing's LEFT edge, level
   with the head or under the wall chrome, physically left in every language
   (the drawing does not mirror). The ink on the picture measures ≥ 10.6:1
   against the darkest 5 % under it at every desktop width (gate 4.5; no wash).
@@ -367,7 +381,8 @@ placement is the other session's, merged at the owner's son's choice.
   identical href.
 - ⚠ **On a phone the bar is the way through, too** (27.9, the owner's son:
   back and next *"moved to the bottom of the page and be seen at all times"*,
-  the send *"just send to save space"*): price · "שלחו" · two 44 px icon
+  the send *"just send to save space"*): price · "שלחו" (on arrival too since
+  29.9 — no question state) · two 44 px icon
   arrows (`.quote__nav`, the word in `aria-label`/`title` from `markSteps`);
   below 1100 no step shows its `.sect__foot`. The bar is 67.0 px at every
   width since its caption went (28.9; it was 71.3 above 360 — `--quote-h`
@@ -1522,7 +1537,8 @@ are not in `VIEWS`:
   but nine named Hebrew lifts (29.9, §9), the live mark whole on both axes, and its checks on exactly the
   steps walked — none on arrival or after a reload, the address unmoved.
 - **every step** — reachable from the rail; a visible send and a readable price;
-  every `[data-wa]` the same href; at least one answer on screen with the
+  every `[data-wa]` the same href, none asking a question, the quiet send
+  saying the order above 1100 and "שלחו" below (29.9); at least one answer on screen with the
   question (after the step has **finished arriving**); nothing prints `{0}`.
 - **every option** clicked, the keyboard walked with real key presses (a
   focused option is never hidden under the fixed furniture), taps ≥ 44 px on

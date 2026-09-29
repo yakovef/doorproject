@@ -3700,28 +3700,25 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
    So the page rests on the truth and `paint()` upgrades it: `is-live` goes on
    `<html>` once there is a real door to send. One direction, and the state
    before JavaScript is the state that is true before JavaScript. */
-/* ⚠ AND A THIRD STATE, FOR A DOOR NOBODY HAS TOUCHED. Two sends are live on
-   arrival and both said "send the door" — so a first-timer could fire off the
-   default as though it were a considered order, and from Peretz's side that
-   is indistinguishable from a real one (`UX-FINDINGS` §5). The send is not
-   removed: it was taken away once and restored on purpose, and the audit
-   asserts a visible send on every step at every viewport. Only the label
-   changes, and the MESSAGE changes with it — `js/share.js` opens with a
-   question rather than "בחרתי דלת".
-
-   ⚠ THE ORDER OF THESE FOUR LINES IS THE WHOLE MECHANISM (§8: a later rule at
-   equal specificity wins). `is-untouched` is written after `is-live`, so on
-   arrival the ask label beats the send label; the moment anything is chosen
-   `paint` drops the class and the send label comes back with no second rule
-   to undo. Both states are still gated on `is-live`, because before the
-   script runs the honest label is neither of them — it is `.wa__off`. */
+/* ⚠ THE THIRD STATE — A DOOR NOBODY HAS TOUCHED ASKED A QUESTION — RETIRED
+   29.9.2026. The owner's son: *"Change the 'יש לי שאלה' text on the WhatsApp
+   button near the price to 'הזמינו את הדלת'."* A button reading "order the
+   door" over a message reading "I have a question" is §0's worst failure, so
+   the question left BOTH sends and the message (`js/share.js` opens with the
+   order on every door); `is-untouched` is gone with it. Two states remain,
+   resting and live, and one swap on top: above 1100 the quiet send by the
+   price says "הזמינו את הדלת" (`.wa__order`); on a phone the bar keeps
+   "שלחו" (27.9, its room). The live labels are still gated on `is-live`,
+   because before the script runs the honest label is `.wa__off`. */
 .wa__on { display: none; }
 .wa__off { display: inline; }
-.wa__ask { display: none; }
+.wa__order { display: none; }
 html.is-live .wa__on { display: inline; }
 html.is-live .wa__off { display: none; }
-html.is-live.is-untouched .wa__on { display: none; }
-html.is-live.is-untouched .wa__ask { display: inline; }
+@media (min-width: 1100px) {
+  html.is-live .quote__send .wa__on { display: none; }
+  html.is-live .quote__send .wa__order { display: inline; }
+}
 
 .btn--ghost {
   background: none; color: var(--ink);

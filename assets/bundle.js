@@ -599,9 +599,9 @@
       "Готовы? Отправьте нам дверь, и мы вернёмся с точным предложением."
     ],
     /* 27.9.2026, the owner's son: *"the WhatsApp button big, saying 'הזמינו את
-       הדלת דרך נציג'"*. The summary's green send only; the bar keeps "שלחו". The
-       untouched door still asks a question (`send.waAsk`) — the label and the
-       message are one decision and the order has not been claimed yet. */
+       הדלת דרך נציג'"*. The summary's green send only; the bar keeps "שלחו".
+       Since 29.9 in EVERY state, the untouched door's too: the question state
+       retired (see `send.waOrder`). */
     "send.waOn": [
       "הזמינו את הדלת דרך נציג",
       "Order the door through a representative",
@@ -613,22 +613,17 @@
        send on the summary keeps its full sentence (`send.waOn`). */
     "send.waOnShort": ["שלחו", "Send", "Отправить"],
     "send.waOffShort": ["שלחו הודעה", "Message us", "Написать нам"],
-    /* ⚠ A THIRD LABEL, FOR A DOOR NOBODY HAS TOUCHED YET. Two sends are live on
-       arrival and both say "send the door" — so a confused first-timer can fire
-       off the default as though it were a considered order, and from Peretz's
-       side that is indistinguishable from a real one.
-       The send is NOT removed: it was taken away once and put back on purpose,
-       and `npm run audit` asserts a visible send on every step at every
-       viewport. What changes is the label, and the MESSAGE changes with it —
-       `js/share.js` opens with a question instead of "בחרתי דלת". Same channel,
-       honestly named, and both halves move together for the same reason
-       `send.waOff` and `FALLBACK_TEXT` do. */
-    "send.waAsk": [
-      "יש לי שאלה — דברו איתי בוואטסאפ",
-      "I have a question — talk to me on WhatsApp",
-      "У меня вопрос — напишите мне в WhatsApp"
-    ],
-    "send.waAskShort": ["יש לי שאלה", "I have a question", "У меня вопрос"],
+    /* ⚠ THE DESKTOP'S QUIET SEND, IN EVERY STATE — 29.9.2026, the owner's son:
+       *"Change the 'יש לי שאלה' text on the WhatsApp button near the price to
+       'הזמינו את הדלת'."* Shown above 1100 (the phone bar keeps "שלחו", 27.9,
+       for its room). ⚠ AND THE QUESTION STATE RETIRED ON BOTH SENDS WITH IT:
+       `send.waAsk` / `send.waAskShort` ("יש לי שאלה") went, and the untouched
+       door's message is the ORDER — a button that says "order the door" over a
+       message that says "I have a question" is §0's worst failure, the label
+       and the message saying two things. (It had existed since 30.8 so that a
+       first-timer firing off the default could not pass for an order; the
+       message still carries the whole door, its price, code and link.) */
+    "send.waOrder": ["הזמינו את הדלת", "Order the door", "Заказать дверь"],
     "send.copy": ["העתקת הפרטים", "Copy the details", "Скопировать данные"],
     "send.save": ["שמירת העיצוב", "Save this design", "Сохранить дизайн"],
     "send.code": ["קוד:", "Code:", "Код:"],
@@ -9799,7 +9794,6 @@ ${plate.defs}${plate.body}
     size: "standard",
     handing: "right-in"
   };
-  var isUntouched = (state2) => Object.keys(DEFAULTS).every((k) => state2[k] === DEFAULTS[k]);
   function toQuery(state2) {
     const p = new URLSearchParams();
     p.set("v", String(VERSION));
@@ -10084,44 +10078,23 @@ ${plate.defs}${plate.body}
     const { flat } = gripDeparture(state2);
     return flat ? [T("addendum.flat")] : [];
   }
-  function message(state2, chosen = false) {
+  function message(state2) {
     const spoke = CUSTOMER_LANG_NOTE[lang()];
     return withLang("he", () => [
-      /* ⚠ "בחרתי דלת" IS A FALSE CLAIM ON A DOOR NOBODY HAS TOUCHED. Two sends
-             are live on arrival, and a confused first-timer can fire off the
-             default as though it were a considered order — from Peretz's side
-             indistinguishable from a real one, which is `PLAN.md` §0's failure mode
-             arriving from the other direction (`UX-FINDINGS` §5).
-             The message is not withheld and the button is not removed: what changes
-             is what the first line CLAIMS. Everything under it — the spec, the
-             price, the code, the link — is still exactly the door on screen, so he
-             can price it if that is what they want; he is simply not told they
-             chose it.
-             The precedent is `FALLBACK_TEXT` below, written to be UNMISTAKABLE from
-             a real order. This is the same idea one step earlier, and the label on
-             the button changes with it — see `is-untouched` in `js/app.js`.
-      
-             ⚠ AND `isUntouched(state)` ALONE WAS THE WRONG QUESTION, 10.9.2026.
-             It asks whether the DOOR is the one the page opened with, and that is
-             the same thing as "nobody has engaged" at exactly one moment: arrival.
-             Measured by walking the guide forward with the button at 390 px — a
-             customer who taps הבא through all eight steps and accepts the standard
-             ₪3,195 door, the commonest thing Peretz sells, reached him as *"I
-             looked at the door the site opens with and I have a question"*. So did
-             one who changed the colour and changed it back. That is `PLAN.md` §0
-             from the other side again: an order he cannot act on without asking
-             whether it was an order.
-             `chosen` is the second half — a fact about the SESSION, not about the
-             door, which is why it is an ARGUMENT and not a field. It cannot go in
-             the state for the reason `liveStep` cannot: it would reach the URL and
-             the short code, and "which questions somebody read" is not part of a
-             door. It defaults to FALSE so that every caller with no session — node,
-             the tests, the A4 sheet, and Peretz opening a shared link — keeps
-             exactly the conservative answer it has today, and a caller that forgets
-             to pass it fails towards the old behaviour rather than towards a false
-             claim. `js/app.js` is the only place that knows, and it passes the same
-             value to the label and to the text so the two stay one decision. */
-      isUntouched(state2) && !chosen ? "שלום, הסתכלתי על הדלת שהאתר נפתח בה ויש לי שאלה:" : "שלום, בחרתי דלת באתר:",
+      /* ⚠ ONE OPENER, THE ORDER, ON EVERY DOOR — 29.9.2026. From 30.8 a door
+         nobody had touched opened with a question ("הסתכלתי על הדלת שהאתר נפתח
+         בה ויש לי שאלה") and both sends said "יש לי שאלה", so a first-timer
+         firing off the default could not pass for an order (`UX-FINDINGS` §5);
+         on 10.9 a session argument (`chosen`) stopped a customer who walked the
+         guide and kept the standard door reaching Peretz as a question.
+         Retired by the owner's son: *"Change the 'יש לי שאלה' text on the
+         WhatsApp button near the price to 'הזמינו את הדלת'."* A button that says
+         "order the door" over a message that asks a question is `PLAN.md` §0's
+         worst failure — the label and the message saying two things — so the
+         label and the message are still ONE decision, and it is now the same on
+         every door: the order. Everything under it — the spec, the price, the
+         code, the link — is the door on screen, as it always was. */
+      "שלום, בחרתי דלת באתר:",
       ...spoke ? [spoke] : [],
       "",
       /* ⚠ THE ROWS, from `js/spec.js`. This function used to assemble the door
@@ -10159,7 +10132,7 @@ ${plate.defs}${plate.body}
       ...shareUrl(state2) ? ["", `לצפייה: ${shareUrl(state2)}`] : []
     ].join("\n"));
   }
-  var whatsappUrl = (state2, chosen = false) => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state2, chosen))}`;
+  var whatsappUrl = (state2) => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state2))}`;
   var FALLBACK_TEXT = "שלום, ניסיתי לבנות דלת באתר והעמוד לא נטען אצלי, אז אין לי קוד לשלוח. אפשר לחזור אליי ולעזור לי לבחור דלת?";
   var fallbackWhatsappUrl = () => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(FALLBACK_TEXT)}`;
   var canSharePicture = () => isServed() && typeof navigator !== "undefined" && typeof navigator.share === "function" && typeof navigator.canShare === "function";
@@ -10188,7 +10161,7 @@ ${plate.defs}${plate.body}
       URL.revokeObjectURL(url);
     }
   }
-  async function sendDoor(state2, chosen = false) {
+  async function sendDoor(state2) {
     if (!canSharePicture()) return "unavailable";
     let file;
     try {
@@ -10196,7 +10169,7 @@ ${plate.defs}${plate.body}
     } catch {
       return "unavailable";
     }
-    const payload = { files: [file], text: message(state2, chosen) };
+    const payload = { files: [file], text: message(state2) };
     if (!navigator.canShare(payload)) return "unavailable";
     try {
       await navigator.share(payload);
@@ -10205,8 +10178,8 @@ ${plate.defs}${plate.body}
       return e && e.name === "AbortError" ? "dismissed" : "unavailable";
     }
   }
-  async function copyMessage(state2, chosen = false) {
-    const text = message(state2, chosen);
+  async function copyMessage(state2) {
+    const text = message(state2);
     try {
       await navigator.clipboard.writeText(text);
       return true;
@@ -11018,7 +10991,7 @@ ${plate.defs}${plate.body}
         el.dataset.sending = "1";
         let how = "unavailable";
         try {
-          how = await sendDoor(state, engaged);
+          how = await sendDoor(state);
         } catch {
         } finally {
           el.dataset.sending = "0";
@@ -12126,12 +12099,11 @@ ${plate.defs}${plate.body}
     if (faceOpts) buildStripes(faceOpts);
     const gripOpts = document.querySelector('.field[data-group="handle"] .field__opts');
     if (gripOpts) buildLengthStepper(gripOpts);
-    const wa = whatsappUrl(state, engaged);
+    const wa = whatsappUrl(state);
     document.querySelectorAll("[data-wa]").forEach((el) => {
       el.href = wa;
     });
     document.documentElement.classList.add("is-live");
-    document.documentElement.classList.toggle("is-untouched", isUntouched(state) && !engaged);
     announce(describe(state));
     $("#undo-btn").disabled = !canUndo();
     $("#redo-btn").disabled = !canRedo();
@@ -12555,7 +12527,7 @@ ${plate.defs}${plate.body}
     }, 500);
   }
   async function onCopy() {
-    const ok = await copyMessage(state, engaged);
+    const ok = await copyMessage(state);
     toast(T(ok ? "copy.ok" : "copy.fail"));
   }
   var toastTimer = null;

@@ -26,6 +26,62 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **29.9 — PROMPT A, 4 OF 5: THE QUIET SEND SAYS "הזמינו את הדלת", AND THE
+  QUESTION STATE RETIRES.** The owner's son: *"Change the 'יש לי שאלה' text on
+  the WhatsApp button near the price to 'הזמינו את הדלת'."*
+  · **What was there.** Since 30.8 a door nobody had touched carried a third
+    state: `html.is-untouched` swapped both sends to "יש לי שאלה" (the quiet
+    one) / "יש לי שאלה — דברו איתי בוואטסאפ" (the green one), and `message()`
+    opened with *"שלום, הסתכלתי על הדלת שהאתר נפתח בה ויש לי שאלה:"* — so a
+    first-timer firing off the default could not pass for an order
+    (`UX-FINDINGS` §5); from 10.9 a session argument (`chosen`, the `engaged`
+    latch in app.js) kept a customer who walked the guide and kept the
+    standard door from reaching Peretz as a question.
+  · **Why both sends, not one label.** Relabelling the quiet send alone would
+    have put "order the door" over a message that asks a question — the label
+    and the message saying two things, `PLAN.md` §0's worst failure. So the
+    question state retires everywhere (ours, reversible): `send.waAsk` and
+    `send.waAskShort` and both `.wa__ask` spans go, `message()` opens with
+    *"שלום, בחרתי דלת באתר:"* on every door — the untouched one sends the
+    standard door's ORDER, with its spec, price, code and link as always —
+    `is-untouched` is gone, and `whatsappUrl`, `sendDoor` and `copyMessage` take
+    no session argument. The `engaged` latch has no reader now; its
+    `noteEngaged()` calls sit in `choose`, `arrowStep` and `buildStripes`,
+    which the other session was reworking the same day, so it stays, marked,
+    to go with them.
+  · **The labels.** Above 1100 the quiet send by the price reads
+    **"הזמינו את הדלת" / "Order the door" / "Заказать дверь"** in every state
+    (`send.waOrder`, `.wa__order`, the same span-swap); the phone bar keeps
+    "שלחו" (27.9, its room) — on arrival too now; the green send reads
+    `send.waOn` ("הזמינו את הדלת דרך נציג") on an untouched door as well.
+  · **Restated, same subjects.** The unit block "the label and the message are
+    one decision": the untouched door sends the order, no door touched or not
+    carries the question, and a second argument to `message`/`whatsappUrl`
+    changes nothing (it held both directions of the question). The audit's
+    walked-door clause: the order on arrival AND after the walk, never a
+    question, no `is-untouched`. The per-step pact: no `.wa__ask` on the page,
+    no send's href asking, and the quiet send saying `.wa__order`'s words above
+    1100 and `.wa__on`'s below (read off the spans, never typed). The route
+    check's live labels are `.wa__on`/`.wa__order`. The phone bar's sweep: the
+    on-label before AND after a step (it asked that the label CHANGED on the
+    walk). Re-run clean: the price-figure hit-test at 320/360/375/390/834 ×
+    three languages (15 pairs), the price and send on the picture at nine
+    desktop widths (ink ≥ 10.6:1 with the new words), the laptop and phone
+    views, the no-script route.
+  · **Falsified:** the question opener back in `message` (on `isUntouched`) →
+    4 unit faults (the untouched door, its question, and a `handleFinish`
+    change that repair bounces back to the untouched door — which the old
+    block skipped) and 12 at the laptop view (the walked door, arrival, and
+    "a send's message asks a question" on every step); the desktop's
+    `.wa__order` swap removed → "the quiet send says 'שלחו'" on all ten steps.
+  · **Sheets: 0 bare.** Not run (intermediate commit).
+  · **Gates:** node --check (renderer, app, share, audit); npm run build; npm
+    test 10,595,453 passed / 5 failed — the five sheet-staleness rows (the
+    count fell by 12 with the opener block's two retired directions).
+  · **Not done, on purpose:** the phone bar's words (his 27.9 "send", for
+    room); the `engaged` latch removed (the flow's functions are the other
+    session's today).
+
 - **29.9 — PROMPT A, 3 OF 5: THE TOUR — A BLACKER SCRIM, AND THE LANGUAGE PICKER
   STAYS LIVE.** The owner's son: *"The grey overlay in the tutorial more black."*
   And: *"In the tutorial there should still be an option to change languages,
