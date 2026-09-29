@@ -169,14 +169,27 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
     rule wants the choice);
   · the arrows beside the door SKIP refused options rather than opening the
     dialog (browsing should not ask).
-  Taken for them 28.9: the step's `<h2>`, shown again above the options on
-  their word, stays visually hidden on a screen under 500 px tall (a phone on
-  its side, a laptop at 200 %) — shown there it took every answer off those
-  screens (5 → 0 steps at 844×390) — and the band over the door carries it.
+  **Taken for them in the 28.9 round**, each reversible in a line:
+  · the faces — Rubik and Bona Nova, the only candidates with Cyrillic
+    (`research/fonts/`, rejections by name);
+  · undo and redo as labelled ink pills at the stage's foot, the picker's
+    side, shown from the first change and never as a disabled pill;
+  · the language picker physically top-RIGHT in every language, so it never
+    shares the price's corner;
+  · the phone's band stays one line (the option's name yields first);
+  · the saved doors in a dialog, reached from both saves;
+  · the tour never on a link carrying a door, bare or the sheet, and set
+    ink at 0.6 rather than a literal grey;
+  · the extra lock's step keyed `xlock`;
+  · the step's `<h2>`, shown again above the options on their word, stays
+    visually hidden under 500 px tall (a phone on its side, a laptop at 200 %)
+    — shown there it took every answer off those screens (5 → 0 steps at
+    844×390) — and the band over the door carries it;
   · on the half door's fixed leaf, under glass, every panel lines up with the
-    window's casing, not only the lone one (28.9, commit 9): *"a window and a
-    panel at the same width"* against the order's own `PANEL_INSET` line, which
-    on a 350 mm leaf gives a 189 mm panel under a 288 mm casing.
+    window's casing, not only the lone one (commit 9): *"a window and a panel
+    at the same width"* against the order's own `PANEL_INSET` line, which on a
+    350 mm leaf gives a 189 mm panel under a 288 mm casing. d122's photograph
+    shows it that way.
   Settled with them in chat, not ours: where the new "ask before removing"
   rule meets Peretz's refusal — a pull handle or bow with no room beside the
   window or the face — **Peretz's rule stands**, refused with its reason and
@@ -191,6 +204,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** The record and the slow gates (10 of 10): sheets predicted first —
+  exactly `recreate-d122` moved, and d122's photograph shows its fixed-leaf
+  panel at the casing's width. The full audit found 4 faults of ours: `xlock`
+  missing from the landscape exemption, and the undo pill on the column in
+  Hebrew at 1100–1152 (it moved without growing; `placeUndo` compares the box
+  now, §8). Test 9,441,223 / 0; fuzz not run. Long form: `HISTORY.md`.
 - **28.9** The half door's face follows the main leaf's (9 of 10) — *"a window
   and a panel at the same width … with 3 panels there should be 3 panels on the
   half door too"*: the fixed leaf asks `faceRowsOn` of its own width — pair and
@@ -224,15 +243,9 @@ lines here. Dates are the day of the change.
   `#savedlg` (save / "my saved doors (N)"); the list is `<dialog id="saved">`.
   Named: at 320 beside the two widest doors the redo touches the arrow (§9).
   The full audit: 46 faults, the instruments' (one of them commit 2's miss).
-- **28.9** The type's two promises, asserted (1c, an audit block only): no
-  request leaves the folder (a Google Fonts `<link>` → 6 caught), and the swap
-  moves no block by more than a line and at most 2 in 100 readings at all (6 of
-  720 on 8bbd134; 28.8's fallback 107/12, raw Arial 38 — both caught). A second
-  fallback, nine faces script × weight, measured no better (4–9): not shipped.
-  Long form: `HISTORY.md`.
 ---
 
-## 0c. Where it stands today — 27.9.2026
+## 0c. Where it stands today — 28.9.2026
 
 **The prices are real and the site is not deployed — deliberately.** Peretz
 gave the numbers on 26.8; `PLACEHOLDER` is `false`. Not deployed on the
@@ -361,6 +374,15 @@ hold — side by side, stacked, or the glyph alone (a phone beside a wide door)
   the step's. ⚠ At 320×568 over the two tallest doors the stage is too short:
   the band keeps the stage's top and its gap to the casing narrows to ~2.5 px
   (named in the audit, asserted still needed).
+- **A first visit gets a tour** (28.9, the owner's son: *"a grey overlay on
+  everything but the thing described, an arrow from the text to the thing …
+  only on the first visit"*): `js/tour.js`, a modal `<dialog id="tour">` of
+  four cut-outs — the door, the navigator, the options, the save and the undo
+  pills' corner — with the callout placed off every cut-out and an arrow to
+  each, remembered in `localStorage` (`dm.tour.v1`, behind a try). Never on a
+  link carrying a door, bare or the sheet. ⚠ **Every instrument opens the
+  page `tourless`** (`tools/browser.mjs`, §8); the audit's one tour block
+  launches a raw browser and asserts the tour opened.
 - **Two arrows beside the door** (27.9): absolute in the wall at the frame's
   mid-height, 8 px outside the casing (`--frame-left/-right/-mid`); they move
   the live step's FIRST group to the next/previous free option IN THE ORDER
@@ -400,14 +422,14 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | **9,440,831 assertions, 0 failed** with the bow redrawn, on the type round's 1 of 10 (28.9; 9,440,778 on the viewer's redrawing before the type, 9,646,600 with עילי and the latch). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 28.9 |
-| `npm run audit` | **no faults** at every viewport on `c58d80b` (28.9): the bow redrawn, on the type round's 1 and 1b and both peepholes off the פרזול. (On the type round's 1 alone it read 11 faults, every one the new fonts', none a fitting — the faults 1b answers) | 28.9 |
-| `npm run collide` | `all` (1,638 designs — 1,468 base, 602 with the bow, plus 170 face-detail; 1,646 before the bow's measured 300 mm cost 8 channel + Coral designs, §9) and `boxes` clean with the bow redrawn (28.9: drawn 0/300/21, declared 4/305/26; the knob-plate 46/46/155 in 48/48/157; the deepest mount 109, the עילי's) | 28.9 |
-| `npm run fuzz` | 30,000 designs over every field (the latch among them), 1,800 clicks, 141 of them met the confirm dialog — 65 yes, 76 no, the door unchanged after every no — nothing broke (the big round's commit 7) | 27.9 |
-| `npm run latency` | **217 ms** worst door against a 600 ms gate (the big round's commit 7) — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · 531 · 656 for default · sidelight+ironwork · the heaviest, unchanged through the round. Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 27.9 |
+| `npm test` | **9,441,223 assertions, 0 failed** at the end of the 28.9 round (commit 10). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 28.9 |
+| `npm run audit` | the full run at the end of the 28.9 round read **4 faults, all fixed in commit 10** (§0b). ⚠ **The re-run after the fix did not finish** — the container restarted under it — and was clean through every block up to the navigator's (the undo and landscape blocks among them); the blocks after that were clean on the first run, before the fix, and are not re-run | 28.9 |
+| `npm run collide` | `all` (1,638 designs — 1,468 base, 602 with the bow, plus 170 face-detail; 1,646 before the bow's measured 300 mm cost 8 channel + Coral designs, §9) clean with the fixed leaf's new face (commit 9), and `boxes` clean at the end of the round (the deepest mount 109, the עילי's) | 28.9 |
+| `npm run fuzz` | 30,000 designs over every field (the latch among them), 1,800 clicks, 141 of them met the confirm dialog — 65 yes, 76 no, the door unchanged after every no — nothing broke (the big round's commit 7). ⚠ **Not run in the 28.9 round** (the tour, the dialogs and the extra lock's step are unfuzzed) | 27.9 |
+| `npm run latency` | **420 ms** worst door against a 600 ms gate (28.9, a container just restarted) — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · 531 · 656 for default · sidelight+ironwork · the heaviest, unchanged through the round (217 ms on 27.9 on another container). Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 28.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
-| `npm run sheets` | the bare sheet files and 6 `lockset` sheets byte-stable across commits that do not touch the drawing. ⚠ The Rotem (27.9) moved 33, every one ONLY in a lever-sized patch at lock height: 10 `against-` by 231 px at their edge (they set no lockset, so they carry the default Rotem), 8 `corpus-`, 6 `recreate-`, `lockset-coral`, `lockset-plate` and 7 `shot`. The big round (27.9), run once after its commit 7 with the prediction written first: **0 bare and 0 lockset moved**, as predicted — the 12 `shot` sheets, `.stamps.json` and `corpus-links.md` (v=26, `lt=`) only. The knob-plate (28.9): exactly the two that show it, `corpus-06` (d092) and `lockset-knobplate`. The bow (28.9): `against-grab` only — no gallery door carries it | 28.9 |
+| `npm run sheets` | the bare sheet files and 6 `lockset` sheets byte-stable across commits that do not touch the drawing. ⚠ The Rotem (27.9) moved 33, every one ONLY in a lever-sized patch at lock height: 10 `against-` by 231 px at their edge (they set no lockset, so they carry the default Rotem), 8 `corpus-`, 6 `recreate-`, `lockset-coral`, `lockset-plate` and 7 `shot`. The big round (27.9), run once after its commit 7 with the prediction written first: **0 bare and 0 lockset moved**, as predicted — the 12 `shot` sheets, `.stamps.json` and `corpus-links.md` (v=26, `lt=`) only. The knob-plate (28.9): exactly the two that show it, `corpus-06` (d092) and `lockset-knobplate`. The bow (28.9): `against-grab` only — no gallery door carries it. The 28.9 round, predicted first: exactly `recreate-d122` (the half door's fixed leaf) | 28.9 |
 
 ⚠ **When a bare sheet moves on a commit that could not have moved it, find out
 what did** — that is how chrome painted across every sheet was found once. And
@@ -789,9 +811,10 @@ derived from the WINDOW rather than from another face.
   mm clamp is gone). ⚠ **Under glass its rows line up with the CASING** (ours,
   §0a): at `PANEL_INSET` the kept panel would be 189 mm under a 288 mm casing,
   where the main leaf's is 459 under 499. The cost: switching the window on
-  widens that leaf's lower panel 189 → 288. d119's narrow leaf read the panel
-  0.50 of the leaf under a 0.34 window — measured, overruled, kept in the
-  comment. Priced as before: the face once, the ironwork per pane (asserted).
+  widens that leaf's lower panel 189 → 288. **d122's photograph agrees** — its
+  fixed leaf's panel is the casing's width, and `recreate-d122` now shows it
+  (the one bare sheet commit 9 moved); d119's narrow leaf read the panel 0.50
+  of the leaf under a 0.34 window — measured, overruled, kept in the comment. Priced as before: the face once, the ironwork per pane (asserted).
   Stripes are not a face and stay on the main leaf only.
 
 **The stripes are a COUNT and a DIRECTION, not tiles** (27.8), priced per
@@ -1607,6 +1630,15 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 - **Blocked options are `aria-disabled`, never `disabled`** — focusable,
   clickable, and they say why. Playwright refuses them, so the audit uses
   `el.click()`.
+- **A placement that reads another must re-run when that one MOVES, not only
+  when it grows** (28.9). The navigator column takes its floor from the undo
+  pills in Hebrew; `placeUndo` re-placed it only on a HEIGHT change, and after
+  an undo the pill row widened, met the trust band's words and lifted 25 px at
+  the same height — the undo pill 936 px² on the column's last mark. It
+  compares the whole box now. And **a commit that grows a shared-corner object
+  re-runs every audit block that measures that corner**, not only its own:
+  commit 7 made the column ten marks and ran the column's blocks, and the
+  pills' block found it three commits later.
 - **`minmax(0, 1fr)`, never a bare `1fr` or `auto` track**, on any grid holding
   the stage — an `auto` track is floored at min-content.
 - **A media query adds no specificity.** Put an override after the rule it
@@ -1817,8 +1849,9 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   band above the door) and the glass step shows an answer at both — and since
   28.9 the grip step too (Rubik's narrower Hebrew shortened its question), and
   at 844×390 the פרזול, face and משקוף steps as well (the band left the stage's
-  flow and the phone bar lost its caption line, 71.3 → 67.0 px): five of eight
-  there, two of eight at 640×360. **The layout is
+  flow and the phone bar lost its caption line, 71.3 → 67.0 px), and the extra
+  lock's own step (three tiles): six of nine there, two of nine at 640×360.
+  **The layout is
   chosen by WIDTH and the problem is HEIGHT** — but `max-width: 1099px` is
   read 19 times in the stylesheet alone (the fixed rail, body padding, quote
   bar, sticky stage, `placeSend`, the toast's anchor among them; the

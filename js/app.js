@@ -3737,7 +3737,13 @@ function placeUndo() {
     .filter(r => r.width && r.bottom > st.top && r.top < st.bottom);
   const wordsTop = words.length ? Math.min(...words.map(r => r.top)) : null;
   const hits = (a, c) => a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
-  const was = box.offsetHeight;
+  /* ⚠ THE WHOLE BOX, NOT ITS HEIGHT (28.9, found by the round's last audit).
+     The column shares this corner in Hebrew and takes its floor from the
+     group; the group can MOVE without growing — after an undo the redo pill
+     joins the row, the row reaches the trust band's words and lifts 25 px at
+     1100–1152 — and a height-only test left the column on its old floor, the
+     undo pill 936 px² over its last mark. */
+  const was = box.getBoundingClientRect();
   box.style.setProperty('--undo-r', `${Math.round(wrap.right - st.right + 8)}px`);
   const place = m => {
     box.dataset.mode = m;
@@ -3751,7 +3757,8 @@ function placeUndo() {
   };
   const SHAPES = ['row', 'stack', 'iconrow', 'icon'];
   if (!SHAPES.some(place)) place('icon');
-  if (box.offsetHeight !== was) placeSteps();
+  const now = box.getBoundingClientRect();
+  if (now.top !== was.top || now.left !== was.left || now.height !== was.height) placeSteps();
 }
 
 /**
@@ -3853,7 +3860,7 @@ function placeBreakdown() {
  * column's own x-range: the room between it and the trust band measured
  * 436–450 px against the column's 464, so the floor pulled the column back up
  * UNDER the price (665 px² at 1100×800 in Russian on the half door). The
- * eight gaps give first, then the two paddings, by exactly the shortfall.
+ * gaps give first, then the two paddings, by exactly the shortfall.
  * (A second placement after `paint` writes the figure was tried too, and
  * measured to change nothing on a load or on a tap that took the figure from
  * four digits to five: the stage's observer re-fits after the first paint,
@@ -3899,14 +3906,17 @@ function placeSteps() {
   const un = document.querySelector('.stage__undo');
   const ur = un && un.getBoundingClientRect();
   if (ur && ur.width && inX(ur) && ur.top > mid) floor = Math.min(floor, ur.top - 8);
-  /* Short of room below what pushed it down: the eight gaps give first (to
-     2 px), then the two paddings (to 6) — by exactly the shortfall, and never
-     the 44 px targets. What is still short after that is pulled up, and the
-     audit names it. */
+  /* Short of room below what pushed it down: the gaps give first (to 2 px),
+     then the two paddings (to 6) — by exactly the shortfall, and never the
+     44 px targets. What is still short after that is pulled up, and the
+     audit names it. ⚠ The gaps are COUNTED: this said "eight" and divided by
+     8 after the extra lock's step made them nine, so it gave 9/8 of what was
+     asked. */
   let short = top + H - floor;
+  const gaps = Math.max(1, col.querySelectorAll('.steps__step').length - 1);
   if (short > 0) {
-    const g = Math.max(2, 6 - short / 8);
-    short -= (6 - g) * 8;
+    const g = Math.max(2, 6 - short / gaps);
+    short -= (6 - g) * gaps;
     const pad = Math.max(6, 10 - Math.max(0, short) / 2);
     col.style.setProperty('--steps-gap', `${g.toFixed(2)}px`);
     col.style.setProperty('--steps-pad', `${pad.toFixed(2)}px`);

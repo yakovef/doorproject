@@ -4774,7 +4774,11 @@ for (const v of VIEWS) {
        commit 5): the band left the stage's flow and the phone bar lost its
        caption line (71.3 → 67.0 px), so three more questions reach an answer
        on a phone on its side. 640x360 is unchanged. */
-    { name: '844x390 a phone on its side', w: 844, h: 390, shows: ['pz', 'face', 'glass', 'grip', 'mk'] },
+    /* ⚠ AND xlock, THE STEP THAT DID NOT EXIST — 28.9, commit 7 made the extra
+       lock its own step, and at 844x390 its one group of three tiles reaches
+       the screen. Not re-measured then (the full audit runs after 1, 5 and
+       10); this clause caught it at 10, as it should. Six of nine. */
+    { name: '844x390 a phone on its side', w: 844, h: 390, shows: ['pz', 'xlock', 'face', 'glass', 'grip', 'mk'] },
     { name: '640x360 a 1280 laptop at 200% zoom', w: 640, h: 360, shows: ['glass', 'grip'] },
   ];
 
@@ -4881,7 +4885,7 @@ for (const v of VIEWS) {
   if (steps < QUESTIONS * MUST.length) fault('answer', `only ${steps} steps were measured of ${QUESTIONS * MUST.length} — the sweep is not walking the guide`);
   if (!faults) {
     console.log(`    ${steps} steps across ${MUST.length} viewports show an answer; a phone on its `
-      + `side and a laptop at 200% zoom show ${EXEMPT.map(e => `${e.shows.length} (${e.shows.join(', ')})`).join(' and ')} of eight, and are the two named exemptions`);
+      + `side and a laptop at 200% zoom show ${EXEMPT.map(e => `${e.shows.length} (${e.shows.join(', ')})`).join(' and ')} of ${QUESTIONS}, and are the two named exemptions`);
   }
 }
 

@@ -12044,7 +12044,7 @@ ${plate.defs}${plate.body}
     const words = [...document.querySelectorAll(".trust__i")].map((e) => e.getBoundingClientRect()).filter((r) => r.width && r.bottom > st.top && r.top < st.bottom);
     const wordsTop = words.length ? Math.min(...words.map((r) => r.top)) : null;
     const hits = (a, c) => a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
-    const was = box.offsetHeight;
+    const was = box.getBoundingClientRect();
     box.style.setProperty("--undo-r", `${Math.round(wrap.right - st.right + 8)}px`);
     const place = (m) => {
       box.dataset.mode = m;
@@ -12058,7 +12058,8 @@ ${plate.defs}${plate.body}
     };
     const SHAPES = ["row", "stack", "iconrow", "icon"];
     if (!SHAPES.some(place)) place("icon");
-    if (box.offsetHeight !== was) placeSteps();
+    const now = box.getBoundingClientRect();
+    if (now.top !== was.top || now.left !== was.left || now.height !== was.height) placeSteps();
   }
   function placeBand() {
     const band = document.querySelector(".stage__band");
@@ -12135,9 +12136,10 @@ ${plate.defs}${plate.body}
     const ur = un && un.getBoundingClientRect();
     if (ur && ur.width && inX(ur) && ur.top > mid) floor = Math.min(floor, ur.top - 8);
     let short = top + H - floor;
+    const gaps = Math.max(1, col.querySelectorAll(".steps__step").length - 1);
     if (short > 0) {
-      const g = Math.max(2, 6 - short / 8);
-      short -= (6 - g) * 8;
+      const g = Math.max(2, 6 - short / gaps);
+      short -= (6 - g) * gaps;
       const pad = Math.max(6, 10 - Math.max(0, short) / 2);
       col.style.setProperty("--steps-gap", `${g.toFixed(2)}px`);
       col.style.setProperty("--steps-pad", `${pad.toFixed(2)}px`);
