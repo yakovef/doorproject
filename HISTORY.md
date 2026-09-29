@@ -26,6 +26,245 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **⚠ PORTED TO THIS BRANCH — 29.9.2026.** The two entries below were written
+  on `claude/elegant-knuth-89z101`, which is NOT the branch the site is built
+  from, so the owner's son opened the web app and could not find the design.
+  Carried across by hand rather than merged: this branch had moved 70 commits
+  and had used the same grille slots (12-14) for the three etched twins, so a
+  merge would have put two designs on one index. `iron` and `iron-light` are
+  APPENDED at 15 and 16, `BITS.grille` 4 -> 5 and `VERSION` 27 -> 28 — which
+  the entries below say was not owed; it was not, on the branch they were
+  written on. `grid`'s `iron` aliases removed; `npm run corpus` gives d092,
+  d108 and d128 their ironwork back and moves no other door. The price
+  comment's "seven bars" was stale from before the 28.9 fix and is corrected.
+  ⚠ **The lesson is the branch, not the drawing:** a session pinned to its own
+  branch can push, pass every gate and still ship nothing anyone sees. Check
+  which branch Pages builds from before calling a design live.
+
+- **⚠ THE IRONWORK HAD SEVEN BARS AND THE DOORS HAVE FIVE — THE TWO EXTRA WERE
+  THE PANE'S OWN REBATE, MEASURED AS MEMBERS — 28.9.2026.** The owner's son
+  sent the drawing back beside the same three photographs with one
+  instruction: *"go and critique it again and fix the problems"*. Every number
+  in the branch was re-taken and five things moved. The bar count is the one
+  that matters, and it is this file's oldest fault in a new costume.
+
+  ⚠ **THE OLD READING COUNTED THE FRAME.** It recorded verticals at 0.029 and
+  0.979 of the pane's width — 8 px inside a 245 px pane — and called them an
+  outer pair hugging the rebate. They are the rebate. Re-measured on the
+  rectified pane with the border excluded, the only verticals are at 0.164
+  0.336 0.502 0.672 0.838: **five bars at sixths**, and the transom's plain
+  stretch — a row profile with no reflection anywhere in it — gives five
+  evenly spaced members and nothing else.
+  ⚠ **AND THE EVIDENCE THAT REFUTED IT WAS ALREADY IN THE ENTRY THAT SHIPPED
+  IT.** That entry recorded the six ring centres as 0.078 0.243 0.415 0.601
+  0.764 0.924 and the seven-bar model's midpoints as 0.094 0.244 0.415 0.586
+  0.757 0.911, and called the two end rings *"the measurement error on the
+  rings nearest the frame"*. With five bars the midpoints are 0.083 0.250
+  0.417 0.583 0.750 0.917 — the two ends land 0.005 and 0.007 out instead of
+  0.016 and 0.013, and every ring fits. **A residual that is largest at
+  exactly the two places a reading is most suspect is not error, it is the
+  finding.**
+  ⚠ **AND THE COMMENT EXPLAINED THE PHANTOM BARS AWAY IN SO MANY WORDS** —
+  *"they are the hardest members in the photograph to see, because they sit
+  against the frame"*. §5.19: a comment defending what the code does not have.
+
+  ── **what else moved, each off a traced centreline** ──
+  · **The oval is a different shape and it springs off the bars.** Measured, it
+    crowns at 0.027 W below the glass line — it very nearly touches it — sweeps
+    down to the 1/6 bar, RUNS DOWN THAT BAR from 0.238 to 0.324 clamped by a
+    collar, leaves it again, sags to 0.481 and closes on the spine at 0.379.
+    The old drawing had it as a free-standing loop inset 0.090 from the head
+    that touched no bar anywhere, closing at 0.404.
+  · **The corner scroll is not a separate member.** The 1/6 bar turns over at
+    the pane's head, runs inboard along the glass line and curls down into the
+    corner. The old drawing hung a scroll off the phantom outer bar, which is
+    why that bar had to be invented to have something to hang it on.
+  · **The two scrolls inside the crown were half again too big and 0.077 W too
+    low** — outer radius 0.097 W drawn against 0.066 measured, eye at 0.392
+    against 0.316.
+  · **The hooks under the crown were twice too big**, 0.082 W against 0.040.
+  · **The thirds now bend into the oval** rather than stopping against it.
+
+  ── **the method, because it is what made the numbers trustworthy** ──
+  The ink map of the rectified pane is mirrored left-right and the elementwise
+  minimum taken, which kills the photographer and the pylon; the result is then
+  **SKELETONISED and walked branch by branch**, splitting at pixels with one
+  neighbour or three. Every table in the branch is one of those walks. The last
+  round read its numbers by eye off the mirrored map; this one traced them, and
+  the difference is the whole entry.
+  ⚠ **AND THE STROKE WIDTHS HAD TO COME OFF THE RAW PANE, NOT THE INK MAP.**
+  The map is a high-pass, so the blurred background estimate rises under a wide
+  member and eats its flanks: it reported every stroke about a third thin and
+  would have had the bars at 0.0123 W. Measured on the raw rectified pane
+  against the bright glass either side, the bars are **0.0164 W** at five
+  places and two heights — which is what was already drawn — and the oval is
+  **0.0266**, where 0.020 was drawn. The one number that was wrong was the one
+  that was never suspected.
+
+  ⚠ **AND THREE DETECTORS DISAGREED ABOUT A SAG, AND THE ANSWER WAS NOT TO
+  AVERAGE THEM.** The ring band measures at 0.520 of the pane's height where
+  the design should put it at 0.500, so the panel appears to sit low in its
+  rebate. How low: the band says 0.044 W, a head-against-foot correlation says
+  0.034 W, the lance points at the two ends say 0.025 W. **The last is
+  impossible** — the head crown's own apex is only 0.021 W below the glass
+  line, so a 0.025 W sag would put the foot's apex outside its pane — which
+  condemns the measurement rather than settling the number. What settled it is
+  a fourth piece of evidence: **on the transom, where the ring chain runs along
+  a 580 px length with no reflection on it, its centre falls at 454.0 against a
+  glass centre of 454.0.** So the design puts the band at its own middle, the
+  door's panel sits a little low in its rebate, and that is how one panel was
+  fitted rather than something to draw. The crown is left where it was measured
+  from the head, the band at the middle, and the disagreement is recorded in
+  the branch rather than split.
+
+  ⚠ **AND THE HEAD IS THE FOOT TURNED OVER, WHICH IS NOW MEASURED RATHER THAN
+  ASSUMED.** The pane's top 0.66 W and its bottom 0.66 W flipped correlate at
+  0.555 with every member coinciding, against 0.32 unshifted. One cap is
+  authored and emitted twice, as before — but on evidence now.
+
+  **`WINDOW-DESIGNS.md` is new, and it is why this round was quick.** The owner's
+  son asked for *"a .md so i dont have to explain each time"*: the standing
+  brief for a photographs-of-a-door round — that it ships in two colour
+  variants, that a new batch may be a design we already have, the measurement
+  sequence above, the traps, the gates, and the warning that withdrawing a
+  grille id strips the ironwork off every gallery door that cited it.
+
+  ⚠ **AND THE SHEET THAT JUDGES IT SAYS THE ID COVERS TWO PATTERNS.** With the
+  drawing beside the eight corpus doors filed under it, **d090 d092 d108 d119**
+  are the composition we draw and **d101 d103 d112 d129** are a visibly
+  different thing — far denser, finer scrollwork filling the whole light. The
+  citation list is **left whole on purpose**: it is what `npm run corpus` fits
+  a measured door BY, so trimming it would strip the ironwork off gallery doors,
+  which is exactly what withdrawing this id did to d092, d108 and d128 on 26.8.
+  Whether the dense one is a second product is Peretz's to say and
+  `ASK-PERETZ.md` §2a now asks him, with the sheet named. Recorded beside the
+  entry in `js/catalog.js` rather than guessed at.
+
+  **Gates.** `npm test` **10,478,784 / 0** once the sheets were regenerated;
+  its first pass read 10,478,783 / 5 and the five were exactly the sheet
+  staleness rows, which is those checks doing their one job.
+  **No price, no id, no list order, no bit, no `VERSION`** — this is the
+  drawing and nothing else. `js/works.js` is byte-identical: the catalogue did
+  not move, so the fitter had nothing to re-fit.
+
+- **⚠ ברזל מחושל IS BACK, REDRAWN FROM THREE NEW PHOTOGRAPHS, AND IT HAD
+  SEVEN BARS WHERE WE DREW FIVE — 27.9.2026.** The owner's son sent three
+  doors his father has installed since the withdrawal — a single door with a
+  rectangular light, a דו כנפי, and a transom over a second דו כנפי — with one
+  instruction: *"do the same thing that you did previously and also upload the
+  pattern next to the other designs that we have, but in two options, one
+  black and one in the color that match the door."* All three carry the same
+  grille, and it is the one Peretz withdrew on 26.8 as *"there is no ברזל
+  מחושל"*.
+
+  ⚠ **SO THIS REVERSES AN OWNER'S DECISION, AND §0a NORMALLY FORBIDS THAT.**
+  The ground is that his son asked for it with the photographs in hand and
+  that the contradiction was already on the record: §0c has said for a month
+  that ten of Peretz's own measured doors carry this grille. Three more makes
+  **thirteen doors against one sentence a month old**. `ASK-PERETZ.md` §2a
+  asks him to confirm, and asks for a price — it is carried at **₪0** like
+  every other bent-bar grille and it is by a distance the most work in the
+  list, so if any grille here is not free it is this one. **No number was
+  invented.**
+
+  **`iron` and `iron-light` are live entries again**, APPENDED to `GRILLES` so
+  every index already in the wild is untouched and **no `VERSION` bump is
+  owed** (12 entries → 14, and `BITS.grille` is 4). They are removed from
+  `grid`'s and `grid-light`'s `aliases`, or `byId` would have two answers for
+  one name; a link carrying `?g=iron` now opens the ironwork it always named.
+
+  ── **how it was measured, because all three photographs have reflections** ──
+  The single door has the photographer standing in the middle of its pane and
+  a pylon across the upper half. The design is symmetric about BOTH axes, so
+  the rectified pane's ink map was mirrored left-right and top-bottom and the
+  **elementwise MINIMUM** taken each time: anything present in only one
+  quadrant — a person, a pylon, a cloud — dies, and anything the design
+  carries survives in all four. That one move turned an unreadable photograph
+  into a clean line drawing. Every fraction in the branch is read off it, row
+  by row.
+
+  ⚠ **AND THE TRANSOM IS THE PIECE OF EVIDENCE THAT SETTLED THE TOPOLOGY.**
+  It is the same composition turned on its side, backlit, with no reflection
+  on it at all. Two things could not have been settled without it:
+
+  · **SEVEN vertical bars, not five.** Measured on the single door the
+    verticals stand at 0.029 0.158 0.329 0.500 0.671 0.842 0.979 of the pane's
+    width, and on the double door's main leaf at the same fractions to within
+    0.01 — an outer pair hugging the rebate and five inner bars at sixths. The
+    old drawing had five, and the two it was missing are the two the corner
+    volutes hang off, which is why it had nothing for them to hang off. They
+    are the hardest members in the photograph to see, because they sit against
+    the frame; in the transom they run the whole length and curl at each end.
+  · **The rings are NOT threaded on a rail.** The transom shows clear glass
+    inside every one of the six and a short stub of bar between each pair. The
+    old drawing ran a rail the full width, through the middle of all six.
+
+  ── **what else moved, with the reading behind it** ──
+  · **Six rings at the midpoints of the seven bars**, radius 0.065 W, with a
+    stub and a collar at each crossing. Measured centres 0.078 0.243 0.415
+    0.601 0.764 0.924 against the midpoints 0.094 0.244 0.415 0.586 0.757
+    0.911 — the middle four agree to 0.002 and the two end ones to 0.015,
+    which is the measurement error on the rings nearest the frame.
+  · **The band is at the pane's MID-HEIGHT**, 0.499 of it on the single door
+    and the same on the double. That is the one offset in this branch that is
+    not a fraction of the width, and it is measured rather than assumed.
+  · **The crown is one measured polyline, not an arch plus a limb.** Read row
+    by row off the mirrored mask the oval crowns at 0.090 W, turns a tight
+    shoulder at (0.30, 0.12), runs almost straight down to its widest at
+    0.186, then sweeps out to 0.51 and closes on the centre boss at 0.404. No
+    two-arc fit gets that shape; the twenty-one points are the readings.
+  · **The lance, the boss and the flanking volutes** are re-fitted to the same
+    map — lance point at 0.190 W, leaf 0.026 W wide at 0.250, boss 0.060 W at
+    0.377, volute eyes at (0.385, 0.392) with a turn and a fifth each.
+  · **The old cap was scaled by the pane's HEIGHT** through a `UH` factor that
+    only became width-scaling on a slender pane. It is pure width now, per
+    this function's own standing rule, with one clamp for a pane wide enough
+    for the two crowns to reach the band.
+
+  ⚠ **AND THE WIDTH RULE WAS CHECKED RATHER THAN ASSUMED.** The crown stands
+  0.62 of the pane's width tall on the single door; on the double door's
+  narrower leaf — a pane 0.72 as wide and half again as slender — it measures
+  **104 px against the 107 that fraction predicts**. The extra height goes
+  into bare glass, which on the double door is most of the pane.
+
+  ⚠ **`flow` IS A NEW HELPER AND IT IS LOCAL TO THIS BRANCH ON PURPOSE.**
+  `poly` is a chain of straight chords, which is right everywhere it is
+  already used — a spiral at tile size, where the chords are under a pixel —
+  and wrong here: this oval is the largest single member in the range and its
+  chords showed as flats along the shoulders. `flow` runs a quadratic through
+  the midpoint of every pair of segments, so it passes through none of the
+  control points and cannot pull the curve off the measurements. Hoisting it
+  beside `poly` would have moved every other grille and 48 committed sheets
+  with them.
+
+  **Gates.** `npm test` **10,478,780 / 0** once the sheets were regenerated.
+  Its first pass read 10,478,779 / 5 and the five were exactly the sheet
+  staleness rows, which is those checks doing their one job: the drawing
+  moved. Every substantive assertion passed on that pass too — both new
+  entries carry a price, both cite evidence that exists on disk, every tile
+  draws its own picture, and the wire format is unchanged.
+  ⚠ **And a comment-only edit after the stamping cost a second round of two
+  families**, which is worth recording because it is the cheapest possible
+  version of §7's rule: the stamp hashes the BUNDLE, and a JS comment moves
+  the bundle while moving no pixel. Proof rather than assertion —
+  `recreate-d003.png` came back **byte-identical** across that re-run, and
+  `phone.png` did not, which is the `shot` family being the one that
+  photographs a live browser (§7).
+
+  ⚠ **AND THREE DOORS IN THE GALLERY HAD BEEN DRAWN WITH NO IRONWORK AT ALL.**
+  `npm run corpus` fits each measured door from its own record by asking which
+  catalogue entry CITES it, and when `iron` went so did its `doors` list — so
+  d092, d108 and d128 fell through to `grille: 'none'` and Peretz's own
+  front page drew three glazed doors with bare panes where the photographs
+  carry a full forged grille. They read `grille: 'iron'` now and draw it.
+  That is the gallery change in this commit, and it is the whole of it: the
+  other twenty-seven doors are byte-identical.
+
+  **Sheets.** The drawing changed, so bare sheets are ALLOWED to move, and
+  `npm run against` now builds `against-iron.png` and `against-iron-light.png`
+  — our drawing beside the eight corpus doors filed under this id, which is
+  the instrument that will say when it is wrong again.
+
 - **28.9 — THE RECORD, AND THE SLOW GATES ON THE FINISHED ROUND (10 of 10).**
   One sheet run, every gate once, the numbers re-read into §0c rather than
   carried forward.

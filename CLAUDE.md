@@ -204,6 +204,18 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **29.9** ברזל מחושל is BACK, as `iron` and `iron-light` (black, and the
+  door's colour) — the owner's son sent three photographs of doors installed
+  since 26.8 (`research/ironwork/`), which makes thirteen doors against one
+  sentence; **this reverses an owner's withdrawal** and `ASK-PERETZ.md` 2a asks
+  him to confirm and to price it (₪0 until he does — never invented). Drawn and
+  re-measured on `claude/elegant-knuth-89z101` (27.9, 28.9: five bars at sixths,
+  not seven — the two extra were the pane's rebate) and PORTED here, because
+  that branch is not the one the site is built from. **`VERSION` 27 → 28**:
+  appended at the end, but seventeen grilles do not fit four bits, so
+  `BITS.grille` is 5. `grid`'s `iron` aliases removed; d092 d108 d128 draw
+  their ironwork again in the gallery. `WINDOW-DESIGNS.md` is the standing
+  brief for a "here is another door" round. Long form: `HISTORY.md`.
 - **28.9** The record and the slow gates (10 of 10): sheets predicted first —
   exactly `recreate-d122` moved, and d122's photograph shows its fixed-leaf
   panel at the casing's width. The full audit found 4 faults of ours: `xlock`
@@ -429,7 +441,7 @@ the artefact** — walking §7's T-list means grepping for each one.
 | gate | reading | when |
 |---|---|---|
 | `npm test` | **9,441,238 assertions, 0 failed** with the כדור redrawn, on the round's 9 of 10 (28.9). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 28.9 |
-| `npm run audit` | the full run at the end of the 28.9 round read **4 faults, all fixed in commit 10** (§0b). ⚠ **The re-run after the fix did not finish** — the container restarted under it — and was clean through every block up to the navigator's (the undo and landscape blocks among them); the blocks after that were clean on the first run, before the fix, and are not re-run ⚠ **On `629f7d0` (the כדור merged onto 10 of 10): 6 faults, every one the saved-designs drawer's** — its toggle not on the page in ru at 390×844 and 834×1112, the stale design not reaching the drawer (he, ru), 8 of 10 cases opened, 24 of 30 rows. The drawer is the 5-of-10 save dialog's; the כדור touched no page code. Not fixed here | 28.9 |
+| `npm run audit` | the full run at the end of the 28.9 round read **4 faults, all fixed in commit 10** (§0b). ⚠ **The re-run after the fix did not finish** — the container restarted under it — and was clean through every block up to the navigator's (the undo and landscape blocks among them); the blocks after that were clean on the first run, before the fix, and are not re-run ⚠ **On `629f7d0` (the כדור merged onto 10 of 10): 6 faults, every one the saved-designs drawer's** — its toggle not on the page in ru at 390×844 and 834×1112, the stale design not reaching the drawer (he, ru), 8 of 10 cases opened, 24 of 30 rows. The drawer is the 5-of-10 save dialog's; the כדור touched no page code. Not fixed here ⚠ **And a COMPLETE run on `629f7d0` + the ironwork port (29.9, every block to the end) read no faults at all, the drawer's 30 rows at 5 shapes in two languages included** — so those 6 did not reproduce once; treat them as unexplained, not as fixed, and not as settled either | 28.9 |
 | `npm run collide` | `all` (1,638 designs — 1,468 base, 602 with the bow, plus 170 face-detail) and `boxes` clean with the כדור redrawn (28.9: drawn 33/33/33, declared 35/35/35; the bow 0/300/21 in 4/305/26; the knob-plate 46/46/155 in 48/48/157; the deepest mount 109, the עילי's) | 28.9 |
 | `npm run fuzz` | 30,000 designs over every field (the latch among them), 1,800 clicks, 141 of them met the confirm dialog — 65 yes, 76 no, the door unchanged after every no — nothing broke (the big round's commit 7). ⚠ **Not run in the 28.9 round** (the tour, the dialogs and the extra lock's step are unfuzzed) | 27.9 |
 | `npm run latency` | **420 ms** worst door against a 600 ms gate (28.9, a container just restarted) — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · 531 · 656 for default · sidelight+ironwork · the heaviest, unchanged through the round (217 ms on 27.9 on another container). Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 28.9 |
@@ -457,8 +469,10 @@ Chromium here can die under raster pressure (§7). Establish it each run.
 `ASK-PERETZ.md` holds the open questions in Hebrew, one line each. The
 expensive one is **A13** — which of our two windows is his "tall" — ₪500 on
 most glazed orders, resting on nothing but the shape of two Hebrew names.
-One place where he contradicts his own doors is recorded, not resolved: he says
-there is no ברזל מחושל, and it is on ten of his installed doors.
+The one place he contradicted his own doors — *"there is no ברזל מחושל"*,
+against ten installed doors and then three new ones — is closed the other way
+round (29.9, the son's instruction) and awaits his confirmation and a price.
+A window-design round follows **`WINDOW-DESIGNS.md`**.
 
 ### Not built, on purpose
 

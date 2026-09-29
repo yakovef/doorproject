@@ -292,7 +292,17 @@ import { repair } from './rules.js';
    pack order, so the layout is v25's again; it is 27 and not 25 because
    26 was written by this page for a day, and a number reused is a code that
    can decode into the wrong door. `lt=` is retired (see `RETIRED`). */
-export const VERSION = 27;
+/* ⚠ 28: 29.9.2026. ברזל מחושל came back as two entries, `iron` and
+   `iron-light`, APPENDED at the end of `GRILLES` so no id already in a link
+   or a code moves index. But the etched twins of 27.9 had left fifteen of the
+   sixteen slots a four-bit field holds, and these make seventeen — a
+   seventeenth entry in four bits encodes as index 0 and builds a bare pane
+   from a code that reads perfectly. So `grille` is five bits, every field
+   packed before it shifts, and a v27 code read under this layout would be a
+   different door. Payload 54 -> 55; `TOTAL_BITS` reserves the check nibble
+   before rounding and stays 60, so the code stays twelve characters. The
+   `?...=` form is not indexed: a link naming either id opens it. */
+export const VERSION = 28;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -937,7 +947,7 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    table since 27.9), and a field at its
    ceiling is what the 14.9 lockset overflow was about. Payload 53. */
 export const BITS = { version: 5, colour: 5, size: 3, handing: 2, window: 2,
-                      grille: 4, handle: 4, lockset: 4, detail: 3,
+                      grille: 5, handle: 4, lockset: 4, detail: 3,
                       speciallock: 2, mashkof: 3, pirzul: 2, handleLen: 4,
                       stripes: 5, bell: 1, peephole: 2, handleFinish: 2,
                       /* The bow, 26.9.2026: one bit, APPENDED at the end of

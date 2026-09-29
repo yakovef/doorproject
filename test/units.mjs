@@ -2003,11 +2003,15 @@ group('every window design comes in black or the door\'s colour');
     ok(!g.id.endsWith('-light') || baseIds.includes(g.id.slice(0, -6)),
        `${g.id} is a twin of nothing`);
   }
-  ok(baseIds.length === 7, `${baseIds.length} designs; the owner's son named seven`);
+  /* Seven named, then an eighth: ברזל מחושל came back on 29.9 at the son's
+     instruction, with three photographs of doors installed since Peretz
+     withdrew it (`research/ironwork/`). Still an exact count — a ninth design
+     arriving by accident is the thing this line exists to notice. */
+  ok(baseIds.length === 8, `${baseIds.length} designs; the owner's son named seven and asked for ברזל מחושל back`);
   ok(GRILLES.length <= 2 ** BITS.grille,
      `${GRILLES.length} grilles in ${BITS.grille} bits — the next entry would encode as index 0`);
   /* The appended twins travel in a link and a code like every other id. */
-  for (const id of ['circles-light', 'vine-light', 'tree-light']) {
+  for (const id of ['circles-light', 'vine-light', 'tree-light', 'iron', 'iron-light']) {
     const st = repair({ ...base, window: 'rect', detail: 'plain', grille: id }).state;
     ok(fromQuery(toQuery(st)).state.grille === id, `a link lost ${id}`);
     const c = decodeCode(encodeCode(st));
@@ -5282,7 +5286,9 @@ group('the פרזול tiles are a composite of this door — 27.9.2026');
      this group for a day; withdrawn 28.9 — and the version it cost is burnt:
      VERSION 27, `lt=` retired.) Falsified 27.9 by drawing the old Coral-only
      glyph (the lockset clause). */
-  ok(VERSION === 27, `VERSION is ${VERSION}: the latch's bit left the layout, and 26 is never reused`);
+  /* 28 since 29.9: `grille` went to five bits for ברזל מחושל's two entries.
+     The latch's number stays burnt either way — 26 is never reused. */
+  ok(VERSION === 28, `VERSION is ${VERSION}: the latch's bit left the layout at 27, the grille field widened at 28, and 26 is never reused`);
   ok(!('latch' in DEFAULTS) && !('latch' in BITS), 'the withdrawn latch is still a field');
   ok(!fromQuery('?lt=latch').notice && !('latch' in fromQuery('?lt=latch').state),
      'a link from the latch\'s day raises a notice or carries the field — lt= is retired, silently');

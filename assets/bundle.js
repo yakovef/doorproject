@@ -1105,6 +1105,18 @@
     // קווים גיאומטריים
     "deco-light": 0,
     // קווים גיאומטריים בגוון הדלת
+    /* ⚠ ברזל מחושל is BACK (27.9.2026, see `catalog.js`) and it is priced at
+       ZERO like every other bent-bar grille here, which is a placeholder and
+       not a figure he gave. It is by some distance the most work in the list —
+       five bars, six rings and two crowns of scrollwork against `grid`'s five
+       straight muntins — so if any grille in this table is not free, it is this
+       one. `ASK-PERETZ.md` asks him for the number; until he answers, charging
+       an invented surcharge would be worse than charging nothing, because a
+       customer can see a price and cannot see that we made it up. */
+    iron: 0,
+    // ברזל מחושל
+    "iron-light": 0,
+    // ברזל מחושל בגוון הדלת
     /* The three laser-cut ones. "laser hard ones" — more machine time, and the
        only three in the range that are cut rather than bent. */
     circles: 700,
@@ -2074,12 +2086,17 @@
       ru: "Без решётки",
       doors: ["d094", "d115"]
     },
+    /* ⚠ `iron` AND `iron-light` WERE ALIASED ONTO THIS ENTRY AND ARE LIVE AGAIN
+       — 27.9.2026. They are their own rows at the foot of this list now; see the
+       note there for whose word revived them and what arrived with it. An `?g=`
+       naming either opens the ironwork it always named, which is what those ids
+       have meant to every customer who was ever sent one. */
     {
       id: "grid",
       he: "סורג רשת",
       en: "Square grid",
       ru: "Решётка-сетка",
-      aliases: ["bars", "iron"],
+      aliases: ["bars"],
       doors: ["d091", "d100", "d107", "d110", "d113", "d117", "d122"]
     },
     {
@@ -2088,7 +2105,7 @@
       en: "Square grid, door colour",
       ru: "Решётка-сетка в цвет двери",
       light: true,
-      aliases: ["bars-light", "iron-light"]
+      aliases: ["bars-light"]
     },
     {
       id: "scroll",
@@ -2261,9 +2278,77 @@
       ru: "Дерево в цвет двери",
       glass: true,
       light: true
-    }
+    },
     /* ⚠ `reeded` IS WITHDRAWN — זכוכית מחורצת, the third of the three. It
        resolves to `mesh`, the other worked glass. */
+    /* ── ברזל מחושל, BACK — 27.9.2026 ───────────────────────────────────
+         Peretz withdrew this on 26.8.2026 in a list of three: *"there is no:
+         זכוכית מחורצת, ברזל מחושל, מדליוני פרח."* The withdrawal note four
+         entries up records the disagreement it left behind and says, in as many
+         words, that it is not ours to resolve: TEN of his own measured doors
+         carry this grille, and the likeliest reading was that he had stopped
+         ordering it rather than never having fitted it.
+    
+         ⚠ HE HAS NOT STOPPED. The owner's son sent three photographs of doors
+         installed since — a single door, a דו כנפי, and a transom over a second
+         דו כנפי — and all three carry this pattern, which makes thirteen doors
+         against one sentence a month old. They are in `research/ironwork/` and
+         the drawing has been re-measured off them; see `grillePaths`.
+    
+         ⚠ SO THIS REVERSES AN OWNER'S DECISION, WHICH IS NORMALLY FORBIDDEN, AND
+         THE GROUND IS THAT HIS SON ASKED FOR IT WITH THE PHOTOGRAPHS IN HAND:
+         *"upload the pattern next to the other designs that we have, but in two
+         options, one black and one in the color that match the door."* That is
+         the `light` axis stated exactly, so it is these two rows and not one.
+         `ASK-PERETZ.md` asks him to confirm, because a withdrawal he repeats is
+         his to repeat.
+    
+         APPENDED, so every index already in the wild is untouched — the ids come
+         back at the END of the list rather than where they stood. ⚠ BUT IT STILL
+         COSTS A VERSION BUMP (27 -> 28), because the three etched twins above
+         filled fifteen of the sixteen slots `BITS.grille` could hold and these
+         make seventeen: the field is five bits now, the layout moved, and a code
+         written under 27 is refused with a notice rather than read at the wrong
+         offsets. They are also removed from `grid`'s aliases above, or `byId`
+         would have two answers for one name. */
+    /* ⚠ THIS CITATION LIST COVERS TWO PATTERNS AND THE DRAWING IS ONE OF THEM.
+       Seen side by side on screenshots/against-iron.png, d090 d092 d108 d119 are
+       the composition we draw — an oval crown, a ring course, bars at sixths —
+       and d101 d103 d112 d129 are a visibly different thing: far denser, finer
+       scrollwork filling the whole light. The drawing is measured off the three
+       photographs in research/ironwork/, which are the first group.
+       ⚠ THE LIST IS LEFT WHOLE ON PURPOSE. It is what npm run corpus fits a
+       measured door BY, so trimming it would drop the ironwork off gallery
+       doors — which is exactly what withdrawing this id did to d092, d108 and
+       d128 on 26.8. Whether the dense one is a second product is Peretz's to
+       say; ASK-PERETZ.md 2a asks him. Until he does, one id draws one of the
+       two and the sheet shows which. */
+    {
+      id: "iron",
+      he: "ברזל מחושל",
+      en: "Wrought ironwork",
+      ru: "Кованое железо",
+      doors: [
+        "ironwork",
+        "d090",
+        "d092",
+        "d101",
+        "d103",
+        "d108",
+        "d112",
+        "d119",
+        "d124",
+        "d128",
+        "d129"
+      ]
+    },
+    {
+      id: "iron-light",
+      he: "ברזל מחושל בגוון הדלת",
+      en: "Wrought ironwork, door colour",
+      ru: "Кованое железо в цвет двери",
+      light: true
+    }
   ];
   var HANDINGS = [
     { id: "right-in", he: "ימין, פנימה", en: "Right, inward", ru: "Правая, внутрь", hinge: "right" },
@@ -6816,60 +6901,164 @@ ${body}
       return out.join("");
     }
     if (kind === "iron") {
-      const UH = Math.min(1, 2.2 * w / h);
-      const thin = w * 0.013, spine = w * 0.02, rib = w * 0.026;
-      const out = [];
-      const capY = (f, up) => up ? y + h * f * UH : y + h * (1 - f * UH);
-      for (const k of [1, 5]) out.push(line(U(k / 6), V(0.02), U(k / 6), V(0.98), thin));
-      for (const k of [2, 4]) {
-        out.push(line(U(k / 6), capY(0.245, true), U(k / 6), capY(0.245, false), thin));
-      }
-      out.push(line(U(0.5), capY(0.19, true), U(0.5), capY(0.19, false), spine));
-      const yb = V(0.51), cr = w * 0.065;
-      out.push(line(x, yb, x + w, yb, w * 0.022));
-      for (let k = 0; k < 6; k++) {
-        const ccx = U((2 * k + 1) / 12);
-        out.push(ink(`M ${n2(ccx - cr)} ${n2(yb)} a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(cr * 2)} 0
-                    a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(-cr * 2)} 0`, w * 0.023));
-      }
-      for (let k = 1; k <= 5; k++) out.push(collar(U(k / 6), yb, w * 0.045, w * 0.028));
-      const cap = (up) => {
-        const Y = (f) => capY(f, up);
-        const s = up ? 1 : -1;
-        const o = [];
-        for (const sx of [-1, 1]) {
-          const vx = U(0.5 + sx * 0.425), vy = Y(0.054);
-          o.push(ink(poly(curl(vx, vy, U(0.5 + sx * 0.5), Y(0.012), 1.25, sx * s)), rib));
+      const BAR = [1 / 6, 1 / 3, 0.5, 2 / 3, 5 / 6];
+      const flow = (pts) => {
+        if (pts.length < 3) return poly(pts);
+        const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+        let d = `M ${n2(pts[0][0])} ${n2(pts[0][1])}`;
+        for (let i = 1; i < pts.length - 1; i++) {
+          const m = mid(pts[i], pts[i + 1]);
+          d += ` Q ${n2(pts[i][0])} ${n2(pts[i][1])} ${n2(m[0])} ${n2(m[1])}`;
         }
-        o.push(ink(`M ${n2(U(1 / 6))} ${n2(Y(0.217))} Q ${n2(U(0.5))} ${n2(Y(-0.12))}
-                  ${n2(U(5 / 6))} ${n2(Y(0.217))}`, rib));
-        o.push(ink(`M ${n2(U(1 / 6))} ${n2(Y(0.245))} Q ${n2(U(0.5))} ${n2(Y(0.199))}
-                  ${n2(U(5 / 6))} ${n2(Y(0.245))}`, w * 0.022));
-        for (const f of [0.28, 0.72]) o.push(dot(U(f), Y(0.232), w * 0.028));
+        const e = pts[pts.length - 1];
+        return d + ` L ${n2(e[0])} ${n2(e[1])}`;
+      };
+      const thin = Math.max(2, w * 0.0164), spine = Math.max(2, w * 0.0145);
+      const rib = Math.max(2, w * 0.025), scr = Math.max(2, w * 0.019);
+      const out = [];
+      const K = Math.min(1, h * 0.46 / (w * 0.6));
+      const T2 = (f) => y + w * f * K;
+      const B = (f) => y + h - w * f * K;
+      const yb = V(0.5);
+      const RING = [];
+      for (let k = 0; k <= BAR.length; k++) RING.push((k * 2 + 1) / (2 * (BAR.length + 1)));
+      const cr = w * 0.064;
+      for (const f of [BAR[0], BAR[4]]) out.push(line(U(f), T2(0.15), U(f), B(0.15), thin));
+      for (const f of [BAR[1], BAR[3]]) out.push(line(U(f), T2(0.57), U(f), B(0.57), thin));
+      out.push(line(U(0.5), T2(0.26), U(0.5), B(0.26), spine));
+      for (const f of RING) {
+        out.push(ink(`M ${n2(U(f) - cr)} ${n2(yb)} a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(cr * 2)} 0
+                    a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(-cr * 2)} 0`, w * 0.019));
+      }
+      for (let k = 0; k < RING.length - 1; k++) {
+        out.push(line(U(RING[k]) + cr, yb, U(RING[k + 1]) - cr, yb, w * 0.019, "butt"));
+        out.push(collar(U(BAR[k]), yb, w * 0.04, w * 0.024));
+      }
+      const OVAL = [
+        [0.5, 0.027],
+        [0.441, 0.029],
+        [0.389, 0.039],
+        [0.338, 0.059],
+        [0.287, 0.092],
+        [0.236, 0.139],
+        [0.201, 0.191],
+        [0.18, 0.228],
+        [0.172, 0.266],
+        [0.172, 0.303],
+        [0.177, 0.331],
+        [0.186, 0.346],
+        [0.193, 0.367],
+        [0.203, 0.387],
+        [0.215, 0.408],
+        [0.234, 0.428],
+        [0.254, 0.449],
+        [0.273, 0.469],
+        [0.297, 0.482],
+        [0.326, 0.48],
+        [0.355, 0.48],
+        [0.383, 0.477],
+        [0.412, 0.465],
+        [0.441, 0.445],
+        [0.465, 0.418],
+        [0.482, 0.391],
+        [0.498, 0.379]
+      ];
+      const SCROLL = [
+        [0.496, 0.332],
+        [0.475, 0.307],
+        [0.461, 0.287],
+        [0.439, 0.268],
+        [0.416, 0.258],
+        [0.393, 0.256],
+        [0.371, 0.26],
+        [0.348, 0.275],
+        [0.332, 0.297],
+        [0.324, 0.32],
+        [0.326, 0.342],
+        [0.34, 0.365],
+        [0.363, 0.373],
+        [0.385, 0.363],
+        [0.395, 0.34],
+        [0.4, 0.318]
+      ];
+      const HOOK = [
+        [0.27, 0.471],
+        [0.252, 0.473],
+        [0.234, 0.473],
+        [0.215, 0.48],
+        [0.203, 0.49],
+        [0.191, 0.5],
+        [0.181, 0.514],
+        [0.172, 0.531],
+        [0.17, 0.543],
+        [0.172, 0.555],
+        [0.184, 0.568],
+        [0.195, 0.584],
+        [0.213, 0.59],
+        [0.232, 0.586],
+        [0.244, 0.57],
+        [0.248, 0.557],
+        [0.248, 0.545]
+      ];
+      const CORNER = [
+        [0.166, 0.15],
+        [0.166, 0.121],
+        [0.163, 0.1],
+        [0.157, 0.077],
+        [0.146, 0.056],
+        [0.13, 0.039],
+        [0.111, 0.028],
+        [0.09, 0.023],
+        [0.066, 0.023],
+        [0.045, 0.032],
+        [0.028, 0.052],
+        [0.019, 0.079],
+        [0.02, 0.105],
+        [0.03, 0.129],
+        [0.047, 0.148],
+        [0.061, 0.141],
+        [0.071, 0.127],
+        [0.076, 0.102],
+        [0.074, 0.086]
+      ];
+      const KNEE = [
+        [0.297, 0.484],
+        [0.303, 0.496],
+        [0.314, 0.508],
+        [0.32, 0.522],
+        [0.326, 0.54],
+        [0.33, 0.556],
+        [0.332, 0.572]
+      ];
+      const cap = (up) => {
+        const Y = (f) => up ? T2(f) : B(f);
+        const o = [];
+        const arm = (tbl, sw) => {
+          for (const sx of [-1, 1]) {
+            o.push(ink(flow(tbl.map(([f, t]) => [U(0.5 + sx * (0.5 - f)), Y(t)])), sw));
+          }
+        };
+        arm(OVAL, rib);
+        arm(SCROLL, scr);
+        arm(HOOK, scr);
+        arm(CORNER, thin);
+        arm(KNEE, thin);
         const lx = U(0.5);
-        o.push(solid(`M ${n2(lx)} ${n2(Y(0.094))}
-                    Q ${n2(lx + w * 0.025)} ${n2(Y(0.128))} ${n2(lx + w * 9e-3)} ${n2(Y(0.185))}
-                    L ${n2(lx - w * 9e-3)} ${n2(Y(0.185))}
-                    Q ${n2(lx - w * 0.025)} ${n2(Y(0.128))} ${n2(lx)} ${n2(Y(0.094))} Z`, w * 0.05));
-        o.push(collar(lx, Y(0.192), w * 0.048, w * 0.022));
+        o.push(solid(`M ${n2(lx)} ${n2(Y(0.176))}
+                    C ${n2(lx + w * 7e-3)} ${n2(Y(0.2))} ${n2(lx + w * 0.011)} ${n2(Y(0.208))}
+                      ${n2(lx + w * 0.011)} ${n2(Y(0.22))}
+                    C ${n2(lx + w * 0.011)} ${n2(Y(0.248))} ${n2(lx + w * 8e-3)} ${n2(Y(0.262))}
+                      ${n2(lx + w * 8e-3)} ${n2(Y(0.3))}
+                    L ${n2(lx - w * 8e-3)} ${n2(Y(0.3))}
+                    C ${n2(lx - w * 8e-3)} ${n2(Y(0.262))} ${n2(lx - w * 0.011)} ${n2(Y(0.248))}
+                      ${n2(lx - w * 0.011)} ${n2(Y(0.22))}
+                    C ${n2(lx - w * 0.011)} ${n2(Y(0.208))} ${n2(lx - w * 7e-3)} ${n2(Y(0.2))}
+                      ${n2(lx)} ${n2(Y(0.176))} Z`, w * 0.034));
+        o.push(collar(lx, Y(0.336), w * 0.052, w * 0.034));
+        o.push(collar(lx, Y(0.372), w * 0.034, w * 0.018));
         for (const sx of [-1, 1]) {
-          o.push(ink(poly(curl(
-            U(0.5 + sx * 0.105),
-            Y(0.152),
-            U(0.5 + sx * 0.2),
-            Y(0.216),
-            1,
-            sx * s
-          )), rib));
-          o.push(collar(U(0.5 + sx / 3), Y(0.28), w * 0.045, w * 0.025));
-          o.push(ink(poly(curl(
-            U(0.5 + sx * 0.265),
-            Y(0.262),
-            U(0.5 + sx / 3),
-            Y(0.28),
-            1,
-            -sx * s
-          )), w * 0.024));
+          o.push(collar(U(0.5 + sx / 3), Y(0.278), w * 0.036, w * 0.05));
+          o.push(collar(U(0.5 + sx / 3), Y(0.524), w * 0.034, w * 0.024));
         }
         return o.join("");
       };
@@ -9548,7 +9737,7 @@ ${plate.defs}${plate.body}
   var checkBadge = () => `<svg class="steps__vg" viewBox="0 0 24 24" aria-hidden="true">${CHECK_BADGE}</svg>`;
 
   // js/url-state.js
-  var VERSION = 27;
+  var VERSION = 28;
   var DEFAULTS = {
     /* ⚠ 7126D, NOT THE ANTHRACITE, AND THE REASON IS THE OPENING PRICE.
        Peretz priced colour on 30.8.2026: 9016T, 9001T and 7126D are in the
@@ -9746,7 +9935,7 @@ ${plate.defs}${plate.body}
     size: 3,
     handing: 2,
     window: 2,
-    grille: 4,
+    grille: 5,
     handle: 4,
     lockset: 4,
     detail: 3,
@@ -10054,16 +10243,16 @@ ${plate.defs}${plate.body}
     { id: "d072", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "nitzan", handleFinish: "hf-black", grab: "nograb", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
     { id: "d078", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "idan", handleFinish: "hf-nickel", grab: "nograb", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 11, stripeTight: false } },
     { id: "d087", state: { colour: "rb-7021d", detail: "panel2", window: "none", grille: "none", handle: "idan", handleFinish: "hf-black", grab: "nograb", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d092", state: { colour: "rb-6219d", detail: "plain", window: "rect", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "knobplate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d092", state: { colour: "rb-6219d", detail: "plain", window: "rect", grille: "iron", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "knobplate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d097", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d099", state: { colour: "rb-7126d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d106", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "circles-light", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "ilai", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d108", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "none", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "ilai", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d108", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "iron", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "ilai", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "idan", handleFinish: "hf-black", grab: "nograb", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d116", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", grab: "nograb", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d122", state: { colour: "rb-7240d", detail: "plain", window: "rect", grille: "grid", handle: "idan", handleFinish: "hf-black", grab: "nograb", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d125", state: { colour: "rb-9001d", detail: "plain", window: "strip", grille: "none", handle: "idan", handleFinish: "hf-nickel", grab: "nograb", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "strip", grille: "none", handle: "idan", handleFinish: "hf-nickel", grab: "nograb", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } }
+    { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "strip", grille: "iron", handle: "idan", handleFinish: "hf-nickel", grab: "nograb", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } }
   ];
 
   // js/tour.js
