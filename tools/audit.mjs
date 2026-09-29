@@ -3690,6 +3690,84 @@ for (const v of VIEWS) {
   await pg.close();
 }
 
+/* ── THE PAGE ASKS NOTHING OF ANYWHERE ELSE, AND THE SWAP MOVES NO LINE — 28.9 ──
+   Two things commit 1 of the type (`0f73fb9`) measured once and nothing
+   asserts: the page makes no request outside its own folder (the README's
+   promise, and the reason the Google Fonts script went), and the tuned
+   fallback holds the page's lines when Rubik swaps in (it was fitted on the
+   nine explainers per language, "0 / 0 / 1 of 9 paragraphs moved"). The
+   per-viewport clause at the top of this file already proves each face
+   LOADED for the text on it; this asks the other two questions, of every
+   request a load makes and of every block of text on every step. */
+{
+  console.log('\nthe page asks nothing of anywhere else, and the swap moves no line');
+  const pg = await b.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
+  const root = 'file://' + process.cwd() + '/';
+  const foreign = [];
+  pg.on('request', r => { const u = r.url(); if (!u.startsWith(root) && !u.startsWith('data:')) foreign.push(u); });
+  /* ⚠ THE SWAP MOVES (ALMOST) NO LINE. The tuned fallback exists so that the
+     page laid out before the face arrives is the page after it: every block of
+     text on every step, in each language, at a phone and a laptop width, is
+     measured with Rubik and again with Rubik taken out of `--sans` (the
+     fallback then paints), and its height — the wrap count — compared. ~720
+     readings a run.
+     ⚠ WHY NOT ZERO, measured 28.9 on this fallback (one face per script, fitted
+     on the explainers): 9 of 720 readings flip on 3615dfd and 6 on 8bbd134,
+     each by ONE line — strings on a knife edge of their box (`Кодовый замок`
+     in a 91 px tile, a twelve-line explainer at 1280), which two typefaces
+     never agree on string by string. A second fallback built script × weight
+     class (nine faces, each within 0.1 % of Rubik over the page's text at that
+     weight) flipped the same 4–9 on other strings, so the residue is the
+     strings, not the tuning. Against it, measured by swapping css/app.css's
+     block: Assistant's 28.8 numbers left under Rubik flip 107 (12 by more than
+     a line) on 8bbd134 and 125 (17) on 3615dfd; a raw untuned Arial 38 and 36.
+     So the gate separates a tuned fallback from a stale one: no block moves by
+     more than a line, and at most TWO readings in a hundred move at all (14
+     of 720). The flips are printed. */
+  let swapSeen = 0, swapMoved = 0, swapFar = 0; const swapList = [];
+  for (const [w, h] of [[390, 844], [1280, 720]]) {
+    await pg.setViewportSize({ width: w, height: h });
+    for (const id of ['he', 'en', 'ru']) {
+      await pg.goto(root + `index.html?lang=${id}`);
+      await pg.evaluate(() => document.fonts.ready);
+      const steps = await pg.evaluate(() => [...document.querySelectorAll('.steps__step')].map(s => s.dataset.step));
+      const heights = () => pg.evaluate(() => [...document.querySelectorAll(
+        '#choices p, #choices .field__hint, #choices .sect__where, #choices summary, #choices .tile__name, #choices .spec__name')]
+        .filter(e => e.offsetParent && e.textContent.trim()).map(e => { const cs = getComputedStyle(e);
+          const lh = cs.lineHeight === 'normal' ? parseFloat(cs.fontSize) * 1.185 : parseFloat(cs.lineHeight);
+          return [e.textContent.trim().slice(0, 30), Math.round(e.getBoundingClientRect().height), lh]; }));
+      let moved = 0, seen = 0, far = 0; const first = [];
+      for (const k of steps) {
+        await pg.evaluate(k => document.querySelector(`.steps__step[data-step="${k}"]`).click(), k);
+        await pg.waitForTimeout(350);
+        const a = await heights();
+        await pg.evaluate(() => { const s = document.createElement('style'); s.id = '_nofont';
+          s.textContent = ':root{--sans:"Rubik Fallback","Segoe UI","Arial Hebrew",Arial,system-ui,sans-serif}'; document.head.append(s); });
+        const z = await heights();
+        await pg.evaluate(() => document.getElementById('_nofont').remove());
+        seen += a.length;
+        a.forEach(([t, hh, lh], i) => {
+          if (!z[i] || z[i][1] === hh) return;
+          moved++; if (Math.abs(z[i][1] - hh) > lh * 1.5) far++;
+          first.push(`${w}px ${id} ${k} "${t}" ${hh}→${z[i][1]}`);
+        });
+      }
+      if (!seen) fault('swap', `${w}px ${id}: no block of text measured — this check is dead`);
+      swapSeen += seen; swapMoved += moved; swapFar += far; swapList.push(...first);
+    }
+  }
+  console.log(`  the swap: ${swapMoved} of ${swapSeen} block readings change height${swapList.length ? ' — ' + swapList.join('; ') : ''}`);
+  if (swapFar) fault('swap', `${swapFar} block(s) of text move by MORE than one line when Rubik swaps in for its fallback — `
+    + 'the tuned fallback in css/app.css no longer describes Rubik; re-measure it (tools note in the file)');
+  if (swapMoved * 50 > swapSeen) fault('swap', `${swapMoved} of ${swapSeen} block readings (over 2 in 100) change height when Rubik `
+    + `swaps in for its fallback (${swapList.slice(0, 4).join('; ')}) — the tuned fallback in css/app.css no longer matches Rubik`);
+  if (foreign.length) {
+    fault('swap', `the page asked for ${foreign.length} thing(s) outside its own folder — ${foreign.slice(0, 3).join(', ')}. `
+      + 'It makes no network request at all (README): the fonts, the rooms and the code are files beside it');
+  }
+  await pg.close();
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    THE HINGE TRAP — PLAN.md §6.1, and the one check this phase exists for.
    ═══════════════════════════════════════════════════════════════════

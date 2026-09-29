@@ -181,6 +181,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** The type's two promises, asserted (1c, an audit block only): no
+  request leaves the folder (a Google Fonts `<link>` → 6 caught), and the swap
+  moves no block by more than a line and at most 2 in 100 readings at all (6 of
+  720 on 8bbd134; 28.8's fallback 107/12, raw Arial 38 — both caught). A second
+  fallback, nine faces script × weight, measured no better (4–9): not shipped.
+  Long form: `HISTORY.md`.
 - **28.9** The price on the photograph (4 of 10) — *"not on a white thing …
   left of the door, between the door and the lamp, on the higher end"*: no
   ground, figure 2.4 rem, the send a line of ink; `right` 8 px off the casing's
@@ -492,7 +498,8 @@ works from `file://` and Peretz can open the folder on his own laptop.
   head, stamped by the build like the rooms, and **the page makes no request
   outside its folder**. Delete the folder and the page is complete in the
   system stack; a fallback tuned per script to Rubik (`"Rubik Fallback"`)
-  keeps the swap from moving a line. The pick, its rejections and the scripts
+  keeps the swap from moving a line — the audit holds it to no block moved by
+  more than one line and at most 2 in 100 readings moved at all (1c). The pick, its rejections and the scripts
   that measured it are `research/fonts/`.
 
 | file | what it is |
@@ -1409,6 +1416,11 @@ are not in `VIEWS`:
   no-photo (drawn room still painting), a wrong code says the code was not
   recognised, the language switch leaves no Hebrew behind, the order sheet
   prints on **one page** (real PDFs at 703 px, counting pages).
+- **the type** — each language's faces loaded for the text on each element, at
+  every viewport; no request a load makes leaves the page's folder; and every
+  block of text on every step, 390 and 1280 × three languages (~720 readings),
+  measured in Rubik and in its fallback: none moves by more than a line, at
+  most 2 in 100 move at all (28.9 1c).
 - **pictures** — the navigator's nine marks (21 px) and the spec's fourteen
   (28 px since 27.9 — the summary's fallback for a row whose step has no tile
   glyph, the משקוף and the handing), rasterised at the size the stylesheet

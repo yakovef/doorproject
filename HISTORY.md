@@ -26,6 +26,53 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — THE TYPE'S TWO PROMISES, ASSERTED (1c, AN AUDIT BLOCK ONLY).**
+  Commit 1 (`0f73fb9`) promised two things it measured once and nothing
+  asserted: the page makes no request outside its own folder (the reason the
+  Google Fonts script went), and the tuned fallback keeps the page's lines when
+  Rubik swaps in (fitted on the nine explainers per language). The per-viewport
+  clause at the top of the audit proves each face LOADED; neither promise had a
+  test, so either could lapse in silence — a `<link>` pasted from a font site,
+  a face swapped for another with the fallback left behind.
+  · **What it asserts.** A new top-level block in `tools/audit.mjs`, "the page
+    asks nothing of anywhere else, and the swap moves no line": every request
+    a load makes (1280×720, then 390×844 and 1280×720 × he/en/ru) is a
+    `file://` under the page's folder or a `data:` URL; and every block of text
+    on every step (`#choices p`, the field hints, the section's where-line,
+    summaries, tile and spec names) is measured in Rubik and again with Rubik
+    taken out of `--sans`, ~720 readings. No block may move by more than one
+    line, and at most 2 readings in 100 may move at all.
+  · **Why not zero.** On 8bbd134, 6 of 720 flip, each by one line (on 3615dfd,
+    9): strings on a knife edge of their box — "Кодовый замок" in a 91 px tile,
+    a twelve-line explainer at 1280 — which two typefaces never agree on string
+    by string. Built and measured in this session before the other commit 1
+    landed: a fallback of nine faces (script × weight class 300–499 / 500–599 /
+    600–900, each within 0.1 % of Rubik over the page's own text at that
+    weight — Rubik ÷ Arial is 0.959 / 0.991 / 0.948 in Hebrew, 1.036 / 1.067 /
+    1.031 in English, 1.036 / 1.068 / 1.023 in Russian) flipped the same 4–9
+    on other strings. So the residue is the strings, not the tuning, and the
+    three-face fallback that shipped stays. The ceiling was 1 in 100 on a
+    single reading of 4 and moved to 2 when the full audit read 9 on the same
+    fallback; written down, not quietly widened.
+  · **What it separates.** Swapping `css/app.css`'s three faces for 28.8's
+    Assistant numbers: 107 of 720 flip, 12 by more than a line (125 / 17 on
+    3615dfd) — two faults. The faces renamed so the fallback matches nothing
+    (a raw, untuned Arial): 38 of 720 (36) — the ceiling fault. A Google Fonts
+    stylesheet in the head: "the page asked for 6 thing(s) outside its own
+    folder". Each run on the tree it was committed to, and restored.
+  · **Dropped from this session's own commit 1**, as a duplicate of `0f73fb9`
+    and `3615dfd` (the same files, the same faces): the nine-face fallback,
+    `stampCss` in the build (theirs declares the faces in the head), the sheet
+    rows at line-height 1.4 (theirs: 6 → 4 px on paper), the picker hiding the
+    current language at every width (theirs: weight 400, 5 / 4 px). A negative
+    clause first written as "the other script's subset stays unloaded" was
+    wrong and is not here: the picker's own labels and the ₪ sign bring all
+    three scripts onto every page.
+  · **Gates:** node --check; npm run build; npm test 9,440,832 passed / 5
+    failed (the five sheet-staleness rows, red since commit 2: shot, recreate,
+    corpus, against, lockset). The block itself on 8bbd134: 6 of 720, no
+    faults. Sheets: none (an audit block; no page file changed).
+
 - **28.9 — THE PRICE AND THE SEND STAND ON THE PHOTOGRAPH, LEFT OF THE DOOR
   (4 of 10).** The owner's son: *"The price bigger and not on a white thing but
   directly on the image; change the font … Remove the 'מחיר משוער' text above
