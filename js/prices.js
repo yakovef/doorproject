@@ -208,7 +208,7 @@ export const GRILLE = {
   /* ⚠ ברזל מחושל is BACK (27.9.2026, see `catalog.js`) and it is priced at
      ZERO like every other bent-bar grille here, which is a placeholder and
      not a figure he gave. It is by some distance the most work in the list —
-     seven bars, six rings and two crowns of scrollwork against `grid`'s five
+     five bars, six rings and two crowns of scrollwork against `grid`'s five
      straight muntins — so if any grille in this table is not free, it is this
      one. `ASK-PERETZ.md` asks him for the number; until he answers, charging
      an invented surcharge would be worse than charging nothing, because a
