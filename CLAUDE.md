@@ -178,6 +178,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** **כדור** (`cadoor`) redrawn off ONE photograph (*"similar in ways with
+  the 'knob on backplate' handle"*): the knob-plate's 54 mm ball on its own 65 mm
+  rose — one routine, `roseKnob`, both knobs. Was a tilted 68 × 80 ovoid off RB's
+  angled product shot, on its `domeKnob` (retired). Footprint 41/41/48 →
+  35/35/35. The escutcheon (covered, round) left as §9 says. Long form:
+  `HISTORY.md`.
 - **28.9** What the new face moved, put back (1b) — the audit on commit 1, eleven
   faults, all widths. **Print:** English's widest double went to two pages
   (276.5 mm), Russian past its 280 ceiling (283.9); rows 6 → 4 px on paper put all
@@ -942,6 +948,10 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
   lit from above with a bright equator (`knobBall`, the פרזול's), and the
   Rotem's egg; the key slot is under the builder's film there and is placed as
   the Rotem's. The two waisted plates share `satinPlate`, not their outlines.
+  **The כדור (`cadoor`) is the same knob on its own 65 mm rose** since 28.9
+  (`research/handles/cadoor/`, `CADOOR`): `roseKnob` draws both, each on its
+  measured rose (data-part `ball` and `rose`); the tilted ovoid and the
+  `domeKnob` it painted, off RB's angled product shot, are gone.
   ⚠ **Every lever is drawn AS PHOTOGRAPHED** — Coral 133, curved 109, Rotem 114, עילי 107
   from spindle to tip — because the camera's parallax on a proud lever could
   not be sized from these photographs (§9).
@@ -967,7 +977,7 @@ before it picks a fill.**
 | gradients | owner |
 |---|---|
 | `gripHard` `gripSoft` | the pull bar and the bow, in the handle finish (`hf=`) |
-| `nickel` `nickelSoft` `plateFace` `domeKnob` `rotemFace` `rotemLever` `knobBall` | the פרזול — nickel is its **own** warm ramp, `FINISH_TONES.nickel` (27.9, measured off the Coral doors: 20% darker than `steel`, hue ≈40°); `steel` stays the pull bar's nickel, the extra locks' and the derivation reference. `domeKnob` (the כדור's ball) through `domeRamp` since 26.9, the measured dome kept literal on nickel |
+| `nickel` `nickelSoft` `plateFace` `rotemFace` `rotemLever` `knobBall` | the פרזול — nickel is its **own** warm ramp, `FINISH_TONES.nickel` (27.9, measured off the Coral doors: 20% darker than `steel`, hue ≈40°); `steel` stays the pull bar's nickel, the extra locks' and the derivation reference. Both knobs' balls are `knobBall` since 28.9 (the כדור's was `domeKnob`, retired with its product shot) |
 | `lockUnit` `lockUnitFace` `lockUnitSoft` `mirrorKnob` | the bought-in extra locks, the ספיר and both viewers' rings (28.9) — a constant steel |
 | `euroSteel` `euroRim` | the cylinder, following the פרזול at its own stand-off (`cylinderRamp`) — derived on nickel too since 27.9, so every finish's plug stands 2–16% off its plate |
 | `bellMetal` | the פעמון, following the pull handle's finish (`bellRamp` keeps Peretz's older *"nickel and gold only"* beside the instruction that overruled it) |
@@ -979,7 +989,7 @@ at least once, always silently.
 
 | | |
 |---|---|
-| follows it | the lever and its furniture, the כדור's ball and shank (26.9 — the owner's son called the constant ball a bug, overruling 31.8), the keyhole, the hinges, the security latch (in his list; not drawn — it is fitted inside, and the choice offered 27.9 was withdrawn 28.9), the metal strips. The כדור על אורך (`knobplate`) too — d092 is bronze. The פרזול tiles show these on THIS door since 27.9 — its lock furniture, the hinges and the viewer when chosen — redrawn when they change (`composite`) |
+| follows it | the lever and its furniture, the כדור's ball and rose (26.9 — the owner's son called the constant ball a bug, overruling 31.8), the keyhole, the hinges, the security latch (in his list; not drawn — it is fitted inside, and the choice offered 27.9 was withdrawn 28.9), the metal strips. The כדור על אורך (`knobplate`) too — d092 is bronze. The פרזול tiles show these on THIS door since 27.9 — its lock furniture, the hinges and the viewer when chosen — redrawn when they change (`composite`) |
 | never | the pull handle, the bow and the פעמון (their own `hf=`) · the extra lock and BOTH viewers (`#lockUnit`, 28.9: *"remove the pirzul effect from them"*, then *"from the regular peephole too"*) · the ספיר (the maker's finish, 31.8) |
 
 ### The lock furniture's measurements (`npm run lockset`, 19.9)

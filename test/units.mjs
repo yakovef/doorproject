@@ -4414,7 +4414,12 @@ group('the finish reaches every piece of metal');
     }
     {
       const st = { ...base, lockset: 'cadoor' };
-      for (const part of ['ball', 'shank']) {
+      /* ⚠ RESTATED 28.9.2026 — THE SHANK IS THE ROSE. The כדור was redrawn off
+         an installed door (research/handles/cadoor/): square-on, the knob sits
+         on a round rose and no shank shows; the old shank was the angled
+         product shot's. The ball keeps its clause, and the rose takes the
+         shank's: each must CHANGE under every finish, asked by name. */
+      for (const part of ['ball', 'rose']) {
         const sel = `data-part="${part}"`;
         const partLooks = svg => {
           const el = new RegExp(`<[a-z]+ ${sel}[^>]*>`).exec(grabDeep(svg, 'data-style="cadoor"') || '');
@@ -4429,16 +4434,33 @@ group('the finish reaches every piece of metal');
              + '26.9: it follows the פרזול');
         }
       }
-      ok(refs(grabDeep(render(st), 'data-style="cadoor"')).includes('nickelSoft'),
-         'the cadoor\'s shank is not painted from the פרזול\'s soft ramp');
-      /* And on nickel the ball is still the MEASUREMENT, stop for stop — the
-         five hexes read off the product photograph — so following the
-         פרזול cost the default door nothing. */
-      const nickelBall = (/<radialGradient id="domeKnob"[^>]*>([\s\S]*?)<\/radialGradient>/
-        .exec(render({ ...st, pirzul: 'pz-nickel' })) || [])[1] || '';
-      ok((nickelBall.match(/stop-color="([^"]+)"/g) || []).join(',')
-         === ['#F2EEEA', '#E3DFDB', '#5D5249', '#988E86', '#6B625B'].map(c => `stop-color="${c}"`).join(','),
-         'on a nickel פרזול the cadoor\'s ball is no longer the measured dome');
+      /* The rose is the PLATES' satin — one of the פרזול's own ramps, by name,
+         as the shank was its soft ramp by name (a rose painted from the grip's
+         gripSoft would change under no פרזול and fail above as well). */
+      ok(refs(grabDeep(render(st), 'data-style="cadoor"')).includes('rotemFace'),
+         'the cadoor\'s rose is not painted from the פרזול\'s satin');
+      /* ⚠ RESTATED 28.9.2026. This asked that on nickel the ball was still the
+         MEASUREMENT stop for stop — the five hexes of RB's product shot — so
+         following the פרזול cost the default door nothing. That shot was taken
+         at an angle and its dome, a ring about an off-centre highlight, reads
+         as a cup; the installed door shows the knob-plate's knob, and the
+         owner's son called the two similar. So the claim now is the one the
+         photographs make: the כדור's ball and the כדור על אורך's are ONE knob,
+         painted from one ramp — the same gradient, stop for stop, on every
+         finish — and neither is the retired dome. */
+      const ballRamp = (svg, style) => {
+        const el = /<[a-z]+ data-part="ball"[^>]*>/.exec(grabDeep(svg, `data-style="${style}"`) || '');
+        const id = el && (/fill="url\(#([A-Za-z0-9_-]+)\)"/.exec(el[0]) || [])[1];
+        const g = id && new RegExp(`<(linear|radial)Gradient id="${id}"[^>]*>([\\s\\S]*?)</\\1Gradient>`).exec(svg);
+        return id && g ? `${id}:${(g[2].match(/stop-color="[^"]+"/g) || []).join(',')}` : null;
+      };
+      for (const pz of ['pz-nickel', 'pz-black', 'pz-bronze', 'pz-gold']) {
+        const a = ballRamp(render({ ...st, pirzul: pz }), 'cadoor');
+        const b = ballRamp(render({ ...base, lockset: 'knobplate', pirzul: pz }), 'knobplate');
+        ok(a && b, `the ${pz} knob balls were not found — this check is dead`);
+        ok(a === b, `on ${pz} the כדור's ball is not the כדור על אורך's — one knob, one ramp (28.9)`);
+        ok(!/domeKnob/.test(a || ''), `on ${pz} the כדור's ball is back on the retired product-shot dome`);
+      }
     }
     ok(grabDeep(render({ ...base, lockset: 'knobplate' }), 'data-style="knobplate"'),
        'the knob-on-backplate group is not in the markup — the pair check is dead');

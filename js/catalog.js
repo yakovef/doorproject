@@ -713,8 +713,11 @@ export const LOCKSETS = [
      (research/handles/rotem/), and they are its citation. */
   { id: 'plate',   he: 'רותם',  en: 'Rotem', ru: 'Ротем',   style: 'plate', lock: true, lever: true,
     aliases: ['longplate'], photo: 'research/handles/rotem/door-1.jpg' },
+  /* Redrawn 28.9.2026 off an installed door (the owner's son's photograph): a
+     54 mm ball on a 65 mm rose — the knob-plate's knob. It cited RB's angled
+     product shot until then (research/handles/rb/…product-cadoor-1.png). */
   { id: 'cadoor',  he: 'כדור',   en: 'Cadoor', ru: 'Шаровая',  style: 'cadoor',
-    photo: 'research/handles/rb/enterance-handle-product-cadoor-1.png' },
+    photo: 'research/handles/cadoor/door-1.jpg' },
   /* ⚠ `escutcheon: 'square'` — THE KEYWAY PLATE UNDER THIS KNOB IS SQUARE, and
      we drew a round one under a square backplate for the life of the entry.
      RB's own `…product-sapir.png` is two pieces: a square knob on a square

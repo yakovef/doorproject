@@ -494,7 +494,7 @@
                         the safe lock and the keypad, and the ספיר — bought-in in
                         one finish, on the owner's word 31.8
          ⚠ 26.9.2026: the כדור left the second row. The owner's son called its
-         constant ball a bug (see domeRamp in renderer.js), so the sentence that
+         constant ball a bug (see the כדור's ball in renderer.js), so the sentence that
          named it beside the ספיר would have told a customer holding a gold door
          the opposite of the picture — this comment's own first paragraph, again.
          The two names come through {0} (the כדור) and {1} (the ספיר), out of
@@ -1705,13 +1705,16 @@
       aliases: ["longplate"],
       photo: "research/handles/rotem/door-1.jpg"
     },
+    /* Redrawn 28.9.2026 off an installed door (the owner's son's photograph): a
+       54 mm ball on a 65 mm rose — the knob-plate's knob. It cited RB's angled
+       product shot until then (research/handles/rb/…product-cadoor-1.png). */
     {
       id: "cadoor",
       he: "כדור",
       en: "Cadoor",
       ru: "Шаровая",
       style: "cadoor",
-      photo: "research/handles/rb/enterance-handle-product-cadoor-1.png"
+      photo: "research/handles/cadoor/door-1.jpg"
     },
     /* ⚠ `escutcheon: 'square'` — THE KEYWAY PLATE UNDER THIS KNOB IS SQUARE, and
        we drew a round one under a square backplate for the life of the entry.
@@ -3112,8 +3115,8 @@
        0.48.
        ⚠ `steel` IS UNTOUCHED ON PURPOSE. It is still the pull bar's and the
        bow's nickel (`hf-nickel`), the bought-in extra locks' constant metal
-       (`lockUnit`), and the reference `CYL_LIFT` and `DOME_LIFT` were measured
-       against — moving it would have brightened every gold and bronze cylinder
+       (`lockUnit`), and the reference `CYL_LIFT` (and `DOME_LIFT`, retired 28.9
+       with the כדור's old dome) were measured against — moving it would have brightened every gold and bronze cylinder
        in silence. No photograph here shows a pull bar or an extra lock. */
     nickel: ["#BDB8AE", "#A8A194", "#8B8372", "#716A5C", "#877F6E", "#5E584D", "#F3F1ED"],
     black: ["#5E6165", "#3D4043", "#26282B", "#171819", "#313437", "#0F1011", "#8A8E93"],
@@ -3286,13 +3289,6 @@ ${stops}
     };
   }
   var bellRamp = (tone) => tone;
-  var DOME = ["#F2EEEA", "#E3DFDB", "#5D5249", "#988E86", "#6B625B"];
-  var DOME_REF = DOME.map((c) => FINISH_TONES.steel.map((s, i) => [Math.abs(rawLum(s) - rawLum(c)), i]).sort((a, b) => a[0] - b[0])[0][1]);
-  var DOME_LIFT = DOME.map((c, i) => rawLum(c) / rawLum(FINISH_TONES.steel[DOME_REF[i]]));
-  function domeRamp(tone) {
-    if (tone === FINISH_TONES.steel || tone === FINISH_TONES.nickel) return DOME;
-    return DOME_LIFT.map((m, i) => scaleTone(tone[DOME_REF[i]], m));
-  }
   var LIGHT = {
     key: 0.24,
     // face wash amplitude
@@ -3494,6 +3490,15 @@ ${stops}
        round top (101 - 21 + 13 = 93, read 93.5) — 99 - 23.5 + 13 = 89 here */
     plug: 89
   };
+  var CADOOR = {
+    rose: 32.5,
+    // the rose: 65 across (left edge and head, centred on the keyway's axis)
+    ball: 27
+    // the ball: 53-55 across, the knob-plate's 54 — the owner's son's
+    // "similar". It reads 10.5 mm toward the closing edge of its rose,
+    // which is the camera's parallax on a knob ~60 mm proud, not an
+    // offset: the escutcheon below is on the rose's axis
+  };
   var PAD = { x: 70, top: 110, bottom: 300 };
   var SCENE = 8e3;
   var SCENE_MAX = (() => {
@@ -3660,7 +3665,6 @@ ${stops}
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
     const hwTone = FINISH_TONES[byId(PIRZUL2, state2.pirzul).tone] || FINISH_TONES.steel;
     const cyl = cylinderRamp(hwTone);
-    const dome = domeRamp(hwTone);
     const bellTone = bellRamp(tone);
     const stripeTone = byId(PIRZUL2, state2.pirzul).tone === "nickel" ? tone : hwTone;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
@@ -4052,8 +4056,8 @@ ${stops}
     <!-- ⚠ AND TWO MORE CONSTANTS FOR THE SAME REASON, ONE STEP OVER —
          ⚠ NOW ONE, SINCE 26.9.2026: the owner's son called the constant
          cadoor a bug ("The 'cadoor' handle isnt affected by the hardware
-         finish"), so its ball follows the פרזול through domeRamp and its
-         shank paints from nickelSoft. The ספיר keeps everything below. The
+         finish"), so its ball follows the פרזול (through domeRamp until 28.9,
+         knobBall since) and its shank painted from nickelSoft (its rose since). The ספיר keeps everything below. The
          31.8 sentence stays here because it is the instruction overruled.
          Owner, 31.8.2026: "the pirzul doesnt change the color of the ספיר and
          כדור handles."
@@ -4078,7 +4082,8 @@ ${stops}
          drawing came from, d092, is BRONZE — so it demonstrably ships in more
          than one finish. The owner named two handles; these are those two.
          ASK-PERETZ §0a7 put the near-name to him; the owner's son answered
-         26.9 that both knobs follow the פרזול (see domeRamp). -->
+         26.9 that both knobs follow the פרזול; since 28.9 they are one knob
+         (roseKnob). -->
     <linearGradient id="lockUnitSoft" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="${FINISH_TONES.steel[1]}"/>
       <stop offset="0.5" stop-color="${FINISH_TONES.steel[3]}"/>
@@ -4347,16 +4352,6 @@ ${stops}
       <stop offset="0.78" stop-color="#5A4B40"/>
       <stop offset="1"   stop-color="#8C8179"/>
     </linearGradient>
-    <!-- Cadoor's dome: a hard terminator, not a smooth falloff. The פרזול's
-         metal since 26.9.2026, through domeRamp — the measured stops on
-         nickel, the same brightness relation in the other three. -->
-    <radialGradient id="domeKnob" cx="0.34" cy="0.26" r="0.86">
-      <stop offset="0"    stop-color="${dome[0]}"/>
-      <stop offset="0.28" stop-color="${dome[1]}"/>
-      <stop offset="0.42" stop-color="${dome[2]}"/>
-      <stop offset="0.72" stop-color="${dome[3]}"/>
-      <stop offset="1"    stop-color="${dome[4]}"/>
-    </radialGradient>
     <!-- Sapir: mirror chrome is bright at both edges with a dark reflected
          core — the opposite of the satin gradient everything else uses. -->
     <linearGradient id="mirrorKnob" x1="0" y1="0" x2="1" y2="0.18">
@@ -7369,11 +7364,17 @@ ${body}
          41 is what `npm run collide -- boxes` measures off the art; 78 was
          never measured. With it corrected the clamp yields `max(63, 51) = 63`
          and the ball lands on the keyway's own axis.
-         ⚠ AND THE BALL SITS ON NO ROSE ON PURPOSE — that is the whole product
-         difference between `cadoor` (כדור) and `knobplate` (כדור על אורך), the
-         one with the backplate. Do not "fix" that by adding one. */
+         ⚠ "THE BALL SITS ON NO ROSE ON PURPOSE" STOOD HERE AND WAS WRONG ABOUT
+         THE PRODUCT: an installed כדור (28.9, research/handles/cadoor/) sits on a
+         65 mm rose. What separates it from the כדור על אורך is the long plate
+         carrying the keyway. That door also bears out the fix above: its knob
+         and its cylinder share one axis, the knob's 10 mm off it the camera's
+         parallax. Re-measured off the redrawn knob by `npm run collide --
+         boxes`: drawn 33 / 33 / 33, declared with the plate family's +2. Was
+         41 / 41 / 48, the tilted 68 x 80 ovoid's. The keyway stays at 63:
+         `max(63, 35 + 10)`. */
       case "cadoor":
-        return { out: 41, in: 41, vy: 48 };
+        return { out: 35, in: 35, vy: 35 };
       case "sapir":
         return { out: 36, in: 74, vy: 43 };
       /* The כדור על אורך, re-measured 28.9 off its redrawn plate (90 x 216, off
@@ -7905,7 +7906,6 @@ ${plate.body}
     const f = (n) => n.toFixed(2);
     const u = Math.round(cx) + "-" + Math.round(cy);
     const plate = satinPlate(knobPlateOutline(cx, cy), "kp", u);
-    const R = KNOBPLATE.rose, r = KNOBPLATE.ball;
     return `
     <g data-hw="lockset-art" data-style="knobplate">
 ${plate.defs}${plate.body}
@@ -7915,12 +7915,18 @@ ${plate.defs}${plate.body}
            door locks with a key from the inside, which it does not. -->
       ${euroEgg(cx, cy, KNOBPLATE.bezel, KNOBPLATE.plug)}
 
-      <!-- the knob stands ~55 mm proud: its shadow falls on the plate below -->
+      ${roseKnob(cx, cy, KNOBPLATE.rose, KNOBPLATE.ball)}
+    </g>`;
+  }
+  function roseKnob(cx, cy, R, r) {
+    const f = (n) => n.toFixed(2);
+    return `
+      <!-- the knob stands ~55 mm proud: its shadow falls on what is below -->
       <circle cx="${f(cx + 3)}" cy="${f(cy + 9)}" r="${r}" fill="#000" opacity="0.36"
               filter="url(#hwShadow)"/>
-      <!-- the rose it turns on: the plate's satin, a dark step round it, lit
+      <!-- the rose it turns on: the plates' satin, a dark step round it, lit
            along the key light's side -->
-      <circle cx="${f(cx)}" cy="${f(cy)}" r="${R}" fill="url(#rotemFace)"/>
+      <circle data-part="rose" cx="${f(cx)}" cy="${f(cy)}" r="${R}" fill="url(#rotemFace)"/>
       <circle cx="${f(cx)}" cy="${f(cy)}" r="${R}" fill="none" stroke="#000"
               stroke-opacity="0.40" stroke-width="1.6" transform="translate(0.6 0.8)"/>
       <path d="${arcPath(cx, cy, R - 1.4, 150, 300)}" fill="none"
@@ -7933,8 +7939,7 @@ ${plate.defs}${plate.body}
       <ellipse cx="${f(cx - r * 0.3)}" cy="${f(cy - r * 0.46)}" rx="${f(r * 0.34)}" ry="${f(r * 0.17)}"
                fill="#fff" opacity="0.50" transform="rotate(-24 ${f(cx - r * 0.3)} ${f(cy - r * 0.46)})"/>
       <circle cx="${f(cx)}" cy="${f(cy)}" r="${r}" fill="none" stroke="#000"
-              stroke-opacity="0.26" stroke-width="1.2"/>
-    </g>`;
+              stroke-opacity="0.26" stroke-width="1.2"/>`;
   }
   function knobPlateOutline(cx, cy) {
     const f = (n) => n.toFixed(2);
@@ -8011,34 +8016,8 @@ ${plate.defs}${plate.body}
     </g>`;
   }
   function cadoorKnob(cx, cy, dir) {
-    const rx = 34, ry = 40;
-    const tilt = -11.8 * dir;
     return `
-    <g data-style="cadoor">
-      <ellipse cx="${cx + dir * 5}" cy="${cy + 9}" rx="${rx}" ry="${ry}"
-               fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
-      <!-- The shank, seen almost edge-on and mostly hidden by the ball. It
-           used to be drawn on the OUTBOARD side, which put 78 mm of knob
-           beyond a 49 mm backset — 29 mm of it hanging off the closing edge of
-           the door. Invisible until the footprints were measured off the art
-           instead of asserted. It points inboard now, which is also where the
-           spindle goes. -->
-      <!-- Shank and ball are the פרזול's metal since 26.9.2026 (see
-           domeRamp): the shank was the bought-in unit's constant soft ring,
-           and it is the furniture's soft ramp now. data-part names each so a
-           check can ask about the BALL, not about the group. -->
-      <rect data-part="shank" x="${cx - (dir < 0 ? 0 : rx * 1.1)}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
-            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#nickelSoft)"
-            transform="${dir < 0 ? `translate(${-rx * 1.2} 0)` : ""}"/>
-      <ellipse data-part="ball" cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#domeKnob)"
-               transform="rotate(${tilt} ${cx} ${cy})"/>
-      <!-- the terminator: a hard bright band over a dark one, not a gradient -->
-      <ellipse cx="${cx - dir * rx * 0.22}" cy="${cy - ry * 0.3}"
-               rx="${rx * 0.46}" ry="${ry * 0.2}" fill="#fff" opacity="0.72"
-               transform="rotate(${tilt - 18 * dir} ${cx} ${cy})"/>
-      <ellipse cx="${cx + dir * rx * 0.1}" cy="${cy + ry * 0.34}"
-               rx="${rx * 0.72}" ry="${ry * 0.3}" fill="#000" opacity="0.26"
-               transform="rotate(${tilt} ${cx} ${cy})"/>
+    <g data-style="cadoor">${roseKnob(cx, cy, CADOOR.rose, CADOOR.ball)}
     </g>`;
   }
   function sapirKnob(cx, cy, dir) {
@@ -8725,13 +8704,16 @@ ${plate.defs}${plate.body}
     <rect x="-41" y="67" width="82" height="82" rx="5"/>
     <rect x="-152" y="-13" width="152" height="26" rx="13"/>
     <circle cx="0" cy="108" r="12" fill="var(--paper, #EFEDE8)"/>` }),
-    /* Cadoor: a free-standing ovoid, no rose — taller than wide. ⚠ THE STUB
+    /* Cadoor: until 28.9 a free-standing ovoid, no rose — taller than wide. ⚠ THE STUB
        SHANK IS GONE, 20.9.2026 — Peretz: *"on the ball handle icon remove the
        line."* It was a 45 x 22 rounded rect beside the ovoid, a side view of
        the neck on a tile whose every neighbour is square-on, and it read as a
        line drawn next to the ball. The box is symmetric again. */
-    cadoor: () => ({ box: [-44, -48, 44, 48], art: `
-    <ellipse cx="0" cy="0" rx="34" ry="40"/>` }),
+    /* ⚠ AND IT IS ROUND SINCE 28.9: the knob on its rose seen square-on, one
+       shape still (Peretz's "remove the line" holds), the rose's own size off the
+       installed door (CADOOR). The ovoid was the angled product shot's. */
+    cadoor: () => ({ box: [-(CADOOR.rose + 10), -(CADOOR.rose + 10), CADOOR.rose + 10, CADOOR.rose + 10], art: `
+    <ellipse cx="0" cy="0" rx="${CADOOR.rose}" ry="${CADOOR.rose}"/>` }),
     // Sapir: square cushion knob on a square rose, the knob offset off the plate.
     sapir: () => ({ box: [-78, -46, 46, 52], art: `
     <rect x="-36" y="-36" width="72" height="72" rx="3"/>

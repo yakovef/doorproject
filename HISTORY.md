@@ -26,6 +26,33 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — כדור (`cadoor`) REDRAWN OFF ONE PHOTOGRAPH.** The owner's son: *"here
+  is the cadoor handle, i only found one image of it though, but i do think that
+  it is similar in ways with the 'knob on backplate' handle."*
+  · **Read** (`research/handles/cadoor/`): leaf 1266 px over 2050 (0.618 px/mm),
+    edge profiles. A round ball 53-55 on a round rose 65; the ball 10.5 mm
+    toward the closing edge of its rose (parallax, ~60 mm proud); the escutcheon
+    ~63, covered and round, 96-99 below the knob.
+  · **Drawn:** `CADOOR` { rose 32.5, ball 27 }; the knob-plate's knob became
+    `roseKnob(cx, cy, R, r)`, drawn by both (data-part `rose` added to the
+    knob-plate's rose, no pixel moved on it). Was a free ovoid 68 x 80 tilted
+    11.8 degrees with a shank, off RB's angled product shot, painted `domeKnob`
+    (five hexes of that shot); `domeKnob`, `domeRamp` and `DOME*` went with
+    their only reader, the hexes kept in the comment. The tile is one round
+    ellipse at the rose's size (Peretz's "remove the line" still one shape).
+  · **Footprint** by `npm run collide -- boxes`: drawn 33 / 33 / 33, declared
+    35 / 35 / 35. Was 41 / 41 / 48. The keyway stays at 63.
+  · **A comment was wrong about the product:** "the ball sits on no rose on
+    purpose" (beside `handleFootprint`). The installed door has one; the
+    difference from the כדור על אורך is the long plate. Rewritten.
+  · **Tests restated, not weakened** (`test/units.mjs`): the ball and the ROSE
+    (was the shank) must each change under every finish; the rose paints from
+    `rotemFace` by name (was the shank from `nickelSoft`); and on every finish
+    the כדור's ball is the כדור על אורך's, stop for stop, and never the retired
+    dome (was: on nickel the ball is the product shot's five hexes). Falsified:
+    with the ball on `nickelSoft` and the rose on `gripSoft` all three fail.
+  · **Not changed:** the escutcheon (§9 — it varies door to door, it is every
+    lockset's) and the 105 mm knob-to-keyway (this door 96-99, the corpus 102-105).
 - **28.9 — NEITHER VIEWER FOLLOWS THE פרזול.** *"remove it from the regular
   peephole too."* The optical ring is `#lockUnit` too (its 26.8 note — Peretz's
   list names the עינית — kept above it as the record, reversed on the owner's

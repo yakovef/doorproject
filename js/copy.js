@@ -594,7 +594,7 @@ export const UI = {
                     the safe lock and the keypad, and the ספיר — bought-in in
                     one finish, on the owner's word 31.8
      ⚠ 26.9.2026: the כדור left the second row. The owner's son called its
-     constant ball a bug (see domeRamp in renderer.js), so the sentence that
+     constant ball a bug (see the כדור's ball in renderer.js), so the sentence that
      named it beside the ספיר would have told a customer holding a gold door
      the opposite of the picture — this comment's own first paragraph, again.
      The two names come through {0} (the כדור) and {1} (the ספיר), out of
