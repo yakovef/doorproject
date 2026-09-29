@@ -178,6 +178,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** The band on the photograph (3 of 10) — *"on the image and closer to
+  the door"*: absolute, `placeBand` sets it 8 px over the casing in the span the
+  wall's controls leave. `FIT_TRIM.top` 40 → −162, exactly the wall 1280×720
+  lacked; the leaf still GREW (426.2 → 436.9 / 550.2 → 556.0 / 562.4 → 567.4),
+  now asserted no smaller. 320's tallest pair: gap 2.5 px, named. `half` and the
+  1152 pair left the wall-ink exemptions. ⚠ Until commit 5 the phone band is
+  ~70 px (the undo trio shares its row). Long form: `HISTORY.md`.
 - **28.9** The navigator on the photograph (2 of 10) — *"not endless … the image
   needs to be behind it"*: `.stage-wrap > .steps` above 1100 (`placeNav`), its
   own ink, 12 px off the panel, centred on the door or pushed below the wall's
@@ -214,12 +221,6 @@ lines here. Dates are the day of the change.
   sheets. Then its bezel stopped following the פרזול (*"remove the pirzul effect
   from them"*, then *"…from the regular peephole too"*): both viewers `#lockUnit`,
   out of the פרזול tile and its copy; the test sweeps both.
-- **28.9** **כדור על אורך** (`knobplate`) redrawn off ONE photograph (*"i only
-  have one image of this but i want it in … refine it"*): a waisted plate 90 ×
-  216 (waist 70 at 0.54 — the עילי's family, 8 mm narrower), a 54 mm knob on a
-  62 mm rose at 0.287, the Rotem's egg. Was a 96 × 300 stadium. Footprint 53/48/
-  198 → 48/48/157; `satinPlate` shared with עילי (its render byte-identical).
-  `KEYWAY_BACKSET` 63 kept though no longer "derived" (max is now 58).
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -306,13 +307,21 @@ the summary's own `saveCurrent`).
   we are at, big — moved from the panel … the name of the thing now
   selected"*): `.stage__band`, the live step's title and `nowLabel` of its first
   group, written by `markSteps`; the panel's `<h2>` is visually hidden (goStep
-  still focuses it). ⚠ Above 1100 it is IN THE FLOW and its height comes out of
-  the drawing — its budget is the height the title gave back the same round,
-  and the audit holds the standard leaf to within 4 px of its pre-round size
-  (421.0 / 550.3 / 563.3 px at 1280×720 / 1440×900 / 1920×918). Each line is
-  one line in every language, so the door never resizes between steps. On a
-  phone it is one 30 px line (`--band-h`) and the STAGE gives it up (the door
-  loses 21.6 px), not the question below.
+  still focuses it). ⚠ **Since 28.9 it stands ON THE PHOTOGRAPH** (*"the header
+  of the section needs to be on the image and closer to the door"*): absolute
+  in the wrap, placed by `placeBand` — its foot 8 px above the casing's head,
+  centred on the door, given only the free span between the wall's controls on
+  its own rows (`--band-w`) and moved off-centre only as far as that span
+  requires. It takes no height, so the door has it back; the crop gave the wall
+  over the tallest door exactly what the band needs (`FIT_TRIM.top` −162, §3),
+  and the standard leaf still grew: 426.2 → 436.9 / 550.2 → 556.0 / 562.4 →
+  567.4 px at 1280×720 / 1440×900 / 1920×918, asserted no smaller than the
+  first figures. Each line is one line in every language (ellipsis), so it never
+  climbs. On a phone it is one line at the same anchor (`--band-h` is gone, the
+  stage has its 30 px back); the option's name yields to an ellipsis before
+  the step's. ⚠ At 320×568 over the two tallest doors the stage is too short:
+  the band keeps the stage's top and its gap to the casing narrows to ~2.5 px
+  (named in the audit, asserted still needed).
 - **Two arrows beside the door** (27.9): absolute in the wall at the frame's
   mid-height, 8 px outside the casing (`--frame-left/-right/-mid`); they move
   the live step's FIRST group to the next/previous free option, wrapping,
@@ -547,8 +556,10 @@ its middle, and the wall, floor, sconces and vignette do not move.
 - **`viewBox`** is tight around THIS door with `PAD` of air. Bare mode and every
   measurement harness use it — framing a narrow door in the full scene would
   hand `npm run profile` fewer pixels and read as a change in the drawing.
-- **`data-fit-x/y/w/h` is `FIT_BOX`**, the fixed scene less `FIT_TRIM` (40 off
-  the top, 130 off the bottom), identical for every door. `fitStage()` crops to
+- **`data-fit-x/y/w/h` is `FIT_BOX`**, the fixed scene less `FIT_TRIM` — 130
+  off the bottom, and since 28.9 162 units MORE at the top (a negative trim:
+  the wall the band stands on over the tallest door, its table beside the
+  constant) — identical for every door. `fitStage()` crops to
   it and only ever widens it to the stage's shape, so the on-screen scale is a
   constant. Bare mode skips `fitStage`.
 - **`STAGE_BOX`** is the room itself: the backdrop, vignette and sconces hang
@@ -1636,19 +1647,16 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   every phone. `…slice` would crop the door's head and foot (forbidden); a
   portrait tile loses the name and price row. The thirty tiles are distinct at
   shipped size (closest pair 2.07%, none under 0.45%).
-- **On a phone the wall's controls cannot stand beside the four biggest
-  doors** (14.9; four since 27.9 — the band above the door takes its line out of
-  the stage, the door is 21.6 px shorter, and `extra1` cleared). Ink on
-  `#frame` on `extra2`, `half`, `halfextra1`, `halfextra2` — worst px² of glyph
-  he/ru, re-measured at the end of the round (27.9): extra2 81/0, half 9/0,
-  halfextra1 194/74, halfextra2 494/466, where `Русский` is charcoal on a
-  charcoal leaf;
-  the two arrows beside the door are measured with the rest. Gated for
-  `standard` and `extra1` everywhere and every door ≥ 1152 px — with ONE named
-  reading since 27.9: the widest double at 1152×800, `Русский` 43 px² (he) / 15
-  (ru), because the title shrank 62 px and the band spends 52 of them there, so
-  that door is ~7 px taller than before the round. Named with its number, the
-  gate not widened.
+- **On a phone the wall's controls cannot stand beside the three biggest
+  doors** (14.9; four on 27.9, three since 28.9 — the band went onto the
+  photograph and the crop gave 202 units more wall above the door, so every
+  door stands lower under the top row and `half` cleared). Ink on `#frame` on
+  `extra2`, `halfextra1`, `halfextra2` — worst px² of glyph he/ru, 28.9:
+  extra2 57/0, halfextra1 35/0, halfextra2 261/90 (they were 81/0, 194/74,
+  494/466); the two arrows beside the door are measured with the rest. Gated
+  for `standard`, `extra1` and `half` everywhere and every door ≥ 1152 px with
+  NO named reading since 28.9 (the widest double at 1152×800 read 17/18 px² on
+  commit 1b and 0 once the crop moved).
 - **Two controls pinned by rules that mirror differently stand in opposite walls
   in one language and the same wall in another** — the mechanism behind a
   closed fault (the removed grip controls under the price card in Hebrew only).

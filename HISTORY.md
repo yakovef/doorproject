@@ -26,6 +26,89 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — THE BAND STANDS ON THE PHOTOGRAPH, OVER THE DOOR (3 of 10).** The
+  owner's son: *"The header of the section needs to be on the image and closer
+  to the door, in some good font — that also goes for the little text below that
+  shows the current option."*
+
+  **WHAT WAS THERE (27.9).** `.stage__band` was a flow item between the `<h1>`
+  and the stage. Above 1100 every pixel of it — 52–63 px with its padding — came
+  out of the drawing, paid for by the title shrinking the same day; on a phone
+  the stage gave up a 30 px line for it (`--band-h`).
+
+  **WHAT IT IS.** Absolute in `.stage-wrap`, placed by `placeBand` (js/app.js):
+  its foot 8 px above the casing's head (`--frame-top`, off the frame's settled
+  box), centred on the door, physical like the frame. Title in `--display`, the
+  option under it in `--sans`, as asked. Out of the flow, so the stage has its
+  height back at every width, and `--band-h` is gone from the phone's stage.
+
+  **THE WALL ABOVE THE DOOR IS ARITHMETIC, AND IT WAS SHORT.** With the band out
+  of the flow and the crop unchanged, measured on the live page (stage top to
+  the TALLEST door's casing head, the band's own height + 8):
+  1280×720 17.0 px against 57.9, 1440×900 21.3 against 62.8, 1920×918 21.7
+  against 62.8, 390×844 9.6 against 26.8 — the band landed 32–43 px above the
+  stage on a desktop, over the page's title. So `FIT_TRIM.top` took exactly the
+  worst shortfall in units: 1280×720 needs 272 units over that casing
+  (H·650.6/(2776+H) = 57.9), so 110 − 272 = **−162** (it was +40: the crop now
+  reaches 162 units ABOVE the scene, which the drawn room covers — `SCENE` is
+  8000 past it — and the photograph is placed to cover the stage whatever the
+  crop). The ceiling was 1100×800: more than 288 units would have made its door
+  smaller than before. `PAD` and the bare `viewBox` are untouched — the page's
+  crop is `data-fit-*`, which paints nothing in bare mode.
+
+  **THE DOOR GREW ANYWAY** — the band gave back more than the wall took. The
+  standard leaf, before → after, measured: 1280×720 426.2 → 436.9, 1440×900
+  550.2 → 556.0, 1920×918 562.4 → 567.4, 1100×800 490.1 → 492.6, 390×844 259.3
+  → 262.3, 320×568 150.2 → 160.4 (predicted from the arithmetic to 0.1 px
+  before the change was built).
+
+  ⚠ **320×568 IS SHORT, AND NAMED.** Its stage is 238.5 px and it would want 351
+  units; over the two tallest doors the band keeps the stage's top and its gap
+  to the casing narrows to 2.5 px — never onto it.
+
+  **AND THE WALL'S CONTROLS WERE ON ITS ROWS.** The first build centred the band
+  on the door and laid it across the language picker and the undo/save slot on
+  every phone (up to 738 px² at 320). So `placeBand` gives it only the free span
+  between the controls on its own rows (`--band-w`) and moves its centre off the
+  door's only as far as that span requires (`--band-l`); on a phone the option's
+  name yields to an ellipsis before the step's title. ⚠ **Until commit 5 that
+  span on a phone is ~70 px** — the undo, redo and save stand on those rows in
+  one 176 px slot — so the phone's band reads "יד… · ל…" in this commit's tree;
+  commit 5 takes undo to the stage's foot and leaves the save alone there.
+  Recorded, not worked round with a rule commit 5 makes pointless. A face's late
+  arrival changes widths the placement was measured in, so `fitStage` now runs
+  on `document.fonts`' `loadingdone` as well.
+
+  **WHAT ELSE IT MOVED.** Every door now stands lower under the wall's top
+  row, and the audit's wall-ink clause said so through its "still needed"
+  branches: the widest double at 1152×800 went 17/18 px² (he/ru, commit 1b) →
+  0/0, so `WIDE_KNOWN` is empty; `half` went to 0 at every phone width and is
+  gated clear with `standard` and `extra1`. The three still named read 57/0,
+  35/0, 261/90 (were 81/0, 194/74, 494/466). The navigator's gate from commit 2
+  re-run on the new crop: 60 doors × widths × directions, nothing on the column.
+  The price card at the door's head corner was not re-measured — commit 4 takes
+  it off that corner.
+
+  **ASSERTED.** The leaf-budget block keeps its subject and is STRONGER: it held
+  the leaf to `0c6e4ac`'s (421.0 / 550.3 / 563.3) less 4 px; it holds it to
+  `fc30c08`'s — the commit before this — with no tolerance, so a later change
+  that spends the gain fails. The band's one-height-on-every-step clause stays
+  (a second line would now climb toward the stage's top rather than resize the
+  door). New: **the band stands on the photograph** — every viewport × three
+  languages × six sizes × two steps (the first and the grip, the longest
+  option names), 288 readings: absolute and in the wrap; inside the stage; its
+  foot ≥ 7.5 px above the casing and never on `#frame`; on no wall control,
+  price, arrow or column; centred on the door unless it fills its span. The
+  320 pair is named and asserted STILL NEEDED. Falsified: the band back in the flow → "static" at every
+  reading; the span taken away (`placeBand` ignoring the controls) → 142 faults
+  at 390 and 320, on the hud slot and the picker; the old crop (+40) → the band,
+  held inside the stage, stands on the casing (48 faults at 320 and 1280).
+  The landscape and "name twice" clauses read the band's text, which is
+  unchanged; their comments were corrected (the `--band-h` they cited is gone).
+
+  **GATES.** `node --check`, `npm run build`, `npm test` 9,440,834 passed / 5 failed — the five sheet-staleness rows (shot, recreate, corpus, against, lockset). Sheets: 0 bare — the
+  crop is the page's, not the bare `viewBox`.
+
 - **28.9 — THE NAVIGATOR STANDS ON THE PHOTOGRAPH (2 of 10).** The owner's son:
   *"In some categories there appears a scroll wheel that messes up with the
   section icons. The rectangle with the icons needs to be not endless, but just
@@ -1941,6 +2024,12 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.9** **כדור על אורך** (`knobplate`) redrawn off ONE photograph (*"i only
+  have one image of this but i want it in … refine it"*): a waisted plate 90 ×
+  216 (waist 70 at 0.54 — the עילי's family, 8 mm narrower), a 54 mm knob on a
+  62 mm rose at 0.287, the Rotem's egg. Was a 96 × 300 stadium. Footprint 53/48/
+  198 → 48/48/157; `satinPlate` shared with עילי (its render byte-identical).
+  `KEYWAY_BACKSET` 63 kept though no longer "derived" (max is now 58).
 - **28.9** The swing bar lock withdrawn — *"remove the bar lock quickly."*
   Out of the catalogue, the code (`VERSION` 27; 26 is burnt), the drawing, the
   rules, the price's null-state and every sweep; `lt=` retired. The פרזול

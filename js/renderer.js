@@ -1470,13 +1470,40 @@ const STAGE_BOX = { x: 0, y: 0, w: MID_X * 2, h: BASE_Y + PAD.bottom };
  * around the SCENE for the page's staging. Separated, this changes the four
  * `data-fit-*` attributes and not one pixel of any bare render.
  *
- * The numbers: 40 off the top leaves 70 units of wall above the TALLEST door's
- * casing (a standard door keeps 370, because the scene is sized on the tall
- * one and every door stands on the same floor). 130 off the bottom leaves 180
- * units of floor below the threshold, about 50 px on a 900 px-high desktop
- * stage. Net scale +6.0%.
+ * The numbers: 130 off the bottom leaves 180 units of floor below the
+ * threshold, about 50 px on a 900 px-high desktop stage. The top was 40 off
+ * (28.8), which left 70 units of wall above the TALLEST door's casing (a
+ * standard door keeps 300 more, because the scene is sized on the tall one and
+ * every door stands on the same floor). Net scale +6.0% then.
+ *
+ * ⚠ AND SINCE 28.9.2026 THE TOP IS 162 UNITS *MORE* THAN THE SCENE — a
+ * negative trim — because the band now stands on the photograph above the
+ * door (the owner's son: *"The header of the section needs to be on the image
+ * and closer to the door"*): its foot 8 px above the casing's head, and it
+ * must not leave the stage over the tallest door. That wall is arithmetic,
+ * measured the day it moved, with the band out of the flow (its height back
+ * in the stage) and before this number changed:
+ *
+ *                wall over the tallest casing   band + 8   short by
+ *   1280×720            17.0 px                   57.9      40.9
+ *   1440×900            21.3                      62.8      41.5
+ *   1920×918            21.7                      62.8      41.1
+ *    390×844             9.6                      26.8      17.2
+ *
+ * The crop took exactly the worst of those in units: 1280×720 needs 272 units
+ * over that casing (H·650.6/(2776+H) = 57.9), so 110 − 272 = −162. The band's
+ * top meets the stage's top there and clears it everywhere else. The leaf
+ * still comes out LARGER than it was with the band in the flow — 426.2 →
+ * 436.8 px at 1280×720, 550.2 → 555.9 at 1440×900, 562.4 → 567.3 at
+ * 1920×918 (the band's height came back to the stage and only part of it went
+ * to the wall); the ceiling was 1100×800, where more than 288 units would have
+ * made the door smaller than before. At 320×568 the stage is too short for
+ * even this (it wants 351), and over the two tallest doors the band keeps the
+ * stage's top and its gap to the casing narrows to ~2.5 px (CLAUDE.md §9).
+ * `PAD` and the bare viewBox are untouched: the SVG's `viewBox` is not this
+ * box, and no sheet moves.
  */
-const FIT_TRIM = { top: 40, bottom: 130 };
+const FIT_TRIM = { top: -162, bottom: 130 };
 const FIT_BOX = {
   x: STAGE_BOX.x,
   y: STAGE_BOX.y + FIT_TRIM.top,

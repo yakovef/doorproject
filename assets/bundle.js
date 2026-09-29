@@ -3510,7 +3510,7 @@ ${stops}
   var FLOOR_RUN = RETURN;
   var BASE_Y = PAD.top + CASING + RET_HEAD + SCENE_MAX.leafH + FLOOR_RUN;
   var STAGE_BOX = { x: 0, y: 0, w: MID_X * 2, h: BASE_Y + PAD.bottom };
-  var FIT_TRIM = { top: 40, bottom: 130 };
+  var FIT_TRIM = { top: -162, bottom: 130 };
   var FIT_BOX = {
     x: STAGE_BOX.x,
     y: STAGE_BOX.y + FIT_TRIM.top,
@@ -10493,6 +10493,9 @@ ${plate.defs}${plate.body}
     } else {
       window.addEventListener("resize", fitStage);
     }
+    if (document.fonts && typeof document.fonts.addEventListener === "function") {
+      document.fonts.addEventListener("loadingdone", () => fitStage());
+    }
     const panelEl = $(".panel--choose");
     if (panelEl) {
       let queued = false;
@@ -11312,8 +11315,10 @@ ${plate.defs}${plate.body}
     const bandT = document.querySelector("[data-band-title]");
     const bandN = document.querySelector("[data-band-now]");
     const fg = firstGroup(liveStep);
+    const bandWas = `${bandT?.textContent}|${bandN?.textContent}`;
     if (bandT && sec) bandT.textContent = T(sec.title);
     if (bandN) bandN.textContent = fg ? nowLabel(fg) : "";
+    if (`${bandT?.textContent}|${bandN?.textContent}` !== bandWas) placeBand();
     const wrapEl = document.querySelector(".stage-wrap");
     if (wrapEl) wrapEl.dataset.step = liveStep;
     const live = document.querySelector(".steps__step.is-on");
@@ -11695,6 +11700,39 @@ ${plate.defs}${plate.body}
     });
     img.src = href;
   }
+  function placeBand() {
+    const band = document.querySelector(".stage__band");
+    const wrapEl = document.querySelector(".stage-wrap");
+    const stage = $("#stage");
+    if (!band || !wrapEl || !stage || !band.getClientRects().length) return;
+    const ws = wrapEl.style;
+    const fTop = parseFloat(ws.getPropertyValue("--frame-top"));
+    const fL = parseFloat(ws.getPropertyValue("--frame-left"));
+    const fR = parseFloat(ws.getPropertyValue("--frame-right"));
+    if (![fTop, fL, fR].every(Number.isFinite)) return;
+    const wrap = wrapEl.getBoundingClientRect(), box = stage.getBoundingClientRect();
+    const sTop = Math.ceil(box.top - wrap.top);
+    const h = band.getBoundingClientRect().height;
+    const top = Math.max(sTop, Math.floor(fTop - 8 - h));
+    const cx = (fL + fR) / 2;
+    let L2 = box.left - wrap.left + 8, R = box.right - wrap.left - 8;
+    for (const el of wrapEl.querySelectorAll(".stage__hud .hud__slot, #quote, .stage__arrow, .stage-wrap > .steps")) {
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height) continue;
+      if (r.bottom - wrap.top <= top || r.top - wrap.top >= top + h) continue;
+      const l = r.left - wrap.left, rr = r.right - wrap.left;
+      if (rr <= cx) L2 = Math.max(L2, rr + 8);
+      else if (l >= cx) R = Math.min(R, l - 8);
+      else {
+        L2 = cx;
+        R = cx;
+      }
+    }
+    band.style.setProperty("--band-top", `${top}px`);
+    band.style.setProperty("--band-w", `${Math.max(0, Math.floor(R - L2))}px`);
+    const w = band.offsetWidth;
+    band.style.setProperty("--band-l", `${Math.round(Math.max(L2, Math.min(cx - w / 2, R - w)))}px`);
+  }
   function fitStage() {
     if (document.documentElement.classList.contains("is-bare")) return;
     const stage = $("#stage");
@@ -11773,6 +11811,7 @@ ${plate.defs}${plate.body}
       sw.setProperty("--frame-left", `${Math.round(f.left - wrap.x)}px`);
       sw.setProperty("--frame-mid", `${Math.round((f.top + f.bottom) / 2 - wrap.y)}px`);
       sw.setProperty("--hud-b", `${Math.round(hudB - wrap.y)}px`);
+      placeBand();
       const col = document.querySelector(".stage-wrap > .steps");
       if (col) {
         const H = col.offsetHeight;

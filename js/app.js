@@ -671,6 +671,14 @@ function init() {
   } else {
     window.addEventListener('resize', fitStage);
   }
+  /* ⚠ AND WHEN A FACE ARRIVES (28.9). The page's own type swaps in after the
+     first paint, and the things placed off measured WIDTHS on the wall — the
+     band's centre inside its free span, the picker it keeps clear of — were
+     measured in the fallback. The stage does not change size for that, so the
+     observer above never hears of it. */
+  if (document.fonts && typeof document.fonts.addEventListener === 'function') {
+    document.fonts.addEventListener('loadingdone', () => fitStage());
+  }
 
   /* ── THE PANEL SAYS WHEN THERE IS MORE OF IT ─────────────────────────
      ⚠ ABOVE 1100 THE PAGE DOES NOT SCROLL AND THE PANEL DOES, and nothing on
@@ -2558,8 +2566,12 @@ function markSteps() {
   const bandT = document.querySelector('[data-band-title]');
   const bandN = document.querySelector('[data-band-now]');
   const fg = firstGroup(liveStep);
+  /* Written only when it changes, and then placed again (28.9): the band is
+     on the photograph and its width decides where it may stand (`placeBand`). */
+  const bandWas = `${bandT?.textContent}|${bandN?.textContent}`;
   if (bandT && sec) bandT.textContent = T(sec.title);
   if (bandN) bandN.textContent = fg ? nowLabel(fg) : '';
+  if (`${bandT?.textContent}|${bandN?.textContent}` !== bandWas) placeBand();
   const wrapEl = document.querySelector('.stage-wrap');
   if (wrapEl) wrapEl.dataset.step = liveStep;
 
@@ -3600,6 +3612,62 @@ function armRoom() {
   img.src = href;
 }
 
+/**
+ * ⚠ THE BAND STANDS ON THE PHOTOGRAPH, ABOVE THE DOOR'S HEAD — 28.9.2026.
+ * The owner's son: *"The header of the section needs to be on the image and
+ * closer to the door, in some good font — that also goes for the little text
+ * below that shows the current option."* It was a flow item above the stage,
+ * and above 1100 every pixel of it came out of the drawing.
+ *
+ * Placed here and not by the stylesheet, because two of its three numbers
+ * depend on what else stands on the wall:
+ *   top    its foot 8 px above the casing's head (`--frame-top`, which
+ *          `fitStage` reads off the frame's SETTLED box), never above the
+ *          stage's own top — the crop leaves room for that everywhere but the
+ *          two tallest doors at 320×568, where the gap to the casing narrows
+ *          instead (CLAUDE.md §9);
+ *   span   the free wall between the controls that stand on those same rows
+ *          (`--band-w`) — on a phone the language picker and the save stand
+ *          level with the band over most doors, and a band laid across them
+ *          was the first thing measured the day it moved (up to 738 px² on
+ *          the picker at 320);
+ *   left   centred on the door, moved off-centre only as far as that span
+ *          requires once the band's own width is known.
+ * Physical `left`, like the frame it is read from: the drawing does not
+ * mirror, so nothing placed against it may (§0c). Two layout reads — its
+ * height, then its width inside the span it has just been given.
+ */
+function placeBand() {
+  const band = document.querySelector('.stage__band');
+  const wrapEl = document.querySelector('.stage-wrap');
+  const stage = $('#stage');
+  if (!band || !wrapEl || !stage || !band.getClientRects().length) return;
+  const ws = wrapEl.style;
+  const fTop = parseFloat(ws.getPropertyValue('--frame-top'));
+  const fL = parseFloat(ws.getPropertyValue('--frame-left'));
+  const fR = parseFloat(ws.getPropertyValue('--frame-right'));
+  if (![fTop, fL, fR].every(Number.isFinite)) return;
+  const wrap = wrapEl.getBoundingClientRect(), box = stage.getBoundingClientRect();
+  const sTop = Math.ceil(box.top - wrap.top);
+  const h = band.getBoundingClientRect().height;
+  const top = Math.max(sTop, Math.floor(fTop - 8 - h));
+  const cx = (fL + fR) / 2;
+  let L = box.left - wrap.left + 8, R = box.right - wrap.left - 8;
+  for (const el of wrapEl.querySelectorAll('.stage__hud .hud__slot, #quote, .stage__arrow, .stage-wrap > .steps')) {
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height) continue;
+    if (r.bottom - wrap.top <= top || r.top - wrap.top >= top + h) continue;
+    const l = r.left - wrap.left, rr = r.right - wrap.left;
+    if (rr <= cx) L = Math.max(L, rr + 8);
+    else if (l >= cx) R = Math.min(R, l - 8);
+    else { L = cx; R = cx; }              // something stands across the door's centre
+  }
+  band.style.setProperty('--band-top', `${top}px`);
+  band.style.setProperty('--band-w', `${Math.max(0, Math.floor(R - L))}px`);
+  const w = band.offsetWidth;
+  band.style.setProperty('--band-l', `${Math.round(Math.max(L, Math.min(cx - w / 2, R - w)))}px`);
+}
+
 function fitStage() {
   /* Bare mode is the measurement harness (tools/frame.mjs, recreate.mjs and
      friends), and a harness wants the drawing's own frame: the door filling
@@ -3864,6 +3932,7 @@ function fitStage() {
     sw.setProperty('--frame-left', `${Math.round(f.left - wrap.x)}px`);
     sw.setProperty('--frame-mid', `${Math.round((f.top + f.bottom) / 2 - wrap.y)}px`);
     sw.setProperty('--hud-b', `${Math.round(hudB - wrap.y)}px`);
+    placeBand();
 
     /* ⚠ WHERE THE NAVIGATOR COLUMN STANDS (28.9), when it is on the photograph.
        Centred on the door's mid-height, as asked — UNLESS that puts it under

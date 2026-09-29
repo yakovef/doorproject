@@ -1119,11 +1119,34 @@ svg { direction: ltr; }
    before the title shrank, less 4 px. Each line is ONE line in every language
    (ellipsis rather than a wrap), so the band — and with it the door — is the
    same height on every step. */
+/* ⚠ ON THE PHOTOGRAPH SINCE 28.9.2026 — the owner's son: *"The header of the
+   section needs to be on the image and closer to the door, in some good font —
+   that also goes for the little text below that shows the current option."*
+   It was a flow item between the `<h1>` and the stage, and above 1100 every
+   pixel of it came out of the drawing. Now it is absolute in `.stage-wrap`,
+   placed by `placeBand` (js/app.js) off the frame's settled box: its FOOT 8 px
+   above the casing's head, centred across on the door — physical, like the
+   frame it is read from; the drawing does not mirror. It takes no height, so
+   the stage gets the band's ~52–63 px back and the door grows with it.
+   ⚠ IT NEVER LANDS ON THE CASING BECAUSE THE CROP MAKES ROOM FOR IT, not
+   because it is pushed: `FIT_TRIM.top` in js/renderer.js was given exactly the
+   wall the band needs over the tallest door (the table is there).
+   ⚠ AND IT NEVER LANDS ON THE WALL'S CONTROLS, because it is given only the
+   free span between them on its own rows (`--band-w`) and its centre is moved
+   off the door's only as far as that span requires (`--band-l`). On a phone
+   the controls stand on those rows over most doors — the language picker in
+   one top corner, the save in the other — so there the band is the room
+   between them, and an option's name too long for it ends in an ellipsis. */
 .stage__band {
-  flex: 0 0 auto;
+  position: absolute; z-index: 4;
+  inset-block-start: var(--band-top, 0px);
+  left: var(--band-l, 16px);
+  inline-size: max-content;
+  max-inline-size: var(--band-w, calc(100% - 32px));
   display: grid; justify-items: center; gap: 0;
-  padding: 2px 16px 6px;
+  padding: 0;
   text-align: center;
+  pointer-events: none;
 }
 .band__title, .band__now {
   margin: 0; max-inline-size: 100%;
@@ -1140,17 +1163,20 @@ svg { direction: ltr; }
   font: 400 clamp(13px, 1.1vw, 15px)/1.35 var(--sans);
   color: var(--ink-2); min-block-size: 1.35em;
 }
-/* ⚠ ON A PHONE IT IS ONE LINE, and the stage gives up exactly that line
-   (`--band-h`, in `.stage`'s phone rules) — the question below the door does
-   not move down for it. The title then the option, the way the two lines read
-   above 1100, in the interface's direction. */
+/* ⚠ ON A PHONE IT IS ONE LINE, AND SINCE 28.9 IT TOO STANDS ON THE PICTURE at
+   the same anchor — the stage no longer gives up a line for it (`--band-h` is
+   gone from `.stage`'s phone rules), so the door has those 30 px back. The
+   title then the option, the way the two lines read above 1100, in the
+   interface's direction. */
 @media (max-width: 1099px) {
-  :root { --band-h: 30px; }
   .stage__band {
     display: flex; justify-content: center; align-items: baseline; gap: 8px;
-    block-size: var(--band-h); padding: 4px 14px 0; overflow: hidden;
+    padding: 0; overflow: hidden; white-space: nowrap;
   }
-  .band__title { font-size: 1.02rem; font-weight: 700; flex: 0 1 auto; min-inline-size: 0; }
+  /* The option's name gives way before the step's: where the free span is
+     short (the controls stand level with the band), the second part ends in
+     an ellipsis first and the title keeps its whole width while it can. */
+  .band__title { font-size: 1.02rem; font-weight: 700; flex: 0 0 auto; max-inline-size: 100%; }
   .band__now { font-size: .86rem; flex: 0 1 auto; min-inline-size: 0; min-block-size: 0; }
   .band__now:not(:empty)::before { content: '·'; margin-inline-end: 8px; color: var(--ink-3); }
 }
@@ -1226,7 +1252,7 @@ svg { direction: ltr; }
      out of the door rather than out of the question under it — at 320x568 the
      answers already arrive below the fold (§9), and a sticky block 30 px
      taller would have pushed them further. The door shrinks by that line. */
-  .stage { block-size: calc(clamp(40vh, 100vw, 56vh) - var(--band-h, 0px)); }
+  .stage { block-size: clamp(40vh, 100vw, 56vh); }
 }
 @media (min-width: 1100px) {
   .stage { block-size: auto; flex: 1 1 auto; min-block-size: 0; }
@@ -2598,7 +2624,7 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
    above, and `.sect__where` / `.sect__title` / `.sect__lede` directly above).
    §8, five times in this file and twice by me. */
 @media (max-width: 1099px) and (max-height: 700px) {
-  .stage { block-size: calc(clamp(36vh, 100vw, 42vh) - var(--band-h, 0px)); }
+  .stage { block-size: clamp(36vh, 100vw, 42vh); }
   .sect__where { margin-block-end: 3px; }
   .sect__title { margin-block-end: 4px; }
   /* ⚠ AND SMALLER, WHICH IS THE ONE PLACE THIS ROUND TOUCHES TYPE SIZE — the

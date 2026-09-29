@@ -4646,7 +4646,9 @@ for (const v of VIEWS) {
   ];
   /* measured to show an answer on only the steps named here, and required to
      still be exactly that. ⚠ RESTATED 27.9.2026 FROM "NONE": the band above
-     the door takes its phone line out of the STAGE (`--band-h`), the stage is
+     the door took its phone line out of the STAGE (`--band-h`, gone 28.9: the
+     band stands on the picture now and the stage has its 30 px back, so the
+     sticky block is the same height either way), the stage was
      30 px shorter, and both shapes now show an answer on the glass step —
      one of eight (measured; its first window tile clears the quote bar). The exemption shrank; it is re-named at its new size rather
      than dropped, because seven steps still show none. */
@@ -5913,21 +5915,27 @@ for (const v of VIEWS) {
   if (faults === before0) console.log(`    ${priced} priced steps across three languages, no explainer says the prices are the same; the colour sentence is on the colour step and the summary in all three`);
 }
 
-/* ── THE BAND ABOVE THE DOOR FITS ITS BUDGET, AND THE ARROWS STEP ─────────
+/* ── THE BAND ABOVE THE DOOR, ON THE PHOTOGRAPH, AND THE ARROWS STEP ──────
    27.9.2026, the owner's son: *"above the door the name of the section we are
    at, big … between the section name and the door, the name of the thing now
    selected … two arrows on each side of the door that change the option (the
    next available one; if none is compatible, a window: 'there is no compatible
-   x with your build')."*
-   ⚠ THE BUDGET IS A MEASUREMENT FROM BEFORE THE ROUND, written here because it
-   is the thing asserted: above 1100 the band is in the flow and takes its
-   height out of the drawing (§0c), and the title shrank in the same round to
-   pay for it. The standard door's leaf height, measured on the live page on
-   `0c6e4ac` (before the title shrank): 1280x720 421.0 px, 1440x900 550.3,
-   1920x918 563.3. Asserted: no smaller than that less 4 px.
+   x with your build')."* And 28.9: *"The header of the section needs to be on
+   the image and closer to the door, in some good font."*
+   ⚠ RESTATED 28.9.2026, SAME SUBJECT, STRONGER. The budget was a measurement
+   from before the 27.9 round — the band was in the flow above 1100 and took
+   its height out of the drawing, and the leaf was held to no smaller than
+   `0c6e4ac`'s (1280x720 421.0 px, 1440x900 550.3, 1920x918 563.3) less 4 px.
+   The band is on the photograph now and gives its height back; the crop took
+   part of it for the wall the band stands on (`FIT_TRIM.top`, whose table is
+   in js/renderer.js). So the leaf is held to what it was on `fc30c08`, the
+   commit BEFORE the move — 426.2, 550.2, 562.4 — with no tolerance: it is
+   436.9, 556.0 and 567.4 after it, and a later change that spends the gain
+   fails here.
    The band itself: the live step's title and its first group's chosen option,
-   the SAME HEIGHT on every step (one line each, in every language) so the door
-   does not resize between steps.
+   the SAME HEIGHT on every step (one line each, in every language) — its foot
+   is anchored over the door, so a second line would climb toward the stage's
+   top rather than resize the door.
    The arrows: the next arrow moves the first group to the next free option in
    the list's own order and the band follows; prev from the first option wraps;
    a step whose group has no other free option opens the one-button dialog and
@@ -5936,7 +5944,7 @@ for (const v of VIEWS) {
 {
   console.log('\nthe band above the door fits its budget, and the arrows step');
   const before = faults;
-  const BUDGET = { '1280x720': 421.0, '1440x900': 550.3, '1920x918': 563.3 };
+  const BUDGET = { '1280x720': 426.2, '1440x900': 550.2, '1920x918': 562.4 };
   let asked = 0;
   for (const [w, h] of [[1280, 720], [1440, 900], [1920, 918]]) for (const lang of ['he', 'ru']) {
     const tag = `${lang} ${w}x${h}`;
@@ -5959,9 +5967,9 @@ for (const v of VIEWS) {
         heights.push(Math.round(m.band * 10) / 10);
         if (i === 0) {
           asked++;
-          if (m.leaf < BUDGET[`${w}x${h}`] - 4) {
+          if (m.leaf < BUDGET[`${w}x${h}`]) {
             fault('band', `${tag}: the leaf is ${m.leaf.toFixed(1)} px, ${(BUDGET[`${w}x${h}`] - m.leaf).toFixed(1)} px smaller `
-              + `than before the round (${BUDGET[`${w}x${h}`]}) — the band costs the drawing more than the title gave back`);
+              + `than before the band went onto the photograph (${BUDGET[`${w}x${h}`]}) — the crop spends more on the wall than the band gave back`);
           }
         }
         if (m.tLines !== 1 || m.nLines !== 1) fault('band', `${tag} step "${m.step}": the band runs to ${m.tLines}+${m.nLines} lines — each is one line`);
@@ -5969,7 +5977,7 @@ for (const v of VIEWS) {
         if (!next) break;
         await pg.waitForTimeout(260);
       }
-      if (new Set(heights).size > 1) fault('band', `${tag}: the band is ${[...new Set(heights)].join(' / ')} px tall across the steps — the door resizes between steps`);
+      if (new Set(heights).size > 1) fault('band', `${tag}: the band is ${[...new Set(heights)].join(' / ')} px tall across the steps — it climbs toward the stage's top on some`);
       if (heights.length < 9) fault('band', `${tag}: only ${heights.length} of 9 steps walked`);
     } finally { await pg.close().catch(() => {}); }
   }
@@ -6023,7 +6031,96 @@ for (const v of VIEWS) {
     } finally { await pg.close().catch(() => {}); }
   }
   if (asked < 10) fault('band', `only ${asked} of 10 readings were made — this check is measuring almost nothing`);
-  if (faults === before) console.log(`    ${asked} readings: the leaf within 4 px of its size before the round at 1280, 1440 and 1920, the band one height on all nine steps in he and ru; the arrows step the face and wrap, the band follows, the tall slot's refusal opens the dialog and changes nothing, hidden on the summary`);
+  if (faults === before) console.log(`    ${asked} readings: the leaf no smaller than before the band went onto the photograph at 1280, 1440 and 1920, the band one height on all nine steps in he and ru; the arrows step the face and wrap, the band follows, the tall slot's refusal opens the dialog and changes nothing, hidden on the summary`);
+}
+
+/* ── THE BAND STANDS ON THE PHOTOGRAPH, OVER THE DOOR AND ON NOTHING ELSE ──
+   28.9.2026 — *"The header of the section needs to be on the image and closer
+   to the door."* Measured the day it moved, at every size, in the three
+   languages, on the default door's first step (its longest title in Russian is
+   the colour's) and on the grip step (the longest option name):
+     · OUT OF THE FLOW: absolute, inside the stage's box — its top never above
+       the stage's top, so it is on the picture and not over the page's title;
+     · OVER THE DOOR: its foot 8 px above the casing's head (≥ 7.5 after
+       rounding), and never on `#frame`;
+     · ON NOTHING ELSE: no wall control, price, arrow or navigator column
+       touches it — `placeBand` gives it only the span between them;
+     · CENTRED on the door wherever its span lets it be, and otherwise moved
+       off the door's centre only as far as that span requires.
+   ⚠ ONE NAMED READING, asserted STILL NEEDED: at 320x568 the stage is too
+   short for the band over the two tallest doors (the crop would have wanted
+   351 units there and the desktop could give 272 before its leaf shrank), so
+   the band keeps the stage's top and its gap to the casing narrows — to more
+   than 2 px, never onto it. The day the gap is 7.5 there, this fails. */
+{
+  console.log('\nthe band stands on the photograph, over the door and on nothing else');
+  const before = faults;
+  const NARROW = new Set(['320x568 extra2', '320x568 halfextra2']);
+  let read = 0; const narrowSeen = new Set(); const offCentre = [];
+  const bandAt = async (pg) => pg.evaluate(() => {
+    const R = e => { const r = e.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height }; };
+    const band = document.querySelector('.stage__band'), stage = document.querySelector('#stage');
+    const fr = document.querySelector('.door-svg #frame');
+    if (!band || !stage || !fr || !band.getClientRects().length) return null;
+    const bb = fr.getBBox(), M = fr.getScreenCTM();
+    const a = new DOMPoint(bb.x, bb.y).matrixTransform(M), z = new DOMPoint(bb.x + bb.width, bb.y + bb.height).matrixTransform(M);
+    const others = [...document.querySelectorAll('.stage__hud .hud__slot, #quote, .stage__arrow, .stage-wrap > .steps')]
+      .filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden')
+      .map(e => ({ n: e.id || e.className.split(' ')[0], r: R(e) }));
+    const t = band.querySelector('[data-band-title]'), n = band.querySelector('[data-band-now]');
+    return { band: R(band), stage: R(stage), frame: { left: a.x, top: a.y, right: z.x, bottom: z.y }, others,
+      pos: getComputedStyle(band).position, inWrap: band.parentElement === document.querySelector('.stage-wrap'),
+      span: parseFloat(band.style.getPropertyValue('--band-w')),
+      clipped: t.scrollWidth > t.clientWidth + 1 || n.scrollWidth > n.clientWidth + 1,
+      text: `${t.textContent} · ${n.textContent}` };
+  });
+  const area = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
+  for (const v of VIEWS) for (const lang of ['he', 'en', 'ru']) for (const size of Object.keys(SIZES)) {
+    const pg = await b.newPage({ viewport: { width: v.w, height: v.h } });
+    try {
+      /* a bare load opens step 01; the size is chosen by a tap, so the
+         customer's first view is the one measured */
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
+      await pg.waitForTimeout(500);
+      if (size !== 'standard') {
+        await pg.evaluate(id => document.querySelector(`.field[data-group="size"] [data-id="${id}"]`)?.click(), size);
+        await pg.waitForTimeout(450);
+      }
+      for (const step of ['first', 'grip']) {
+        if (step === 'grip') {
+          await pg.evaluate(() => document.querySelector('.steps__step[data-step="grip"]')?.click());
+          await pg.waitForTimeout(450);
+        }
+        const m = await bandAt(pg);
+        const tag = `${lang} ${v.w}x${v.h} ${size} ${step}`;
+        if (!m) { fault('band-photo', `${tag}: no band on the page — this check has lost its subject`); continue; }
+        read++;
+        if (m.pos !== 'absolute' || !m.inWrap) fault('band-photo', `${tag}: the band is ${m.pos}${m.inWrap ? '' : ' and not in the wrap'} — it is in the flow again, and its height comes out of the door`);
+        if (m.band.top < m.stage.top - 0.5) fault('band-photo', `${tag}: the band's top is ${(m.stage.top - m.band.top).toFixed(1)} px above the stage — off the picture`);
+        const onFrame = area(m.band, m.frame);
+        const gap = m.frame.top - m.band.bottom;
+        const key = `${v.w}x${v.h} ${size}`;
+        if (onFrame) fault('band-photo', `${tag}: the band stands on the door — ${onFrame} px² of it on #frame`);
+        else if (NARROW.has(key)) { if (gap < 7.5) narrowSeen.add(key); if (gap < 2) fault('band-photo', `${tag}: the named narrow gap is ${gap.toFixed(1)} px — it may narrow, not close`); }
+        else if (gap < 7.5) fault('band-photo', `${tag}: the band's foot is ${gap.toFixed(1)} px above the casing, not 8`);
+        for (const o of m.others) {
+          const x = area(m.band, o.r);
+          if (x) fault('band-photo', `${tag}: the band is on the ${o.n} (${x} px², "${m.text}")`);
+        }
+        const doorC = (m.frame.left + m.frame.right) / 2, bandC = (m.band.left + m.band.right) / 2;
+        /* off-centre is allowed only where the band fills its whole span */
+        if (Math.abs(bandC - doorC) > 1.5 && m.band.width < m.span - 1.5) fault('band-photo', `${tag}: the band is ${(bandC - doorC).toFixed(1)} px off the door's centre with room to spare in its span`);
+        if (Math.abs(bandC - doorC) > 1.5) offCentre.push(tag);
+      }
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('band-photo', `${v.name} ${lang} ${size}: chromium died before the band was measured`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  for (const k of NARROW) if (!narrowSeen.has(k)) fault('band-photo', `${k}: the named narrow gap is gone — the band clears the casing by 8 px there now; remove it from NARROW`);
+  const want = VIEWS.length * 3 * Object.keys(SIZES).length * 2;
+  if (read < want) fault('band-photo', `read ${read} of ${want} bands — this check is measuring less than it says`);
+  if (faults === before) console.log(`    ${read} readings over ${VIEWS.length} viewports x three languages x ${Object.keys(SIZES).length} sizes x two steps: absolute, inside the stage, its foot 8 px above the casing on all but the named narrow pair at 320 (gap > 2), on no wall control, price, arrow or column; centred on the door on ${read - offCentre.length}, moved only as far as its span requires on ${offCentre.length}`);
 }
 
 /* ── THE NAVIGATOR IS A DARK COLUMN, AND ITS CHECKS ARE WHAT YOU WALKED ───
@@ -6344,7 +6441,11 @@ for (const v of VIEWS) {
      21.6 px shorter, and `extra1`'s 7 px² at 360 went to 0 at every width —
      reported by this check's own "still needed" clause. It is gated with the
      standard door now, at every width. */
-  const CLEARS = ['standard', 'extra1'];
+  /* ⚠ AND `half` JOINED THEM ON 28.9: the band went onto the photograph and
+     the crop took 202 units more wall above the door (`FIT_TRIM`), so every
+     door stands lower under the wall's top row — `half` read 0 at every phone
+     width in both languages, reported by the "still needed" clause below. */
+  const CLEARS = ['standard', 'extra1', 'half'];
   const CLEAR = CLEARS[0];
   const KNOWN = ALL.filter(s => !CLEARS.includes(s));   // the exemption, asserted below
   /* ⚠ AND ONE NAMED READING AT 1152, NEW THE SAME DAY, WITH ITS NUMBER — the
@@ -6359,7 +6460,10 @@ for (const v of VIEWS) {
      was re-cut to fit the wall (css/app.css, `.lang`), and the Hebrew reading
      came in under what was named — so the name follows it down. `ru` reads 18
      and stays named at 15, inside this check's +10: re-measured, never widened. */
-  const WIDE_KNOWN = { 'he 1152x800 halfextra2': 17, 'ru 1152x800 halfextra2': 15 };
+  /* ⚠ EMPTY SINCE 28.9 — the same crop put the widest double's head below the
+     picker at 1152, and both readings went to 0 (their "no longer" clause said
+     so). The machinery is kept so the next one is named the same way. */
+  const WIDE_KNOWN = {};
   const wideSeen = {};
   let measured = 0;
   const seen = {};
@@ -6468,10 +6572,9 @@ for (const v of VIEWS) {
     }
   }
   if (faults === before) {
-    console.log(`    ${measured} readings in two languages: the standard door's and extra1's wall chrome `
-      + 'never touches them, no size is touched at 1152 px and up but the two named readings '
-      + `(${Object.entries(wideSeen).map(([k, v]) => `${k} ${v}`).join(', ')}), and the four doors §9 names are still `
-      + `the four that overlap (worst px² of glyph, he/ru: `
+    console.log(`    ${measured} readings in two languages: the wall chrome never touches the ${CLEARS.join(', ')} doors, `
+      + `no size is touched at 1152 px and up${Object.keys(wideSeen).length ? ` but the named readings (${Object.entries(wideSeen).map(([k, v]) => `${k} ${v}`).join(', ')})` : ''}, `
+      + `and the ${KNOWN.length} doors §9 names are still the ones that overlap (worst px² of glyph, he/ru: `
       + KNOWN.map(s => `${s} ${seen[s].he}/${seen[s].ru}`).join(', ') + ')');
   }
 }
