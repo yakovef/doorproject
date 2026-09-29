@@ -173,6 +173,10 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   their word, stays visually hidden on a screen under 500 px tall (a phone on
   its side, a laptop at 200 %) — shown there it took every answer off those
   screens (5 → 0 steps at 844×390) — and the band over the door carries it.
+  · on the half door's fixed leaf, under glass, every panel lines up with the
+    window's casing, not only the lone one (28.9, commit 9): *"a window and a
+    panel at the same width"* against the order's own `PANEL_INSET` line, which
+    on a 350 mm leaf gives a 189 mm panel under a 288 mm casing.
   Settled with them in chat, not ours: where the new "ask before removing"
   rule meets Peretz's refusal — a pull handle or bow with no room beside the
   window or the face — **Peretz's rule stands**, refused with its reason and
@@ -187,6 +191,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** The half door's face follows the main leaf's (9 of 10) — *"a window
+  and a panel at the same width … with 3 panels there should be 3 panels on the
+  half door too"*: the fixed leaf asks `faceRowsOn` of its own width — pair and
+  trio drawn solid (it was bare), kept rows under glass; its glass the main
+  light's fractions (the 110 mm clamp gone). Under glass its panels take the
+  casing's width (ours, §0a). The face charged once, the ironwork per pane.
+  Long form: `HISTORY.md`.
 - **28.9** A first visit gets a tour (8 of 10) — *"a grey overlay on everything
   but the thing described, an arrow from the text to the thing"*: `js/tour.js`,
   a modal `<dialog>` of four cut-outs (door, navigator, options, save + undo),
@@ -219,13 +230,6 @@ lines here. Dates are the day of the change.
   720 on 8bbd134; 28.8's fallback 107/12, raw Arial 38 — both caught). A second
   fallback, nine faces script × weight, measured no better (4–9): not shipped.
   Long form: `HISTORY.md`.
-- **28.9** The price on the photograph (4 of 10) — *"not on a white thing …
-  left of the door, between the door and the lamp, on the higher end"*: no
-  ground, figure 2.4 rem, the send a line of ink; `right` 8 px off the casing's
-  left edge, at its head. Ink ≥ 10.6:1 on the picture (gate 4.5, no wash).
-  "מחיר משוער" off the figure (bar 71.3 → 67.0 px). Picker top-RIGHT in every
-  language. In en/ru the column shares that wall: its gaps give (≥ 2 px). Long
-  form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -775,6 +779,20 @@ derived from the WINDOW rather than from another face.
   14.9 overrule and the window's own x fractions are the owner's son's light.
   A face that keeps nothing falls back to the window's own lone panel, aligned
   to the casing (d097); plain behind the square window draws that.
+- ⚠ **The fixed leaf of a דלת וחצי carries the same face** (28.9, the owner's
+  son: *"…a window and a panel at the same width, just like the main door — and
+  with 3 panels there should be 3 panels on the half door too"*). It asks
+  `faceRowsOn` of ITS width and draws through the same `appliedFrame`: the
+  rows are the main leaf's (one height), a solid face keeps `PANEL_INSET` of
+  its own 350 mm, and its glass is the main light's FRACTIONS of its width —
+  the square window 148 mm, the slot 112/103/86 mm on the three bands (the 110
+  mm clamp is gone). ⚠ **Under glass its rows line up with the CASING** (ours,
+  §0a): at `PANEL_INSET` the kept panel would be 189 mm under a 288 mm casing,
+  where the main leaf's is 459 under 499. The cost: switching the window on
+  widens that leaf's lower panel 189 → 288. d119's narrow leaf read the panel
+  0.50 of the leaf under a 0.34 window — measured, overruled, kept in the
+  comment. Priced as before: the face once, the ironwork per pane (asserted).
+  Stripes are not a face and stay on the main leaf only.
 
 **The stripes are a COUNT and a DIRECTION, not tiles** (27.8), priced per
 stripe. `metalStrips` places them from four measured tables, doors named beside

@@ -3466,56 +3466,78 @@ export function render(state) {
                                  null, PANEL_INSET, mouldOf(detail))
                   : '');
           })()
-      : openings.length && sideW > 320
+      : sideW > 320
         ? (() => {
-            /* ⚠ THE SECOND LEAF GETS THE PANEL TOO — 14.9.2026, and it is the
-               same one-line omission as in `panelFits` and `faceObstacles`,
-               arriving in the place that draws. Peretz: the square window on a
-               דו כנפי puts a panel on BOTH leaves. d119 is that door and shows
-               it — a main leaf with a window over a panel beside a narrow leaf
-               with a window over a panel, the two panels at the same height.
-               ⚠ `alignTo` STAYS NULL HERE, which is the opposite of the main
-               leaf, and the photograph is why. On the main leaf the panel
-               takes the opening's own outer edges; on d119's narrow leaf the
-               panel is measurably WIDER than the window above it — 0.50 of
-               that leaf's width against the window's 0.34 — so it keeps the
-               composition's own inset instead. `PANEL_INSET` gives 1 - 2(0.23)
-               = 0.54, which is that measurement to four hundredths.
-               The rows are `PANEL_ROWS.lone` through `appliedFrame`'s lone
-               branch, and because both leaves are the same height the two
-               panels line up across the door without being told to. */
-            /* ⚠ OFF THE MAIN LEAF'S CUT OPENING, SINCE 26.9.2026. This read
-               the catalogue's millimetre rectangle, which the square window no
-               longer has — it is fractions of the leaf, the Greek set's — so
-               the fixed leaf takes the main leaf's top, height and (for the
-               ornament's scale) width off `openings`, and the two lights share
-               a top and a height because they are the same numbers (G3). */
-            /* ⚠ AND THE SQUARE WINDOW TAKES ITS OWN FRACTIONS OF THIS LEAF, the
-               way the Greek set's light always did here (`classicFixedLight`)
-               — so a face tap does not move this pane either. It was the main
-               pane clamped to `sideW - 240`: 110 mm on the 350 mm leaf beside
-               the set's 148, which the new "the window does not move when the
-               face changes" check found on all three two-leaf sizes. d119's
-               narrow leaf read 0.34 of its width against the 0.314 the clamp
-               gave; 0.422 overrules that reading on the same word that
-               overruled the ten corpus doors on the main leaf. The slot is
-               millimetres and keeps the clamp. */
+            /* ⚠ THE FIXED LEAF CARRIES THE MAIN LEAF'S FACE — 28.9.2026. The
+               owner's son: *"On the half door the proportions between windows
+               and panels need to be the same as on the main door — a window and
+               a panel at the same width, just like the main door — and with 3
+               panels there should be 3 panels on the half door too."*
+               Until today this branch ran only under glass, so a solid pair or
+               trio on a דלת וחצי stood beside a bare half leaf, and under the
+               square window it drew the window's lone panel at `PANEL_INSET`
+               whatever the face. Now it asks the main leaf's own statement,
+               `faceRowsOn`, of THIS leaf — its width, its openings, the shared
+               height — and draws what that answers through the same
+               `appliedFrame`: the pair's two rows, the trio's three with its
+               plate, the rows a face KEEPS where the window replaces its upper
+               panel, and behind a plain face the window's lone panel lined up
+               with the casing. Every row is a fraction of the height both
+               leaves share, so the two leaves' panels line up across the door
+               by construction; every inset is a fraction of this leaf's width
+               (`PANEL_INSET`) or the casing's own edge, as on the main leaf.
+               The panel on BOTH leaves is Peretz's own (14.9: the square window
+               on a דו כנפי puts a panel on each), and d119 is that door.
+               ⚠ d119 SAID OTHERWISE ABOUT ITS WIDTH, AND IS OVERRULED ON THIS WORD. Its narrow
+               leaf's panel is measurably WIDER than the window above it — 0.50
+               of that leaf against the window's 0.34 — and until today the
+               panel kept `PANEL_INSET` (0.54, that reading to four hundredths)
+               instead of the casing. Measured, overruled, kept.
+               The Greek set's branch above is untouched: it always drew the
+               whole composition on this leaf, which is what this now does for
+               every face. */
+            /* THE GLASS, AS THE SAME FRACTIONS OF THIS LEAF. The square window
+               is fractions of the leaf (`classicFixedLight`, the Greek set's
+               own light here since 25.9); the slot is millimetres on the main
+               leaf and takes the fractions of it that its cut opening there
+               comes to. It was the main pane clamped to `sideW - 240` — 110 mm
+               on every size — and that clamp is gone: on `half` the slot is
+               0.320 of either leaf (272 → 112 mm), on `halfextra2` 0.247 (86).
+               Rows are the main leaf's (G3), so the two lights share a top and
+               a height. The ornament stays at the MAIN pane's scale (`ornW`,
+               see grillePaths). */
             const main = openings[0];
-            const own = win.frac ? classicFixedLight(sideW, leafH) : null;
-            const paneW = own ? own.w : Math.min(main.w, sideW - 240);
-            const paneX = own ? own.x : (sideW - paneW) / 2;
-            const paneTop = y0 + (own ? own.top : main.top);
-            const paneH = own ? own.h : main.h;
-            return aperture({ x: sideX + paneX, y: paneTop,
-                     w: paneW, h: paneH,
-                     /* The ornament at the MAIN leaf's scale — see grillePaths. */
+            const scale = sideW / leafW;
+            const own = !main ? null
+              : win.frac ? { ...classicFixedLight(sideW, leafH), splits: [] }
+              : { x: main.x * scale, w: main.w * scale, top: main.top, h: main.h,
+                  splits: main.splits.map(sp => ({ x: sp.x * scale, w: sp.w * scale })) };
+            const f = faceRowsOn(detail, win, own ? [own] : [], sideW, leafH);
+            /* ⚠ UNDER GLASS EVERY ROW LINES UP WITH THE CASING, NOT ONLY THE
+               LONE PANEL — ours, named so it can be reversed in a line. On the
+               main leaf the rows a face keeps stand at `PANEL_INSET`, and that
+               happens to be the casing's width to the eye: 459 mm under 499 on
+               the 850 leaf (0.92). The casing is 70 mm of stock whatever the
+               leaf, so on the 350 mm leaf the same inset would put a 189 mm
+               panel under a 288 mm casing (0.66) — the mismatch his sentence is
+               about. So here the kept rows take the casing's edge, as the lone
+               panel always has; on a SOLID fixed leaf there is no window to
+               match and the face keeps `PANEL_INSET` of its own width. The
+               cost: switching the window on widens this leaf's lower panel
+               189 → 288 mm, where the main leaf's stays put. */
+            const alignTo = own ? Math.max(0, own.x - MOULD_BAND) : null;
+            return (own
+                ? aperture({ x: sideX + own.x, y: y0 + own.top, w: own.w, h: own.h,
+                     splits: own.splits.map(sp => ({ x: sideX + sp.x, w: sp.w })),
                      ornW: main.w,
                      paint, edge, grille, key: 's', profile: mouldOf(detail),
                      leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
-              + (detail.panel || win.panel
+                : '')
+              + (f.rows.length
                   ? appliedFrame(sideX, y0, sideW, leafH, paint, pale,
-                                 paneTop + paneH, null, 0, 's',
-                                 null, PANEL_INSET, mouldOf(detail))
+                                 own ? y0 + own.top + own.h : y0,
+                                 f.lone ? null : f.rows, 0, 's', alignTo,
+                                 panelInset(detail), mouldOf(detail))
                   : '');
           })()
         : ''}</g>` : ''}

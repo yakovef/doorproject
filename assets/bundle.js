@@ -5210,19 +5210,24 @@ ${stops}
         PANEL_INSET,
         mouldOf(detail)
       ) : "");
-    })() : openings.length && sideW > 320 ? (() => {
+    })() : sideW > 320 ? (() => {
       const main = openings[0];
-      const own = win.frac ? classicFixedLight(sideW, leafH) : null;
-      const paneW = own ? own.w : Math.min(main.w, sideW - 240);
-      const paneX = own ? own.x : (sideW - paneW) / 2;
-      const paneTop = y0 + (own ? own.top : main.top);
-      const paneH = own ? own.h : main.h;
-      return aperture({
-        x: sideX + paneX,
-        y: paneTop,
-        w: paneW,
-        h: paneH,
-        /* The ornament at the MAIN leaf's scale — see grillePaths. */
+      const scale = sideW / leafW;
+      const own = !main ? null : win.frac ? { ...classicFixedLight(sideW, leafH), splits: [] } : {
+        x: main.x * scale,
+        w: main.w * scale,
+        top: main.top,
+        h: main.h,
+        splits: main.splits.map((sp) => ({ x: sp.x * scale, w: sp.w * scale }))
+      };
+      const f = faceRowsOn(detail, win, own ? [own] : [], sideW, leafH);
+      const alignTo = own ? Math.max(0, own.x - MOULD_BAND) : null;
+      return (own ? aperture({
+        x: sideX + own.x,
+        y: y0 + own.top,
+        w: own.w,
+        h: own.h,
+        splits: own.splits.map((sp) => ({ x: sideX + sp.x, w: sp.w })),
         ornW: main.w,
         paint: paint2,
         edge,
@@ -5230,19 +5235,19 @@ ${stops}
         key: "s",
         profile: mouldOf(detail),
         leaf: { x: sideX, y: y0, w: sideW, h: leafH }
-      }) + (detail.panel || win.panel ? appliedFrame(
+      }) : "") + (f.rows.length ? appliedFrame(
         sideX,
         y0,
         sideW,
         leafH,
         paint2,
         pale,
-        paneTop + paneH,
-        null,
+        own ? y0 + own.top + own.h : y0,
+        f.lone ? null : f.rows,
         0,
         "s",
-        null,
-        PANEL_INSET,
+        alignTo,
+        panelInset(detail),
         mouldOf(detail)
       ) : "");
     })() : ""}</g>` : ""}

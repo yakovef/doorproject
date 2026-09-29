@@ -26,6 +26,74 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — THE HALF DOOR'S FACE FOLLOWS THE MAIN LEAF'S (9 of 10).** The owner's
+  son: *"On the half door the proportions between windows and panels need to be
+  the same as on the main door — a window and a panel at the same width, just
+  like the main door — and with 3 panels there should be 3 panels on the half
+  door too."*
+
+  **WHAT WAS WRONG.** The fixed leaf of a דלת וחצי drew a face only under glass:
+  a solid pair or trio stood beside a BARE half leaf. Under the square window it
+  drew the window's lone panel at `PANEL_INSET` whatever the face (0.68–0.90,
+  189 mm under a 288 mm casing), so a glazed pair or trio did not repeat. The
+  slot there was the main pane clamped to `sideW − 240`, 110 mm on every size.
+
+  **WHAT IT DOES.** The branch asks the main leaf's own statement,
+  `faceRowsOn(detail, win, openings, sideW, leafH)`, of the fixed leaf and draws
+  what it answers through the same `appliedFrame`. Solid: the pair's two rows,
+  the trio's three with its plate, at `PANEL_INSET` of the leaf's own width.
+  Glazed: the rows the face KEEPS (the window replaces the upper panel), and
+  behind a plain face the window's lone panel. The rows are fractions of the
+  one height both leaves share, so the panels line up across the door (within
+  0.5 mm, asserted). The glass is the main light's fractions of the fixed leaf's
+  width. The square window was already `classicFixedLight` (148 mm). The slot
+  now takes the fractions its cut opening comes to on the main leaf: 0.320 on
+  `half` (112 mm), 0.294 on `halfextra1` (103), 0.247 on `halfextra2` (86).
+  The ornament stays at the main pane's scale (`ornW`). The Greek set's branch
+  is untouched.
+
+  **OURS, NAMED IN §0a: UNDER GLASS THE ROWS TAKE THE CASING'S WIDTH.** The
+  order's technical line said `PANEL_INSET` of the leaf's own width. On the main
+  leaf that happens to read as the casing's width: 459 mm under 499 (0.92). The
+  casing is 70 mm of stock whatever the leaf, so on 350 mm the same inset gives
+  189 under 288 (0.66), the very mismatch his sentence names. So under glass
+  every fixed-leaf row lines up with the casing, as the lone panel always has;
+  solid, `PANEL_INSET` stands as ordered. The cost: switching the window on
+  widens that leaf's lower panel 189 → 288, where the main leaf's stays put.
+  **d119 is overruled by his word:** its narrow leaf reads the panel at 0.50 of
+  the leaf under a 0.34 window. Measured, overruled, kept in the comment.
+
+  **THE MONEY, ASSERTED AGAIN.** The drawing doubled and the charge must not.
+  Across the three doubles × solid/square window × pair/trio, the face adds
+  exactly what it adds on the standard door. A glazed double counts two panes
+  (`paneCount`), and a priced grille adds exactly twice its one-pane figure.
+
+  **THE GROUP** ("the half door carries the main leaf's face, and is charged
+  for one", 138 assertions) reads the drawing leaf by leaf. It checks: the same
+  number of panels on both leaves, with a §5.15 guard that the main leaf
+  yielded some; the same rows; solid, the same x fractions of each leaf;
+  glazed, every fixed-leaf panel on the casing's edges (pane ± band); and the
+  pane at the main pane's fractions of its own leaf. It counts what it asked
+  (≥ 18 doors, ≥ 9 glazed, all 3 slots). **Falsified three ways**, each
+  restored. The old branch back → 27 faults: solid faces bare, rows apart, the
+  slot's 0.343/0.657 against 0.340–0.376 on all three bands. The kept rows at
+  `PANEL_INSET` under glass → 9 "not the casing's width". The face priced × 2
+  on a double → 9 money faults.
+
+  **THE REST.** `npm run collide -- all`: 1,638 designs (1,468 base, 602 with the
+  bow, 170 face-detail), `half` and `halfextra2` among the swept sizes; the
+  fixed leaf's panes against its new mouldings, "nothing overlaps", and
+  `faceObstacles` agrees everywhere. (1,468 is 8 fewer than the 1,476 §0c
+  carried. Traced by running the sweep at each commit: 82eb150 1,476/610,
+  `86eb6fa` 1,468/602, the same ever since. The bow's redraw off four doors
+  moved its box, and eight designs carrying it left the buildable set. Not this
+  round's; the figure had simply not been re-read.) In `catalog.js`
+  the `SIDE_OPENING_MIN` and `glazedPanels` notes described the clamp; they
+  describe the fractions now, and the latter's dead citation of an
+  `ASK-PERETZ.md` §4b (no longer in the file) points at §0g (A18). No gallery
+  door is a double, so only `recreate-d122` (`s=sidelight` → `half`, the square
+  window, plain) shows the change, and it will move at commit 10.
+
 - **28.9 — A FIRST VISIT GETS A TOUR (8 of 10).** The owner's son: *"A little
   tutorial when a person first joins: at every step a grey overlay on everything
   but the thing described, an arrow from the text to the thing. First the door …
@@ -2435,6 +2503,13 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.9** The price on the photograph (4 of 10) — *"not on a white thing …
+  left of the door, between the door and the lamp, on the higher end"*: no
+  ground, figure 2.4 rem, the send a line of ink; `right` 8 px off the casing's
+  left edge, at its head. Ink ≥ 10.6:1 on the picture (gate 4.5, no wash).
+  "מחיר משוער" off the figure (bar 71.3 → 67.0 px). Picker top-RIGHT in every
+  language. In en/ru the column shares that wall: its gaps give (≥ 2 px). Long
+  form: `HISTORY.md`.
 - **28.9** The band on the photograph (3 of 10) — *"on the image and closer to
   the door"*: absolute, `placeBand` sets it 8 px over the casing in the span the
   wall's controls leave. `FIT_TRIM.top` 40 → −162, exactly the wall 1280×720

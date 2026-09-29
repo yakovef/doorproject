@@ -2850,6 +2850,131 @@ group('a square window brings its panel to both leaves and charges for one');
   }
 }
 
+/* ⚠ THE HALF DOOR'S FACE FOLLOWS THE MAIN LEAF'S — 28.9.2026. The owner's son:
+   *"On the half door the proportions between windows and panels need to be the
+   same as on the main door — a window and a panel at the same width, just like
+   the main door — and with 3 panels there should be 3 panels on the half door
+   too."* Until today a solid pair or trio on a דלת וחצי stood beside a BARE
+   fixed leaf, under the square window that leaf drew the window's lone panel
+   whatever the face, and the slot there was the main pane clamped to 110 mm.
+   Read off the drawing, per leaf, in the leaf's own terms:
+     · the same NUMBER of panels on both leaves, on every face (§5.15: the main
+       leaf must have yielded some wherever the face or window brings one);
+     · the same ROWS — top and foot of every moulding within 0.5 mm, because
+       the two leaves share a height;
+     · solid, the same x FRACTIONS of each leaf's own width (`PANEL_INSET`);
+     · glazed, every fixed-leaf panel the casing's width — its moulding's outer
+       edges on the pane's ± the band — which is "a window and a panel at the
+       same width";
+     · the pane the same x fractions of its leaf as the main pane of its own —
+       the slot included, so the 110 mm clamp cannot come back.
+   And the money, again, because the drawing doubled and the charge must not:
+   the face adds on a two-leaf door exactly what it adds on the standard one,
+   and the ironwork is counted per pane — two on a glazed double.
+   Falsified: the old branch back (solid faces bare, the clamp) → the counts
+   and the slot's fraction fail; the kept rows at `PANEL_INSET` under glass →
+   "not the casing's width"; the face priced ×2 on a double → the money. */
+group("the half door carries the main leaf's face, and is charged for one");
+{
+  const attrs = tag => Object.fromEntries([...(tag || '').matchAll(/([\w-]+)="([^"]*)"/g)].map(m => [m[1], m[2]]));
+  const inside = (svg, open) => {
+    let depth = 1; const tag = /<(\/?)g\b[^>]*?(\/?)>/g; tag.lastIndex = open;
+    for (let t; (t = tag.exec(svg));) {
+      if (t[1]) { if (!--depth) return svg.slice(open, t.index); } else if (!t[2]) depth++;
+    }
+    return '';
+  };
+  /* Every moulding inside a panel group: its outer box, off the left run
+     (x, top, foot) and the right run (x). */
+  const panelsIn = seg => {
+    const out = [];
+    for (const m of seg.matchAll(/<g data-detail="panel"([^>]*)>/g)) {
+      const band = +attrs(m[1])['data-band'];
+      const g = inside(seg, m.index + m[0].length);
+      const Ls = [...g.matchAll(/<path d="M ([\d.]+) ([\d.]+) L [^"]* L [\d.]+ ([\d.]+) Z" fill="url\(#mould-[\w]+-l\)"/g)];
+      const Rs = [...g.matchAll(/<path d="M ([\d.]+) [\d.]+ L [^"]*" fill="url\(#mould-[\w]+-r\)"/g)];
+      Ls.forEach((l, i) => out.push({ band, x0: +l[1], top: +l[2], foot: +l[3], x1: Rs[i] ? +Rs[i][1] : NaN }));
+    }
+    return out;
+  };
+  const glassIn = seg => attrs(/<rect\b[^>]*fill="url\(#glass\)"[^>]*>/.exec(seg)?.[0]);
+  const P = st => priceAgorot({ ...base, ...st });
+  const twoLeaf = Object.keys(SIZES).filter(k => SIZES[k].side);
+  ok(twoLeaf.length === 3, `${twoLeaf.length} sizes carry a second leaf, not three — this group reads the list`);
+  let asked = 0, glazedAsked = 0, slotAsked = 0;
+  for (const size of twoLeaf) for (const window of ['none', 'rect', 'strip'])
+  for (const detail of ['plain', 'panel2', 'panel3']) {
+    const st = repair({ ...base, size, window, detail, handle: 'none', grille: 'none' }).state;
+    if (st.window !== window || st.detail !== detail) continue;
+    const svg = render(st);
+    const s0 = svg.indexOf('<g id="side-leaf"'), m0 = svg.indexOf('<g id="leaf"');
+    const side = svg.slice(s0, m0), mainAll = svg.slice(m0, svg.indexOf('<g id="hardware">'));
+    const mainDetail = mainAll.slice(mainAll.indexOf('<g id="detail">'));
+    const sl = attrs(/<rect\b[^>]*>/.exec(side)?.[0]), ml = attrs(/<g id="leaf"[^>]*>/.exec(svg)?.[0]);
+    const sx = +sl.x, sw = +sl.width, mx = +ml['data-x'], mw = +ml['data-w'];
+    const tag = `${size}/${window}/${detail}`;
+    const S = panelsIn(side), M = panelsIn(mainDetail);
+    const brings = detail !== 'plain' || window === 'rect';
+    if (brings) ok(M.length > 0, `${tag}: the main leaf yielded no panel — this check is dead`);
+    ok(S.length === M.length,
+       `${tag}: the fixed leaf draws ${S.length} panel(s) and the main leaf ${M.length} — the half door must carry the same face`);
+    asked++;
+    S.forEach((p, i) => {
+      const q = M[i];
+      if (!q) return;
+      ok(Math.abs(p.top - q.top) <= 0.5 && Math.abs(p.foot - q.foot) <= 0.5,
+         `${tag}: panel ${i + 1} runs ${p.top.toFixed(1)}–${p.foot.toFixed(1)} on the fixed leaf and `
+       + `${q.top.toFixed(1)}–${q.foot.toFixed(1)} on the main one — the two leaves share their rows`);
+    });
+    if (window === 'none') {
+      S.forEach((p, i) => {
+        const q = M[i];
+        if (!q) return;
+        const f = [(p.x0 - sx) / sw, (p.x1 - sx) / sw], g = [(q.x0 - mx) / mw, (q.x1 - mx) / mw];
+        ok(Math.abs(f[0] - g[0]) <= 0.002 && Math.abs(f[1] - g[1]) <= 0.002,
+           `${tag}: panel ${i + 1} spans ${f.map(v => v.toFixed(3))} of the fixed leaf and `
+         + `${g.map(v => v.toFixed(3))} of the main one — a solid face keeps its proportions on both leaves`);
+      });
+      continue;
+    }
+    const gs = glassIn(side), gm = glassIn(mainAll);
+    ok(gs.x != null && gm.x != null, `${tag}: a leaf with no glass rect — this check is dead`);
+    if (gs.x == null || gm.x == null) continue;
+    glazedAsked++;
+    if (window === 'strip') slotAsked++;
+    const fs = [(+gs.x - sx) / sw, (+gs.x + +gs.width - sx) / sw];
+    const fm = [(+gm.x - mx) / mw, (+gm.x + +gm.width - mx) / mw];
+    ok(Math.abs(fs[0] - fm[0]) <= 0.002 && Math.abs(fs[1] - fm[1]) <= 0.002,
+       `${tag}: the fixed leaf's pane spans ${fs.map(v => v.toFixed(3))} of its width and the main pane `
+     + `${fm.map(v => v.toFixed(3))} of its own (${(+gs.width).toFixed(0)} mm wide) — the same fractions of each leaf`);
+    for (const [i, p] of S.entries()) {
+      const c0 = +gs.x - p.band, c1 = +gs.x + +gs.width + p.band;
+      ok(Math.abs(p.x0 - c0) <= 0.5 && Math.abs(p.x1 - c1) <= 0.5,
+         `${tag}: the fixed leaf's panel ${i + 1} spans ${p.x0.toFixed(1)}–${p.x1.toFixed(1)} under a casing of `
+       + `${c0.toFixed(1)}–${c1.toFixed(1)} — not the casing's width ("a window and a panel at the same width")`);
+    }
+  }
+  ok(asked >= 18 && glazedAsked >= 9 && slotAsked === 3,
+     `the half-door sweep asked ${asked} doors, ${glazedAsked} glazed and ${slotAsked} slots — a branch went unasked`);
+  /* The money: the face once, the ironwork per pane. */
+  for (const size of twoLeaf) for (const window of ['none', 'rect']) for (const detail of ['panel2', 'panel3']) {
+    const one = P({ size: 'standard', window, detail }) - P({ size: 'standard', window });
+    const two = P({ size, window, detail }) - P({ size, window });
+    ok(one === two, `${size}/${window}/${detail}: the face adds ${shekels(two)} on two leaves and `
+     + `${shekels(one)} on one — the half leaf's copy has become a second charge`);
+  }
+  const iron = GRILLES.find(g => g.id !== 'none' && g.delta > 0);
+  ok(iron, 'no priced grille — the per-pane clause is dead');
+  if (iron) for (const size of twoLeaf) {
+    const st = repair({ ...base, size, window: 'rect', grille: iron.id }).state;
+    ok(st.grille === iron.id, `${size}: ${iron.id} did not survive a square window — the per-pane clause is dead`);
+    ok(paneCount(st) === 2, `${size}: a glazed double counts ${paneCount(st)} panes, not two`);
+    const perPane = P({ size: 'standard', window: 'rect', grille: iron.id }) - P({ size: 'standard', window: 'rect' });
+    const here = P({ size, window: 'rect', grille: iron.id }) - P({ size, window: 'rect' });
+    ok(here === 2 * perPane, `${size}: ${iron.id} adds ${shekels(here)} on two panes against ${shekels(perPane)} on one`);
+  }
+}
+
 group('a panel that is charged for is a panel that is drawn');
 {
   let n = 0, missing = 0;
