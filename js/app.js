@@ -3972,12 +3972,16 @@ function placeSteps() {
   col.style.removeProperty('--steps-pad');
   let H = col.offsetHeight;
   const cx = col.getBoundingClientRect();
-  let top = mid - H / 2;
   const inX = r => r.width && r.right > cx.left && r.left < cx.right;
+  /* the chrome above the door's middle that pushes it down, as a floor for
+     its top; and the top a column of height h takes: centred, or pushed */
+  let push = -Infinity;
   for (const el of document.querySelectorAll('#quote, .stage__hud .hud__slot')) {
     const r = el.getBoundingClientRect();
-    if (inX(r) && r.top < mid && r.bottom + 8 > top) top = r.bottom + 8;
+    if (inX(r) && r.top < mid && r.bottom + 8 > mid - H / 2) push = Math.max(push, r.bottom + 8);
   }
+  const topFor = h => Math.max(mid - h / 2, push);
+  let top = topFor(H);
   /* ⚠ THE FLOOR IS THE TRUST BAND'S WORDS, NOT ITS BOX — 28.9.2026 (the
      extra lock's step made the column ten marks, 514 px, ≥ 470 even with its
      gaps given). The band's box is the whole floor strip, but its four claims
@@ -3993,8 +3997,8 @@ function placeSteps() {
     if (r.width && inX(r) && r.top > mid) floor = Math.min(floor, r.top - 8);
   }
   /* the undo pills at the stage's foot, where they share the column's corner
-     (Hebrew): their box is kept even with nothing to undo, so the column does
-     not jump on the first change */
+     (Hebrew): both stand there from load, greyed until there is something to
+     undo (29.9), so the column never jumps on the first change */
   const un = document.querySelector('.stage__undo');
   const ur = un && un.getBoundingClientRect();
   if (ur && ur.width && inX(ur) && ur.top > mid) floor = Math.min(floor, ur.top - 8);
@@ -4004,15 +4008,25 @@ function placeSteps() {
      audit names it. ⚠ The gaps are COUNTED: this said "eight" and divided by
      8 after the extra lock's step made them nine, so it gave 9/8 of what was
      asked. */
-  let short = top + H - floor;
+  /* ⚠ AND A CENTRED COLUMN GIVES TWICE WHAT IT IS SHORT (29.9). It gave
+     exactly the shortfall and kept its old top — right for a column PUSHED
+     down, whose top stays put, but a centred one is re-centred as it shrinks
+     and its foot rises by only half of what it gives: at 1100×800 in Hebrew,
+     once both undo pills stand in the corner from load, the column came out
+     12 px ABOVE the door's middle with gap left to give. So it shrinks to the
+     height that fits under the floor however it stands — centred (its foot at
+     mid + h/2) and pushed (at push + h) — and takes its top again after. */
   const gaps = Math.max(1, col.querySelectorAll('.steps__step').length - 1);
-  if (short > 0) {
-    const g = Math.max(2, 6 - short / gaps);
-    short -= (6 - g) * gaps;
-    const pad = Math.max(6, 10 - Math.max(0, short) / 2);
+  if (top + H > floor) {
+    const fits = Math.min(2 * (floor - mid), floor - push);
+    let give = H - fits;
+    const g = Math.max(2, 6 - give / gaps);
+    give -= (6 - g) * gaps;
+    const pad = Math.max(6, 10 - Math.max(0, give) / 2);
     col.style.setProperty('--steps-gap', `${g.toFixed(2)}px`);
     col.style.setProperty('--steps-pad', `${pad.toFixed(2)}px`);
     H = col.offsetHeight;
+    top = topFor(H);
   }
   if (top + H > floor) top = floor - H;
   wrapEl.style.setProperty('--steps-top', `${Math.round(top - wrap.y)}px`);
@@ -4510,9 +4524,11 @@ function toast(text) {
      foot, which is where this hangs on a phone and near where it hangs on a
      desktop. Read off the LAYOUT box (`offset*`, which a transform does not
      move — the toast's entrance is one), and lifted by exactly the overlap
-     plus 8 px. */
+     plus 8 px. ⚠ Whenever the group is PAINTED (29.9): a greyed pill stands
+     there from load, so a toast before the first change — a save, a link's
+     notice — must clear it too; the test was "an enabled pill". */
   const un = document.querySelector('.stage__undo');
-  const shown = un && un.querySelector('.undo-pill:not(:disabled)');
+  const shown = un && un.getBoundingClientRect().width > 0;
   if (shown) {
     const u = un.getBoundingClientRect();
     const top = el.offsetTop, bot = top + el.offsetHeight, l = el.offsetLeft, r = l + el.offsetWidth;

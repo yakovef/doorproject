@@ -12342,12 +12342,14 @@ ${plate.defs}${plate.body}
     col.style.removeProperty("--steps-pad");
     let H = col.offsetHeight;
     const cx = col.getBoundingClientRect();
-    let top = mid - H / 2;
     const inX = (r) => r.width && r.right > cx.left && r.left < cx.right;
+    let push = -Infinity;
     for (const el of document.querySelectorAll("#quote, .stage__hud .hud__slot")) {
       const r = el.getBoundingClientRect();
-      if (inX(r) && r.top < mid && r.bottom + 8 > top) top = r.bottom + 8;
+      if (inX(r) && r.top < mid && r.bottom + 8 > mid - H / 2) push = Math.max(push, r.bottom + 8);
     }
+    const topFor = (h) => Math.max(mid - h / 2, push);
+    let top = topFor(H);
     const st = document.querySelector("#stage")?.getBoundingClientRect();
     let floor = (st ? st.bottom : wrap.bottom) - 8;
     for (const w of document.querySelectorAll(".trust__i")) {
@@ -12357,15 +12359,17 @@ ${plate.defs}${plate.body}
     const un = document.querySelector(".stage__undo");
     const ur = un && un.getBoundingClientRect();
     if (ur && ur.width && inX(ur) && ur.top > mid) floor = Math.min(floor, ur.top - 8);
-    let short = top + H - floor;
     const gaps = Math.max(1, col.querySelectorAll(".steps__step").length - 1);
-    if (short > 0) {
-      const g = Math.max(2, 6 - short / gaps);
-      short -= (6 - g) * gaps;
-      const pad = Math.max(6, 10 - Math.max(0, short) / 2);
+    if (top + H > floor) {
+      const fits = Math.min(2 * (floor - mid), floor - push);
+      let give = H - fits;
+      const g = Math.max(2, 6 - give / gaps);
+      give -= (6 - g) * gaps;
+      const pad = Math.max(6, 10 - Math.max(0, give) / 2);
       col.style.setProperty("--steps-gap", `${g.toFixed(2)}px`);
       col.style.setProperty("--steps-pad", `${pad.toFixed(2)}px`);
       H = col.offsetHeight;
+      top = topFor(H);
     }
     if (top + H > floor) top = floor - H;
     wrapEl.style.setProperty("--steps-top", `${Math.round(top - wrap.y)}px`);
@@ -12519,7 +12523,7 @@ ${plate.defs}${plate.body}
     el.style.removeProperty("margin-block-end");
     el.hidden = false;
     const un = document.querySelector(".stage__undo");
-    const shown = un && un.querySelector(".undo-pill:not(:disabled)");
+    const shown = un && un.getBoundingClientRect().width > 0;
     if (shown) {
       const u = un.getBoundingClientRect();
       const top = el.offsetTop, bot = top + el.offsetHeight, l = el.offsetLeft, r = l + el.offsetWidth;

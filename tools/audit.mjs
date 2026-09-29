@@ -5331,8 +5331,15 @@ for (const v of VIEWS) {
    in every language (the picker's side, physically). Asked at every `VIEWS`
    viewport, Hebrew and Russian, all six sizes — a door that arrives by link,
    then two colour taps and one undo:
-     · NOTHING until there is something to undo (a link carries no history),
-       and the redo only once there is something to redo;
+     · ⚠ RESTATED 29.9, SAME SUBJECT (what is on the wall before and after
+       each tap), on his word — *"available but greyed out at the start,
+       because there isn't something to go back to; that also goes for the
+       other button next to it"*: BOTH pills painted from load and both
+       disabled (a link carries no history); after two changes the undo
+       enabled and the redo disabled; after an undo both enabled; a disabled
+       pill's ground is not the enabled one's (greyed, not bronze). It said
+       "nothing until there is something to undo, the redo only once there is
+       something to redo" — 28.9's rule, reversed by him;
      · the group at the corner — its right edge 8 px inside the stage, its
        foot 8 px above the stage's, or 8 px above the trust band's words where
        those reach the corner (a desktop) — and every pill ≥ 44 px both ways;
@@ -5343,6 +5350,9 @@ for (const v of VIEWS) {
        in place, re-measured, and must touch one of them) — below 1100 of
        stack / icon (29.9: *"on the phone … vertical"*), the glyphs side by
        side only where neither stacked shape fits (the loop below asserts it);
+     · the geometry clauses (corner, ≥ 44, on no door, on nothing else, the
+       shape) read at LOAD as well as after the undo, and the shape is the
+       same at both — settled before the tour's fourth step opens over it;
      · and the undo's own toast stacks above it, never on it.
    ⚠ The first run of this block found two faults in the first build, which
    placed by the wall's WIDTH alone: the pills on the trust band's words at
@@ -5351,14 +5361,20 @@ for (const v of VIEWS) {
    ⚠ ONE NAMED READING, asserted STILL NEEDED: at 320×568 beside the two widest
    doors, with undo AND redo showing, the wall is 93 px — an arrow and one pill
    wide — and the stage 239 px tall, so the stacked redo reaches the arrow by
-   66 (halfextra1) and 115 px² (halfextra2) in both languages. No shape clears
+   66 (halfextra1) and 115 px² (halfextra2) in both languages. Since 29.9
+   only `halfextra2`'s: see ARROW_KNOWN. No shape clears
    it without standing on the door. Named with its number (+10), never
    widened; the day it clears, this fails and the name comes out. */
 {
   console.log('\nundo stands at the stage\'s foot, labelled, and off the door');
   const before = faults;
   let read = 0, lifted = 0; const modes = { row: 0, stack: 0, iconrow: 0, icon: 0 };
-  const ARROW_KNOWN = { '320x568 halfextra1': 66, '320x568 halfextra2': 115 };
+  /* `halfextra1` left this list on 29.9: the band's line box (0.8 px) made
+     every door at 320×568 0.7 px smaller, and on a step the glyphs side by
+     side now clear the casing by 0.09 px — so its pills stand beside the door
+     without reaching the arrow. A knife edge, measured, named here so the day
+     it comes back is not a surprise. */
+  const ARROW_KNOWN = { '320x568 halfextra2': 115 };
   const arrowSeen = new Set();
   for (const v of VIEWS) for (const lang of ['he', 'ru']) for (const size of Object.keys(SIZES)) {
     const tag = `${lang} ${v.w}x${v.h} ${size}`;
@@ -5366,21 +5382,7 @@ for (const v of VIEWS) {
     try {
       await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=${size}`);
       await pg.waitForTimeout(450);
-      const shownAt = () => pg.evaluate(() => [...document.querySelectorAll('.stage__undo .undo-pill')]
-        .filter(x => x.getBoundingClientRect().width > 0).map(x => x.id));
-      const fresh = await shownAt();
-      if (fresh.length) fault('undo-pill', `${tag}: ${fresh.join(', ')} painted before anything could be undone`);
-      await pg.evaluate(() => document.querySelector('.steps__step[data-step="colour"]')?.click());
-      await pg.waitForTimeout(300);
-      for (const k of [2, 4]) {
-        await pg.evaluate(n => [...document.querySelectorAll('.sect.is-live [role="radio"]')][n]?.click(), k);
-        await pg.waitForTimeout(200);
-      }
-      const once = await shownAt();
-      if (once.join() !== 'undo-btn') fault('undo-pill', `${tag}: after two changes the pills shown are [${once.join(', ')}] — the undo alone`);
-      await pg.evaluate(() => document.querySelector('#undo-btn')?.click());
-      await pg.waitForTimeout(450);
-      const m = await pg.evaluate(() => {
+      const measure = () => pg.evaluate(() => {
         const R = e => { const r = e.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height }; };
         const ov = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
         const box = document.querySelector('.stage__undo');
@@ -5403,8 +5405,14 @@ for (const v of VIEWS) {
         const wordsTop = words.length ? Math.min(...words.map(r => r.top)) : null;
         const lifted = wordsTop !== null && words.some(w => w.left < g.right && w.right > g.left);
         const foot = lifted ? wordsTop - 8 : st.bottom - 8;
-        /* the shape: put each earlier shape back in place and ask what it touches */
-        const obst = [f, ...others.filter(o => o.n === 'quote' || o.n.startsWith('stage__arrow')).map(o => o.r)];
+        /* the shape: put each earlier shape back in place and ask what it touches.
+           ⚠ The arrows' boxes count even while they are hidden (29.9): on the
+           summary they are hidden with their box KEPT, and `placeUndo` keeps
+           clear of that box so the shape does not change when a step brings
+           them back — which this clause now meets on load, where a link opens
+           the summary and the pills are painted. */
+        const obst = [f, ...others.filter(o => o.n === 'quote').map(o => o.r),
+          ...[...document.querySelectorAll('.stage__arrow')].map(R)];
         const mode = box.dataset.mode, b0 = box.style.getPropertyValue('--undo-b'), touches = {};
         const wrapB = document.querySelector('.stage-wrap').getBoundingClientRect().bottom;
         for (const k of ['row', 'stack', 'iconrow', 'icon']) {
@@ -5421,34 +5429,95 @@ for (const v of VIEWS) {
         return { mode, touches, lifted, onDoor, hits, toastOn, pills: pr.map(pp => ({ id: pp.id, w: pp.r.width, h: pp.r.height })),
           dr: Math.round((st.right - 8 - g.right) * 10) / 10, db: Math.round((foot - g.bottom) * 10) / 10 };
       });
+      /* what is painted, and in which state: [id, disabled, ground] */
+      const shownAt = () => pg.evaluate(() => [...document.querySelectorAll('.stage__undo .undo-pill')]
+        .filter(x => x.getBoundingClientRect().width > 0 && getComputedStyle(x).visibility !== 'hidden')
+        .map(x => ({ id: x.id, off: x.disabled, bg: getComputedStyle(x).backgroundColor })));
+      const said = l => l.map(x => `${x.id}${x.off ? ' (disabled)' : ''}`).join(', ') || 'nothing';
+      const fresh = await shownAt();
+      if (fresh.map(x => x.id).join() !== 'undo-btn,redo-btn' || !fresh.every(x => x.off)) {
+        fault('undo-pill', `${tag}: on load the wall shows [${said(fresh)}] — both pills, both disabled (greyed), from the first paint`);
+      }
+      const atLoad = await measure();
+      /* ⚠ A TOAST BEFORE THE FIRST CHANGE STACKS ABOVE THEM TOO (29.9): the
+         greyed pills are painted from load, and `toast` lifted itself only
+         over an ENABLED pill. Saving is the toast a customer meets first. */
+      await pg.evaluate(() => { document.querySelector('#save-hud')?.click(); document.querySelector('#savedlg-save')?.click(); });
+      await pg.waitForTimeout(350);
+      const early = await pg.evaluate(() => {
+        const t = document.querySelector('#toast'); if (!t || t.hidden) return null;
+        const a = t.getBoundingClientRect();
+        return [...document.querySelectorAll('.stage__undo .undo-pill')].reduce((n, x) => { const r = x.getBoundingClientRect();
+          const w = Math.min(a.right, r.right) - Math.max(a.left, r.left), h = Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top);
+          return n + (w > 0 && h > 0 ? Math.round(w * h) : 0); }, 0);
+      });
+      if (early === null) fault('undo-pill', `${tag}: saving before any change raised no toast — the early-toast clause has no subject`);
+      else if (early) fault('undo-pill', `${tag}: the save's toast, before anything could be undone, covers ${early} px² of the greyed pills — it stacks above them`);
+      await pg.evaluate(() => { const t = document.querySelector('#toast'); if (t) t.hidden = true; });
+      await pg.evaluate(() => document.querySelector('.steps__step[data-step="colour"]')?.click());
+      await pg.waitForTimeout(300);
+      for (const k of [2, 4]) {
+        await pg.evaluate(n => [...document.querySelectorAll('.sect.is-live [role="radio"]')][n]?.click(), k);
+        await pg.waitForTimeout(200);
+      }
+      const once = await shownAt();
+      const beforeUndo = await measure();
+      if (once.map(x => `${x.id}${x.off ? '-' : '+'}`).join() !== 'undo-btn+,redo-btn-') {
+        fault('undo-pill', `${tag}: after two changes the wall shows [${said(once)}] — the undo enabled, the redo painted and disabled`);
+      }
+      /* greyed, not bronze: a disabled pill's ground is not the enabled one's */
+      const live = once.find(x => x.id === 'undo-btn' && !x.off), grey = fresh.find(x => x.off);
+      if (live && grey && live.bg === grey.bg) fault('undo-pill', `${tag}: a disabled pill is painted in the enabled pill's ${live.bg} — it does not read as greyed out`);
+      await pg.evaluate(() => document.querySelector('#undo-btn')?.click());
+      await pg.waitForTimeout(450);
+      const after = await shownAt();
+      if (after.map(x => `${x.id}${x.off ? '-' : '+'}`).join() !== 'undo-btn+,redo-btn+') {
+        fault('undo-pill', `${tag}: after an undo the wall shows [${said(after)}] — both enabled`);
+      }
+      const m = await measure();
+      /* the same geometry clauses, at load and after the undo; the shape the
+         same at both (the corner is settled before anything is tapped) */
+      for (const [when, r] of [['on load', atLoad], ['after an undo', m]]) {
+        if (!r) continue;
+        const wtag = `${tag} ${when}`;
+        for (const x of r.pills) if (x.w < 44 || x.h < 44) fault('undo-pill', `${wtag}: ${x.id} is ${Math.round(x.w)}x${Math.round(x.h)} — the floor is 44`);
+        if (Math.abs(r.dr) > 1.5 || Math.abs(r.db) > 1.5) fault('undo-pill', `${wtag}: the group stands ${r.dr} px off 8 px in from the stage's right and ${r.db} px off 8 px above ${r.lifted ? "the trust band's words" : "the stage's foot"}`);
+        if (r.onDoor) fault('undo-pill', `${wtag}: the undo pills stand on the door — ${r.onDoor} px² of #frame (shape "${r.mode}")`);
+        for (const h of r.hits) {
+          const k = `${v.w}x${v.h} ${size}`, px = +h.split(' ').pop();
+          if (h.startsWith('redo-btn on stage__arrow') && ARROW_KNOWN[k] !== undefined) {
+            arrowSeen.add(`${lang} ${k}`);
+            if (px > ARROW_KNOWN[k] + 10) fault('undo-pill', `${wtag}: the named redo-on-arrow reading grew to ${px} px² (named at ${ARROW_KNOWN[k]})`);
+            continue;
+          }
+          fault('undo-pill', `${wtag}: ${h} px²`);
+        }
+        const order = v.w < 1100 ? ['stack', 'icon', 'iconrow'] : ['row', 'stack', 'iconrow', 'icon'];
+        if (!order.includes(r.mode)) fault('undo-pill', `${wtag}: the shape is "${r.mode}" — below 1100 the pair is stacked (stack, icon; iconrow only where neither fits)`);
+        for (const k of order.slice(0, order.indexOf(r.mode))) {
+          if (!r.touches[k]) fault('undo-pill', `${wtag}: the shape is "${r.mode}" but "${k}" touches nothing — the first shape that fits is "${k}"`);
+        }
+      }
+      /* the corner does not move under a tap: the redo turning live changes
+         nothing on the wall. (Load is the summary here — a link opens it —
+         where the stage can differ from a step's by a fraction of a pixel,
+         and at 320 beside `halfextra1` that is the whole of the difference
+         between two shapes: the casing's right edge 218.18 px on the summary,
+         217.91 on a step, the glyphs side by side starting at 218.) */
+      if (beforeUndo && m && beforeUndo.mode !== m.mode) fault('undo-pill', `${tag}: the shape is "${beforeUndo.mode}" before the undo and "${m.mode}" after it — the corner moved under a tap`);
+      if (!atLoad) fault('undo-pill', `${tag}: on load no undo group or no #frame — the load clauses have no subject`);
       if (!m) { fault('undo-pill', `${tag}: no undo group or no #frame — this check has lost its subject`); continue; }
       read++;
       modes[m.mode] = (modes[m.mode] || 0) + 1;
       const ids = m.pills.map(x => x.id).join();
       if (ids !== 'undo-btn,redo-btn') fault('undo-pill', `${tag}: after an undo the pills shown are [${ids}] — both, undo first`);
-      for (const x of m.pills) if (x.w < 44 || x.h < 44) fault('undo-pill', `${tag}: ${x.id} is ${Math.round(x.w)}x${Math.round(x.h)} — the floor is 44`);
-      if (Math.abs(m.dr) > 1.5 || Math.abs(m.db) > 1.5) fault('undo-pill', `${tag}: the group stands ${m.dr} px off 8 px in from the stage's right and ${m.db} px off 8 px above ${m.lifted ? "the trust band's words" : "the stage's foot"}`);
-      if (m.onDoor) fault('undo-pill', `${tag}: the undo pills stand on the door — ${m.onDoor} px² of #frame (shape "${m.mode}")`);
       if (m.lifted) lifted++;
-      for (const h of m.hits) {
-        const k = `${v.w}x${v.h} ${size}`, px = +h.split(' ').pop();
-        if (h.startsWith('redo-btn on stage__arrow') && ARROW_KNOWN[k] !== undefined) {
-          arrowSeen.add(`${lang} ${k}`);
-          if (px > ARROW_KNOWN[k] + 10) fault('undo-pill', `${tag}: the named redo-on-arrow reading grew to ${px} px² (named at ${ARROW_KNOWN[k]})`);
-          continue;
-        }
-        fault('undo-pill', `${tag}: ${h} px²`);
-      }
       if (m.toastOn === null) fault('undo-pill', `${tag}: the undo raised no toast — the stacking clause has no subject`);
       else if (m.toastOn) fault('undo-pill', `${tag}: the undo's own toast covers ${m.toastOn} px² of the pills — it stacks above them`);
       /* ⚠ Below 1100 the order is stack, icon only (29.9, the owner's son: undo
          vertical on the phone) — so a phone is ASSERTED to get a stacked
-         shape, and within it the first that touches nothing, as before. */
-      const order = v.w < 1100 ? ['stack', 'icon', 'iconrow'] : ['row', 'stack', 'iconrow', 'icon'];
-      if (!order.includes(m.mode)) fault('undo-pill', `${tag}: the shape is "${m.mode}" — below 1100 the pair is stacked (stack, icon; iconrow only where neither fits)`);
-      for (const k of order.slice(0, order.indexOf(m.mode))) {
-        if (!m.touches[k]) fault('undo-pill', `${tag}: the shape is "${m.mode}" but "${k}" touches nothing — the first shape that fits is "${k}"`);
-      }
+         shape, and within it the first that touches nothing, as before; the
+         shape and geometry clauses are in the loop above, at load and after. */
     } catch (e) {
       if (!crashed(e)) throw e;
       fault('undo-pill', `${tag}: chromium died before the pills were measured`);
@@ -5459,7 +5528,7 @@ for (const v of VIEWS) {
   for (const lang of ['he', 'ru']) for (const k of Object.keys(ARROW_KNOWN)) {
     if (!arrowSeen.has(`${lang} ${k}`)) fault('undo-pill', `${lang} ${k}: the named redo-on-arrow reading is gone — the pills clear the arrow there now; take it out of ARROW_KNOWN and CLAUDE.md §9`);
   }
-  if (faults === before) console.log(`    ${read} readings (${VIEWS.length} viewports x he/ru x ${Object.keys(SIZES).length} sizes): none painted before a change, the undo alone after two, both after an undo; at the corner (above the trust band's words on ${lifted}), ≥ 44, on no door and on nothing else on the wall, the toast above them; shapes row ${modes.row}, stack ${modes.stack}, iconrow ${modes.iconrow}, icon ${modes.icon}, each the first that touches nothing`);
+  if (faults === before) console.log(`    ${read} readings (${VIEWS.length} viewports x he/ru x ${Object.keys(SIZES).length} sizes): both painted and greyed from load, a save's toast above them before any change, the undo live after two changes and the redo still greyed, both live after an undo; one shape across the undo; at the corner (above the trust band's words on ${lifted}), ≥ 44, on no door and on nothing else on the wall, the toast above them; shapes row ${modes.row}, stack ${modes.stack}, iconrow ${modes.iconrow}, icon ${modes.icon}, each the first that touches nothing`);
 }
 
 /* ── THE SAVE ASKS, AND BOTH ITS DIALOGS CLOSE THE WAY A DIALOG DOES ───────
@@ -5542,8 +5611,8 @@ for (const v of VIEWS) {
    browser without that, so the page meets an empty store:
      · a bare load opens it as a MODAL, within two seconds, on step 1;
      · on each of its four steps the target — the door's frame, the navigator,
-       the options, the save and the undo pills' corner — is WHOLE inside a
-       cut-out; the callout is inside the viewport and covers no cut-out; each
+       the options, the save and BOTH undo pills (each painted, 29.9) — is
+       WHOLE inside a cut-out; the callout is inside the viewport and covers no cut-out; each
        arrow starts on the callout's edge and ends on a cut-out's edge; and the
        target is not clickable through the scrim (`elementFromPoint` at its
        centre is the tour);
@@ -5572,7 +5641,10 @@ for (const v of VIEWS) {
     const targets = step === 1 ? [document.querySelector('#stage .door-svg #frame')]
       : step === 2 ? [document.querySelector('.steps')]
       : step === 3 ? [wide ? document.querySelector('.panel--choose') : document.querySelector('.sect.is-live')]
-      : [document.querySelector('#save-hud'), document.querySelector('.stage__undo')];
+      /* ⚠ RESTATED 29.9, same subject: the save and EACH pill, not the
+         pills' group — whose 44 px placeholder box was inside the cut-out
+         while nothing in it was painted, which is what he saw */
+      : [document.querySelector('#save-hud'), document.querySelector('#undo-btn'), document.querySelector('#redo-btn')];
     const holes = [...d.querySelectorAll('.tour__hole')].map(h => ({ left: +h.getAttribute('x'), top: +h.getAttribute('y'),
       right: +h.getAttribute('x') + +h.getAttribute('width'), bottom: +h.getAttribute('y') + +h.getAttribute('height') }));
     const card = R(d.querySelector('.tour__card'));
@@ -5582,11 +5654,12 @@ for (const v of VIEWS) {
       const inX = x >= r.left - 1 && x <= r.right + 1, inY = y >= r.top - 1 && y <= r.bottom + 1;
       return Math.hypot(dx, dy) <= 1.5 && (Math.abs(x - r.left) <= 1.5 || Math.abs(x - r.right) <= 1.5 || Math.abs(y - r.top) <= 1.5 || Math.abs(y - r.bottom) <= 1.5 || !(inX && inY)); };
     const arrows = [...d.querySelectorAll('.tour__arrow')].map(l => ({ x1: +l.getAttribute('x1'), y1: +l.getAttribute('y1'), x2: +l.getAttribute('x2'), y2: +l.getAttribute('y2') }));
-    const out = { step, holes: holes.length, targets: 0, whole: 0, clickThrough: [] };
+    const out = { step, holes: holes.length, targets: 0, whole: 0, clickThrough: [], empty: [] };
     for (const t of targets) {
       if (!t) continue;
       out.targets++;
       const r = R(t);
+      if (!(r.right - r.left > 0 && r.bottom - r.top > 0)) { out.empty.push(t.id || String(t.className).split(' ')[0]); continue; }
       /* the part of the target on screen must be inside a cut-out — on a
          phone the options' on-screen part is what lies between the sticky
          door and the fixed quote bar */
@@ -5620,6 +5693,7 @@ for (const v of VIEWS) {
         steps++;
         if (m.step !== k) fault('tour', `${tag}: expected step ${k}, the tour is on ${m.step}`);
         if (!m.targets) fault('tour', `${tag} step ${k}: no target on the page — this step has no subject`);
+        if (m.empty.length) fault('tour', `${tag} step ${k}: ${m.empty.join(', ')} is not painted — the cut-out opens over an empty corner`);
         if (m.whole < m.targets) fault('tour', `${tag} step ${k}: ${m.targets - m.whole} of ${m.targets} targets are not whole inside a cut-out`);
         if (m.clickThrough.length) fault('tour', `${tag} step ${k}: ${m.clickThrough.join(', ')} can be pressed through the scrim`);
         if (!m.cardIn) fault('tour', `${tag} step ${k}: the callout leaves the viewport`);
@@ -7052,7 +7126,23 @@ for (const v of VIEWS) {
   }
   if (readings < 6) fault('nav-column', `only ${readings} of 6 viewports were read — this check is measuring almost nothing`);
   /* THE WALL GATE, every size at every desktop width, both directions (28.9):
-     the column on no door, no arrow, no wall control, inside the stage. */
+     the column on no door, no arrow, no wall control, inside the stage.
+     ⚠ AND CENTRED OR PUSHED DOWN, AT EVERY SIZE AND WIDTH (29.9) — the clause
+     above asks it of one door at 1100 and 1920 in Hebrew. In Hebrew the column
+     shares the stage's bottom-right corner with the undo pills, and since 29.9
+     both pills stand there from load (greyed until there is something to
+     undo): where the stage is short the column cannot be centred on the door
+     and stays clear of them, so it stands ABOVE the door's middle. Measured
+     that day, after `placeSteps` learned to give a centred column twice its
+     shortfall (it had given the shortfall and kept its top — 1100 standard
+     read −12): these readings, in px up, are NAMED with their numbers (+2),
+     asserted still needed. They are not new — the same lift came after an
+     undo before 29.9 (1280×720 standard −20 on `02a9543`), where no clause
+     looked — only painted from load. At 1280×720 the room below the door's
+     middle down to the pills is 214 px and the column's shortest half 235. */
+  const LIFTED = { '1100x800 half': 27, '1100x800 halfextra1': 9, '1152x800 standard': 4, '1152x800 half': 4,
+    '1152x800 halfextra1': 11, '1280x720 standard': 21, '1280x720 half': 21, '1280x720 extra1': 5, '1280x720 halfextra1': 5 };
+  const liftSeen = new Set();
   let wallRead = 0;
   for (const [w, h] of [[1100, 800], [1152, 800], [1280, 720], [1440, 900], [1920, 918]]) for (const lang of ['he', 'en']) for (const size of Object.keys(SIZES)) {
     const pg = await b.newPage({ viewport: { width: w, height: h } });
@@ -7066,16 +7156,25 @@ for (const v of VIEWS) {
         const on = [['the door', document.querySelector('.door-svg #frame')], ...[...document.querySelectorAll('.stage__arrow')].map(e => ['an arrow', e]),
                     ...[...document.querySelectorAll('.stage__hud .hud__slot')].map(e => ['a wall control', e])]
           .map(([k, e]) => [k, e ? ov(r, e.getBoundingClientRect()) : 0]).filter(([, o]) => o);
-        return { on, inWrap: r.top >= W.top - 1 && r.bottom <= W.bottom + 1 };
+        const f = document.querySelector('.door-svg #frame')?.getBoundingClientRect();
+        return { on, inWrap: r.top >= W.top - 1 && r.bottom <= W.bottom + 1,
+          midOff: f ? Math.round((r.top + r.bottom) / 2 - (f.top + f.bottom) / 2) : null };
       });
       if (!m) { fault('nav-column', `${lang} ${w}x${h} ${size}: no column on the photograph — the wall gate has no subject`); continue; }
       wallRead++;
       if (m.on.length) fault('nav-column', `${lang} ${w}x${h} ${size}: the column stands on ${m.on.map(([k, o]) => `${k} (${o} px²)`).join(', ')}`);
       if (!m.inWrap) fault('nav-column', `${lang} ${w}x${h} ${size}: the column leaves the stage`);
+      const lk = `${w}x${h} ${size}`, named = lang === 'he' ? LIFTED[lk] : undefined;
+      if (m.midOff === null) fault('nav-column', `${lang} ${lk}: no #frame — the centring clause has no subject`);
+      else if (named !== undefined) {
+        if (m.midOff < -2) liftSeen.add(lk);
+        if (-m.midOff > named + 2) fault('nav-column', `${lang} ${lk}: the column stands ${-m.midOff} px above the door's middle — named at ${named}`);
+      } else if (m.midOff < -2) fault('nav-column', `${lang} ${lk}: the column's middle is ${m.midOff} px from the door's — centred on it, or pushed down, never up`);
     } finally { await pg.close().catch(() => {}); }
   }
+  for (const k of Object.keys(LIFTED)) if (!liftSeen.has(k)) fault('nav-column', `he ${k}: the named lift is gone — the column is centred there now; take it out of LIFTED and CLAUDE.md §9`);
   if (wallRead < 5 * 2 * Object.keys(SIZES).length) fault('nav-column', `the wall gate read ${wallRead} of ${5 * 2 * Object.keys(SIZES).length} doors`);
-  if (faults === before) console.log(`    ${readings} viewports: a dark column on the photograph above 1100 (a dark row below), ${STEPS} whole ≥44 px targets, the live one a light square; checks on exactly the steps walked, none on arrival or after a reload, the address unmoved; ${wallRead} doors × widths × directions with the column on no door, arrow or wall control`);
+  if (faults === before) console.log(`    ${readings} viewports: a dark column on the photograph above 1100 (a dark row below), ${STEPS} whole ≥44 px targets, the live one a light square; checks on exactly the steps walked, none on arrival or after a reload, the address unmoved; ${wallRead} doors × widths × directions with the column on no door, arrow or wall control, centred or pushed down but for the ${Object.keys(LIFTED).length} named Hebrew lifts`);
 }
 
 /* ── THE HANDLE FINISH IS ON THE PAGE ONLY WHERE IT PAINTS SOMETHING ──────

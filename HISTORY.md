@@ -26,6 +26,74 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **29.9 — PROMPT A, 2 OF 5: UNDO AND REDO PAINTED FROM THE FIRST PAINT, GREYED.**
+  The owner's son: *"At the tutorial's fourth step the undo button is not shown
+  yet, so it looks strange — available but greyed out at the start, because
+  there isn't something to go back to; that also goes for the other button next
+  to it."*
+  · **What was wrong.** Both pills shipped `disabled` and `.undo-pill:disabled`
+    was `display: none`; the group kept a 44 × 44 placeholder box so the column
+    above it would not jump. So the tour's fourth cut-out (`#save-hud` and
+    `.stage__undo`) opened over an empty corner — what he saw — and the audit's
+    tour clause passed, because it asked that the GROUP's box be inside the
+    cut-out, and the placeholder was. (28.9's own decision: "never as a disabled
+    pill" — reversed by him, §0a.)
+  · **What it is.** A disabled pill is painted: the ink at .45 over the picture
+    (a grey — the enabled pills have been bronze since `0a94d3f`), paper letters,
+    no shadow and no halo, the arrow cursor, no hover, still `disabled` (nothing
+    to press; §8's `aria-disabled` is for options refused with a reason). The
+    placeholder box is gone: both pills stand there from load, so `placeUndo`
+    settles the shape before anything is tapped and a tap never moves it.
+  · **What it moved, found by the blocks that measure that corner (§8):**
+    (1) `toast` lifted itself only over an ENABLED pill, so a save's toast
+    before the first change sat on the greyed pills (397–756 px² at 1100–1152
+    he) — it clears the painted group now. (2) In Hebrew the column takes its
+    floor from the pills, and at 1100×800 the pair (a row lifted over the trust
+    band's words) put it **12 px above the door's middle** — `placeSteps` gave
+    a centred column exactly its shortfall and kept its old top, but a centred
+    column re-centres as it shrinks and its foot rises by only half of what it
+    gives. It now shrinks to the height that fits however it stands (centred:
+    foot at mid + h/2; pushed: at push + h) and takes its top again: 1100
+    standard −12.3 → −2.4, `extra2`/`halfextra2` −6.6 → 0, `extra1` −3.2 →
+    −0.2. (3) Where the stage is simply too short the column still stands
+    above the door's middle: at 1280×720 the room from the door's middle down
+    to the pills is 214 px against the ten marks' tightest half of 235 —
+    **21 px** up (standard, `half`). The clause asked it of one door at 1100
+    and 1920; a sweep at 1100 / 1152 / 1280 × six sizes (he) now asks it of
+    every one, and nine lifts are NAMED with their numbers, asserted still
+    needed (§9). They are not new: 1280 standard read −20 after an undo on
+    `02a9543`, where no clause looked.
+  · **Restated, same subjects.** The pill block: what is on the wall before and
+    after each tap — both painted and disabled on load, the undo enabled and
+    the redo disabled after two changes, both enabled after the undo, a
+    disabled pill's ground not the enabled one's (it said "nothing until there
+    is something to undo" — his reversal); the geometry clauses (corner, ≥ 44,
+    on no door, on nothing else, the shape) read at load AND after the undo;
+    the shape the same before and after the undo. The shape clause counts the
+    arrows' boxes while they are hidden, as `placeUndo` does (on the summary,
+    where a link lands, they are hidden with their box kept). `ARROW_KNOWN`
+    re-measured: `halfextra2` 115 stays, needed; `halfextra1` left — the band's
+    0.8 px made the door 0.7 px smaller at 320 and on a step the glyphs side by
+    side clear its casing by 0.09 px (218.18 on the summary, 217.91 on a step,
+    against 218): a knife edge, named in the code. The tour's fourth clause:
+    the save and EACH pill painted and whole in the cut-out, not the group.
+    NEW: a save's toast before any change stacks above the pills.
+  · **Falsified:** `display: none` back on `:disabled` → 96 "nothing on load",
+    96 "the redo not painted after two changes", 24 "the corner moved under a
+    tap", and the tour's fourth step "undo-btn, redo-btn is not painted" at
+    all three of its viewports; a disabled pill in the bronze → 96 "not
+    greyed"; the old `placeSteps` → 16, 1100 he standard −12 among them; the
+    toast's old test → 36 (the save's toast on the greyed pills); a named lift
+    removed → 1. The wall-ink, save-dialog and saved-list blocks: clean.
+  · **Sheets: 0 bare** (no `render()` change); not run (intermediate commit).
+  · **Gates:** node --check (renderer, app, audit); npm run build; npm test
+    10,595,362 passed / 5 failed — the five sheet-staleness rows (shot,
+    recreate, corpus, against, lockset); the pill, column, tour, wall-ink and
+    save blocks clean.
+  · **Not done, on purpose:** the pills or the column moved out of their
+    shared corner in Hebrew (a product question — the pills' corner is the
+    other session's, merged at the owner's son's choice); `aria-disabled` on a
+    pill (there is nothing to explain — it is not refused, it is empty).
 - **29.9 — THE WINDOW'S DESIGNS UNLOCK WITH A WINDOW (prompt B, 2 of 3).** The
   owner's son: *"The window section split in 2: the main one with the window
   types (the only 2 we have), and if they choose a window, a sub-section

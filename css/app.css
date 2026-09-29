@@ -1225,10 +1225,16 @@ svg { direction: ltr; }
    The owner's son: *"The undo option rethought: not noticeable on pc and in
    the way on the phone — more noticeable, but not colliding with the door."*
    Two labelled pills, paper on ink, 8 px inside the stage's bottom-right
-   corner — physically right in every language, the picker's side — shown from
-   the first change (a disabled pill takes no room and paints nothing; the
-   group's own 44 px box is kept, so the navigator column above it does not
-   jump on the first tap). `placeUndo` (js/app.js) publishes `--undo-b` and
+   corner — physically right in every language, the picker's side.
+   ⚠ PAINTED FROM THE FIRST PAINT SINCE 29.9, GREYED WHILE DISABLED — the
+   owner's son: *"At the tutorial's fourth step the undo button is not shown
+   yet, so it looks strange — available but greyed out at the start, because
+   there isn't something to go back to; that also goes for the other button
+   next to it."* Until then a disabled pill took no room and painted nothing,
+   so the tour's fourth cut-out opened over an empty 44 × 44 corner. Both
+   pills stand there from load now, and the group needs no placeholder box:
+   its shape is settled before the tour opens and never changes on a tap.
+   `placeUndo` (js/app.js) publishes `--undo-b` and
    `--undo-r` off the stage's rect and picks the shape: `row`, `stack` (redo
    above undo), `iconrow` or `icon` (the glyph alone, the word in
    `aria-label`/`title`), the first that touches neither the door, an arrow
@@ -1240,7 +1246,6 @@ svg { direction: ltr; }
   inset-block-end: var(--undo-b, 8px);
   right: var(--undo-r, 8px);
   display: flex; gap: 6px; align-items: flex-end; flex-direction: row;
-  min-inline-size: 44px; min-block-size: 44px;
   pointer-events: none;
 }
 html:not([dir="rtl"]) .stage__undo { flex-direction: row-reverse; }
@@ -1256,7 +1261,6 @@ html:not([dir="rtl"]) .stage__undo[data-mode="icon"] { flex-direction: column-re
   font: 600 .9rem/1 var(--sans); white-space: nowrap;
   box-shadow: 0 4px 14px rgb(0 0 0 / .22);
 }
-.undo-pill:disabled { display: none; }
 .undo-pill .btn__ico { inline-size: 19px; block-size: 19px; }
 .undo-pill:hover { filter: brightness(1.25); }
 .undo-pill:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
@@ -1274,6 +1278,18 @@ html:not([dir="rtl"]) .stage__undo[data-mode="icon"] { flex-direction: column-re
 .undo-pill:hover { filter: none; background: #6A5129; }
 .undo-pill:focus-visible { outline-color: var(--ink); }
 .undo-pill .btn__ico { stroke-width: 2.1; }
+/* A DISABLED PILL IS GREYED, NOT HIDDEN (29.9, above): the ink at .45 over the
+   picture, paper letters, no shadow and no halo, the arrow cursor, and no
+   hover — still `disabled`, because there is nothing to press (it is not an
+   option refused for a reason, so §8's `aria-disabled` rule is not its rule).
+   Ours, reversible in a line. */
+.undo-pill:disabled, .undo-pill:disabled:hover {
+  background: color-mix(in srgb, var(--ink) 45%, transparent); color: var(--paper);
+  box-shadow: none; filter: none; cursor: default;
+}
+@supports not (background: color-mix(in srgb, red 50%, transparent)) {
+  .undo-pill:disabled, .undo-pill:disabled:hover { background: var(--ink-3); }
+}
 .stage__undo[data-mode="icon"] .undo-pill,
 .stage__undo[data-mode="iconrow"] .undo-pill { padding: 0; inline-size: 44px; }
 .stage__undo[data-mode="icon"] .undo-pill__w,

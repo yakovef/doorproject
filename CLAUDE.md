@@ -173,7 +173,9 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   · the faces — Rubik and Bona Nova, the only candidates with Cyrillic
     (`research/fonts/`, rejections by name);
   · undo and redo as labelled ink pills at the stage's foot, the picker's
-    side, shown from the first change and never as a disabled pill;
+    side, ~~shown from the first change and never as a disabled pill~~ —
+    **REVERSED BY THEM 29.9** (*"available but greyed out at the start"*):
+    both painted from load, greyed while disabled;
   · the language picker physically top-RIGHT in every language, so it never
     shares the price's corner;
   · the phone's band stays one line (the option's name yields first);
@@ -204,6 +206,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **29.9** Undo and redo PAINTED FROM LOAD, greyed while disabled (*"available
+  but greyed out at the start"*): ink at .45, no shadow, still `disabled`; no
+  placeholder box. The toast clears them before the first change too.
+  `placeSteps` gives a centred column twice its shortfall (it kept its top:
+  1100 he −12 px); where the Hebrew stage is short the column still stands above
+  the door's middle — nine readings named (1280 standard 21 px). Long form: `HISTORY.md`.
 - **29.9** The designs unlock with a window (B, 2 of 3) — *"the window section
   split in 2 … a sub-section unlocks right after it — the designs"*: the grille
   group's `when: grilleHasSubject` (`isGlazed`), the finish group's hiding; the
@@ -311,9 +319,13 @@ and the backdrop close them, focus returns to the save.
 ⚠ **Undo and redo left that row on 28.9** (*"not noticeable on pc and in the
 way on the phone — more noticeable, but not colliding with the door"*): two
 labelled ink pills (`.undo-pill`, "↶ ביטול", "↷ חזרה") 8 px inside the stage's
-bottom-right corner, the picker's side in every language, shown from the first
-change (a disabled pill is not painted), redo only while there is something to
-redo. `placeUndo` picks the first shape the wall beside the door's foot can
+bottom-right corner, the picker's side in every language. ⚠ **Both painted
+from the first paint since 29.9, greyed while disabled** (*"At the tutorial's
+fourth step the undo button is not shown yet, so it looks strange — available
+but greyed out at the start … that also goes for the other button next to
+it"*; 28.9 had painted neither until the first change): ink at .45, paper
+letters, no shadow, still `disabled`, so the corner is settled before the
+tour's fourth cut-out opens over it and never moves on a tap. `placeUndo` picks the first shape the wall beside the door's foot can
 hold — side by side, stacked, or the glyph alone (a phone beside a wide door)
 — and the column (Hebrew, same corner) and the toast stand above them.
 ⚠ **Since 29.9 they and the save are BRONZE** (`--accent-ink`, white, a paper
@@ -1488,7 +1500,8 @@ are not in `VIEWS`:
 - **arrival and order** — one step live at every width; a bare load on step 01
   and a link on the summary; the whole question sequence off the navigator;
   the navigator a dark column on the door-facing edge above 1100 (a dark row
-  below), the live mark whole on both axes, and its checks on exactly the
+  below), centred on the door or pushed down at every size and desktop width
+  but nine named Hebrew lifts (29.9, §9), the live mark whole on both axes, and its checks on exactly the
   steps walked — none on arrival or after a reload, the address unmoved.
 - **every step** — reachable from the rail; a visible send and a readable price;
   every `[data-wa]` the same href; at least one answer on screen with the
@@ -1507,10 +1520,11 @@ are not in `VIEWS`:
   tiles redrawn when the lock furniture changes.
 - **repairs** — a real repair at every viewport, every sentence on screen, its
   box covering no option; an undo that moves the price names a spec row (the
-  pill is what it presses); the undo pills hidden until there is something to
-  undo, at the stage's corner, ≥ 44, on no door and nothing else on the wall,
-  the first shape that fits, the toast above them (every viewport, he/ru, six
-  sizes); the save's dialog modal, saving only when asked, counting, opening
+  pill is what it presses); the undo pills painted from load and greyed while
+  disabled (29.9), at the stage's corner, ≥ 44, on no door and nothing else on
+  the wall, the first shape that fits and the same one across an undo, the
+  toast above them — a save's before any change included (every viewport,
+  he/ru, six sizes); the save's dialog modal, saving only when asked, counting, opening
   the list as a modal, closing on Escape and the backdrop, focus back on the
   save; the saved doors' rows priced, distinct and whole, the card under them
   unmoved; a tap
@@ -1526,7 +1540,8 @@ are not in `VIEWS`:
   (removed 27.9 — the order keeps `handingWords()`) and, under the green send,
   the telephone reading exactly `PHONE_DISPLAY`.
 - **the tour** — a modal on a first bare load; on each of four steps the
-  target whole in its cut-out and not pressable through the scrim, the callout
+  target whole in its cut-out and not pressable through the scrim (the
+  fourth: the save and each undo pill, painted — 29.9), the callout
   inside the viewport and off the cut-outs, every arrow edge to edge (1280 he,
   390 and 320 ru); remembered after the last step, skip and Escape, gone on
   the second visit; never on a link, bare or the sheet; with storage refused
@@ -1828,8 +1843,22 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   (side by side, stacked, the glyphs alone) clears both the door and the arrow,
   so the stacked redo touches the arrow by 66 px² (`halfextra1`) and 115
   (`halfextra2`), he and ru. A named reading in the audit, asserted still
-  needed. What would close it is a product question: the arrows on a phone,
+  needed — since 29.9 `halfextra2`'s only: the band's line box made every door
+  at 320 0.7 px smaller and on a step the glyphs side by side clear
+  `halfextra1`'s casing by 0.09 px (a knife edge; on the summary, 0.18 px on it,
+  so there the stacked glyphs stand beside the arrow's hidden, kept box). What would close it is a product question: the arrows on a phone,
   or the redo, somewhere other than beside the door.
+- **In Hebrew the navigator column shares the bottom-right corner with the undo
+  pills, and where the stage is short it cannot be centred on the door** (29.9).
+  Both pills stand there from load now (greyed), and the column stops 8 px
+  above them; its ten marks are 470 px at their tightest. At 1280×720 the room
+  from the door's middle down to the pills is 214 px against a half of 235, so
+  the column stands **21 px above the door's middle** (standard, `half`); named
+  in the audit with the other eight (1100: `half` 27, `halfextra1` 9; 1152:
+  standard and `half` 4, `halfextra1` 11; 1280: `extra1`, `halfextra1` 5),
+  asserted still needed. Not new: the same lift came after an undo before 29.9,
+  where no clause looked. What would close it is a product question — the
+  pills or the column somewhere other than one corner in Hebrew.
 - **Two controls pinned by rules that mirror differently stand in opposite walls
   in one language and the same wall in another** — the mechanism behind a
   closed fault (the removed grip controls under the price card in Hebrew only).
