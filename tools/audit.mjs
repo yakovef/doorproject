@@ -2630,7 +2630,28 @@ for (const v of VIEWS) {
       });
     }
     if (!head) fault(v.name, 'no navigator circle can be reached with Tab');
+    /* ⚠ AND THE COLUMN COMES BEFORE THE OPTIONS IN THE TAB ORDER — 28.9.2026.
+       Above 1100 the navigator stands on the photograph, a child of
+       `.stage-wrap` rather than of the panel (`placeNav`), and the order asks
+       that moving it not move it in the keyboard's walk: it is appended LAST in
+       the wrap, which precedes the panel in the document. Asked of the DOM's
+       order, which is what Tab follows here (nothing on the page sets a
+       positive `tabindex`), and of every circle, not just the first. */
+    const order = await p.evaluate(() => {
+      const circles = [...document.querySelectorAll('.steps__step')];
+      const firstOpt = document.querySelector('#choices [role="radio"]');
+      if (!circles.length || !firstOpt) return null;
+      return {
+        before: circles.every(c => c.compareDocumentPosition(firstOpt) & Node.DOCUMENT_POSITION_FOLLOWING),
+        positive: [...document.querySelectorAll('[tabindex]')].filter(e => +e.getAttribute('tabindex') > 0).length,
+      };
+    });
+    if (!order) fault(v.name, 'no navigator circles or no options — the tab-order clause has no subject');
     else {
+      if (!order.before) fault(v.name, 'a navigator circle comes AFTER the first option in the document — the keyboard reaches the options before the steps');
+      if (order.positive) fault(v.name, `${order.positive} element(s) carry a positive tabindex — the DOM order is no longer the tab order this clause reads`);
+    }
+    if (head) {
       /* ⚠ ENTER GOES TO THAT STEP, and this replaced "Enter toggles a section",
          which itself replaced "Enter opens it" when the desktop started
          arriving with all four open. A flow has no toggle: pressing Enter on a
@@ -6014,6 +6035,22 @@ for (const v of VIEWS) {
    Hebrew, right in English), on ink, nine targets whole in the panel and ≥ 44,
    never scrolling; the live one a light square, the rest on the ground. Below
    1100: the fixed row keeps its 62 px and takes the same look.
+   ⚠ RESTATED 28.9.2026 — the column is ON THE PHOTOGRAPH now (the owner's son:
+   *"…not endless, but just the size it needs to host all the section icons, a
+   little separated from the options choosing thing, the image needs to be
+   behind it"*). Same subjects, new place: above 1100 it is a child of
+   `.stage-wrap`, inside the stage's box and outside the panel's; 12 px off the
+   stage's panel-facing edge (inline-START — the panel is the grid's first
+   column in both directions); centred on the door's mid-height unless the wall
+   chrome on its side pushes it down (`--steps-top`); its OWN ink, its height
+   its content; the panel paints no stripe any more and reserves its scrollbar
+   lane (`scrollbar-gutter: stable`) so the tiles stop shifting between a step
+   that scrolls and one that does not. And a WALL gate, measured the day it
+   moved at every size and seven desktop widths in both directions: the column
+   touches no door (`#frame`), no arrow, no wall control, and stands inside the
+   stage — nothing to name. (The price card covered its top in Hebrew at
+   1100–1152 on that day; the card leaves that corner in commit 4 and the
+   price's own clause says so.)
    And the checks: exactly the steps LEFT by a gesture, never derived from the
    door — so on arrival there are none, after two presses of the way on there
    are two, a rail tap adds the one it leaves, the URL does not move, and a
@@ -6038,17 +6075,34 @@ for (const v of VIEWS) {
         const nav = document.querySelector('.steps'), pn = document.querySelector('.panel--choose');
         if (!nav || !pn) return null;
         const r = nav.getBoundingClientRect(), P = pn.getBoundingClientRect();
+        const W = document.querySelector('.stage-wrap').getBoundingClientRect();
+        const S = document.querySelector('#stage').getBoundingClientRect();
         const rtl = document.documentElement.dir === 'rtl';
         const steps = [...nav.querySelectorAll('.steps__step')];
-        const vis = innerWidth >= 1100 ? P : { top: 0, bottom: innerHeight, left: 0, right: innerWidth };
+        const vis = innerWidth >= 1100 ? W : { top: 0, bottom: innerHeight, left: 0, right: innerWidth };
         const circ = s => getComputedStyle(s.querySelector('.steps__c')).backgroundColor;
+        const f = document.querySelector('.door-svg #frame')?.getBoundingClientRect();
+        const ov = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
+        const hits = [];
+        if (f && ov(r, f)) hits.push(`the door ${ov(r, f)} px²`);
+        for (const a of document.querySelectorAll('.stage__arrow')) if (ov(r, a.getBoundingClientRect())) hits.push(`an arrow ${ov(r, a.getBoundingClientRect())} px²`);
+        for (const a of document.querySelectorAll('.stage__hud .hud__slot')) if (ov(r, a.getBoundingClientRect())) hits.push(`a wall control ${ov(r, a.getBoundingClientRect())} px²`);
+        const push = parseFloat(getComputedStyle(document.querySelector('.stage-wrap')).getPropertyValue('--steps-top'));
         return {
           n: steps.length,
           column: getComputedStyle(nav).flexDirection === 'column',
           width: Math.round(r.width), height: Math.round(r.height),
-          /* the door-facing edge: inline-end of the panel */
-          edge: Math.round(rtl ? r.left - P.left : P.right - r.right),
-          groundDesk: getComputedStyle(pn).backgroundImage.includes(INK),
+          /* ON THE PHOTOGRAPH (28.9): a child of the wrap, inside the stage's box, clear of the panel's */
+          onPhoto: nav.parentElement === document.querySelector('.stage-wrap')
+            && r.left >= S.left - 1 && r.right <= S.right + 1 && (r.right <= P.left || r.left >= P.right),
+          /* 12 px off the stage's panel-facing edge: inline-START of the wrap */
+          edge: Math.round(rtl ? W.right - r.right : r.left - W.left),
+          /* centred on the door's middle, or pushed DOWN by the wall chrome (never up) */
+          midOff: f ? Math.round((r.top + r.bottom) / 2 - (f.top + f.bottom) / 2) : null,
+          hits, inWrap: r.top >= W.top - 1 && r.bottom <= W.bottom + 1,
+          ownInk: getComputedStyle(nav).backgroundColor === INK,
+          stripe: getComputedStyle(pn).backgroundImage.includes(INK),
+          gutter: getComputedStyle(pn).scrollbarGutter,
           groundPhone: getComputedStyle(pn, '::before').backgroundColor,
           scrolls: nav.scrollHeight > nav.clientHeight + 1,
           whole: steps.every(s => { const b = s.getBoundingClientRect();
@@ -6066,9 +6120,15 @@ for (const v of VIEWS) {
       const wide = w >= 1100;
       if (wide) {
         if (!a.column || a.width > 60) fault('nav-column', `${tag}: the navigator is ${a.column ? '' : 'not '}a column, ${a.width} px wide — it should be a column of at most 60 px`);
-        if (a.edge > 4) fault('nav-column', `${tag}: the column stands ${a.edge} px in from the panel's door-facing edge — it belongs on that edge`);
-        if (!a.groundDesk) fault('nav-column', `${tag}: the panel paints no ink stripe behind the column`);
-        if (a.scrolls) fault('nav-column', `${tag}: the column scrolls — nine 44 px targets fit every desktop panel`);
+        if (!a.onPhoto) fault('nav-column', `${tag}: the column is not on the photograph — it should be a child of .stage-wrap, inside the stage and clear of the panel`);
+        if (Math.abs(a.edge - 12) > 2) fault('nav-column', `${tag}: the column stands ${a.edge} px in from the stage's panel-facing edge — 12 px off it`);
+        if (a.midOff === null || a.midOff < -2) fault('nav-column', `${tag}: the column's middle is ${a.midOff} px from the door's — it is centred on it, or pushed down, never up`);
+        if (a.hits.length) fault('nav-column', `${tag}: the column stands on ${a.hits.join(', ')}`);
+        if (!a.inWrap) fault('nav-column', `${tag}: the column leaves the stage at its top or foot`);
+        if (!a.ownInk) fault('nav-column', `${tag}: the column is not its own ink rectangle`);
+        if (a.stripe) fault('nav-column', `${tag}: the panel still paints an ink stripe — the column is not on it any more`);
+        if (a.gutter !== 'stable') fault('nav-column', `${tag}: the panel's scrollbar lane is "${a.gutter}", not reserved — the tiles shift between steps that scroll and steps that do not`);
+        if (a.scrolls) fault('nav-column', `${tag}: the column scrolls — its targets fit`);
       } else {
         if (a.column || a.height < 58 || a.height > 64) fault('nav-column', `${tag}: the phone navigator is ${a.column ? 'a column' : 'a row'} ${a.height} px tall — it keeps its 62 px row`);
         if (a.groundPhone !== INK) fault('nav-column', `${tag}: the phone row's ground is ${a.groundPhone}, not the ink`);
@@ -6106,7 +6166,31 @@ for (const v of VIEWS) {
     } finally { await pg.close().catch(() => {}); }
   }
   if (readings < 6) fault('nav-column', `only ${readings} of 6 viewports were read — this check is measuring almost nothing`);
-  if (faults === before) console.log(`    ${readings} viewports: a dark column on the door-facing edge above 1100 (a dark row below), nine whole ≥44 px targets, the live one a light square; checks on exactly the steps walked, none on arrival or after a reload, the address unmoved`);
+  /* THE WALL GATE, every size at every desktop width, both directions (28.9):
+     the column on no door, no arrow, no wall control, inside the stage. */
+  let wallRead = 0;
+  for (const [w, h] of [[1100, 800], [1152, 800], [1280, 720], [1440, 900], [1920, 918]]) for (const lang of ['he', 'en']) for (const size of Object.keys(SIZES)) {
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=${size}`);
+      await pg.waitForTimeout(450);
+      const m = await pg.evaluate(() => {
+        const n = document.querySelector('.stage-wrap > .steps'); if (!n) return null;
+        const r = n.getBoundingClientRect(), W = document.querySelector('.stage-wrap').getBoundingClientRect();
+        const ov = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
+        const on = [['the door', document.querySelector('.door-svg #frame')], ...[...document.querySelectorAll('.stage__arrow')].map(e => ['an arrow', e]),
+                    ...[...document.querySelectorAll('.stage__hud .hud__slot')].map(e => ['a wall control', e])]
+          .map(([k, e]) => [k, e ? ov(r, e.getBoundingClientRect()) : 0]).filter(([, o]) => o);
+        return { on, inWrap: r.top >= W.top - 1 && r.bottom <= W.bottom + 1 };
+      });
+      if (!m) { fault('nav-column', `${lang} ${w}x${h} ${size}: no column on the photograph — the wall gate has no subject`); continue; }
+      wallRead++;
+      if (m.on.length) fault('nav-column', `${lang} ${w}x${h} ${size}: the column stands on ${m.on.map(([k, o]) => `${k} (${o} px²)`).join(', ')}`);
+      if (!m.inWrap) fault('nav-column', `${lang} ${w}x${h} ${size}: the column leaves the stage`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (wallRead < 5 * 2 * Object.keys(SIZES).length) fault('nav-column', `the wall gate read ${wallRead} of ${5 * 2 * Object.keys(SIZES).length} doors`);
+  if (faults === before) console.log(`    ${readings} viewports: a dark column on the photograph above 1100 (a dark row below), nine whole ≥44 px targets, the live one a light square; checks on exactly the steps walked, none on arrival or after a reload, the address unmoved; ${wallRead} doors × widths × directions with the column on no door, arrow or wall control`);
 }
 
 /* ── THE HANDLE FINISH IS ON THE PAGE ONLY WHERE IT PAINTS SOMETHING ──────

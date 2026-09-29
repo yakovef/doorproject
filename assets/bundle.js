@@ -10529,6 +10529,10 @@ ${plate.defs}${plate.body}
     armRoom();
     if (typeof window.matchMedia === "function") {
       window.matchMedia("(min-width: 1100px)").addEventListener("change", placeSend);
+      window.matchMedia("(min-width: 1100px)").addEventListener("change", () => {
+        placeNav();
+        fitStage();
+      });
     }
   }
   var markMore = () => {
@@ -10707,6 +10711,7 @@ ${plate.defs}${plate.body}
     const tel = document.getElementById("send-tel");
     if (wa && tel && tel.previousElementSibling !== wa) wa.after(tel);
     if (send && wrap.contains(send)) $(".layout").appendChild(send);
+    document.querySelectorAll(".stage-wrap > .steps").forEach((n) => n.remove());
     wrap.replaceChildren();
     const opener = document.createElement("button");
     opener.type = "button";
@@ -10808,6 +10813,7 @@ ${plate.defs}${plate.body}
     }
     sum.querySelector(".sect__back").addEventListener("click", () => stepBy(-1));
     wrap.appendChild(sum);
+    placeNav();
   }
   function tilePrice(g, o, state2) {
     const after = { ...repair({ ...state2, [g.key]: o.id }).state, [g.key]: o.id };
@@ -11093,6 +11099,18 @@ ${plate.defs}${plate.body}
       });
     }
     host.appendChild(box);
+  }
+  function placeNav() {
+    const nav = document.querySelector(".steps");
+    const panel = $("#choices"), wrap = $(".stage-wrap");
+    if (!nav || !panel || !wrap) return;
+    const wide = typeof window.matchMedia === "function" && window.matchMedia("(min-width: 1100px)").matches;
+    const home = wide ? wrap : panel;
+    if (nav.parentElement === home) return;
+    const had = nav.contains(document.activeElement) ? document.activeElement : null;
+    if (wide) wrap.appendChild(nav);
+    else panel.insertBefore(nav, panel.querySelector(".sect") || null);
+    if (had) had.focus({ preventScroll: true });
   }
   function placeSend() {
     const wa = $("#wa-btn");
@@ -11755,6 +11773,23 @@ ${plate.defs}${plate.body}
       sw.setProperty("--frame-left", `${Math.round(f.left - wrap.x)}px`);
       sw.setProperty("--frame-mid", `${Math.round((f.top + f.bottom) / 2 - wrap.y)}px`);
       sw.setProperty("--hud-b", `${Math.round(hudB - wrap.y)}px`);
+      const col = document.querySelector(".stage-wrap > .steps");
+      if (col) {
+        const H = col.offsetHeight;
+        const cx = col.getBoundingClientRect();
+        const mid = (f.top + f.bottom) / 2;
+        let top = mid - H / 2;
+        const inX = (r) => r.width && r.right > cx.left && r.left < cx.right;
+        for (const el of document.querySelectorAll("#quote, .stage__hud .hud__slot")) {
+          const r = el.getBoundingClientRect();
+          if (inX(r) && r.top < mid && r.bottom + 8 > top) top = r.bottom + 8;
+        }
+        const trust = document.querySelector(".trust");
+        const tr = trust && trust.getBoundingClientRect();
+        const floor = (tr && tr.height && tr.top > mid ? tr.top : wrap.bottom) - 8;
+        if (top + H > floor) top = floor - H;
+        sw.setProperty("--steps-top", `${Math.round(top - wrap.y)}px`);
+      }
       const root = document.documentElement.style;
       root.setProperty("--stage-l", `${Math.round(wrap.x)}px`);
       root.setProperty("--stage-w", `${Math.round(wrap.width)}px`);
@@ -11787,6 +11822,10 @@ ${plate.defs}${plate.body}
     const style = document.documentElement.style;
     const choose2 = document.querySelector(".panel--choose");
     const railEl = choose2 && choose2.querySelector(".steps");
+    if (choose2 && !railEl) {
+      const pad = parseFloat(getComputedStyle(choose2).paddingBlockStart) || 0;
+      style.setProperty("--rail-band", `${Math.round(pad)}px`);
+    }
     const footEl = document.querySelector(".sect:not([hidden]) .sect__foot");
     if (choose2 && railEl && getComputedStyle(railEl).position === "sticky") {
       const pad = parseFloat(getComputedStyle(choose2).paddingBlockStart) || 0;

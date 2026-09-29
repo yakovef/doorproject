@@ -3734,23 +3734,48 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    its content, so the column is ink from the card's top to its foot whatever
    the step's length, and the nav itself is transparent. The card's inline-end
    padding moves into the column's gap. */
+/* ⚠ AND SINCE 28.9 IT STANDS ON THE PHOTOGRAPH, NOT ON THE PANEL — the owner's
+   son: *"The rectangle with the icons needs to be not endless, but just the
+   size it needs to host all the section icons, a little separated from the
+   options choosing thing, the image needs to be behind it — on the image and
+   not on some white thing."* The 27.9 column above was the panel's second grid
+   column with the PANEL's background painting the ink, so the ink ran the
+   card's whole height whatever the step, and the panel's scrollbar — on the
+   door-facing edge in RTL — ran down it on any step long enough to scroll.
+   Now `placeNav` (js/app.js) carries `.steps` into `.stage-wrap` above 1100
+   and this places it there:
+     · on the stage's edge that faces the panel — `inset-inline-start`, since
+       the panel is the grid's first column in both directions — 12 px off it;
+     · centred on the door's mid-height, its height its content: 44 px
+       targets 6 px apart inside 10 px of ink, 9 × 44 + 8 × 6 + 20 = 464 px,
+       which no desktop `VIEW` stage is shorter than — and moved DOWN only
+       where the centred place is under the wall's other furniture on its side
+       (`--steps-top`, computed in `fitStage`);
+     · its own ink, `--r-card` corners, the photograph round it.
+   ⚠ THE WALL IS ARITHMETIC. The column (56) and its gap (12) share the wall
+   on that side with the arrow (44, at 8 px off the casing): 120 px. The wall
+   is 140–150 px at 1100–1200 on the standard door and fits; the widest double
+   at 1100 has 73 and does not — the audit gates the standard door at every
+   width and every door from 1280 up, and NAMES the readings that overlap.
+   The panel goes back to one column, and `scrollbar-gutter: stable` reserves
+   the scrollbar's lane on every step, so the tiles no longer shift sideways
+   between a step that scrolls and one that does not. */
 @media (min-width: 1100px) {
-  .panel--choose {
-    grid-template-columns: minmax(0, 1fr) 56px;
-    column-gap: 18px;
-    padding-inline-end: 0;
-    background: linear-gradient(to left, var(--ink) 0 56px, var(--surface) 56px);
-  }
-  [dir="rtl"] .panel--choose {
-    background: linear-gradient(to right, var(--ink) 0 56px, var(--surface) 56px);
-  }
-  .panel--choose > * { grid-column: 1; }
-  .panel--choose > .steps {
-    grid-column: 2; grid-row: 1 / span 40;
-    align-self: start;
+  .panel--choose { scrollbar-gutter: stable; }
+  .stage-wrap > .steps {
+    position: absolute;
+    inset-inline-start: 12px;
+    /* `fitStage` publishes the top: the door's mid-height less half the
+       column, or 8 px under the wall chrome on its side where that is lower
+       (see `--steps-top` there). Before the first fit, centred on the stage. */
+    inset-block-start: var(--steps-top, calc(50% - 232px));
+    z-index: 4;
     flex-direction: column; align-items: center; gap: 6px;
-    margin: 0; padding: 0 0 12px;
-    border: 0; box-shadow: none;
+    margin: 0; padding: 10px 6px;
+    inline-size: 56px;
+    background: var(--ink);
+    border: 0; border-radius: var(--r-card);
+    box-shadow: 0 6px 18px rgb(0 0 0 / .18);
     min-block-size: 0; overflow: visible;
     -webkit-mask-image: none; mask-image: none;
   }

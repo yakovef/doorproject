@@ -178,6 +178,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.9** The navigator on the photograph (2 of 10) — *"not endless … the image
+  needs to be behind it"*: `.stage-wrap > .steps` above 1100 (`placeNav`), its
+  own ink, 12 px off the panel, centred on the door or pushed below the wall's
+  chrome (`--steps-top`); the panel one column with a reserved scrollbar lane.
+  On no door, arrow or wall control at any size or width. ⚠ Until commit 4 the
+  Hebrew price CARD still covers its top at 1100–1152 (≤ 1,982 px²); commit 4
+  takes the card from that corner. Long form: `HISTORY.md`.
 - **28.9** What the new face moved, put back (1b) — the audit on commit 1, eleven
   faults, all widths. **Print:** English's widest double went to two pages
   (276.5 mm), Russian past its 280 ceiling (283.9); rows 6 → 4 px on paper put all
@@ -213,11 +220,6 @@ lines here. Dates are the day of the change.
   62 mm rose at 0.287, the Rotem's egg. Was a 96 × 300 stadium. Footprint 53/48/
   198 → 48/48/157; `satinPlate` shared with עילי (its render byte-identical).
   `KEYWAY_BACKSET` 63 kept though no longer "derived" (max is now 58).
-- **28.9** The swing bar lock withdrawn — *"remove the bar lock quickly."*
-  Out of the catalogue, the code (`VERSION` 27; 26 is burnt), the drawing, the
-  rules, the price's null-state and every sweep; `lt=` retired. The פרזול
-  tiles stay a composite of the door (lock furniture, hinges, viewer). Long
-  form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 27.9.2026
@@ -821,11 +823,24 @@ for the same half of the leaf and `repair` trades between them.
   carries a value on first paint, so a state-derived indicator would read
   complete before anything was touched. Since 27.9 (the owner's son: *"…a
   black rectangle, and then the section that i am in will turn white and be
-  square"*) it is a 56 px ink COLUMN on the panel's door-facing edge
-  (inline-end) above 1100 — the panel stays the scroller, the ink is its own
-  background stripe, nine 44 px targets never scroll — and the same look on
-  the phone's fixed 62 px row (the ink a fixed strip under it, so the row's
-  fade cue still works). The live step is a light square. ⚠ **The checks are
+  square"*) it is a 56 px ink COLUMN above 1100 and the same look on the
+  phone's fixed 62 px row (the ink a fixed strip under it, so the row's fade
+  cue still works). The live step is a light square.
+  ⚠ **Since 28.9 the column stands ON THE PHOTOGRAPH** (*"…not endless, but just
+  the size it needs … a little separated from the options choosing thing, the
+  image needs to be behind it"*): `placeNav` moves `.steps` into `.stage-wrap`
+  above 1100 and back into the panel below it (the phone row must stay in the
+  panel — a fixed row inside the sticky wrap's stacking context would paint
+  under its own ink strip). Absolute, 12 px off the stage's panel-facing edge,
+  its own ink and `--r-card`, 464 px tall; centred on the door's mid-height
+  unless the wall chrome on its side reaches below that, then 8 px under it,
+  never below the trust band (`--steps-top`, computed in `fitStage` off the
+  live rects). The panel is one column again with `scrollbar-gutter: stable`
+  (the "scroll wheel" was the panel's scrollbar down the old column). Appended
+  last in the wrap, so Tab still reaches the steps before the options.
+  Measured: on no door, arrow or wall control at any size, 1100–1920, both
+  directions — the wall beside the widest double at 1100 is 137 px, not the 73
+  the brief assumed (73 is §9's phone figure). ⚠ **The checks are
   `visited`**, a Set in `app.js` beside `liveStep`: a step LEFT by a gesture
   (its button, the bar's arrows, the rail, the skip, a summary row) — never
   derived from the door, never in the state, the URL or the code; a reload

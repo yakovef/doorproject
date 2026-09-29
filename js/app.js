@@ -849,6 +849,8 @@ function init() {
      rest of this file already tests for. */
   if (typeof window.matchMedia === 'function') {
     window.matchMedia('(min-width: 1100px)').addEventListener('change', placeSend);
+    /* and the navigator, which stands on the photograph above 1100 (28.9) */
+    window.matchMedia('(min-width: 1100px)').addEventListener('change', () => { placeNav(); fitStage(); });
   }
 }
 
@@ -1191,6 +1193,11 @@ function buildPanel() {
   const tel = document.getElementById('send-tel');
   if (wa && tel && tel.previousElementSibling !== wa) wa.after(tel);
   if (send && wrap.contains(send)) $('.layout').appendChild(send);
+  /* ⚠ AND A NAVIGATOR LEFT ON THE PHOTOGRAPH (28.9). Above 1100 the column
+     lives in `.stage-wrap`, outside this element, so `replaceChildren` below
+     would not reach it — and a language switch would build a second column
+     over the first. Removed here, rebuilt below, placed by `placeNav`. */
+  document.querySelectorAll('.stage-wrap > .steps').forEach(n => n.remove());
   wrap.replaceChildren();
 
   /* The first offer the panel makes, above the navigator: somewhere to start
@@ -1284,6 +1291,8 @@ function buildPanel() {
     nav.appendChild(b);
   }
   wrap.appendChild(nav);
+  /* Built in the panel, where the phone's fixed row lives; `placeNav` carries
+     it onto the photograph above 1100 once the steps are in place below. */
 
   /* ── THE STEPS ─────────────────────────────────────────────────────
      Every step is built once and hidden; `goStep` shows one. Building them all
@@ -1459,6 +1468,7 @@ function buildPanel() {
   }
   sum.querySelector('.sect__back').addEventListener('click', () => stepBy(-1));
   wrap.appendChild(sum);
+  placeNav();
 }
 
 /**
@@ -2032,6 +2042,41 @@ function buildLengthStepper(host) {
  * put right. There is exactly one thing now, and this is it — it moves one
  * element and reshapes nothing.
  */
+/* ── THE NAVIGATOR STANDS ON THE PHOTOGRAPH ABOVE 1100 — 28.9.2026 ────
+   The owner's son: *"In some categories there appears a scroll wheel that
+   messes up with the section icons. The rectangle with the icons needs to be
+   not endless, but just the size it needs to host all the section icons, a
+   little separated from the options choosing thing, the image needs to be
+   behind it — on the image and not on some white thing."*
+   So above 1100 `.steps` is a child of `.stage-wrap`: absolute, on the
+   stage's edge that faces the panel, as tall as its targets, centred on the
+   door's mid-height — the photograph behind it. It was the panel's second
+   grid column (27.9) with the PANEL's background painting its ink, so the ink
+   ran the card's full height whatever the step, and in RTL the panel's own
+   scrollbar sat on that same edge and ran down the column on every step long
+   enough to scroll: the "scroll wheel".
+   ⚠ ONE ELEMENT MOVED, THE WAY `placeSend` MOVES ONE. Below 1100 the fixed
+   row stays in the panel, unchanged: `.stage-wrap` is sticky at z-index 3
+   there, a stacking context, and a fixed row inside it would paint UNDER its
+   own ink strip (the panel's `::before`, z-index 5). Appended LAST in the wrap
+   so the tab order is what it was — the wall's controls, then the steps, then
+   the options (the order asks for the column before the options).
+   Focus rides the move: a focused circle that is re-parented is blurred by
+   the browser, so it is given back. */
+function placeNav() {
+  const nav = document.querySelector('.steps');
+  const panel = $('#choices'), wrap = $('.stage-wrap');
+  if (!nav || !panel || !wrap) return;
+  const wide = typeof window.matchMedia === 'function'
+    && window.matchMedia('(min-width: 1100px)').matches;
+  const home = wide ? wrap : panel;
+  if (nav.parentElement === home) return;
+  const had = nav.contains(document.activeElement) ? document.activeElement : null;
+  if (wide) wrap.appendChild(nav);
+  else panel.insertBefore(nav, panel.querySelector('.sect') || null);
+  if (had) had.focus({ preventScroll: true });
+}
+
 function placeSend() {
   const wa = $('#wa-btn');
   const card = document.querySelector('.panel--send .send');
@@ -3820,6 +3865,37 @@ function fitStage() {
     sw.setProperty('--frame-mid', `${Math.round((f.top + f.bottom) / 2 - wrap.y)}px`);
     sw.setProperty('--hud-b', `${Math.round(hudB - wrap.y)}px`);
 
+    /* ⚠ WHERE THE NAVIGATOR COLUMN STANDS (28.9), when it is on the photograph.
+       Centred on the door's mid-height, as asked — UNLESS that puts it under
+       the wall's other furniture on its side: measured the day it moved, the
+       price card at the door's head covered its top two marks in Hebrew at
+       1100 on every size (up to 5,246 px²) and at 1152 on the four larger
+       doors, so "fit" and "colour" could not be tapped. So it stands 8 px under
+       whatever chrome its own x-range meets above the door's middle, and 8 px
+       above the trust band at the stage's foot. The chrome is read off the
+       page, never listed as numbers: the price moves in the same round, and a
+       column that asked where the card USED to be would be wrong the day after.
+       Read after the variables above are set, so the card is already where
+       those put it. Its own height is `offsetHeight` — the layout box, which a
+       transform cannot distort. */
+    const col = document.querySelector('.stage-wrap > .steps');
+    if (col) {
+      const H = col.offsetHeight;
+      const cx = col.getBoundingClientRect();
+      const mid = (f.top + f.bottom) / 2;
+      let top = mid - H / 2;
+      const inX = r => r.width && r.right > cx.left && r.left < cx.right;
+      for (const el of document.querySelectorAll('#quote, .stage__hud .hud__slot')) {
+        const r = el.getBoundingClientRect();
+        if (inX(r) && r.top < mid && r.bottom + 8 > top) top = r.bottom + 8;
+      }
+      const trust = document.querySelector('.trust');
+      const tr = trust && trust.getBoundingClientRect();
+      const floor = (tr && tr.height && tr.top > mid ? tr.top : wrap.bottom) - 8;
+      if (top + H > floor) top = floor - H;
+      sw.setProperty('--steps-top', `${Math.round(top - wrap.y)}px`);
+    }
+
     const root = document.documentElement.style;
     root.setProperty('--stage-l', `${Math.round(wrap.x)}px`);
     root.setProperty('--stage-w', `${Math.round(wrap.width)}px`);
@@ -3947,7 +4023,15 @@ function fitStage() {
      reason: these exist whether or not the drawing came up. */
   const style = document.documentElement.style;
   const choose = document.querySelector('.panel--choose');
+  /* ⚠ ONLY A RAIL INSIDE THE PANEL takes part (28.9): above 1100 the column
+     stands on the photograph, outside it, and the panel's band is then its own
+     padding alone — without this branch the CSS fallback of 83 px would
+     over-pad every scroll by the height of a row that is not there. */
   const railEl = choose && choose.querySelector('.steps');
+  if (choose && !railEl) {
+    const pad = parseFloat(getComputedStyle(choose).paddingBlockStart) || 0;
+    style.setProperty('--rail-band', `${Math.round(pad)}px`);
+  }
   const footEl = document.querySelector('.sect:not([hidden]) .sect__foot');
   if (choose && railEl && getComputedStyle(railEl).position === 'sticky') {
     /* ⚠ THE BAND, NOT THE HEIGHT, AND THE DIFFERENCE IS 10 px OF TILE.

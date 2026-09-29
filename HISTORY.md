@@ -26,6 +26,82 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.9 — THE NAVIGATOR STANDS ON THE PHOTOGRAPH (2 of 10).** The owner's son:
+  *"In some categories there appears a scroll wheel that messes up with the
+  section icons. The rectangle with the icons needs to be not endless, but just
+  the size it needs to host all the section icons, a little separated from the
+  options choosing thing, the image needs to be behind it — on the image and not
+  on some white thing."*
+
+  **WHAT WAS THERE (27.9, `3c0aef4`).** Above 1100 the nine marks were the
+  panel's second grid column and the PANEL's background painted their ink as a
+  56 px stripe — so the ink ran the card's whole height whatever the step, and
+  in RTL the panel's own scrollbar sat on that same edge and ran down the column
+  on every step long enough to scroll. That is the "scroll wheel": the bar
+  appeared on some steps only.
+
+  **WHAT IT IS.** `placeNav` (js/app.js) moves `.steps` into `.stage-wrap` above
+  1100 and back into the panel below it, on a `matchMedia` listener beside
+  `placeSend`'s; `buildPanel` clears a column left in the wrap first, or a
+  language switch would build a second over it. ⚠ **The phone row stays in the
+  panel on purpose**: `.stage-wrap` is sticky at z-index 3 below 1100 — a
+  stacking context — and a fixed row inside it would paint UNDER its own ink
+  strip (the panel's `::before`, z-index 5). The column is absolute, 12 px off
+  the stage's panel-facing edge (inline-START: the panel is the grid's first
+  column in both directions), its own ink with `--r-card` corners, 464 px tall
+  (9 × 44 + 8 × 6 + 20). The panel is one column again with `scrollbar-gutter:
+  stable`, so the tiles no longer shift between a step that scrolls and one
+  that does not. Appended LAST in the wrap, so the keyboard reaches the steps
+  before the options, as asked. `--rail-band` (the panel's scroll padding) was
+  measured off a rail INSIDE the panel; with none there it would have fallen to
+  the stylesheet's 83 px and over-padded every scroll, so it is the panel's own
+  padding when the rail is elsewhere.
+
+  **WHERE IT STANDS VERTICALLY — MEASURED, NOT ASSUMED.** Centred on the door's
+  mid-height, as asked — and the first build did exactly that and put the price
+  CARD over its top two marks in Hebrew at 1100 on every size (up to 5,246 px²)
+  and at 1152 on the four larger doors: "fit" and "colour" could not be tapped.
+  So `fitStage` publishes `--steps-top`: centred, or 8 px under whatever wall
+  chrome its own x-range meets above the door's middle (read off the live rects,
+  never a list of numbers — the price moves in commit 4), and never below 8 px
+  over the trust band. ⚠ **In THIS commit's tree the Hebrew card still overlaps
+  it at 1100–1152** — the room between the card's foot and the trust band is
+  411–432 px against the column's 464 — down to at most 1,982 px². The card
+  leaves that corner in commit 4 (the price block that replaces it is half its
+  height), and commit 4 gates "never under the price". Recorded rather than
+  papered over with an adaptive gap that commit 4 would make pointless.
+
+  **THE WALL, MEASURED THE DAY IT MOVED.** At 1100, 1152, 1280, 1366, 1440, 1680
+  and 1920, every size, Hebrew and English (the column changes sides with the
+  direction): on no door, no arrow, no wall control, inside the stage —
+  nothing to name. ⚠ The brief expected the widest double at 1100 not to fit on
+  "73 px of wall"; the wall there is **137 px** (73 is §9's PHONE figure), and
+  column 56 + gap 12 + arrow 44 + 8 = 120 leaves 17. So the gate is stronger than
+  the brief's: every door at every desktop width, not the standard door and
+  ≥ 1280 only.
+
+  **ASSERTED, RESTATED.** The `3c0aef4` block keeps its subjects — a column
+  ≤ 60 px, nine whole ≥ 44 px targets, the live one a light square, the checks
+  exactly the steps walked — and asks them of the new place: a child of the wrap
+  inside the stage and clear of the panel ("on the photograph"); 12 px off the
+  panel-facing edge; centred or pushed down, never up; on no door, arrow or wall
+  control; inside the stage; its OWN ink; the panel painting no stripe and
+  reserving its gutter. A wall gate over five desktop widths × two directions ×
+  six sizes, with a §5.15 count of what it read. The keyboard walk asserts every
+  circle precedes the first option in the document and that no element carries
+  a positive tabindex (the DOM order being what Tab follows). Falsified: the
+  column back in the panel → "not on the photograph" and its dependents, and the
+  wall gate reads 0 of 60; no gutter → the gutter clause at each desktop view.
+
+  **SEEN AND NOT TOUCHED.** The step foot's "Next ›" wraps to two lines in
+  English and Russian at every desktop width — and did at `9abc298` too (67 px,
+  two lines), so it is not this round's; listed for the owner's son rather than
+  fixed in passing.
+
+  **GATES.** `node --check`, `npm run build`, `npm test` 9,440,830 passed / 5 failed — the five sheet-staleness rows (shot, recreate, corpus, against, lockset). The audit after
+  commit 1b ran in its own worktree while this was built: **no faults** at every viewport, EXIT 0 — the wall readings the 1b re-cut predicted (he 17, ru 18 at 1152 on the widest double) and the print clause holding all six on one page. Sheets: 0 bare
+  (the column is chrome; `?bare=1` hides it).
+
 - **28.9 — NEITHER VIEWER FOLLOWS THE פרזול.** *"remove it from the regular
   peephole too."* The optical ring is `#lockUnit` too (its 26.8 note — Peretz's
   list names the עינית — kept above it as the record, reversed on the owner's
@@ -1865,6 +1941,11 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.9** The swing bar lock withdrawn — *"remove the bar lock quickly."*
+  Out of the catalogue, the code (`VERSION` 27; 26 is burnt), the drawing, the
+  rules, the price's null-state and every sweep; `lt=` retired. The פרזול
+  tiles stay a composite of the door (lock furniture, hinges, viewer). Long
+  form: `HISTORY.md`.
 - **28.9** **עילי** (`ilai`), a new lockset, INCLUDED (*"very similar to rotem, it
   is also in the price, i want you to call it 'עילי'"*): the waisted backplate —
   220 tall, 91 at head and foot, 78 at a waist 0.54 down, a slim 14 mm bar under
