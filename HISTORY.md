@@ -26,6 +26,60 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **29.9 — PROMPT A, 1 OF 5: THE BAND'S TWO LINES BIGGER.** The owner's son:
+  *"The text above the door bigger, especially the one that represents the
+  option that is now chosen."* Answered in chat the same day: the option's name
+  in **the title's own face** (Bona Nova).
+  · **What was there.** The title `700 clamp(22px, 2.1vw, 30px)/1.15` Bona
+    Nova, the option's line `400 clamp(13px, 1.1vw, 15px)/1.35` Rubik in
+    `--ink-2` — at 1280×720 26.9 px over 14.1 (0.52 of it).
+  · **What it is.** The title `700 clamp(26px, 2.5vw, 36px)/1.1`, the option's
+    line `700 clamp(19px, 1.9vw, 27px)/1.2`, both `--display` in `--ink` — the
+    option at three quarters of the title (sizes and ratio ours, reversible in
+    a line). Below 1100 the one-line band keeps its 28.9 sizes AND line-heights
+    (restated there, since the desktop's changed under them); only the option's
+    face and ink follow. Bona Nova's line box is deeper than Rubik's, so the
+    phone band is 18.8 → 19.6 px — named, not tuned away.
+  · **The headroom is arithmetic, and the page already does it.** The band,
+    measured: 44.1 → 55.3 px at 1100×800, 49.9 → 64.4 at 1280×720, 54.8 → 72.0
+    at 1440×900 and 1920×918 (+17.2 at the widest, as the brief estimated). The
+    brief asked for `FIT_TRIM.top` to take the shortfall; since `d3b54e6`
+    `fitCrop` gives each viewport exactly the wall its band needs above the
+    TALLEST door, read off the band's own height, so the taller band took its
+    wall with no number changed: the standard leaf 502.6 → 494.5 (1100), 437.0
+    → 426.6 (1280), 564.0 → 551.4 (1440), 576.5 → 563.9 (1920) — −2.2 to −2.4 %,
+    the ~2 % predicted — and 156.2 → 155.5 at 320×568 (the phone band's 0.8 px);
+    390–834 unchanged (below 1100 `FIT_TRIM` is the floor, and it already held
+    the phone band). The gap over the casing is 7.5–9.0 px at every size and
+    width (7.5 at 1920 beside the two tallest: by construction, a rounded
+    `--frame-top` and a floored band top keep it ≥ 7.5).
+  · **Restated, same subjects.** The leaf floors: 436.9 / 556.0 / 567.4 →
+    **426.6 / 551.4 / 563.9**, the reason beside them (the door gave the band
+    ~17 px on his word), no tolerance. NEW beside them, his words as the
+    subject rather than the stylesheet's numbers: the title ≥ 26 px, the
+    option's line ≥ 19 px and ≥ 0.7 of the title, in the title's face, weight
+    and ink, at 1280 / 1440 / 1920 in he and ru. The type clause (every
+    viewport) holds `.band__now` to Bona Nova too — the body's Rubik sample no
+    longer reads the band's line, which is not Rubik any more. The band's
+    sweep (288 readings: on the photograph, never on `#frame`, gap ≥ 7.5, on
+    no control), the one-line / one-height clauses, the landscape counts and
+    the name-twice check re-run: clean — 288 band readings (gap 7.5–9.0), one height on all ten steps, 6 of 9 steps with an answer at 844×390 and 2 of 9 at 640×360 (the 28.9 counts, unchanged), no step naming itself twice. The 320×568 `NARROW` pair the brief
+    names had already gone with `d3b54e6` (8 px there since).
+  · **Falsified:** the old sizes back (face kept) → the size clause at all
+    six readings (0.50–0.52 of the title); the option's line back in Rubik
+    400, `--ink-2` → the face-and-ink clause at all six, and the type clause
+    ("the now computes to Rubik") at the laptop view; the crop not making room
+    for the band (`fitCrop` returning the attribute) → 48 faults, the band ON
+    `#frame` over `extra2`/`halfextra2` at 1280×720 (809–1574 px², three
+    languages, both steps) and 1.7 px over them at 320×568.
+  · **Sheets: 0 bare** (no `render()` change); not run (intermediate commit).
+  · **Gates:** node --check (renderer, app, audit); npm run build; npm test
+    10,595,362 passed / 5 failed — the five sheet-staleness rows (shot,
+    recreate, corpus, against, lockset); the band's, landscape and name blocks
+    and the laptop view's type clause as above.
+  · **Not done, on purpose:** shrinking the band over the tall doors instead
+    of the door (the brief's rule: the door gives); the phone's sizes (its
+    one line already carries the step and its answer at 320).
 - **29.9 — THE WINDOW STEP BEFORE THE FACE (prompt B, 1 of 3).** The owner's
   son: *"The window section before the face section. If a user chooses a
   window, in the face section the stripes are greyed out; with no window the

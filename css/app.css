@@ -1160,13 +1160,22 @@ svg { direction: ltr; }
 .band__title {
   /* `--display` since 28.9 (*"the header of the section … in some good font"*),
      at 700: Bona Nova's two weights are 400 and 700, and a 600 would be matched
-     to the 700 anyway — the rule says what is painted. */
-  font: 700 clamp(22px, 2.1vw, 30px)/1.15 var(--display);
+     to the 700 anyway — the rule says what is painted.
+     ⚠ BIGGER SINCE 29.9 (the owner's son: *"The text above the door bigger,
+     especially the one that represents the option that is now chosen"*):
+     22–30 px → 26–36 px. */
+  font: 700 clamp(26px, 2.5vw, 36px)/1.1 var(--display);
   letter-spacing: 0; color: var(--ink);
 }
+/* ⚠ THE OPTION'S LINE IN THE TITLE'S OWN FACE SINCE 29.9 — his answer in chat:
+   Bona Nova, not Rubik; 700 at three quarters of the title (13–15 px → 19–27),
+   and in `--ink`, not `--ink-2`: "especially" the chosen option. Its phone
+   size below is unchanged; the face and the ink carry to it. The door gives
+   the taller band its wall through `fitCrop` (js/app.js), which reads the
+   band's own height — so nothing here is a number the crop has to be told. */
 .band__now {
-  font: 400 clamp(13px, 1.1vw, 15px)/1.35 var(--sans);
-  color: var(--ink-2); min-block-size: 1.35em;
+  font: 700 clamp(19px, 1.9vw, 27px)/1.2 var(--display);
+  color: var(--ink); min-block-size: 1.2em;
 }
 /* ⚠ ON A PHONE IT IS ONE LINE, AND SINCE 28.9 IT TOO STANDS ON THE PICTURE at
    the same anchor — the stage no longer gives up a line for it (`--band-h` is
@@ -1181,8 +1190,11 @@ svg { direction: ltr; }
   /* The option's name gives way before the step's: where the free span is
      short (the controls stand level with the band), the second part ends in
      an ellipsis first and the title keeps its whole width while it can. */
-  .band__title { font-size: 1.02rem; font-weight: 700; flex: 0 0 auto; max-inline-size: 100%; }
-  .band__now { font-size: .86rem; flex: 0 1 auto; min-inline-size: 0; min-block-size: 0; }
+  /* The phone's one line keeps its 28.9 size and height (29.9, ours): the
+     sizes and line-heights are restated here because the desktop's changed
+     under them; only the option's face and ink follow the desktop's. */
+  .band__title { font-size: 1.02rem; font-weight: 700; line-height: 1.15; flex: 0 0 auto; max-inline-size: 100%; }
+  .band__now { font-size: .86rem; line-height: 1.35; flex: 0 1 auto; min-inline-size: 0; min-block-size: 0; }
   .band__now:not(:empty)::before { content: '·'; margin-inline-end: 8px; color: var(--ink-3); }
 }
 

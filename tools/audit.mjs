@@ -209,13 +209,18 @@ for (const v of VIEWS) {
         const used = cover.length && pick(cover, w);
         return used && used.st !== 'loaded';
       });
+      /* ⚠ EXTENDED 29.9: the option's line over the door is in the title's own
+         face (his answer in chat), so it is held to Bona Nova too. */
       const els = { body: document.body, price: document.querySelector('.quote__price .send__figure'),
-                    h1: document.querySelector('.stage__h1'), band: document.querySelector('.band__title') };
+                    h1: document.querySelector('.stage__h1'), band: document.querySelector('.band__title'),
+                    now: document.querySelector('.band__now') };
       const out = { lang: document.documentElement.lang };
       for (const [k, e] of Object.entries(els)) {
         const f = fam(e);
+        /* the body's sample text is Rubik's: `.band__now` left it on 29.9, when
+           the option's line over the door took the title's face */
         const text = k === 'body'
-          ? said(document.querySelector('.sect:not([hidden]) .field__hint, .sect:not([hidden]) h3, .band__now')) || said(els.h1)
+          ? said(document.querySelector('.sect:not([hidden]) .field__hint, .sect:not([hidden]) h3, .sect:not([hidden]) .tile__name')) || said(els.h1)
           : said(e);
         const m = e && text ? missing(f, +getComputedStyle(e).fontWeight, text) : [];
         const covered = faces.some(x => x.fam === f);
@@ -223,7 +228,7 @@ for (const v of VIEWS) {
       }
       return out;
     });
-    for (const [k, want] of [['body', 'Rubik'], ['price', 'Bona Nova'], ['h1', 'Bona Nova'], ['band', 'Bona Nova']]) {
+    for (const [k, want] of [['body', 'Rubik'], ['price', 'Bona Nova'], ['h1', 'Bona Nova'], ['band', 'Bona Nova'], ['now', 'Bona Nova']]) {
       const r = type[k];
       if (!r.found) { fault(v.name, `the ${k} is not on the page, or says nothing — the type check has lost its subject`); continue; }
       if (r.family !== want) fault(v.name, `${type.lang}: the ${k} computes to "${r.family}", not ${want}`);
@@ -6454,6 +6459,15 @@ for (const v of VIEWS) {
    1280×720's for all of them (437.0, 564.0, 576.5 px), so the leaf is held to
    what it was the commit before THAT — 436.9, 556.0, 567.4 — no tolerance. A
    later change that spends either gain fails here.
+   ⚠ AND RESTATED LOWER THE SAME DAY, ON HIS WORD, SAME SUBJECT: *"The text
+   above the door bigger, especially the one that represents the option that
+   is now chosen."* The band grew 49.9 → 64.4 px at 1280×720 and 54.8 → 72.0
+   at 1440×900 and 1920×918 (the title 26–36 px, the option's line 19–27 px
+   in the title's face), and `fitCrop` gave the tallest door that wall — the
+   door gave the band ~17 px, as asked: the leaf 437.0 → 426.6, 564.0 → 551.4,
+   576.5 → 563.9. So the floor is the leaf with the bigger band, no tolerance:
+   a change that spends MORE of the door on the wall still fails here, and
+   the day the band shrinks this reads green with room to spare, not red.
    The band itself: the live step's title and its first group's chosen option,
    the SAME HEIGHT on every step (one line each, in every language) — its foot
    is anchored over the door, so a second line would climb toward the stage's
@@ -6466,7 +6480,7 @@ for (const v of VIEWS) {
 {
   console.log('\nthe band above the door fits its budget, and the arrows step');
   const before = faults;
-  const BUDGET = { '1280x720': 436.9, '1440x900': 556.0, '1920x918': 567.4 };
+  const BUDGET = { '1280x720': 426.6, '1440x900': 551.4, '1920x918': 563.9 };
   let asked = 0;
   for (const [w, h] of [[1280, 720], [1440, 900], [1920, 918]]) for (const lang of ['he', 'ru']) {
     const tag = `${lang} ${w}x${h}`;
@@ -6481,7 +6495,10 @@ for (const v of VIEWS) {
           const t = document.querySelector('[data-band-title]'), n = document.querySelector('[data-band-now]');
           if (!band || !leaf || !t) return null;
           const lh = el => parseFloat(getComputedStyle(el).lineHeight);
+          const cs = e => getComputedStyle(e);
           return { band: band.getBoundingClientRect().height, leaf: leaf.getBoundingClientRect().height,
+            tPx: parseFloat(cs(t).fontSize), nPx: parseFloat(cs(n).fontSize), tFam: cs(t).fontFamily, nFam: cs(n).fontFamily,
+            tInk: cs(t).color, nInk: cs(n).color, nW: +cs(n).fontWeight,
             tLines: Math.round(t.getBoundingClientRect().height / lh(t)), nLines: n.textContent ? Math.round(n.getBoundingClientRect().height / lh(n)) : 1,
             step: document.querySelector('.sect.is-live')?.dataset.section };
         });
@@ -6489,6 +6506,20 @@ for (const v of VIEWS) {
         heights.push(Math.round(m.band * 10) / 10);
         if (i === 0) {
           asked++;
+          /* ⚠ THE BAND'S SIZE, 29.9 — *"The text above the door bigger,
+             especially the one that represents the option that is now chosen"*,
+             and the option in the title's face (his answer). Asserted as his
+             words, not as the stylesheet's numbers: the title at least 26 px,
+             the option's line at least 19 px AND at least 0.7 of the title
+             (it was 0.52: 14.08 under 26.88 at 1280×720), in the title's face,
+             weight and ink. */
+          if (m.tPx < 26 || m.nPx < 19 || m.nPx < 0.7 * m.tPx) {
+            fault('band', `${tag}: the band's title is ${m.tPx} px and the chosen option ${m.nPx} px (${(m.nPx / m.tPx).toFixed(2)} of it) — `
+              + 'he asked for both bigger, the option especially (≥ 26, ≥ 19 and ≥ 0.7 of the title)');
+          }
+          if (m.nFam !== m.tFam || m.nInk !== m.tInk || m.nW < 700) {
+            fault('band', `${tag}: the chosen option is ${m.nFam.split(',')[0]} ${m.nW} in ${m.nInk}, the title ${m.tFam.split(',')[0]} in ${m.tInk} — one face, one ink`);
+          }
           if (m.leaf < BUDGET[`${w}x${h}`]) {
             fault('band', `${tag}: the leaf is ${m.leaf.toFixed(1)} px, ${(BUDGET[`${w}x${h}`] - m.leaf).toFixed(1)} px smaller `
               + `than before the band went onto the photograph (${BUDGET[`${w}x${h}`]}) — the crop spends more on the wall than the band gave back`);
@@ -6553,7 +6584,7 @@ for (const v of VIEWS) {
     } finally { await pg.close().catch(() => {}); }
   }
   if (asked < 10) fault('band', `only ${asked} of 10 readings were made — this check is measuring almost nothing`);
-  if (faults === before) console.log(`    ${asked} readings: the leaf no smaller than before the band went onto the photograph at 1280, 1440 and 1920, the band one height on all ${STEPS} steps in he and ru; the arrows step the face and wrap, the band follows, the tall slot's refusal opens the dialog and changes nothing, hidden on the summary`);
+  if (faults === before) console.log(`    ${asked} readings: the band's title ≥ 26 px and the chosen option ≥ 19 px and ≥ 0.7 of it, one face and ink; the leaf no smaller than with that band at 1280, 1440 and 1920, the band one height on all ${STEPS} steps in he and ru; the arrows step the face and wrap, the band follows, the tall slot's refusal opens the dialog and changes nothing, hidden on the summary`);
 }
 
 /* ── THE ARROWS WALK THE TILES IN THE ORDER THEY ARE DRAWN ────────────────

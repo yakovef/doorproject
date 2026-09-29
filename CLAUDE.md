@@ -204,6 +204,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **29.9** The band's two lines BIGGER (*"especially the one that represents the
+  option that is now chosen"*): title 26–36 px, the option 19–27 px in the
+  title's face (Bona Nova 700, his answer) and ink; the phone keeps its sizes
+  (+0.8 px of line box). The band 54.8 → 72.0 px at 1440/1920; `fitCrop` gave
+  the tallest door that wall, the leaf 437.0 → 426.6 / 564.0 → 551.4 / 576.5 →
+  563.9 — the floors restated there. Long form: `HISTORY.md`.
 - **29.9** The window step before the face (B, 1 of 3) — *"The window section
   before the face section"*: `SECTIONS` · `glass` · `face` ·, adjacent still
   (§3); `WANT_ORDER` and the audit's arrows walk with it. No copy claimed the
@@ -379,10 +385,15 @@ placement is the other session's, merged at the owner's son's choice.
   requires. It takes no height, so the door has it back; the crop gives the
   wall over the tallest door exactly what the band needs at each viewport
   (`fitCrop` in js/app.js, since 29.9; `FIT_TRIM.top` −162, §3, is the floor
-  below 1100, where the band shares its row with the picker), and the standard
-  leaf grew: 426.2 → 437.0 / 550.2 → 564.0 / 562.4 → 576.5 px at 1280×720 /
-  1440×900 / 1920×918, asserted no smaller than 436.9 / 556.0 / 567.4 (the
-  one crop for every viewport, 28.9). Each line is one line in every language (ellipsis), so it never
+  below 1100, where the band shares its row with the picker). ⚠ **Bigger since
+  29.9** (*"The text above the door bigger, especially the one that represents
+  the option that is now chosen"*): the title 26–36 px, the option's line
+  19–27 px in the title's own face and ink (Bona Nova 700 — his answer in
+  chat), so the band is 64.4 / 72.0 px at 1280 / 1440–1920 (was 49.9 / 54.8)
+  and the door gave it that wall: the standard leaf is 426.6 / 551.4 / 563.9 px
+  at 1280×720 / 1440×900 / 1920×918 and asserted no smaller (437.0 / 564.0 /
+  576.5 with the smaller band; the audit also holds the option ≥ 19 px and
+  ≥ 0.7 of the title, in its face). Each line is one line in every language (ellipsis), so it never
   climbs. On a phone it is one line at the same anchor (`--band-h` is gone, the
   stage has its 30 px back); the option's name yields to an ellipsis before
   the step's. At 320×568 the crop extends past `FIT_TRIM` so the band clears
