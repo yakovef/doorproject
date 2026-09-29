@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { BELLS, BOWS, glassRows, PEEPHOLES, STRIPE_SLOTS, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, finishHasSubject, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
+import { BELLS, BOWS, glassRows, PEEPHOLES, STRIPE_SLOTS, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, finishHasSubject, grilleHasSubject, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
 import { contrast, lighten, scaleTone, silhouette } from '../js/colour.js';
 import { SECTION_ICON, sectionIcon, SPEC_ICON, specIcon } from '../js/icons.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
@@ -6803,6 +6803,47 @@ group('a tap that would take something away asks first');
   const { s: f0, r: f1 } = plan({ window: 'strip' }, { detail: 'panel2' }, 'detail');
   ok(f0.window === 'strip' && f1.detail !== 'panel2',
      'a face beside the tall slot now sticks — the refusal the page keeps for it has lost its reason');
+}
+
+/* ── THE WINDOW'S DESIGNS ARE OFFERED EXACTLY WHERE THERE IS GLASS — 29.9 ──
+   The owner's son: *"The window section split in 2: the main one with the
+   window types, and if they choose a window, a sub-section unlocks right after
+   it — the designs."* The page hides the designs group off
+   `grilleHasSubject`; this holds that predicate to the rules, the finish
+   sweep's shape: over every window × size, as repaired, the group is shown if
+   and only if at least one design is choosable (not greyed by `conflicts`),
+   and if and only if the window is not "none". A predicate that hid the group
+   beside a window would strand a choice the order charges for; one that showed
+   it on a solid door would offer tiles that are all grey. §5.15: both halves
+   seen. And beside it (§5.22): a LINK carrying a design and no window still
+   brings its window, with its sentence — only the page stops offering that
+   tap, so the rule for links must not go with it. */
+group('the window designs are offered exactly where there is glass');
+{
+  let shown = 0, hidden = 0;
+  for (const w of WINDOWS) for (const sz of Object.keys(SIZES)) {
+    const st = repair({ ...DEFAULTS, window: w.id, size: sz }).state;
+    ok(st.window === w.id, `${w.id} on ${sz}: the fixture arrived as window ${st.window} — no subject`);
+    const blocked = conflicts(st).grille;
+    const choosable = GRILLES.some(g => g.id !== 'none' && !blocked[g.id]);
+    const on = grilleHasSubject(st);
+    if (on) shown++; else hidden++;
+    ok(on === choosable,
+       `${w.id} on ${sz}: the designs group is ${on ? 'shown' : 'hidden'} and ${choosable ? 'a design can' : 'no design can'} `
+     + 'be chosen — the page would offer grey tiles or hide a real choice');
+    ok(on === (w.id !== 'none'),
+       `${w.id} on ${sz}: the designs group is ${on ? 'shown' : 'hidden'} — it should unlock exactly with a window`);
+  }
+  ok(shown > 0 && hidden > 0, `the sweep saw ${shown} shown and ${hidden} hidden — one half is missing, so it tested nothing`);
+  /* the link half: a design with no window brings the window and says so */
+  for (const g of GRILLES.filter(o => o.id !== 'none')) {
+    const r = repair({ ...DEFAULTS, window: 'none', grille: g.id });
+    ok(r.state.window !== 'none' && r.state.grille === g.id,
+       `a link with the design ${g.id} and no window arrived as window ${r.state.window}, design ${r.state.grille} — `
+     + 'the design no longer brings its window');
+    ok(r.said.includes(T('fix.windowAdded')), `a link with the design ${g.id} and no window: the window came without its sentence`);
+    ok(grilleHasSubject(r.state), `a link with the design ${g.id}: the window came and the designs group would still be hidden`);
+  }
 }
 
 group('the handle finish is offered exactly where it costs something');

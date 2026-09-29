@@ -2328,7 +2328,25 @@ for (const v of VIEWS) {
     await p.waitForTimeout(70);
     const onStep = await p.$eval(`.sect[data-section="${section}"]`, el => !el.hidden);
     if (!onStep) { fault(v.name, `step ${section} would not open`); continue; }
-    const opened = await p.$eval(`${g}`, el => el.getBoundingClientRect().height > 0);
+    let opened = await p.$eval(`${g}`, el => el.getBoundingClientRect().height > 0);
+    /* ⚠ A GROUP HIDDEN BY ITS `when` IS REACHED THE WAY A PERSON REACHES IT —
+       29.9.2026. The window's designs unlock with a window (and the handle
+       finish with a bar): hidden by `markGroup` while the door has nothing for
+       them to act on. This walk answers every confirm dialog "no", so after the
+       פרזול step's viewer the window tap is declined and the designs stay
+       hidden — the right page and a stale instrument (§5.28). So where the
+       field is `hidden` (the `when` mechanism, never a layout accident), the
+       walk gives it its subject — the square window, the Idan — answering
+       yes, and then asks again: still hidden is the fault it always was. */
+    const UNLOCK = { grille: ['window', 'rect'], handleFinish: ['handle', 'idan'] };
+    if (!opened && UNLOCK[key] && await p.$eval(`${g}`, el => el.hidden)) {
+      const [ug, uid] = UNLOCK[key];
+      await p.$eval(`.field[data-group="${ug}"] [data-id="${uid}"]`, el => el.click());
+      await p.waitForTimeout(30);
+      await p.evaluate(() => { const d = document.querySelector('#confirm'); if (d && d.open) document.querySelector('#confirm-yes')?.click(); });
+      await p.waitForTimeout(30);
+      opened = await p.$eval(`${g}`, el => el.getBoundingClientRect().height > 0);
+    }
     if (!opened) { fault(v.name, `${key} is on step ${section} and not visible`); continue; }
 
     const ids = await p.$$eval(`${g} [role="radio"]`, els => els.map(e => e.dataset.id));
@@ -4787,7 +4805,10 @@ for (const v of VIEWS) {
        lock its own step, and at 844x390 its one group of three tiles reaches
        the screen. Not re-measured then (the full audit runs after 1, 5 and
        10); this clause caught it at 10, as it should. Six of nine. */
-    { name: '844x390 a phone on its side', w: 844, h: 390, shows: ['pz', 'xlock', 'face', 'glass', 'grip', 'mk'] },
+    /* ⚠ AND IN THE FLOW'S ORDER, glass BEFORE face since 29.9 — the clause
+       compares the list as read off the page, in sequence; the six are the
+       same six. */
+    { name: '844x390 a phone on its side', w: 844, h: 390, shows: ['pz', 'xlock', 'glass', 'face', 'grip', 'mk'] },
     { name: '640x360 a 1280 laptop at 200% zoom', w: 640, h: 360, shows: ['glass', 'grip'] },
   ];
 
@@ -6707,6 +6728,87 @@ for (const v of VIEWS) {
   }
   if (read < 2) fault('grille-groups', `only ${read} of 2 languages read`);
   if (faults === before) console.log(`    ${read} languages: two headings, the included designs then the priced ones with the surcharge in the heading, every door-colour twin beside its black design`);
+}
+
+/* ── THE WINDOW'S DESIGNS UNLOCK WITH A WINDOW ─────────────────────────────
+   29.9.2026, the owner's son: *"The window section split in 2: the main one
+   with the window types, and if they choose a window, a sub-section unlocks
+   right after it — the designs. So the arrow feature near the door works
+   well."* `npm test` holds `grilleHasSubject` to the rules; this holds the PAGE
+   to it, the two ways a door arrives — a link (the paint at boot) and a tap
+   (the paint after a change), both directions — as the finish group's block
+   does, because a listing rule read when the tiles were built froze once
+   (8.9). While hidden no design tile is visible, so none can be tapped from
+   the page; a LINK carrying a design and no window still brings its window
+   (`repair`), and the field is shown on that door. And the step's arrows walk
+   the window list alone: none → slot → square → none, with no dialog.
+   §5.15: every reading asserts it found the field. Falsified by dropping
+   `when` from the grille group: the solid door's clauses fire. */
+{
+  console.log('\nthe window designs are on the page only with a window');
+  const before = faults;
+  const pg = await b.newPage({ viewport: { width: 1280, height: 800 } });
+  const read = () => pg.evaluate(() => {
+    const f = document.querySelector('.field[data-group="grille"]');
+    if (!f) return null;
+    const tiles = [...f.querySelectorAll('[role="radio"]')];
+    return { hidden: f.hidden, seen: f.checkVisibility(), tileSeen: tiles.some(t => t.checkVisibility()),
+             win: document.querySelector('.field[data-group="window"] [aria-checked="true"]')?.dataset.id };
+  });
+  const toGlass = () => pg.evaluate(() => document.querySelector('.steps__step[data-step="glass"]')?.click());
+  let asked = 0;
+  const judge = (m, want, what) => {
+    if (!m) { fault('grille-when', `${what}: no designs field on the page — nothing to check`); return; }
+    asked++;
+    if (m.seen !== want || m.hidden === want || m.tileSeen !== want) {
+      fault('grille-when', `${what}: the window designs are ${m.seen ? 'shown' : 'hidden'} `
+        + `(${m.tileSeen ? 'a tile visible' : 'no tile visible'}) on a door with window "${m.win}" — `
+        + `they should be ${want ? 'shown' : 'hidden'}`);
+    }
+  };
+  for (const [q, want, what, win] of [['', false, 'a solid door', 'none'], ['&w=strip', true, 'the tall slot', 'strip'],
+       ['&w=rect', true, 'the square window', 'rect'],
+       /* a design with no window in a LINK: repair brings the window, so the
+          designs are on the page with it (SAID.windowAdded) */
+       ['&w=none&g=scroll', true, 'a design linked without a window', null]]) {
+    await pg.goto(`file://${process.cwd()}/index.html?lang=he${q}`);
+    await pg.waitForTimeout(300);
+    await toGlass();
+    await pg.waitForTimeout(150);
+    const m = await read();
+    if (m && win && m.win !== win) fault('grille-when', `${what} (link): the window is "${m.win}", not "${win}" — this case has no subject`);
+    if (m && !win && (!m.win || m.win === 'none')) fault('grille-when', `${what} (link): the design arrived with no window — repair no longer brings it`);
+    judge(m, want, `${what} (link)`);
+  }
+  /* by the tap, both directions, on one page — and the arrows through the
+     window list alone, from the solid door */
+  await pg.goto(`file://${process.cwd()}/index.html?lang=he`);
+  await pg.waitForTimeout(300);
+  await toGlass();
+  await pg.waitForTimeout(150);
+  for (const [id, want] of [['rect', true], ['none', false], ['strip', true], ['none', false]]) {
+    await pg.evaluate(i => document.querySelector(`.field[data-group="window"] [data-id="${i}"]`)?.click(), id);
+    await pg.waitForTimeout(150);
+    const m = await read();
+    if (m && m.win !== id) fault('grille-when', `tapping "${id}": the window is "${m.win}" — the tap did not land`);
+    judge(m, want, `tapping "${id}"`);
+  }
+  const walk = [];
+  for (let k = 0; k < 3; k++) {
+    await pg.evaluate(() => document.querySelector('.stage__arrow--next').click());
+    await pg.waitForTimeout(160);
+    if (await pg.evaluate(() => !!document.querySelector('#confirm')?.open)) {
+      fault('grille-when', 'an arrow through the window list asked first — nothing was taken away');
+      await pg.keyboard.press('Escape');
+    }
+    const m = await read();
+    walk.push(m && m.win);
+    judge(m, m && m.win !== 'none', `the arrow onto "${m && m.win}"`);
+  }
+  if (walk.join(',') !== 'strip,rect,none') fault('grille-when', `the arrows walk the window step as none → ${walk.join(' → ')} — it should be none → strip → rect → none`);
+  await pg.close().catch(() => {});
+  if (asked < 11) fault('grille-when', `only ${asked} of 11 readings taken — this check is measuring less than it says`);
+  if (faults === before) console.log(`    ${asked} readings: hidden on a solid door and after "none", shown with either window, by link and by tap; a design linked without a window brings it; the arrows walk none → slot → square → none, asking nothing`);
 }
 
 /* ── THE BAND STANDS ON THE PHOTOGRAPH, OVER THE DOOR AND ON NOTHING ELSE ──

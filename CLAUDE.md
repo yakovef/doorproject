@@ -204,6 +204,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **29.9** The designs unlock with a window (B, 2 of 3) — *"the window section
+  split in 2 … a sub-section unlocks right after it — the designs"*: the grille
+  group's `when: grilleHasSubject` (`isGlazed`), the finish group's hiding; the
+  arrows walk none → slot → square. A linked design still brings its window.
+  Units hold it to the rules; the audit to the page (links, taps, arrows); its
+  every-option walk now unlocks a `when` group first (§5.28). Long form: `HISTORY.md`.
 - **29.9** The band's two lines BIGGER (*"especially the one that represents the
   option that is now chosen"*): title 26–36 px, the option 19–27 px in the
   title's face (Bona Nova 700, his answer) and ink; the phone keeps its sizes
@@ -227,30 +233,6 @@ lines here. Dates are the day of the change.
   (leaf 160.4 → 156.2). Below 1100 `FIT_TRIM` is the floor — exactly the need
   there put `halfextra2` under the picker by 224 px² at 390. `halfextra1`
   cleared; the phone exemptions have ceilings. Long form: `HISTORY.md`.
-- **29.9** ברזל מחושל is BACK, as `iron` and `iron-light` (black, and the
-  door's colour) — the owner's son sent three photographs of doors installed
-  since 26.8 (`research/ironwork/`), which makes thirteen doors against one
-  sentence; **this reverses an owner's withdrawal** and `ASK-PERETZ.md` 2a asks
-  him to confirm and to price it (₪0 until he does — never invented). Drawn and
-  re-measured on `claude/elegant-knuth-89z101` (27.9, 28.9: five bars at sixths,
-  not seven — the two extra were the pane's rebate) and PORTED here, because
-  that branch is not the one the site is built from. **`VERSION` 27 → 28**:
-  appended at the end, but seventeen grilles do not fit four bits, so
-  `BITS.grille` is 5. `grid`'s `iron` aliases removed; d092 d108 d128 draw
-  their ironwork again in the gallery. `WINDOW-DESIGNS.md` is the standing
-  brief for a "here is another door" round. Long form: `HISTORY.md`.
-- **28.9** The record and the slow gates (10 of 10): sheets predicted first —
-  exactly `recreate-d122` moved, and d122's photograph shows its fixed-leaf
-  panel at the casing's width. The full audit found 4 faults of ours: `xlock`
-  missing from the landscape exemption, and the undo pill on the column in
-  Hebrew at 1100–1152 (it moved without growing; `placeUndo` compares the box
-  now, §8). Test 9,441,223 / 0; fuzz not run. Long form: `HISTORY.md`.
-- **28.9** **כדור** (`cadoor`) redrawn off ONE photograph (*"similar in ways with
-  the 'knob on backplate' handle"*): the knob-plate's 54 mm ball on its own 65 mm
-  rose — one routine, `roseKnob`, both knobs. Was a tilted 68 × 80 ovoid off RB's
-  angled product shot, on its `domeKnob` (retired). Footprint 41/41/48 →
-  35/35/35. The escutcheon (covered, round) left as §9 says. Long form:
-  `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 28.9.2026
@@ -984,6 +966,14 @@ for the same half of the leaf and `repair` trades between them.
   else away asks first (`#confirm`, `planChoice`/`displacedBy`, §3 Rules).
   The summary shows the PICTURES of what was chosen, one button per spec row
   back to its step, at every width (§0c; `#summary` stays, visually hidden).
+- **The glass step is two groups, the second unlocked by the first** (29.9,
+  the owner's son: *"… if they choose a window, a sub-section unlocks right
+  after it — the designs. So the arrow feature near the door works well"*):
+  the window (`none · strip · rect`, "none" kept — ours, §0a) and the designs,
+  whose `when` is `grilleHasSubject` = `isGlazed`, the question that greys
+  every design on a solid door — hidden through the finish group's mechanism.
+  The arrows walk the window list alone. A LINK with a design and no window
+  still brings the window (`SAID.windowAdded`).
 - A bare load opens step 01; a shared link or a code opens the summary (T11).
 - ⚠ **A first bare visit gets a TOUR** (28.9, the owner's son: *"A little
   tutorial when a person first joins … Only on the first visit"*; `js/tour.js`):

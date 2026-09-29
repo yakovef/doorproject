@@ -26,6 +26,55 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **29.9 — THE WINDOW'S DESIGNS UNLOCK WITH A WINDOW (prompt B, 2 of 3).** The
+  owner's son: *"The window section split in 2: the main one with the window
+  types (the only 2 we have), and if they choose a window, a sub-section
+  unlocks right after it — the designs. So the arrow feature near the door
+  works well."*
+  · **What was wrong.** The designs (fourteen tiles, two headed groups) stood
+    under the window list on every door, all grey on a solid one with "needs a
+    window" under each — a screenful of refusals on the default door, and a
+    step whose first question was drowned by its second.
+  · **What changed.** The grille group carries `when: grilleHasSubject`, a new
+    predicate in js/catalog.js beside `isGlazed` and equal to it — the SAME
+    question `conflicts` asks before greying every design with
+    `why.needsWindow`, so the group is hidden exactly where every tile in it
+    would be grey (§5.26: ask the question the rule asks, not a second one;
+    the brief's `window !== 'none'` agrees on every window × size, asserted).
+    Hidden by `markGroup` on every paint, the finish group's mechanism — never
+    a rebuild (8.9). The step's arrows move its first group, the window: none
+    → slot → square → none.
+  · **Kept, and named ours** (CLAUDE.md §0a): the "none" window tile stays —
+    it is the one way back to a solid door on the step.
+  · **The link half stays.** A design in a link with no window still brings
+    the window, with `fix.windowAdded` — only the page stops offering that tap.
+    No unit asserted it before; one does now, over every design.
+  · **Asserted.** Units: over every window × size, the group is shown iff a
+    design is choosable and iff there is a window (both halves seen), and the
+    link repair above. Audit, a new block beside the designs' grouping: four
+    links (solid, slot, square, a design with no window), four taps both ways,
+    and three arrow presses from the solid door walking none → slot → square →
+    none with no dialog; while hidden no design tile is visible. The grouping
+    block already arrived with `w=rect`.
+  · **Falsified:** `when` dropped from the grille group — the unit sweep fails
+    on every solid door, and the audit's solid-door readings fire.
+  · **The full audit after this commit: 9 faults, none of them the page's.**
+    Eight were the every-option walk at each viewport: it answers every
+    confirm dialog "no", so after the פרזול step's viewer the window tap was
+    declined, the door stayed solid, and "grille is on step glass and not
+    visible" — the right page and a stale instrument, §5.28's shape a third
+    time (a gate in the page, a walk that did not know it). The walk now
+    reaches a group hidden by its `when` the way a person does: it gives it its
+    subject (the square window, answering yes — and the Idan for the finish
+    group) and then asks again; still hidden is the fault it always was. The
+    ninth was COMMIT 1's, surfacing here because the plan ran no audit after
+    it: the 844×390 landscape exemption lists its steps in flow order and
+    compares them as a sequence, and it still said face before glass. The six
+    are the same six; the list is in the new order. Both are re-read by the
+    audit after commit 3.
+  · **Not done:** no `VERSION`; the designs' ids, order and the code are
+    untouched. No sheet moves.
+
 - **29.9 — PROMPT A, 1 OF 5: THE BAND'S TWO LINES BIGGER.** The owner's son:
   *"The text above the door bigger, especially the one that represents the
   option that is now chosen."* Answered in chat the same day: the option's name
@@ -80,6 +129,7 @@ oldest lines move to the top of the "moved" section.
   · **Not done, on purpose:** shrinking the band over the tall doors instead
     of the door (the brief's rule: the door gives); the phone's sizes (its
     one line already carries the step and its answer at 320).
+
 - **29.9 — THE WINDOW STEP BEFORE THE FACE (prompt B, 1 of 3).** The owner's
   son: *"The window section before the face section. If a user chooses a
   window, in the face section the stripes are greyed out; with no window the
@@ -3045,6 +3095,30 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **29.9** ברזל מחושל is BACK, as `iron` and `iron-light` (black, and the
+  door's colour) — the owner's son sent three photographs of doors installed
+  since 26.8 (`research/ironwork/`), which makes thirteen doors against one
+  sentence; **this reverses an owner's withdrawal** and `ASK-PERETZ.md` 2a asks
+  him to confirm and to price it (₪0 until he does — never invented). Drawn and
+  re-measured on `claude/elegant-knuth-89z101` (27.9, 28.9: five bars at sixths,
+  not seven — the two extra were the pane's rebate) and PORTED here, because
+  that branch is not the one the site is built from. **`VERSION` 27 → 28**:
+  appended at the end, but seventeen grilles do not fit four bits, so
+  `BITS.grille` is 5. `grid`'s `iron` aliases removed; d092 d108 d128 draw
+  their ironwork again in the gallery. `WINDOW-DESIGNS.md` is the standing
+  brief for a "here is another door" round. Long form: `HISTORY.md`.
+- **28.9** The record and the slow gates (10 of 10): sheets predicted first —
+  exactly `recreate-d122` moved, and d122's photograph shows its fixed-leaf
+  panel at the casing's width. The full audit found 4 faults of ours: `xlock`
+  missing from the landscape exemption, and the undo pill on the column in
+  Hebrew at 1100–1152 (it moved without growing; `placeUndo` compares the box
+  now, §8). Test 9,441,223 / 0; fuzz not run. Long form: `HISTORY.md`.
+- **28.9** **כדור** (`cadoor`) redrawn off ONE photograph (*"similar in ways with
+  the 'knob on backplate' handle"*): the knob-plate's 54 mm ball on its own 65 mm
+  rose — one routine, `roseKnob`, both knobs. Was a tilted 68 × 80 ovoid off RB's
+  angled product shot, on its `domeKnob` (retired). Footprint 41/41/48 →
+  35/35/35. The escutcheon (covered, round) left as §9 says. Long form:
+  `HISTORY.md`.
 - **28.9** The half door's face follows the main leaf's (9 of 10) — *"a window
   and a panel at the same width … with 3 panels there should be 3 panels on the
   half door too"*: the fixed leaf asks `faceRowsOn` of its own width — pair and

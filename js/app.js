@@ -28,7 +28,7 @@
  */
 
 import {
-  BELLS, BOWS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS, finishHasSubject,
+  BELLS, BOWS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS, finishHasSubject, grilleHasSubject,
   GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LOCKSETS, MASHKOFS,
   mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, BUILD_A,
   PEEPHOLES, PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_A, STRIPE_MAX, WINDOWS,
@@ -163,9 +163,18 @@ const GROUPS = [
   /* ⚠ `tinted`: a `-light` design's tile is the design in the DOOR'S colour
      (27.9.2026, *"black or the color of the door"*), so the art is drawn for
      the paint on screen and re-drawn when it changes — `retintOptions`. */
+  /* ⚠ `when`: THE DESIGNS UNLOCK WITH A WINDOW — 29.9.2026, the owner's son:
+     *"The window section split in 2 … if they choose a window, a sub-section
+     unlocks right after it — the designs. So the arrow feature near the door
+     works well."* Hidden through the finish group's mechanism (`markGroup`
+     sets the field `hidden` on every paint) off `grilleHasSubject`, which is
+     `isGlazed` — the question that greys every design on a solid door. So the
+     step's arrows walk the window list alone (none → slot → square → none),
+     and the "none" window tile stays (ours, CLAUDE.md §0a): it is the only
+     way back to a solid door on this step. */
   { key: 'grille', title: 'g.grille', in: 'glass', kind: 'sq', list: () => GRILLES,
     glyph: o => grilleGlyph(o, byId(COLOURS, state.colour).hex), tinted: true,
-    hint: 'g.grille.h',
+    hint: 'g.grille.h', when: grilleHasSubject,
     /* ⚠ TWO HEADED GROUPS, AND EACH DESIGN'S TWO COLOURS SIDE BY SIDE — 28.9,
        the owner's son: *"Put the expensive window designs apart from the
        regular ones, and keep the same designs in different colours near each

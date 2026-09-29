@@ -2255,6 +2255,20 @@ export function grillePlacement(state) {
    answered true for. */
 export const isGlazed = state => paneCount(state) > 0;
 
+/**
+ * ⚠ THE WINDOW'S DESIGNS ARE SHOWN ONLY WHEN THERE IS A WINDOW — 29.9.2026, the
+ * owner's son: *"The window section split in 2: the main one with the window
+ * types, and if they choose a window, a sub-section unlocks right after it —
+ * the designs. So the arrow feature near the door works well."* The page
+ * hides the designs group off this (`when`, as the finish group's
+ * `finishHasSubject`). It is `isGlazed` — the same question `conflicts` asks
+ * before greying every design with `why.needsWindow` — so the group is hidden
+ * exactly where every tile in it would be grey, and never shown with nothing
+ * to choose. A grille in a LINK with no window still brings its window
+ * (`repair`, `SAID.windowAdded`); only the page stops offering that tap.
+ */
+export const grilleHasSubject = state => isGlazed(state);
+
 /* ── THE MONEY, ATTACHED ───────────────────────────────────────────────
  *
  * Every price lives in `js/prices.js` — one screen of plain shekels, so the
