@@ -16,12 +16,13 @@
  * Run: npm run audit
  */
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import { assertFreshBundle } from './fresh.mjs';
 import { crashed } from './browser.mjs';
 import { load, lum } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
 import { deltaLabel, formatAgorot, priceAgorot, priceLabel, priceParts } from '../js/price.js';
-import { DETAILS, SIZES } from '../js/catalog.js';
+import { DETAILS, GRILLES, SIZES } from '../js/catalog.js';
 import { detailGlyph, stripesGlyph } from '../js/renderer.js';
 import { SECTION_ICON, SPEC_ICON } from '../js/icons.js';
 import { L, setLang, T, withLang } from '../js/copy.js';
@@ -48,6 +49,14 @@ const CODE = new RegExp(`^DM-[0-9A-Z]{${encodeCode(DEFAULTS).length - 3}}$`);
    is the one just past a breakpoint, not the round number a laptop happens to
    be. `css/app.css` has exactly one breakpoint, 1100, so it is here; 1152 is
    the far side of the band, where the wall is only just wide enough. */
+/* ⚠ THE WALK'S LENGTH, STATED ONCE — 28.9.2026. Nine question steps and the
+   summary since the extra lock got its own step (`xlock`, after the פרזול).
+   Sixteen places in this file had typed 8 or 9 by hand, and a tenth step would
+   have left every walk one step short, green. `WANT_ORDER` (the arrival block)
+   asserts the page's navigator is exactly this long. */
+const QUESTIONS = 9;
+const STEPS = QUESTIONS + 1;
+
 const VIEWS = [
   { name: 'phone',    w: 390,  h: 844 },
   { name: 'phone-s',  w: 320,  h: 568 },
@@ -85,7 +94,7 @@ const groupsOn = p => p.$$eval('.field[data-group]', els => els.map(e => ({
 
 await assertFreshBundle();
 
-let b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+let b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 let faults = 0;
 let crashes = 0;
 const fault = (view, msg) => { faults++; console.log(`  ✗ [${view}] ${msg}`); };
@@ -1488,7 +1497,7 @@ for (const v of VIEWS) {
       if (!n) return false; n.click(); return true;
     });
     let picked = 0, onGrip = false;
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < STEPS; i++) {
       /* ⚠ RE-AIMED 25.9.2026. It tapped the Idan and the two-panel face, and
          the square window then said two sentences: the face went, and the
          lever went. Since the lever yields the moment a bar is chosen, that
@@ -1596,7 +1605,7 @@ for (const v of VIEWS) {
     await p.waitForTimeout(300);
     const fresh = await opener();
     let walked = 0;
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < QUESTIONS; i++) {
       const moved = await p.evaluate(() => {
         const b = [...document.querySelectorAll('.sect__next')]
           .find(x => x.offsetParent && !x.disabled);
@@ -1682,7 +1691,7 @@ for (const v of VIEWS) {
        asked. It overrules Peretz's 30.8 "handles before the panels"; the
        fault text names both. Falsified by the old SECTIONS: fires at every
        viewport and prints both sequences. */
-    const WANT_ORDER = ['fit', 'colour', 'lock', 'pz', 'face', 'glass', 'grip', 'mk', 'sum'];
+    const WANT_ORDER = ['fit', 'colour', 'lock', 'pz', 'xlock', 'face', 'glass', 'grip', 'mk', 'sum'];
     if (keys.join(',') !== WANT_ORDER.join(',')) {
       fault(v.name, `the flow asks its questions as ${keys.join(' → ')}, `
         + `and it should be ${WANT_ORDER.join(' → ')} `
@@ -2218,11 +2227,19 @@ for (const v of VIEWS) {
      DERIVED, same discipline as `small` above: every pair of operable
      elements inside `.stage__hud`, not a named list of the three slots, so a
      fourth control added later is covered without anyone remembering to. */
+  /* ⚠ WIDENED 28.9.2026, SAME SUBJECT: the wall holds more than `.stage__hud`
+     now — the price (left of the door), the undo pills (at the stage's foot),
+     the two arrows and, above 1100, the navigator column — so every operable
+     element on the WALL is paired, not only the hud's. */
   const hudOverlaps = await p.evaluate(() => {
     const hud = document.querySelector('.stage__hud');
     if (!hud) return [];
-    const els = [...hud.querySelectorAll(
-      'button, a[href], input, select, [role="radio"], [role="button"]')]
+    const wallEls = ['.stage__hud', '.stage__undo', '#quote', '.stage-wrap > .steps']
+      .map(q => document.querySelector(q)).filter(Boolean);
+    const els = [...wallEls.flatMap(w => [...w.querySelectorAll(
+      'button, a[href], input, select, [role="radio"], [role="button"]')]),
+      ...document.querySelectorAll('.stage__arrow')]
+      .filter(el => !(el.closest('#quote') && getComputedStyle(document.querySelector('#quote')).position === 'fixed'))
       .map(el => ({ el, r: el.getBoundingClientRect() }))
       .filter(({ r }) => r.width && r.height);
     const out = [];
@@ -2630,7 +2647,28 @@ for (const v of VIEWS) {
       });
     }
     if (!head) fault(v.name, 'no navigator circle can be reached with Tab');
+    /* ⚠ AND THE COLUMN COMES BEFORE THE OPTIONS IN THE TAB ORDER — 28.9.2026.
+       Above 1100 the navigator stands on the photograph, a child of
+       `.stage-wrap` rather than of the panel (`placeNav`), and the order asks
+       that moving it not move it in the keyboard's walk: it is appended LAST in
+       the wrap, which precedes the panel in the document. Asked of the DOM's
+       order, which is what Tab follows here (nothing on the page sets a
+       positive `tabindex`), and of every circle, not just the first. */
+    const order = await p.evaluate(() => {
+      const circles = [...document.querySelectorAll('.steps__step')];
+      const firstOpt = document.querySelector('#choices [role="radio"]');
+      if (!circles.length || !firstOpt) return null;
+      return {
+        before: circles.every(c => c.compareDocumentPosition(firstOpt) & Node.DOCUMENT_POSITION_FOLLOWING),
+        positive: [...document.querySelectorAll('[tabindex]')].filter(e => +e.getAttribute('tabindex') > 0).length,
+      };
+    });
+    if (!order) fault(v.name, 'no navigator circles or no options — the tab-order clause has no subject');
     else {
+      if (!order.before) fault(v.name, 'a navigator circle comes AFTER the first option in the document — the keyboard reaches the options before the steps');
+      if (order.positive) fault(v.name, `${order.positive} element(s) carry a positive tabindex — the DOM order is no longer the tab order this clause reads`);
+    }
+    if (head) {
       /* ⚠ ENTER GOES TO THAT STEP, and this replaced "Enter toggles a section",
          which itself replaced "Enter opens it" when the desktop started
          arriving with all four open. A flow has no toggle: pressing Enter on a
@@ -2797,9 +2835,21 @@ for (const v of VIEWS) {
     await p.goto(`file://${process.cwd()}/index.html`
                + '?c=rb-0097d&w=rect&g=none&n=idan&k=cylinder&d=plain&s=extra2&h=right-in');
     await p.waitForTimeout(400);
+    /* ⚠ ONE CHANGE FIRST, SINCE 28.9: the undo pill is not shown until there is
+       something to undo (a link arrives with no history), and a wall check
+       that cannot see it would pass by skipping it. A colour, then a second
+       one, then an undo: both pills live. */
+    await p.evaluate(() => document.querySelector('.steps__step[data-step="colour"]')?.click());
+    await p.waitForTimeout(300);
+    for (const k of [2, 4]) {
+      await p.evaluate(n => [...document.querySelectorAll('.sect.is-live [role="radio"]')][n]?.click(), k);
+      await p.waitForTimeout(220);
+    }
+    await p.evaluate(() => document.querySelector('#undo-btn')?.click());
+    await p.waitForTimeout(350);
     const wall = await p.evaluate(() => {
       const seen = [], bad = [];
-      for (const sel of ['#price-toggle', '#quote-wa',
+      for (const sel of ['#price-toggle', '#quote-wa', '#save-hud',
                          '#undo-btn', '#redo-btn']) {
         const el = document.querySelector(sel);
         if (!el) continue;
@@ -2818,7 +2868,7 @@ for (const v of VIEWS) {
        guard is now on the two that remain, and it is the same guard. A wall
        check that finds nothing in the wall is an empty loop whatever is
        missing from it. */
-    for (const need of ['#price-toggle', '#undo-btn']) {
+    for (const need of ['#price-toggle', '#save-hud', '#undo-btn', '#redo-btn']) {
       if (!wall.seen.includes(need)) {
         fault(v.name, `the wall check never saw ${need} — it is measuring nothing`);
       }
@@ -2834,7 +2884,7 @@ for (const v of VIEWS) {
     skipped.push(v.name);
     console.log(`  ⚠ chromium died at ${v.w}x${v.h} — this viewport was NOT audited`);
     await b.close().catch(() => {});
-    b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+    b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
   }
 }
 
@@ -3269,9 +3319,15 @@ for (const v of VIEWS) {
        behind it, which is exactly what `?bare=1` does for the drawing.
        `visibility`, not `display`, so nothing reflows and the stage keeps the
        size the rest of this block already measured. */
+    /* ⚠ AND SINCE 28.9 THE WALL CARRIES MORE THAN THE HUD: the navigator
+       column, the band, the arrows and the undo pills all stand on the
+       photograph. The column's foot is a hard ink edge a few px above the
+       floor at 1100 px, and it read as the floor line (−18.6 px at `cusp`,
+       the first full audit after it moved). Occluders out of the frame, the
+       rule this block already states. */
     await pg.addStyleTag({ content:
-      '.trust, .stage__hud, .quote, .hint, .toast '
-      + '{ visibility: hidden !important; }' });
+      '.trust, .stage__hud, .quote, .hint, .toast, .stage-wrap > .steps, .stage__band, '
+      + '.stage__arrow, .stage__undo { visibility: hidden !important; }' });
     await pg.waitForTimeout(60);
     await pg.screenshot({ path: '/tmp/audit-floor.png',
       clip: { x: g.x, y: g.y, width: g.w, height: g.h } });
@@ -3432,13 +3488,13 @@ for (const v of VIEWS) {
        CLAUDE.md §5.10 wearing a test. */
     if (!r.qFixed) {
       if (r.qTop < r.boxT - 1 || r.qBot > r.boxB + 1) {
-        fault(v.name, `the price card is outside the stage (${Math.round(r.boxT - r.qTop)} px above `
-          + 'its top) — it is anchored to the door\'s head (27.9; it was a lamp) and the anchor left the picture');
+        fault(v.name, `the price is outside the stage (${Math.round(r.boxT - r.qTop)} px above `
+          + 'its top) — it is anchored to the door\'s head (left of it since 28.9; the right corner 27.9, a lamp before) and the anchor left the picture');
       }
       if (!r.hudCount) {
         fault(v.name, 'no .hud__slot on the wall — the overlap check has nothing to compare against');
       } else if (r.hudOverlap > 0) {
-        fault(v.name, `the price card covers ${r.hudOverlap} px² of the wall chrome `
+        fault(v.name, `the price covers ${r.hudOverlap} px² of the wall chrome `
           + '(the language buttons, or undo/redo)');
       }
     }
@@ -3665,6 +3721,84 @@ for (const v of VIEWS) {
       + 'of the only axis the summary is short of');
   } else if (!faults) {
     console.log(`    the spec comes first (spec y=${o.specTop}, explainer y=${o.expTop})`);
+  }
+  await pg.close();
+}
+
+/* ── THE PAGE ASKS NOTHING OF ANYWHERE ELSE, AND THE SWAP MOVES NO LINE — 28.9 ──
+   Two things commit 1 of the type (`0f73fb9`) measured once and nothing
+   asserts: the page makes no request outside its own folder (the README's
+   promise, and the reason the Google Fonts script went), and the tuned
+   fallback holds the page's lines when Rubik swaps in (it was fitted on the
+   nine explainers per language, "0 / 0 / 1 of 9 paragraphs moved"). The
+   per-viewport clause at the top of this file already proves each face
+   LOADED for the text on it; this asks the other two questions, of every
+   request a load makes and of every block of text on every step. */
+{
+  console.log('\nthe page asks nothing of anywhere else, and the swap moves no line');
+  const pg = await b.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
+  const root = 'file://' + process.cwd() + '/';
+  const foreign = [];
+  pg.on('request', r => { const u = r.url(); if (!u.startsWith(root) && !u.startsWith('data:')) foreign.push(u); });
+  /* ⚠ THE SWAP MOVES (ALMOST) NO LINE. The tuned fallback exists so that the
+     page laid out before the face arrives is the page after it: every block of
+     text on every step, in each language, at a phone and a laptop width, is
+     measured with Rubik and again with Rubik taken out of `--sans` (the
+     fallback then paints), and its height — the wrap count — compared. ~720
+     readings a run.
+     ⚠ WHY NOT ZERO, measured 28.9 on this fallback (one face per script, fitted
+     on the explainers): 9 of 720 readings flip on 3615dfd and 6 on 8bbd134,
+     each by ONE line — strings on a knife edge of their box (`Кодовый замок`
+     in a 91 px tile, a twelve-line explainer at 1280), which two typefaces
+     never agree on string by string. A second fallback built script × weight
+     class (nine faces, each within 0.1 % of Rubik over the page's text at that
+     weight) flipped the same 4–9 on other strings, so the residue is the
+     strings, not the tuning. Against it, measured by swapping css/app.css's
+     block: Assistant's 28.8 numbers left under Rubik flip 107 (12 by more than
+     a line) on 8bbd134 and 125 (17) on 3615dfd; a raw untuned Arial 38 and 36.
+     So the gate separates a tuned fallback from a stale one: no block moves by
+     more than a line, and at most TWO readings in a hundred move at all (14
+     of 720). The flips are printed. */
+  let swapSeen = 0, swapMoved = 0, swapFar = 0; const swapList = [];
+  for (const [w, h] of [[390, 844], [1280, 720]]) {
+    await pg.setViewportSize({ width: w, height: h });
+    for (const id of ['he', 'en', 'ru']) {
+      await pg.goto(root + `index.html?lang=${id}`);
+      await pg.evaluate(() => document.fonts.ready);
+      const steps = await pg.evaluate(() => [...document.querySelectorAll('.steps__step')].map(s => s.dataset.step));
+      const heights = () => pg.evaluate(() => [...document.querySelectorAll(
+        '#choices p, #choices .field__hint, #choices .sect__where, #choices summary, #choices .tile__name, #choices .spec__name')]
+        .filter(e => e.offsetParent && e.textContent.trim()).map(e => { const cs = getComputedStyle(e);
+          const lh = cs.lineHeight === 'normal' ? parseFloat(cs.fontSize) * 1.185 : parseFloat(cs.lineHeight);
+          return [e.textContent.trim().slice(0, 30), Math.round(e.getBoundingClientRect().height), lh]; }));
+      let moved = 0, seen = 0, far = 0; const first = [];
+      for (const k of steps) {
+        await pg.evaluate(k => document.querySelector(`.steps__step[data-step="${k}"]`).click(), k);
+        await pg.waitForTimeout(350);
+        const a = await heights();
+        await pg.evaluate(() => { const s = document.createElement('style'); s.id = '_nofont';
+          s.textContent = ':root{--sans:"Rubik Fallback","Segoe UI","Arial Hebrew",Arial,system-ui,sans-serif}'; document.head.append(s); });
+        const z = await heights();
+        await pg.evaluate(() => document.getElementById('_nofont').remove());
+        seen += a.length;
+        a.forEach(([t, hh, lh], i) => {
+          if (!z[i] || z[i][1] === hh) return;
+          moved++; if (Math.abs(z[i][1] - hh) > lh * 1.5) far++;
+          first.push(`${w}px ${id} ${k} "${t}" ${hh}→${z[i][1]}`);
+        });
+      }
+      if (!seen) fault('swap', `${w}px ${id}: no block of text measured — this check is dead`);
+      swapSeen += seen; swapMoved += moved; swapFar += far; swapList.push(...first);
+    }
+  }
+  console.log(`  the swap: ${swapMoved} of ${swapSeen} block readings change height${swapList.length ? ' — ' + swapList.join('; ') : ''}`);
+  if (swapFar) fault('swap', `${swapFar} block(s) of text move by MORE than one line when Rubik swaps in for its fallback — `
+    + 'the tuned fallback in css/app.css no longer describes Rubik; re-measure it (tools note in the file)');
+  if (swapMoved * 50 > swapSeen) fault('swap', `${swapMoved} of ${swapSeen} block readings (over 2 in 100) change height when Rubik `
+    + `swaps in for its fallback (${swapList.slice(0, 4).join('; ')}) — the tuned fallback in css/app.css no longer matches Rubik`);
+  if (foreign.length) {
+    fault('swap', `the page asked for ${foreign.length} thing(s) outside its own folder — ${foreign.slice(0, 3).join(', ')}. `
+      + 'It makes no network request at all (README): the fonts, the rooms and the code are files beside it');
   }
   await pg.close();
 }
@@ -4060,7 +4194,7 @@ for (const v of VIEWS) {
       fault(where, `could not be walked: ${e.message}`);
     } finally { await p.close(); }
   }
-  if (walked) console.log(`    ${walked} walks, 9 steps each: one way on and one way back in the bar, no foot, one bar height`);
+  if (walked) console.log(`    ${walked} walks, ${STEPS} steps each: one way on and one way back in the bar, no foot, one bar height`);
 }
 
 /* ── A PHONE HELD SIDEWAYS CAN SEE WHAT IT IS BEING ASKED ────────────────
@@ -4112,7 +4246,7 @@ for (const v of VIEWS) {
     try {
       await p.goto(SIDEWAYS, { waitUntil: 'load' });
       await p.waitForTimeout(500);
-      for (let i = 0; i < 9; i++) {
+      for (let i = 0; i < STEPS; i++) {
         const m = await p.evaluate(() => {
           const live = document.querySelector('.sect.is-live');
           if (!live) return { missing: 'no live step' };
@@ -4159,7 +4293,7 @@ for (const v of VIEWS) {
         } else if (w === EXEMPT_W && m.key !== EXEMPT_STEP) {
           exemptSeen += m.short ? 1 : 0;
         }
-        if (i === 8) break;
+        if (i === STEPS - 1) break;
         const next = await p.$('.quote__next:not([hidden])');
         if (!next) { fault(where, `step "${m.key}": no way on in the quote bar`); break; }
         await next.click();
@@ -4528,7 +4662,7 @@ for (const v of VIEWS) {
     try {
       await p.goto(KB_URL, { waitUntil: 'load' });
       await p.waitForTimeout(700);
-      for (let s = 0; s < 9; s++) {
+      for (let s = 0; s < STEPS; s++) {
         const live = await p.evaluate(() => document.querySelector('.sect.is-live')?.dataset.section || null);
         if (!live || live === 'sum') break;
         stepsSeen++;
@@ -4625,7 +4759,9 @@ for (const v of VIEWS) {
   ];
   /* measured to show an answer on only the steps named here, and required to
      still be exactly that. ⚠ RESTATED 27.9.2026 FROM "NONE": the band above
-     the door takes its phone line out of the STAGE (`--band-h`), the stage is
+     the door took its phone line out of the STAGE (`--band-h`, gone 28.9: the
+     band stands on the picture now and the stage has its 30 px back, so the
+     sticky block is the same height either way), the stage was
      30 px shorter, and both shapes now show an answer on the glass step —
      one of eight (measured; its first window tile clears the quote bar). The exemption shrank; it is re-named at its new size rather
      than dropped, because seven steps still show none. */
@@ -4634,7 +4770,11 @@ for (const v of VIEWS) {
        is narrower than the stack it replaced, so the grip step's question is a
        line shorter and an answer reaches the screen. Narrowed, as the clause
        below asks, never widened. */
-    { name: '844x390 a phone on its side', w: 844, h: 390, shows: ['glass', 'grip'] },
+    /* ⚠ AND pz, face AND mk JOINED AT 844x390 ON 28.9 (the full audit after
+       commit 5): the band left the stage's flow and the phone bar lost its
+       caption line (71.3 → 67.0 px), so three more questions reach an answer
+       on a phone on its side. 640x360 is unchanged. */
+    { name: '844x390 a phone on its side', w: 844, h: 390, shows: ['pz', 'face', 'glass', 'grip', 'mk'] },
     { name: '640x360 a 1280 laptop at 200% zoom', w: 640, h: 360, shows: ['glass', 'grip'] },
   ];
 
@@ -4677,7 +4817,7 @@ for (const v of VIEWS) {
 
   let steps = 0;
   const walk = async (p, onStep) => {
-    for (let s = 0; s < 9; s++) {
+    for (let s = 0; s < STEPS; s++) {
       const m = await p.evaluate(seen);
       if (!m) return 'no live step';
       if (m.step === 'sum') return null;
@@ -4738,10 +4878,10 @@ for (const v of VIEWS) {
         + 'CLAUDE.md §9; if it shows fewer, something took the answer back off the screen');
     }
   }
-  if (steps < 8 * MUST.length) fault('answer', `only ${steps} steps were measured of ${8 * MUST.length} — the sweep is not walking the guide`);
+  if (steps < QUESTIONS * MUST.length) fault('answer', `only ${steps} steps were measured of ${QUESTIONS * MUST.length} — the sweep is not walking the guide`);
   if (!faults) {
     console.log(`    ${steps} steps across ${MUST.length} viewports show an answer; a phone on its `
-      + 'side and a laptop at 200% zoom show one (glass) of eight, and are the two named exemptions');
+      + `side and a laptop at 200% zoom show ${EXEMPT.map(e => `${e.shows.length} (${e.shows.join(', ')})`).join(' and ')} of eight, and are the two named exemptions`);
   }
 }
 
@@ -4774,7 +4914,7 @@ for (const v of VIEWS) {
     try {
       await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
       await p.waitForTimeout(700);
-      for (let s = 0; s < 9; s++) {
+      for (let s = 0; s < STEPS; s++) {
         const m = await p.evaluate(() => {
           const live = document.querySelector('.sect.is-live');
           if (!live) return null;
@@ -4782,8 +4922,15 @@ for (const v of VIEWS) {
              above the door now (the `<h2>` is visually hidden), so the group
              heading is compared with the band — which must name this step. */
           const band = (document.querySelector('.stage__band [data-band-title]')?.textContent || '').trim();
-          const h2 = (live.querySelector('.sect__title')?.textContent || '').trim();
+          const h2el = live.querySelector('.sect__title');
+          const h2 = (h2el?.textContent || '').trim();
           const title = band === h2 ? band : `(band "${band}" is not the step's "${h2}")`;
+          /* ⚠ RESTATED 28.9.2026: the `<h2>` is SHOWN again above the options
+             (*"The title of the section also above the options"*) — the band
+             and it say the step's name twice ON PURPOSE and must agree (the
+             line above); what is still refused is a GROUP heading repeating
+             it (below). So the `<h2>` must be drawn at this 390x844. */
+          const h2Drawn = !!h2el && h2el.getBoundingClientRect().width > 2 && h2el.getBoundingClientRect().height > 8;
           /* DRAWN, not `display` — §0b 11.9: `checkVisibility` calls a clipped
              element visible, so a heading hidden by `sr-only` would pass a
              display test while still being announced. */
@@ -4792,11 +4939,12 @@ for (const v of VIEWS) {
             .map(h => h.textContent.trim());
           const groups = [...live.querySelectorAll('[role="radiogroup"]')]
             .map(g => (g.getAttribute('aria-label') || '').trim());
-          return { step: live.dataset.section, title, heads, groups };
+          return { step: live.dataset.section, title, heads, groups, h2Drawn };
         });
         if (!m) { fault('twice', `${lang}: no live step after ${s} steps`); break; }
         if (m.step === 'sum') break;
         if (m.title.startsWith('(band')) fault('twice', `${lang} step "${m.step}": ${m.title}`);
+        if (!m.h2Drawn) fault('twice', `${lang} step "${m.step}": the step's own title is not drawn above its options — it is asked for there as well as above the door`);
         steps++;
         headings += m.heads.length;
         for (const h of m.heads) {
@@ -4827,7 +4975,7 @@ for (const v of VIEWS) {
     }
     await p.close().catch(() => {});
   }
-  if (steps < 24) fault('twice', `only ${steps} steps of 24 were walked — the sweep is not walking the guide`);
+  if (steps < QUESTIONS * 3) fault('twice', `only ${steps} steps of ${QUESTIONS * 3} were walked — the sweep is not walking the guide`);
   /* §5.15: the day nothing renders a `.field__title` this passes for the wrong
      reason, and the steps that legitimately keep one are what say otherwise. */
   if (headings < 8) fault('twice', `only ${headings} group headings were found across three languages — `
@@ -5060,6 +5208,12 @@ for (const v of VIEWS) {
           if (!moved) break;
           await p.waitForTimeout(320);
         }
+        /* ⚠ AND WHAT IT PRESSES IS THE PILL (28.9): `#undo-btn` left the
+           wall's top row for the labelled pill at the stage's foot, and this
+           walk is the customer pressing the thing they can see. */
+        if (!(await p.evaluate(() => !!document.querySelector('#undo-btn')?.closest('.stage__undo')))) {
+          fault('undo', `${lang} ${s.name}: #undo-btn is not the pill at the stage's foot — this walk presses something else`);
+        }
         const bare = await p.evaluate(() => document.querySelector('#undo-btn')?.disabled);
         if (bare === undefined) {
           fault('undo', `${lang} ${s.name}: no undo button — this check has lost its subject`);
@@ -5136,7 +5290,372 @@ for (const v of VIEWS) {
   }
 }
 
-/* ── THE SAVED-DESIGNS DRAWER FITS THE CARD IT HANGS IN ──────────────────
+/* ── UNDO YOU CAN SEE, AT THE STAGE'S FOOT, AND OFF THE DOOR ──────────────
+   28.9.2026, the owner's son: *"The undo option rethought: not noticeable on
+   pc and in the way on the phone — more noticeable, but not colliding with the
+   door."* Two labelled ink pills, 8 px inside the stage's bottom-right corner
+   in every language (the picker's side, physically). Asked at every `VIEWS`
+   viewport, Hebrew and Russian, all six sizes — a door that arrives by link,
+   then two colour taps and one undo:
+     · NOTHING until there is something to undo (a link carries no history),
+       and the redo only once there is something to redo;
+     · the group at the corner — its right edge 8 px inside the stage, its
+       foot 8 px above the stage's, or 8 px above the trust band's words where
+       those reach the corner (a desktop) — and every pill ≥ 44 px both ways;
+     · never on `#frame`, and on none of the wall's other things: the trust
+       band's words, the price, the arrows, the navigator column, the band;
+     · its SHAPE is the first of row / stack / iconrow / icon that touches
+       neither the door, an arrow nor the price (each earlier shape is put back
+       in place, re-measured, and must touch one of them);
+     · and the undo's own toast stacks above it, never on it.
+   ⚠ The first run of this block found two faults in the first build, which
+   placed by the wall's WIDTH alone: the pills on the trust band's words at
+   1100–1280 (Russian) and 1100–1152 (Hebrew), up to 1,646 px², and at 320 the
+   stacked redo on the arrow beside the door, up to 943 px².
+   ⚠ ONE NAMED READING, asserted STILL NEEDED: at 320×568 beside the two widest
+   doors, with undo AND redo showing, the wall is 93 px — an arrow and one pill
+   wide — and the stage 239 px tall, so the stacked redo reaches the arrow by
+   66 (halfextra1) and 115 px² (halfextra2) in both languages. No shape clears
+   it without standing on the door. Named with its number (+10), never
+   widened; the day it clears, this fails and the name comes out. */
+{
+  console.log('\nundo stands at the stage\'s foot, labelled, and off the door');
+  const before = faults;
+  let read = 0, lifted = 0; const modes = { row: 0, stack: 0, iconrow: 0, icon: 0 };
+  const ARROW_KNOWN = { '320x568 halfextra1': 66, '320x568 halfextra2': 115 };
+  const arrowSeen = new Set();
+  for (const v of VIEWS) for (const lang of ['he', 'ru']) for (const size of Object.keys(SIZES)) {
+    const tag = `${lang} ${v.w}x${v.h} ${size}`;
+    const pg = await b.newPage({ viewport: { width: v.w, height: v.h } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=${size}`);
+      await pg.waitForTimeout(450);
+      const shownAt = () => pg.evaluate(() => [...document.querySelectorAll('.stage__undo .undo-pill')]
+        .filter(x => x.getBoundingClientRect().width > 0).map(x => x.id));
+      const fresh = await shownAt();
+      if (fresh.length) fault('undo-pill', `${tag}: ${fresh.join(', ')} painted before anything could be undone`);
+      await pg.evaluate(() => document.querySelector('.steps__step[data-step="colour"]')?.click());
+      await pg.waitForTimeout(300);
+      for (const k of [2, 4]) {
+        await pg.evaluate(n => [...document.querySelectorAll('.sect.is-live [role="radio"]')][n]?.click(), k);
+        await pg.waitForTimeout(200);
+      }
+      const once = await shownAt();
+      if (once.join() !== 'undo-btn') fault('undo-pill', `${tag}: after two changes the pills shown are [${once.join(', ')}] — the undo alone`);
+      await pg.evaluate(() => document.querySelector('#undo-btn')?.click());
+      await pg.waitForTimeout(450);
+      const m = await pg.evaluate(() => {
+        const R = e => { const r = e.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height }; };
+        const ov = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
+        const box = document.querySelector('.stage__undo');
+        const st = R(document.querySelector('#stage')), fr = document.querySelector('.door-svg #frame');
+        if (!box || !fr) return null;
+        const f = R(fr), g = R(box);
+        const pills = [...box.querySelectorAll('.undo-pill')].filter(x => x.getBoundingClientRect().width > 0);
+        const pr = pills.map(x => ({ id: x.id, r: R(x) }));
+        const others = [...document.querySelectorAll('.trust__i, #quote, .stage__arrow, .stage-wrap > .steps, .stage__band')]
+          .filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'
+            && !(e.id === 'quote' && getComputedStyle(e).position === 'fixed'))
+          .map(e => ({ n: e.id || e.className.split(' ')[0], r: R(e) }));
+        const hits = [];
+        for (const pp of pr) for (const o of others) { const x = ov(pp.r, o.r); if (x) hits.push(`${pp.id} on ${o.n} ${x}`); }
+        const onDoor = pr.reduce((a, pp) => a + ov(pp.r, f), 0);
+        const t = document.querySelector('#toast');
+        const toastOn = t && !t.hidden ? pr.reduce((a, pp) => a + ov(pp.r, R(t)), 0) : null;
+        /* the trust band's words, and the foot the group should have */
+        const words = [...document.querySelectorAll('.trust__i')].map(R).filter(r => r.width && r.bottom > st.top && r.top < st.bottom);
+        const wordsTop = words.length ? Math.min(...words.map(r => r.top)) : null;
+        const lifted = wordsTop !== null && words.some(w => w.left < g.right && w.right > g.left);
+        const foot = lifted ? wordsTop - 8 : st.bottom - 8;
+        /* the shape: put each earlier shape back in place and ask what it touches */
+        const obst = [f, ...others.filter(o => o.n === 'quote' || o.n.startsWith('stage__arrow')).map(o => o.r)];
+        const mode = box.dataset.mode, b0 = box.style.getPropertyValue('--undo-b'), touches = {};
+        const wrapB = document.querySelector('.stage-wrap').getBoundingClientRect().bottom;
+        for (const k of ['row', 'stack', 'iconrow', 'icon']) {
+          box.dataset.mode = k;
+          box.style.setProperty('--undo-b', `${Math.round(wrapB - st.bottom + 8)}px`);
+          let gg = R(box);
+          if (wordsTop !== null && words.some(w => w.left < gg.right && w.right > gg.left)) {
+            box.style.setProperty('--undo-b', `${Math.round(wrapB - wordsTop + 8)}px`);
+            gg = R(box);
+          }
+          touches[k] = obst.some(o => ov(gg, o) > 0);
+        }
+        box.dataset.mode = mode; box.style.setProperty('--undo-b', b0);
+        return { mode, touches, lifted, onDoor, hits, toastOn, pills: pr.map(pp => ({ id: pp.id, w: pp.r.width, h: pp.r.height })),
+          dr: Math.round((st.right - 8 - g.right) * 10) / 10, db: Math.round((foot - g.bottom) * 10) / 10 };
+      });
+      if (!m) { fault('undo-pill', `${tag}: no undo group or no #frame — this check has lost its subject`); continue; }
+      read++;
+      modes[m.mode] = (modes[m.mode] || 0) + 1;
+      const ids = m.pills.map(x => x.id).join();
+      if (ids !== 'undo-btn,redo-btn') fault('undo-pill', `${tag}: after an undo the pills shown are [${ids}] — both, undo first`);
+      for (const x of m.pills) if (x.w < 44 || x.h < 44) fault('undo-pill', `${tag}: ${x.id} is ${Math.round(x.w)}x${Math.round(x.h)} — the floor is 44`);
+      if (Math.abs(m.dr) > 1.5 || Math.abs(m.db) > 1.5) fault('undo-pill', `${tag}: the group stands ${m.dr} px off 8 px in from the stage's right and ${m.db} px off 8 px above ${m.lifted ? "the trust band's words" : "the stage's foot"}`);
+      if (m.onDoor) fault('undo-pill', `${tag}: the undo pills stand on the door — ${m.onDoor} px² of #frame (shape "${m.mode}")`);
+      if (m.lifted) lifted++;
+      for (const h of m.hits) {
+        const k = `${v.w}x${v.h} ${size}`, px = +h.split(' ').pop();
+        if (h.startsWith('redo-btn on stage__arrow') && ARROW_KNOWN[k] !== undefined) {
+          arrowSeen.add(`${lang} ${k}`);
+          if (px > ARROW_KNOWN[k] + 10) fault('undo-pill', `${tag}: the named redo-on-arrow reading grew to ${px} px² (named at ${ARROW_KNOWN[k]})`);
+          continue;
+        }
+        fault('undo-pill', `${tag}: ${h} px²`);
+      }
+      if (m.toastOn === null) fault('undo-pill', `${tag}: the undo raised no toast — the stacking clause has no subject`);
+      else if (m.toastOn) fault('undo-pill', `${tag}: the undo's own toast covers ${m.toastOn} px² of the pills — it stacks above them`);
+      const order = ['row', 'stack', 'iconrow', 'icon'];
+      for (const k of order.slice(0, order.indexOf(m.mode))) {
+        if (!m.touches[k]) fault('undo-pill', `${tag}: the shape is "${m.mode}" but "${k}" touches nothing — the first shape that fits is "${k}"`);
+      }
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('undo-pill', `${tag}: chromium died before the pills were measured`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  const want = VIEWS.length * 2 * Object.keys(SIZES).length;
+  if (read < want) fault('undo-pill', `read ${read} of ${want} doors — this check is measuring less than it says`);
+  for (const lang of ['he', 'ru']) for (const k of Object.keys(ARROW_KNOWN)) {
+    if (!arrowSeen.has(`${lang} ${k}`)) fault('undo-pill', `${lang} ${k}: the named redo-on-arrow reading is gone — the pills clear the arrow there now; take it out of ARROW_KNOWN and CLAUDE.md §9`);
+  }
+  if (faults === before) console.log(`    ${read} readings (${VIEWS.length} viewports x he/ru x ${Object.keys(SIZES).length} sizes): none painted before a change, the undo alone after two, both after an undo; at the corner (above the trust band's words on ${lifted}), ≥ 44, on no door and on nothing else on the wall, the toast above them; shapes row ${modes.row}, stack ${modes.stack}, iconrow ${modes.iconrow}, icon ${modes.icon}, each the first that touches nothing`);
+}
+
+/* ── THE SAVE ASKS, AND BOTH ITS DIALOGS CLOSE THE WAY A DIALOG DOES ───────
+   28.9.2026 — *"on clicking, a window with two options, save or view a saved
+   door."* The wall's save opens `#savedlg`: a modal (`:modal`), focus inside
+   it, its choices ≥ 44 px. "שמירת הדלת" saves (one more design in storage, a
+   toast) and closes; the second choice carries the count and opens `#saved`
+   as a modal; Escape and the backdrop close either, and focus comes back to
+   the save button in the wall. The summary's own save still saves at once. */
+{
+  console.log('\nthe save asks, and its dialogs close the way a dialog does');
+  const before = faults;
+  let walked = 0;
+  for (const [w, h] of [[390, 844], [320, 568], [1280, 720], [1920, 918]]) for (const lang of ['he', 'en', 'ru']) {
+    const tag = `${lang} ${w}x${h}`;
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
+      await pg.evaluate(() => localStorage.removeItem('dm.saved.v1'));
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
+      await pg.waitForTimeout(450);
+      const st = () => pg.evaluate(() => {
+        const d = document.querySelector('#savedlg'), l = document.querySelector('#saved');
+        const small = [...document.querySelectorAll('dialog[open] button')].filter(x => { const r = x.getBoundingClientRect(); return r.width && (r.width < 44 || r.height < 44); }).map(x => x.id || x.className);
+        let n = 0; try { n = JSON.parse(localStorage.getItem('dm.saved.v1') || '[]').length; } catch {}
+        return { dlg: !!d?.open, dlgModal: !!d?.matches(':modal'), list: !!l?.open, listModal: !!l?.matches(':modal'),
+          focusIn: !!document.activeElement?.closest('dialog[open]'), focus: document.activeElement?.id || '',
+          count: d?.querySelector('[data-saved-count]')?.textContent, stored: n, small,
+          toast: !document.querySelector('#toast').hidden, rows: document.querySelectorAll('#saved .saved__row').length };
+      });
+      await pg.click('#save-hud');
+      await pg.waitForTimeout(200);
+      const a = await st();
+      if (!a.dlg || !a.dlgModal) fault('save-dlg', `${tag}: the wall's save did not open its dialog as a modal`);
+      if (!a.focusIn) fault('save-dlg', `${tag}: the save dialog opened and focus stayed outside it`);
+      if (a.small.length) fault('save-dlg', `${tag}: dialog buttons under 44 px: ${a.small.join(', ')}`);
+      if (a.stored !== 0) fault('save-dlg', `${tag}: opening the dialog saved something — it asks first`);
+      if (a.count !== '0') fault('save-dlg', `${tag}: the list's choice counts "${a.count}" with nothing saved`);
+      await pg.click('#savedlg-save');
+      await pg.waitForTimeout(300);
+      const b2 = await st();
+      if (b2.dlg) fault('save-dlg', `${tag}: "save" did not close the dialog`);
+      if (b2.stored !== 1 || !b2.toast) fault('save-dlg', `${tag}: "save" stored ${b2.stored} and ${b2.toast ? 'said so' : 'said nothing'}`);
+      if (b2.focus !== 'save-hud') fault('save-dlg', `${tag}: focus went to "${b2.focus}" on closing, not back to the wall's save`);
+      await pg.click('#save-hud');
+      await pg.waitForTimeout(200);
+      const c = await st();
+      if (c.count !== '1') fault('save-dlg', `${tag}: the list's choice counts "${c.count}" with one door saved`);
+      await pg.click('#savedlg-list');
+      await pg.waitForTimeout(300);
+      const d = await st();
+      if (d.dlg || !d.list || !d.listModal) fault('save-dlg', `${tag}: the second choice did not replace the dialog with the saved doors as a modal`);
+      if (d.rows !== 1) fault('save-dlg', `${tag}: the saved doors show ${d.rows} rows for one saved door`);
+      await pg.keyboard.press('Escape');
+      await pg.waitForTimeout(200);
+      const e2 = await st();
+      if (e2.list) fault('save-dlg', `${tag}: Escape did not close the saved doors`);
+      if (e2.focus !== 'save-hud') fault('save-dlg', `${tag}: after the list closed focus is on "${e2.focus}", not the wall's save it was reached from`);
+      await pg.click('#save-hud');
+      await pg.waitForTimeout(200);
+      await pg.mouse.click(3, h - 3);
+      await pg.waitForTimeout(200);
+      const f2 = await st();
+      if (f2.dlg) fault('save-dlg', `${tag}: a tap on the backdrop did not close the save dialog`);
+      walked++;
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('save-dlg', `${tag}: chromium died during the walk`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (walked < 12) fault('save-dlg', `only ${walked} of 12 walks finished`);
+  if (faults === before) console.log(`    ${walked} walks (four shapes x three languages): the wall's save opens a modal with focus inside, saves only when asked, counts, opens the list as a modal, closes on Escape and on the backdrop, and gives focus back to the save`);
+}
+
+/* ── THE FIRST-VISIT TOUR: FOUR CUT-OUTS, ONCE, AND NEVER ON A LINK ──────────
+   28.9.2026, the owner's son: *"A little tutorial when a person first joins:
+   at every step a grey overlay on everything but the thing described, an arrow
+   from the text to the thing … Only on the first visit."* Every other block in
+   this file opens the page `tourless` (tools/browser.mjs); this one launches a
+   browser without that, so the page meets an empty store:
+     · a bare load opens it as a MODAL, within two seconds, on step 1;
+     · on each of its four steps the target — the door's frame, the navigator,
+       the options, the save and the undo pills' corner — is WHOLE inside a
+       cut-out; the callout is inside the viewport and covers no cut-out; each
+       arrow starts on the callout's edge and ends on a cut-out's edge; and the
+       target is not clickable through the scrim (`elementFromPoint` at its
+       centre is the tour);
+     · the last step ends it and marks it seen; a second load shows nothing;
+       skip and Escape each end it and mark it seen;
+     · a link carrying a door, bare mode and the sheet never show it;
+     · with storage refused it shows, ends, and throws nothing.
+   At 1280x720 (he), 390x844 and 320x568 (ru — the longest words in the
+   narrowest callout). */
+{
+  console.log('\nthe first-visit tour: four cut-outs, once, and never on a link');
+  const before = faults;
+  const raw = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+  let steps = 0;
+  const URL0 = `file://${process.cwd()}/index.html`;
+  const state = pg => pg.evaluate(() => {
+    const d = document.querySelector('#tour');
+    let flag = null; try { flag = localStorage.getItem('dm.tour.v1'); } catch { flag = 'no-storage'; }
+    return { open: !!d?.open, modal: !!d?.matches(':modal'), step: d?.dataset.step, flag };
+  });
+  const measure = pg => pg.evaluate(() => {
+    const d = document.querySelector('#tour');
+    const R = e => { const r = e.getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; };
+    const wide = innerWidth >= 1100;
+    const step = +d.dataset.step;
+    const targets = step === 1 ? [document.querySelector('#stage .door-svg #frame')]
+      : step === 2 ? [document.querySelector('.steps')]
+      : step === 3 ? [wide ? document.querySelector('.panel--choose') : document.querySelector('.sect.is-live')]
+      : [document.querySelector('#save-hud'), document.querySelector('.stage__undo')];
+    const holes = [...d.querySelectorAll('.tour__hole')].map(h => ({ left: +h.getAttribute('x'), top: +h.getAttribute('y'),
+      right: +h.getAttribute('x') + +h.getAttribute('width'), bottom: +h.getAttribute('y') + +h.getAttribute('height') }));
+    const card = R(d.querySelector('.tour__card'));
+    const inside = (a, b) => a.left >= b.left - 1 && a.top >= b.top - 1 && a.right <= b.right + 1 && a.bottom <= b.bottom + 1;
+    const meets = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+    const onEdge = (x, y, r) => { const dx = Math.max(r.left - x, 0, x - r.right), dy = Math.max(r.top - y, 0, y - r.bottom);
+      const inX = x >= r.left - 1 && x <= r.right + 1, inY = y >= r.top - 1 && y <= r.bottom + 1;
+      return Math.hypot(dx, dy) <= 1.5 && (Math.abs(x - r.left) <= 1.5 || Math.abs(x - r.right) <= 1.5 || Math.abs(y - r.top) <= 1.5 || Math.abs(y - r.bottom) <= 1.5 || !(inX && inY)); };
+    const arrows = [...d.querySelectorAll('.tour__arrow')].map(l => ({ x1: +l.getAttribute('x1'), y1: +l.getAttribute('y1'), x2: +l.getAttribute('x2'), y2: +l.getAttribute('y2') }));
+    const out = { step, holes: holes.length, targets: 0, whole: 0, clickThrough: [] };
+    for (const t of targets) {
+      if (!t) continue;
+      out.targets++;
+      const r = R(t);
+      /* the part of the target on screen must be inside a cut-out — on a
+         phone the options' on-screen part is what lies between the sticky
+         door and the fixed quote bar */
+      const bar = document.querySelector('.quote');
+      const foot = bar && getComputedStyle(bar).position === 'fixed' ? bar.getBoundingClientRect().top : innerHeight;
+      const sticky = !wide && step === 3 ? document.querySelector('.stage-wrap').getBoundingClientRect().bottom : 0;
+      const vis = { left: Math.max(r.left, 0), top: Math.max(r.top, sticky, 0), right: Math.min(r.right, innerWidth), bottom: Math.min(r.bottom, innerHeight, step === 3 ? foot : innerHeight) };
+      if (holes.some(h => inside(vis, h))) out.whole++;
+      const e = document.elementFromPoint((vis.left + vis.right) / 2, (vis.top + vis.bottom) / 2);
+      if (!e || !e.closest('#tour')) out.clickThrough.push(t.id || t.className.baseVal || String(t.className).split(' ')[0]);
+    }
+    out.cardIn = card.left >= 0 && card.top >= 0 && card.right <= innerWidth && card.bottom <= innerHeight;
+    out.cardOnHole = holes.some(h => meets(card, h));
+    out.arrowsOk = arrows.every(a => onEdge(a.x1, a.y1, card) && holes.some(h => onEdge(a.x2, a.y2, h)));
+    out.arrows = arrows.length;
+    return out;
+  });
+  for (const [w, h, lang] of [[1280, 720, 'he'], [390, 844, 'ru'], [320, 568, 'ru']]) {
+    const tag = `${lang} ${w}x${h}`;
+    const ctx = await raw.newContext({ viewport: { width: w, height: h } });
+    const pg = await ctx.newPage();
+    const errs = []; pg.on('pageerror', e => errs.push(String(e)));
+    try {
+      await pg.goto(`${URL0}?lang=${lang}`);
+      await pg.waitForFunction(() => document.querySelector('#tour')?.open, null, { timeout: 2500 }).catch(() => {});
+      const a = await state(pg);
+      if (!a.open || !a.modal || a.step !== '1') { fault('tour', `${tag}: a first bare load did not open the tour as a modal on step 1 (${JSON.stringify(a)})`); continue; }
+      for (let k = 1; k <= 4; k++) {
+        await pg.waitForTimeout(120);
+        const m = await measure(pg);
+        steps++;
+        if (m.step !== k) fault('tour', `${tag}: expected step ${k}, the tour is on ${m.step}`);
+        if (!m.targets) fault('tour', `${tag} step ${k}: no target on the page — this step has no subject`);
+        if (m.whole < m.targets) fault('tour', `${tag} step ${k}: ${m.targets - m.whole} of ${m.targets} targets are not whole inside a cut-out`);
+        if (m.clickThrough.length) fault('tour', `${tag} step ${k}: ${m.clickThrough.join(', ')} can be pressed through the scrim`);
+        if (!m.cardIn) fault('tour', `${tag} step ${k}: the callout leaves the viewport`);
+        if (m.cardOnHole) fault('tour', `${tag} step ${k}: the callout covers a cut-out`);
+        if (!m.arrows || !m.arrowsOk) fault('tour', `${tag} step ${k}: ${m.arrows} arrow(s), and not every one runs from the callout's edge to a cut-out's edge`);
+        await pg.evaluate(() => document.querySelector('.tour__next').click());
+      }
+      await pg.waitForTimeout(150);
+      const z = await state(pg);
+      if (z.open || z.flag !== 'seen') fault('tour', `${tag}: after the last step the tour is ${z.open ? 'still open' : 'shut'} and the flag is ${z.flag}`);
+      await pg.goto(`${URL0}?lang=${lang}`);
+      await pg.waitForTimeout(1800);
+      if ((await state(pg)).open) fault('tour', `${tag}: the tour came back on the second visit`);
+      if (errs.length) fault('tour', `${tag}: ${errs.join(' | ').slice(0, 120)}`);
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('tour', `${tag}: chromium died during the tour`);
+    } finally { await ctx.close().catch(() => {}); }
+  }
+  /* skip, Escape, and the places it must never open */
+  for (const [how, q] of [['skip', ''], ['escape', ''], ['link', '&c=rb-9016d'], ['bare', '&bare=1'], ['sheet', '&sheet=1']]) {
+    const ctx = await raw.newContext({ viewport: { width: 1280, height: 720 } });
+    const pg = await ctx.newPage();
+    try {
+      await pg.goto(`${URL0}?lang=he${q}`);
+      await pg.waitForTimeout(1700);
+      const a = await state(pg);
+      if (how === 'link' || how === 'bare' || how === 'sheet') {
+        if (a.open) fault('tour', `the tour opened on ${how === 'link' ? 'a link carrying a door' : how === 'bare' ? 'the bare drawing' : 'the order sheet'}`);
+      } else {
+        if (!a.open) { fault('tour', `${how}: the tour did not open`); continue; }
+        if (how === 'skip') await pg.evaluate(() => document.querySelector('.tour__skip').click());
+        else await pg.keyboard.press('Escape');
+        await pg.waitForTimeout(150);
+        const z = await state(pg);
+        if (z.open || z.flag !== 'seen') fault('tour', `${how}: the tour is ${z.open ? 'still open' : 'shut'} and the flag is ${z.flag} — it ends and is remembered`);
+      }
+    } finally { await ctx.close().catch(() => {}); }
+  }
+  /* storage refused: it shows, ends, and throws nothing */
+  {
+    const ctx = await raw.newContext({ viewport: { width: 390, height: 844 } });
+    await ctx.addInitScript(() => {
+      const no = () => { throw new DOMException('denied', 'SecurityError'); };
+      Object.defineProperty(window, 'localStorage', { get: no, configurable: true });
+    });
+    const pg = await ctx.newPage();
+    const errs = []; pg.on('pageerror', e => errs.push(String(e)));
+    await pg.goto(`${URL0}?lang=he`);
+    await pg.waitForTimeout(1700);
+    const a = await state(pg);
+    if (!a.open) fault('tour', 'with storage refused the tour did not show — "first visit" is every visit there');
+    await pg.evaluate(() => document.querySelector('.tour__skip')?.click());
+    await pg.waitForTimeout(150);
+    if ((await state(pg)).open) fault('tour', 'with storage refused the tour would not end');
+    if (errs.length) fault('tour', `with storage refused the page threw: ${errs.join(' | ').slice(0, 120)}`);
+    await ctx.close().catch(() => {});
+  }
+  await raw.close();
+  if (steps < 12) fault('tour', `only ${steps} of 12 tour steps were measured`);
+  if (faults === before) console.log(`    ${steps} steps at three shapes: a modal on a first bare load, every target whole in its cut-out and not pressable through the scrim, the callout inside the viewport and off the cut-outs, every arrow edge to edge; remembered after the last step, skip and Escape; never on a link, bare or the sheet; with storage refused it shows and ends without throwing`);
+}
+
+/* ── THE SAVED DOORS: A DIALOG, AND THE CARD UNDER IT DOES NOT MOVE ───────
+   ⚠ RESTATED 28.9.2026 FOR A DIALOG, SAME SUBJECTS. The list was a drawer
+   inside the summary's send card; the owner's son: *"The save button's
+   function changed: on clicking, a window with two options, save or view a
+   saved door."* So it is `<dialog id="saved">` now, opened by the summary's
+   "העיצוב שלי" and by the save dialog's second choice. Every clause below keeps
+   its subject — the page does not widen, the summary card and `#spec` do not
+   move while it is open, every row names its price and is distinguishable by
+   what is PAINTED on it, every × is whole on screen and is what
+   `elementFromPoint` returns — and one is new: it opens as a MODAL (the page
+   behind it inert, `:modal` matching it), so nothing on the card can move
+   under a finger while it is up.
+
    Measured 13.9 by walking as the customer who cannot decide between two
    doors — save one, build another, come back. Nothing in this repository had
    ever put a design IN that drawer, so nothing had ever opened it with rows.
@@ -5212,8 +5731,8 @@ for (const v of VIEWS) {
           if (!btn || btn.hidden) return { noBtn: true };
           btn.click();
           const box = document.querySelector('#saved');
-          if (!box || box.hidden) return { noDrawer: true };
-          box.scrollIntoView({ block: 'center' });
+          if (!box || !box.open) return { noDrawer: true };
+          const modal = box.matches(':modal');
           const W = innerWidth, H = innerHeight;
           /* ⚠ WHAT IS PAINTED, NOT WHAT IS IN THE NODE. The description is
              elided, so `textContent` is the whole `summaryLine` whatever the
@@ -5253,7 +5772,7 @@ for (const v of VIEWS) {
             };
           });
           return {
-            shut,
+            shut, modal,
             open: {
               side: doc.scrollWidth - doc.clientWidth,
               card: document.querySelector('.panel--send .send')?.getBoundingClientRect().width,
@@ -5271,12 +5790,13 @@ for (const v of VIEWS) {
           continue;
         }
         if (m.noDrawer) {
-          fault('saved', `${lang} ${s.name}: the toggle did not open the drawer`);
+          fault('saved', `${lang} ${s.name}: the toggle did not open the saved doors' dialog`);
           await p.close().catch(() => {});
           continue;
         }
         opened++;
         rowsSeen += m.rows.length;
+        if (!m.modal) fault('saved', `${lang} ${s.name}: the saved doors opened, but not as a modal — the card under them is live`);
         if (m.rows.length !== DOORS.length) {
           fault('saved', `${lang} ${s.name}: ${m.rows.length} rows for ${DOORS.length} saved `
             + 'designs — the sweep is not measuring what it names');
@@ -5591,7 +6111,7 @@ for (const v of VIEWS) {
     try {
       await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
       await p.waitForTimeout(900);
-      for (let s = 0; s < 8; s++) {
+      for (let s = 0; s < QUESTIONS; s++) {
         const live = await p.evaluate(() => document.querySelector('.sect.is-live')?.dataset.section || null);
         if (!live) { fault(where, 'no live step — this check has no subject'); break; }
         /* ⚠ RESTATED 27.9.2026 ON BOTH AXES, SAME SUBJECT (the live mark is
@@ -5602,12 +6122,19 @@ for (const v of VIEWS) {
            navigator's box on both axes AND inside what the panel shows (the
            viewport below 1100, where the row is fixed and the panel is the
            page). */
+        /* ⚠ RESTATED 28.9.2026, SAME SUBJECT, AND LATE: since commit 2 of that
+           day the column stands ON THE PHOTOGRAPH, a child of `.stage-wrap`, so
+           above 1100 the box that shows it is the STAGE, not the panel it no
+           longer stands in. Commit 2's record said this clause had been
+           restated; it had not, and the first full audit after it failed every
+           desktop step here. */
         const inRow = await p.evaluate(() => {
           const row = document.querySelector('.steps'), c = document.querySelector('.steps__step.is-on');
-          const pn = document.querySelector('.panel--choose');
-          if (!row || !c || !pn) return null;
+          const st = document.querySelector('#stage');
+          if (!row || !c || !st) return null;
           const r = row.getBoundingClientRect(), k = c.getBoundingClientRect();
-          const wide = innerWidth >= 1100, v = pn.getBoundingClientRect();
+          const wide = innerWidth >= 1100, v = st.getBoundingClientRect();
+          if (wide && !row.parentElement.classList.contains('stage-wrap')) return false;
           const box = wide ? v : { left: 0, right: innerWidth, top: 0, bottom: innerHeight };
           return k.left >= r.left - 1 && k.right <= r.right + 1
             && k.top >= r.top - 1 && k.bottom <= r.bottom + 1
@@ -5615,7 +6142,7 @@ for (const v of VIEWS) {
             && k.left >= box.left - 1 && k.right <= box.right + 1;
         });
         if (inRow === null) fault(where, `step "${live}": no navigator row or no live circle — the circle clause has no subject`);
-        else if (!inRow) fault(where, `step "${live}": the live mark is cut by the edge of the navigator or of the panel it stands in — a navigator whose current position is off its own edge is not a navigator`);
+        else if (!inRow) fault(where, `step "${live}": the live mark is cut by the edge of the navigator or of the picture it stands on — a navigator whose current position is off its own edge is not a navigator`);
         else circles++;
         if (taps) {
           for (const at of ['mid', 'bottom']) {
@@ -5673,7 +6200,7 @@ for (const v of VIEWS) {
   /* §5.15, twice: a sweep that tapped nothing and one that never looked at the
      circle both read green without these. */
   if (clicks < 60) fault('tap', `only ${clicks} taps were made with the panel scrolled — this check is not measuring what it is named after`);
-  if (circles < 8 * TAP.length - 2) fault('tap', `the live circle was checked on ${circles} steps of ${8 * TAP.length} — the walk stopped short`);
+  if (circles < QUESTIONS * TAP.length - 2) fault('tap', `the live circle was checked on ${circles} steps of ${QUESTIONS * TAP.length} — the walk stopped short`);
   if (faults === before0) {
     console.log(`    ${clicks} real taps with the panel scrolled, none scrolled anything `
       + `(${changed} changed what the panel holds and were not judged); `
@@ -5892,21 +6419,27 @@ for (const v of VIEWS) {
   if (faults === before0) console.log(`    ${priced} priced steps across three languages, no explainer says the prices are the same; the colour sentence is on the colour step and the summary in all three`);
 }
 
-/* ── THE BAND ABOVE THE DOOR FITS ITS BUDGET, AND THE ARROWS STEP ─────────
+/* ── THE BAND ABOVE THE DOOR, ON THE PHOTOGRAPH, AND THE ARROWS STEP ──────
    27.9.2026, the owner's son: *"above the door the name of the section we are
    at, big … between the section name and the door, the name of the thing now
    selected … two arrows on each side of the door that change the option (the
    next available one; if none is compatible, a window: 'there is no compatible
-   x with your build')."*
-   ⚠ THE BUDGET IS A MEASUREMENT FROM BEFORE THE ROUND, written here because it
-   is the thing asserted: above 1100 the band is in the flow and takes its
-   height out of the drawing (§0c), and the title shrank in the same round to
-   pay for it. The standard door's leaf height, measured on the live page on
-   `0c6e4ac` (before the title shrank): 1280x720 421.0 px, 1440x900 550.3,
-   1920x918 563.3. Asserted: no smaller than that less 4 px.
+   x with your build')."* And 28.9: *"The header of the section needs to be on
+   the image and closer to the door, in some good font."*
+   ⚠ RESTATED 28.9.2026, SAME SUBJECT, STRONGER. The budget was a measurement
+   from before the 27.9 round — the band was in the flow above 1100 and took
+   its height out of the drawing, and the leaf was held to no smaller than
+   `0c6e4ac`'s (1280x720 421.0 px, 1440x900 550.3, 1920x918 563.3) less 4 px.
+   The band is on the photograph now and gives its height back; the crop took
+   part of it for the wall the band stands on (`FIT_TRIM.top`, whose table is
+   in js/renderer.js). So the leaf is held to what it was on `fc30c08`, the
+   commit BEFORE the move — 426.2, 550.2, 562.4 — with no tolerance: it is
+   436.9, 556.0 and 567.4 after it, and a later change that spends the gain
+   fails here.
    The band itself: the live step's title and its first group's chosen option,
-   the SAME HEIGHT on every step (one line each, in every language) so the door
-   does not resize between steps.
+   the SAME HEIGHT on every step (one line each, in every language) — its foot
+   is anchored over the door, so a second line would climb toward the stage's
+   top rather than resize the door.
    The arrows: the next arrow moves the first group to the next free option in
    the list's own order and the band follows; prev from the first option wraps;
    a step whose group has no other free option opens the one-button dialog and
@@ -5915,7 +6448,7 @@ for (const v of VIEWS) {
 {
   console.log('\nthe band above the door fits its budget, and the arrows step');
   const before = faults;
-  const BUDGET = { '1280x720': 421.0, '1440x900': 550.3, '1920x918': 563.3 };
+  const BUDGET = { '1280x720': 426.2, '1440x900': 550.2, '1920x918': 562.4 };
   let asked = 0;
   for (const [w, h] of [[1280, 720], [1440, 900], [1920, 918]]) for (const lang of ['he', 'ru']) {
     const tag = `${lang} ${w}x${h}`;
@@ -5924,7 +6457,7 @@ for (const v of VIEWS) {
       await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
       await pg.waitForTimeout(700);
       const heights = [];
-      for (let i = 0; i < 9; i++) {
+      for (let i = 0; i < STEPS; i++) {
         const m = await pg.evaluate(() => {
           const band = document.querySelector('.stage__band'), leaf = document.querySelector('.door-svg #leaf');
           const t = document.querySelector('[data-band-title]'), n = document.querySelector('[data-band-now]');
@@ -5938,9 +6471,9 @@ for (const v of VIEWS) {
         heights.push(Math.round(m.band * 10) / 10);
         if (i === 0) {
           asked++;
-          if (m.leaf < BUDGET[`${w}x${h}`] - 4) {
+          if (m.leaf < BUDGET[`${w}x${h}`]) {
             fault('band', `${tag}: the leaf is ${m.leaf.toFixed(1)} px, ${(BUDGET[`${w}x${h}`] - m.leaf).toFixed(1)} px smaller `
-              + `than before the round (${BUDGET[`${w}x${h}`]}) — the band costs the drawing more than the title gave back`);
+              + `than before the band went onto the photograph (${BUDGET[`${w}x${h}`]}) — the crop spends more on the wall than the band gave back`);
           }
         }
         if (m.tLines !== 1 || m.nLines !== 1) fault('band', `${tag} step "${m.step}": the band runs to ${m.tLines}+${m.nLines} lines — each is one line`);
@@ -5948,8 +6481,8 @@ for (const v of VIEWS) {
         if (!next) break;
         await pg.waitForTimeout(260);
       }
-      if (new Set(heights).size > 1) fault('band', `${tag}: the band is ${[...new Set(heights)].join(' / ')} px tall across the steps — the door resizes between steps`);
-      if (heights.length < 9) fault('band', `${tag}: only ${heights.length} of 9 steps walked`);
+      if (new Set(heights).size > 1) fault('band', `${tag}: the band is ${[...new Set(heights)].join(' / ')} px tall across the steps — it climbs toward the stage's top on some`);
+      if (heights.length < STEPS) fault('band', `${tag}: only ${heights.length} of ${STEPS} steps walked`);
     } finally { await pg.close().catch(() => {}); }
   }
   /* the arrows, on the face step: a door where they can move, and one where they cannot */
@@ -6002,7 +6535,232 @@ for (const v of VIEWS) {
     } finally { await pg.close().catch(() => {}); }
   }
   if (asked < 10) fault('band', `only ${asked} of 10 readings were made — this check is measuring almost nothing`);
-  if (faults === before) console.log(`    ${asked} readings: the leaf within 4 px of its size before the round at 1280, 1440 and 1920, the band one height on all nine steps in he and ru; the arrows step the face and wrap, the band follows, the tall slot's refusal opens the dialog and changes nothing, hidden on the summary`);
+  if (faults === before) console.log(`    ${asked} readings: the leaf no smaller than before the band went onto the photograph at 1280, 1440 and 1920, the band one height on all ${STEPS} steps in he and ru; the arrows step the face and wrap, the band follows, the tall slot's refusal opens the dialog and changes nothing, hidden on the summary`);
+}
+
+/* ── THE ARROWS WALK THE TILES IN THE ORDER THEY ARE DRAWN ────────────────
+   28.9.2026, the owner's son: *"The arrows choose very randomly in the colour
+   section — I want it to go nicely one by one, in every section."* They walked
+   the LIST's order — the code's index order — while the colour step draws its
+   options grouped by price and the glass step its designs with their twins
+   side by side. On every step whose first group is drawn as one tile per
+   option (the משקוף's three rows are not), at 1280x720 in Hebrew and 390x844 in
+   Russian: pressing "next" once per free tile visits the free tiles in DOM
+   order after the chosen one, wrapping, and "prev" from there steps back one.
+   A press that asks (the confirm dialog — a bar against the lever) is answered
+   yes and counted (§5.28). §5.15: the steps walked and presses made are
+   counted. */
+{
+  console.log('\nthe arrows walk the tiles in the order they are drawn');
+  const before = faults;
+  let presses = 0, walkedSteps = 0, asked = 0;
+  for (const [w, h, lang] of [[1280, 720, 'he'], [390, 844, 'ru']]) {
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
+      await pg.waitForTimeout(500);
+      for (const step of ['fit', 'colour', 'lock', 'pz', 'face', 'glass', 'grip']) {
+        await pg.evaluate(k => document.querySelector(`.steps__step[data-step="${k}"]`)?.click(), step);
+        await pg.waitForTimeout(350);
+        const read = () => pg.evaluate(() => {
+          const f = document.querySelector('.sect.is-live .field');
+          if (!f) return null;
+          const tiles = [...f.querySelectorAll('[role="radio"][data-id]')];
+          return { key: f.dataset.group, ids: tiles.map(t => t.dataset.id),
+            free: tiles.filter(t => t.getAttribute('aria-disabled') !== 'true').map(t => t.dataset.id),
+            on: tiles.find(t => t.getAttribute('aria-checked') === 'true')?.dataset.id };
+        });
+        const g0 = await read();
+        if (!g0 || !g0.ids.length) { fault('arrow-order', `${lang} ${w}x${h} ${step}: no first group with tiles — nothing to walk`); continue; }
+        walkedSteps++;
+        const want = [];
+        const at = g0.free.indexOf(g0.on);
+        for (let k = 1; k < g0.free.length; k++) want.push(g0.free[(at + k) % g0.free.length]);
+        const got = [];
+        for (let k = 0; k < want.length; k++) {
+          await pg.evaluate(() => document.querySelector('.stage__arrow--next').click());
+          await pg.waitForTimeout(160);
+          const dlg = await pg.evaluate(() => {
+            const d = document.querySelector('#confirm');
+            if (!d || !d.open) return false;
+            const y = document.querySelector('#confirm-yes');
+            (y && !y.hidden ? y : document.querySelector('#confirm-ok')).click();
+            return true;
+          });
+          if (dlg) { asked++; await pg.waitForTimeout(200); }
+          const gk = await read();
+          got.push(gk && gk.on);
+          presses++;
+        }
+        const n = Math.min(got.length, want.length);
+        const bad = got.slice(0, n).findIndex((id, i) => id !== want[i]);
+        if (bad >= 0) fault('arrow-order', `${lang} ${w}x${h} ${step}: press ${bad + 1} landed on "${got[bad]}", the next tile drawn is "${want[bad]}" — `
+          + `drawn order ${g0.free.join(' ')}, walked ${got.join(' ')}`);
+        /* and back one */
+        const g1 = await read();
+        await pg.evaluate(() => document.querySelector('.stage__arrow--prev').click());
+        await pg.waitForTimeout(160);
+        await pg.evaluate(() => { const d = document.querySelector('#confirm'); if (d && d.open) document.querySelector('#confirm-yes:not([hidden]), #confirm-ok')?.click(); });
+        await pg.waitForTimeout(160);
+        const g2 = await read();
+        presses++;
+        const free1 = g1.free, i1 = free1.indexOf(g1.on);
+        const back = free1[(i1 - 1 + free1.length) % free1.length];
+        if (free1.length > 1 && g2.on !== back) fault('arrow-order', `${lang} ${w}x${h} ${step}: "prev" from "${g1.on}" landed on "${g2.on}", the tile drawn before it is "${back}"`);
+      }
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('arrow-order', `${lang} ${w}x${h}: chromium died during the walk`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (walkedSteps < 14) fault('arrow-order', `only ${walkedSteps} of 14 steps walked — this check is measuring less than it says`);
+  if (faults === before) console.log(`    ${presses} presses over ${walkedSteps} steps in two languages: every "next" the next free tile drawn, wrapping, every "prev" the one before (${asked} presses asked first and were answered yes)`);
+}
+
+/* ── THE WINDOW DESIGNS: REGULAR, THEN SPECIAL, EACH ONE'S TWO COLOURS TOGETHER
+   28.9.2026, the owner's son: *"Put the expensive window designs apart from the
+   regular ones, and keep the same designs in different colours near each
+   other."* On the glass step, in Hebrew and Russian: exactly two headings; the
+   first group every design the list prices at nothing, the second every one it
+   prices at something, its heading carrying that surcharge; every `-light`
+   twin drawn directly after its black design; every design drawn once. */
+{
+  console.log('\nthe window designs: regular, then special, each design\'s two colours together');
+  const before = faults;
+  let read = 0;
+  const priced = new Set(GRILLES.filter(o => o.delta).map(o => o.id));
+  for (const lang of ['he', 'ru']) {
+    const pg = await b.newPage({ viewport: { width: 1280, height: 720 } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&w=rect`);
+      await pg.waitForTimeout(400);
+      await pg.evaluate(() => document.querySelector('.steps__step[data-step="glass"]')?.click());
+      await pg.waitForTimeout(300);
+      const seq = await pg.evaluate(() => [...(document.querySelector('.field[data-group="grille"] .field__opts')?.children || [])]
+        .map(e => e.classList.contains('opts__sub') ? `#${e.textContent.trim()}` : e.dataset.id).filter(Boolean));
+      if (!seq.length) { fault('grille-groups', `${lang}: no grille field on the glass step — nothing to check`); continue; }
+      read++;
+      const heads = seq.map((x, i) => [x, i]).filter(([x]) => x.startsWith('#'));
+      if (heads.length !== 2 || heads[0][1] !== 0) { fault('grille-groups', `${lang}: ${heads.length} headings (${heads.map(h => h[0]).join(' | ')}) — two, the first on top`); continue; }
+      const g1 = seq.slice(1, heads[1][1]), g2 = seq.slice(heads[1][1] + 1);
+      if (g1.some(id => priced.has(id)) || g2.some(id => !priced.has(id))) fault('grille-groups', `${lang}: the groups are not split on price — regular [${g1}] special [${g2}]`);
+      const all = [...g1, ...g2];
+      if (all.length !== GRILLES.length || new Set(all).size !== all.length) fault('grille-groups', `${lang}: ${all.length} designs drawn for ${GRILLES.length} in the list, or one drawn twice`);
+      for (let i = 0; i < all.length; i++) {
+        if (!/-light$/.test(all[i])) continue;
+        if (all[i - 1] !== all[i].replace(/-light$/, '')) fault('grille-groups', `${lang}: "${all[i]}" is drawn after "${all[i - 1]}", not beside its black design`);
+      }
+      if (!/\d/.test(heads[1][0])) fault('grille-groups', `${lang}: the special designs' heading "${heads[1][0]}" names no surcharge`);
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('grille-groups', `${lang}: chromium died`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (read < 2) fault('grille-groups', `only ${read} of 2 languages read`);
+  if (faults === before) console.log(`    ${read} languages: two headings, the included designs then the priced ones with the surcharge in the heading, every door-colour twin beside its black design`);
+}
+
+/* ── THE BAND STANDS ON THE PHOTOGRAPH, OVER THE DOOR AND ON NOTHING ELSE ──
+   28.9.2026 — *"The header of the section needs to be on the image and closer
+   to the door."* Measured the day it moved, at every size, in the three
+   languages, on the default door's first step (its longest title in Russian is
+   the colour's) and on the grip step (the longest option name):
+     · OUT OF THE FLOW: absolute, inside the stage's box — its top never above
+       the stage's top, so it is on the picture and not over the page's title;
+     · OVER THE DOOR: its foot 8 px above the casing's head (≥ 7.5 after
+       rounding), and never on `#frame`;
+     · ON NOTHING ELSE: no wall control, price, arrow or navigator column
+       touches it — `placeBand` gives it only the span between them;
+     · CENTRED on the door wherever its span lets it be, and otherwise moved
+       off the door's centre only as far as that span requires.
+   ⚠ ONE NAMED READING, asserted STILL NEEDED: at 320x568 the stage is too
+   short for the band over the two tallest doors (the crop would have wanted
+   351 units there and the desktop could give 272 before its leaf shrank), so
+   the band keeps the stage's top and its gap to the casing narrows — to more
+   than 2 px, never onto it. The day the gap is 7.5 there, this fails. */
+{
+  console.log('\nthe band stands on the photograph, over the door and on nothing else');
+  const before = faults;
+  const NARROW = new Set(['320x568 extra2', '320x568 halfextra2']);
+  let read = 0; const narrowSeen = new Set(); const offCentre = [];
+  const bandAt = async (pg) => pg.evaluate(() => {
+    const R = e => { const r = e.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height }; };
+    const band = document.querySelector('.stage__band'), stage = document.querySelector('#stage');
+    const fr = document.querySelector('.door-svg #frame');
+    if (!band || !stage || !fr || !band.getClientRects().length) return null;
+    const bb = fr.getBBox(), M = fr.getScreenCTM();
+    const a = new DOMPoint(bb.x, bb.y).matrixTransform(M), z = new DOMPoint(bb.x + bb.width, bb.y + bb.height).matrixTransform(M);
+    const others = [...document.querySelectorAll('.stage__hud .hud__slot, #quote, .stage__arrow, .stage-wrap > .steps')]
+      .filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden')
+      .map(e => ({ n: e.id || e.className.split(' ')[0], r: R(e) }));
+    const t = band.querySelector('[data-band-title]'), n = band.querySelector('[data-band-now]');
+    /* the span's two edges, derived here the way the page must have: the
+       stage's inset and every control on the band's own rows */
+    const bb0 = band.getBoundingClientRect(), st0 = stage.getBoundingClientRect(), cx0 = (a.x + z.x) / 2;
+    let L = st0.left + 8, Rr = st0.right - 8;
+    for (const o of others) {
+      if (o.r.bottom <= bb0.top || o.r.top >= bb0.bottom) continue;
+      if (o.r.right <= cx0) L = Math.max(L, o.r.right + 8); else if (o.r.left >= cx0) Rr = Math.min(Rr, o.r.left - 8);
+    }
+    return { band: R(band), stage: R(stage), frame: { left: a.x, top: a.y, right: z.x, bottom: z.y }, others, L, Rr,
+      pos: getComputedStyle(band).position, inWrap: band.parentElement === document.querySelector('.stage-wrap'),
+      span: parseFloat(band.style.getPropertyValue('--band-w')),
+      clipped: t.scrollWidth > t.clientWidth + 1 || n.scrollWidth > n.clientWidth + 1,
+      text: `${t.textContent} · ${n.textContent}` };
+  });
+  const area = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
+  for (const v of VIEWS) for (const lang of ['he', 'en', 'ru']) for (const size of Object.keys(SIZES)) {
+    const pg = await b.newPage({ viewport: { width: v.w, height: v.h } });
+    try {
+      /* a bare load opens step 01; the size is chosen by a tap, so the
+         customer's first view is the one measured */
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
+      await pg.waitForTimeout(500);
+      if (size !== 'standard') {
+        await pg.evaluate(id => document.querySelector(`.field[data-group="size"] [data-id="${id}"]`)?.click(), size);
+        await pg.waitForTimeout(450);
+      }
+      for (const step of ['first', 'grip']) {
+        if (step === 'grip') {
+          await pg.evaluate(() => document.querySelector('.steps__step[data-step="grip"]')?.click());
+          await pg.waitForTimeout(450);
+        }
+        const m = await bandAt(pg);
+        const tag = `${lang} ${v.w}x${v.h} ${size} ${step}`;
+        if (!m) { fault('band-photo', `${tag}: no band on the page — this check has lost its subject`); continue; }
+        read++;
+        if (m.pos !== 'absolute' || !m.inWrap) fault('band-photo', `${tag}: the band is ${m.pos}${m.inWrap ? '' : ' and not in the wrap'} — it is in the flow again, and its height comes out of the door`);
+        if (m.band.top < m.stage.top - 0.5) fault('band-photo', `${tag}: the band's top is ${(m.stage.top - m.band.top).toFixed(1)} px above the stage — off the picture`);
+        const onFrame = area(m.band, m.frame);
+        const gap = m.frame.top - m.band.bottom;
+        const key = `${v.w}x${v.h} ${size}`;
+        if (onFrame) fault('band-photo', `${tag}: the band stands on the door — ${onFrame} px² of it on #frame`);
+        else if (NARROW.has(key)) { if (gap < 7.5) narrowSeen.add(key); if (gap < 2) fault('band-photo', `${tag}: the named narrow gap is ${gap.toFixed(1)} px — it may narrow, not close`); }
+        else if (gap < 7.5) fault('band-photo', `${tag}: the band's foot is ${gap.toFixed(1)} px above the casing, not 8`);
+        for (const o of m.others) {
+          const x = area(m.band, o.r);
+          if (x) fault('band-photo', `${tag}: the band is on the ${o.n} (${x} px², "${m.text}")`);
+        }
+        const doorC = (m.frame.left + m.frame.right) / 2, bandC = (m.band.left + m.band.right) / 2;
+        /* off-centre is allowed only where centring would cross an edge of its
+           span — so the band abuts that edge. ⚠ RESTATED 28.9 (commit 5): it
+           asked "does the band fill its span", which is the special case of a
+           span symmetric about the door; with the save alone in its corner the
+           phone's span became asymmetric and roomy, and 11 correct placements
+           read as faults. */
+        const abuts = Math.abs(m.band.left - m.L) < 1.5 || Math.abs(m.band.right - m.Rr) < 1.5;
+        if (Math.abs(bandC - doorC) > 1.5 && !abuts) fault('band-photo', `${tag}: the band is ${(bandC - doorC).toFixed(1)} px off the door's centre and touches neither edge of its span`);
+        if (Math.abs(bandC - doorC) > 1.5) offCentre.push(tag);
+      }
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('band-photo', `${v.name} ${lang} ${size}: chromium died before the band was measured`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  for (const k of NARROW) if (!narrowSeen.has(k)) fault('band-photo', `${k}: the named narrow gap is gone — the band clears the casing by 8 px there now; remove it from NARROW`);
+  const want = VIEWS.length * 3 * Object.keys(SIZES).length * 2;
+  if (read < want) fault('band-photo', `read ${read} of ${want} bands — this check is measuring less than it says`);
+  if (faults === before) console.log(`    ${read} readings over ${VIEWS.length} viewports x three languages x ${Object.keys(SIZES).length} sizes x two steps: absolute, inside the stage, its foot 8 px above the casing on all but the named narrow pair at 320 (gap > 2), on no wall control, price, arrow or column; centred on the door on ${read - offCentre.length}, moved only as far as its span requires on ${offCentre.length}`);
 }
 
 /* ── THE NAVIGATOR IS A DARK COLUMN, AND ITS CHECKS ARE WHAT YOU WALKED ───
@@ -6014,6 +6772,22 @@ for (const v of VIEWS) {
    Hebrew, right in English), on ink, nine targets whole in the panel and ≥ 44,
    never scrolling; the live one a light square, the rest on the ground. Below
    1100: the fixed row keeps its 62 px and takes the same look.
+   ⚠ RESTATED 28.9.2026 — the column is ON THE PHOTOGRAPH now (the owner's son:
+   *"…not endless, but just the size it needs to host all the section icons, a
+   little separated from the options choosing thing, the image needs to be
+   behind it"*). Same subjects, new place: above 1100 it is a child of
+   `.stage-wrap`, inside the stage's box and outside the panel's; 12 px off the
+   stage's panel-facing edge (inline-START — the panel is the grid's first
+   column in both directions); centred on the door's mid-height unless the wall
+   chrome on its side pushes it down (`--steps-top`); its OWN ink, its height
+   its content; the panel paints no stripe any more and reserves its scrollbar
+   lane (`scrollbar-gutter: stable`) so the tiles stop shifting between a step
+   that scrolls and one that does not. And a WALL gate, measured the day it
+   moved at every size and seven desktop widths in both directions: the column
+   touches no door (`#frame`), no arrow, no wall control, and stands inside the
+   stage — nothing to name. (The price card covered its top in Hebrew at
+   1100–1152 on that day; the card leaves that corner in commit 4 and the
+   price's own clause says so.)
    And the checks: exactly the steps LEFT by a gesture, never derived from the
    door — so on arrival there are none, after two presses of the way on there
    are two, a rail tap adds the one it leaves, the URL does not move, and a
@@ -6038,17 +6812,34 @@ for (const v of VIEWS) {
         const nav = document.querySelector('.steps'), pn = document.querySelector('.panel--choose');
         if (!nav || !pn) return null;
         const r = nav.getBoundingClientRect(), P = pn.getBoundingClientRect();
+        const W = document.querySelector('.stage-wrap').getBoundingClientRect();
+        const S = document.querySelector('#stage').getBoundingClientRect();
         const rtl = document.documentElement.dir === 'rtl';
         const steps = [...nav.querySelectorAll('.steps__step')];
-        const vis = innerWidth >= 1100 ? P : { top: 0, bottom: innerHeight, left: 0, right: innerWidth };
+        const vis = innerWidth >= 1100 ? W : { top: 0, bottom: innerHeight, left: 0, right: innerWidth };
         const circ = s => getComputedStyle(s.querySelector('.steps__c')).backgroundColor;
+        const f = document.querySelector('.door-svg #frame')?.getBoundingClientRect();
+        const ov = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
+        const hits = [];
+        if (f && ov(r, f)) hits.push(`the door ${ov(r, f)} px²`);
+        for (const a of document.querySelectorAll('.stage__arrow')) if (ov(r, a.getBoundingClientRect())) hits.push(`an arrow ${ov(r, a.getBoundingClientRect())} px²`);
+        for (const a of document.querySelectorAll('.stage__hud .hud__slot')) if (ov(r, a.getBoundingClientRect())) hits.push(`a wall control ${ov(r, a.getBoundingClientRect())} px²`);
+        const push = parseFloat(getComputedStyle(document.querySelector('.stage-wrap')).getPropertyValue('--steps-top'));
         return {
           n: steps.length,
           column: getComputedStyle(nav).flexDirection === 'column',
           width: Math.round(r.width), height: Math.round(r.height),
-          /* the door-facing edge: inline-end of the panel */
-          edge: Math.round(rtl ? r.left - P.left : P.right - r.right),
-          groundDesk: getComputedStyle(pn).backgroundImage.includes(INK),
+          /* ON THE PHOTOGRAPH (28.9): a child of the wrap, inside the stage's box, clear of the panel's */
+          onPhoto: nav.parentElement === document.querySelector('.stage-wrap')
+            && r.left >= S.left - 1 && r.right <= S.right + 1 && (r.right <= P.left || r.left >= P.right),
+          /* 12 px off the stage's panel-facing edge: inline-START of the wrap */
+          edge: Math.round(rtl ? W.right - r.right : r.left - W.left),
+          /* centred on the door's middle, or pushed DOWN by the wall chrome (never up) */
+          midOff: f ? Math.round((r.top + r.bottom) / 2 - (f.top + f.bottom) / 2) : null,
+          hits, inWrap: r.top >= W.top - 1 && r.bottom <= W.bottom + 1,
+          ownInk: getComputedStyle(nav).backgroundColor === INK,
+          stripe: getComputedStyle(pn).backgroundImage.includes(INK),
+          gutter: getComputedStyle(pn).scrollbarGutter,
           groundPhone: getComputedStyle(pn, '::before').backgroundColor,
           scrolls: nav.scrollHeight > nav.clientHeight + 1,
           whole: steps.every(s => { const b = s.getBoundingClientRect();
@@ -6061,14 +6852,20 @@ for (const v of VIEWS) {
         };
       }, [INK]);
       const a = await look();
-      if (!a || a.n !== 9) { fault('nav-column', `${tag}: ${a ? a.n : 'no'} navigator marks — this check has no subject`); continue; }
+      if (!a || a.n !== STEPS) { fault('nav-column', `${tag}: ${a ? a.n : 'no'} navigator marks — this check has no subject`); continue; }
       readings++;
       const wide = w >= 1100;
       if (wide) {
         if (!a.column || a.width > 60) fault('nav-column', `${tag}: the navigator is ${a.column ? '' : 'not '}a column, ${a.width} px wide — it should be a column of at most 60 px`);
-        if (a.edge > 4) fault('nav-column', `${tag}: the column stands ${a.edge} px in from the panel's door-facing edge — it belongs on that edge`);
-        if (!a.groundDesk) fault('nav-column', `${tag}: the panel paints no ink stripe behind the column`);
-        if (a.scrolls) fault('nav-column', `${tag}: the column scrolls — nine 44 px targets fit every desktop panel`);
+        if (!a.onPhoto) fault('nav-column', `${tag}: the column is not on the photograph — it should be a child of .stage-wrap, inside the stage and clear of the panel`);
+        if (Math.abs(a.edge - 12) > 2) fault('nav-column', `${tag}: the column stands ${a.edge} px in from the stage's panel-facing edge — 12 px off it`);
+        if (a.midOff === null || a.midOff < -2) fault('nav-column', `${tag}: the column's middle is ${a.midOff} px from the door's — it is centred on it, or pushed down, never up`);
+        if (a.hits.length) fault('nav-column', `${tag}: the column stands on ${a.hits.join(', ')}`);
+        if (!a.inWrap) fault('nav-column', `${tag}: the column leaves the stage at its top or foot`);
+        if (!a.ownInk) fault('nav-column', `${tag}: the column is not its own ink rectangle`);
+        if (a.stripe) fault('nav-column', `${tag}: the panel still paints an ink stripe — the column is not on it any more`);
+        if (a.gutter !== 'stable') fault('nav-column', `${tag}: the panel's scrollbar lane is "${a.gutter}", not reserved — the tiles shift between steps that scroll and steps that do not`);
+        if (a.scrolls) fault('nav-column', `${tag}: the column scrolls — its targets fit`);
       } else {
         if (a.column || a.height < 58 || a.height > 64) fault('nav-column', `${tag}: the phone navigator is ${a.column ? 'a column' : 'a row'} ${a.height} px tall — it keeps its 62 px row`);
         if (a.groundPhone !== INK) fault('nav-column', `${tag}: the phone row's ground is ${a.groundPhone}, not the ink`);
@@ -6106,7 +6903,31 @@ for (const v of VIEWS) {
     } finally { await pg.close().catch(() => {}); }
   }
   if (readings < 6) fault('nav-column', `only ${readings} of 6 viewports were read — this check is measuring almost nothing`);
-  if (faults === before) console.log(`    ${readings} viewports: a dark column on the door-facing edge above 1100 (a dark row below), nine whole ≥44 px targets, the live one a light square; checks on exactly the steps walked, none on arrival or after a reload, the address unmoved`);
+  /* THE WALL GATE, every size at every desktop width, both directions (28.9):
+     the column on no door, no arrow, no wall control, inside the stage. */
+  let wallRead = 0;
+  for (const [w, h] of [[1100, 800], [1152, 800], [1280, 720], [1440, 900], [1920, 918]]) for (const lang of ['he', 'en']) for (const size of Object.keys(SIZES)) {
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=${size}`);
+      await pg.waitForTimeout(450);
+      const m = await pg.evaluate(() => {
+        const n = document.querySelector('.stage-wrap > .steps'); if (!n) return null;
+        const r = n.getBoundingClientRect(), W = document.querySelector('.stage-wrap').getBoundingClientRect();
+        const ov = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
+        const on = [['the door', document.querySelector('.door-svg #frame')], ...[...document.querySelectorAll('.stage__arrow')].map(e => ['an arrow', e]),
+                    ...[...document.querySelectorAll('.stage__hud .hud__slot')].map(e => ['a wall control', e])]
+          .map(([k, e]) => [k, e ? ov(r, e.getBoundingClientRect()) : 0]).filter(([, o]) => o);
+        return { on, inWrap: r.top >= W.top - 1 && r.bottom <= W.bottom + 1 };
+      });
+      if (!m) { fault('nav-column', `${lang} ${w}x${h} ${size}: no column on the photograph — the wall gate has no subject`); continue; }
+      wallRead++;
+      if (m.on.length) fault('nav-column', `${lang} ${w}x${h} ${size}: the column stands on ${m.on.map(([k, o]) => `${k} (${o} px²)`).join(', ')}`);
+      if (!m.inWrap) fault('nav-column', `${lang} ${w}x${h} ${size}: the column leaves the stage`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (wallRead < 5 * 2 * Object.keys(SIZES).length) fault('nav-column', `the wall gate read ${wallRead} of ${5 * 2 * Object.keys(SIZES).length} doors`);
+  if (faults === before) console.log(`    ${readings} viewports: a dark column on the photograph above 1100 (a dark row below), ${STEPS} whole ≥44 px targets, the live one a light square; checks on exactly the steps walked, none on arrival or after a reload, the address unmoved; ${wallRead} doors × widths × directions with the column on no door, arrow or wall control`);
 }
 
 /* ── THE HANDLE FINISH IS ON THE PAGE ONLY WHERE IT PAINTS SOMETHING ──────
@@ -6129,7 +6950,11 @@ for (const v of VIEWS) {
   let asked = 0;
   for (const [q, want, what] of [['', false, 'no pull handle'], ['&n=idan', true, 'an Idan'],
        ['&n=channel', false, 'the recessed channel'], ['&gb=grab', true, 'the bow'],
-       ['&bl=bell', true, 'the doorbell']]) {
+       /* ⚠ RESTATED 28.9.2026: a bell ALONE hides it now (*"the option to
+          choose a colour for a pull handle opens only when there is a pull
+          handle on the door"* — reversing the 27.9 extension we had made), and
+          a bell beside a bar still shows it. */
+       ['&bl=bell', false, 'a doorbell alone'], ['&bl=bell&n=idan', true, 'a doorbell beside an Idan']]) {
     await pg.goto(`file://${process.cwd()}/index.html?lang=he${q}`);
     await pg.waitForTimeout(300);
     await toGrip();
@@ -6156,8 +6981,19 @@ for (const v of VIEWS) {
         + `it should be ${want ? 'shown' : 'hidden'}; the rule ran when the tiles were built, not on the paint`);
     }
   }
+  /* and a link carrying a gold finish with nothing but a bell: the finish goes
+     home to nickel, and the page SAYS so — a link that changes its price in
+     silence is §0's worst failure */
+  await pg.goto(`file://${process.cwd()}/index.html?lang=he&bl=bell&hf=hf-gold`);
+  await pg.waitForTimeout(400);
+  /* read off the door's CODE — the address is not rewritten on arrival */
+  const home = await pg.evaluate(() => ({ code: document.querySelector('#code')?.textContent || '', notice: !document.querySelector('#notice')?.hidden && (document.querySelector('#notice')?.textContent || '') }));
+  asked++;
+  const hfNow = decodeCode(home.code)?.handleFinish;
+  if (hfNow !== 'hf-nickel') fault('finish-group', `a bell alone with hf=hf-gold kept the ${hfNow} finish (code ${home.code}) — nothing on the door can wear it`);
+  if (!home.notice) fault('finish-group', 'a bell alone with hf=hf-gold came back nickel WITHOUT a notice — a link changed its price in silence');
   await pg.close();
-  if (faults === before) console.log(`    ${asked} readings: hidden with nothing to paint, shown with a bar, the bow or the bell, by link and by tap`);
+  if (faults === before) console.log(`    ${asked} readings: hidden with nothing to paint and beside a bell alone, shown with a bar or the bow (a bell beside one too), by link and by tap; a stale gold finish on a lone bell comes home to nickel with a notice`);
 }
 
 /* ── THE פרזול TILES ARE THIS DOOR'S — 27.9.2026 ───────────────────────────
@@ -6260,7 +7096,11 @@ for (const v of VIEWS) {
      21.6 px shorter, and `extra1`'s 7 px² at 360 went to 0 at every width —
      reported by this check's own "still needed" clause. It is gated with the
      standard door now, at every width. */
-  const CLEARS = ['standard', 'extra1'];
+  /* ⚠ AND `half` JOINED THEM ON 28.9: the band went onto the photograph and
+     the crop took 202 units more wall above the door (`FIT_TRIM`), so every
+     door stands lower under the wall's top row — `half` read 0 at every phone
+     width in both languages, reported by the "still needed" clause below. */
+  const CLEARS = ['standard', 'extra1', 'half'];
   const CLEAR = CLEARS[0];
   const KNOWN = ALL.filter(s => !CLEARS.includes(s));   // the exemption, asserted below
   /* ⚠ AND ONE NAMED READING AT 1152, NEW THE SAME DAY, WITH ITS NUMBER — the
@@ -6275,7 +7115,10 @@ for (const v of VIEWS) {
      was re-cut to fit the wall (css/app.css, `.lang`), and the Hebrew reading
      came in under what was named — so the name follows it down. `ru` reads 18
      and stays named at 15, inside this check's +10: re-measured, never widened. */
-  const WIDE_KNOWN = { 'he 1152x800 halfextra2': 17, 'ru 1152x800 halfextra2': 15 };
+  /* ⚠ EMPTY SINCE 28.9 — the same crop put the widest double's head below the
+     picker at 1152, and both readings went to 0 (their "no longer" clause said
+     so). The machinery is kept so the next one is named the same way. */
+  const WIDE_KNOWN = {};
   const wideSeen = {};
   let measured = 0;
   const seen = {};
@@ -6384,26 +7227,40 @@ for (const v of VIEWS) {
     }
   }
   if (faults === before) {
-    console.log(`    ${measured} readings in two languages: the standard door's and extra1's wall chrome `
-      + 'never touches them, no size is touched at 1152 px and up but the two named readings '
-      + `(${Object.entries(wideSeen).map(([k, v]) => `${k} ${v}`).join(', ')}), and the four doors §9 names are still `
-      + `the four that overlap (worst px² of glyph, he/ru: `
+    console.log(`    ${measured} readings in two languages: the wall chrome never touches the ${CLEARS.join(', ')} doors, `
+      + `no size is touched at 1152 px and up${Object.keys(wideSeen).length ? ` but the named readings (${Object.entries(wideSeen).map(([k, v]) => `${k} ${v}`).join(', ')})` : ''}, `
+      + `and the ${KNOWN.length} doors §9 names are still the ones that overlap (worst px² of glyph, he/ru: `
       + KNOWN.map(s => `${s} ${seen[s].he}/${seen[s].ru}`).join(', ') + ')');
   }
 }
 
-/* ── THE PRICE CARD STAYS INSIDE THE PICTURE IT IS PINNED TO ─────────────
-   ⚠ RESTATED 27.9.2026 FOR A NEW ANCHOR, SAME SUBJECT. The card hung under the
-   right-hand lamp (below); the owner's son moved it — *"it looks bad under the
-   lamp, move to near the door, at the up right corner"* — to the door's head
-   corner: `left: calc(var(--frame-right) + 8px)`, `top: max(var(--frame-top),
-   var(--hud-b) + 8px)`, no translate. The three clauses below keep their
-   subject (whole where the wall holds it; never on the leaf; the breakdown
-   centred on it) and a FOURTH asserts the anchor itself, because a card
-   quietly drifting back to the lamp would pass the other three. Every reading
-   now waits for the page's finite animations first: `#frame`'s own arrival is
-   a 6 px translate, and a card placed during it was placed by it (§7 — the
-   page reads the frame's settled geometry for exactly that reason).
+/* ── THE PRICE STANDS ON THE PHOTOGRAPH, LEFT OF THE DOOR, AND ON NOTHING ──
+   ⚠ RESTATED 28.9.2026 FOR A THIRD ANCHOR, SAME SUBJECTS. The owner's son:
+   *"The price bigger and not on a white thing but directly on the image …
+   Move the WhatsApp button with the price to the left of the door, between the
+   door and the lamp, on the higher end."* It was a paper card at the door's
+   top-right corner (27.9) and under the right-hand lamp before that (28.8).
+   Now there is no card: the figure and a line of ink under it, anchored
+   PHYSICALLY — `right` 8 px outside the casing's LEFT edge, `top` at the
+   casing's head or 8 px under the wall chrome. The clauses keep their subject
+   and are asked of the new anchor:
+     1 whole where the wall can hold it — the wall is the LEFT one now;
+     2 never on the door, at any reading (ungated, §5.22);
+     3 its breakdown centred on the FIGURE (its anchor since the caption went),
+       or moved inboard by exactly what keeps it 8 px inside the stage — every
+       such reading is NAMED in the summary line, and a shift that is not the
+       clamp is a fault;
+     4 the anchor itself, so a price drifting back to the right would fail;
+   and three are new:
+     5 never under the picker, an arrow, the navigator column or the band;
+     6 READABLE ON THE PICTURE: with its ink made transparent, the photograph
+       under the figure's box and the send's is sampled and its darkest 5 %
+       held to 4.5:1 against `--ink` — at every reading of the standard door
+       (the picture behind the price does not change with the door's size,
+       only its position does, and the sizes are swept for placement);
+     7 the language picker stands at the stage's physical top-RIGHT in all
+       three languages (the price took the left; in English and Russian the
+       picker was there).
 
    Measured 14.9 by walking as the customer who has a QUESTION halfway through
    — the one who taps the quiet send from a question step rather than the green
@@ -6466,17 +7323,15 @@ try {
   const SHAPES = [[1100, 800], [1152, 800], [1200, 800], [1280, 720], [1366, 768],
                   [1440, 900], [1536, 864], [1680, 950], [1920, 918]];
   const GAP = 8;                 // the same 8 px the vertical clamp keeps
-  /* The readings where the card stands on the door and that is known. EMPTY
-     since 27.9.2026: there were four (en 1100x800 halfextra2, ru 1100x800
-     halfextra1 and halfextra2, ru 1152x800 halfextra2), 1-22 px onto the leaf
-     with a 184-207 px card. The phone's send became "Send" (7b9dc43) and the
-     card is 113-142 px there now, 0 px on the door on all four — measured on
-     that commit alone, before the icon commit on top of it. The clause below
-     now fires for EVERY reading; the set stays so a future known overlap has a
-     place to be named, and the stale-exemption check still walks it. */
+  /* The readings where the price stands on the door and that is known — empty
+     since 27.9 (the four there were went with the one-word send); kept so a
+     future known overlap has a place to be named. */
   const ON_DOOR_OK = new Set();
   const stillOverlapping = new Set();
-  let room = 0, tight = [], measured = 0, popovers = 0, anchored = 0;
+  const rel = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+  const INK = 0.2126 * rel(0x1C) + 0.7152 * rel(0x1A) + 0.0722 * rel(0x17);   // --ink
+  let room = 0, tight = [], measured = 0, popovers = 0, anchored = 0, contrasts = 0, lowest = 99, lowestAt = '';
+  const shifted = [];
   const p = await b.newPage();
   for (const lang of ['he', 'en', 'ru']) {
     for (const [w, h] of SHAPES) {
@@ -6494,79 +7349,105 @@ try {
             .filter(a => a.effect && a.effect.getComputedTiming().iterations !== Infinity);
           await Promise.race([Promise.all(finite.map(a => a.finished.catch(() => {}))),
             new Promise(res => setTimeout(res, 3000))]);
-          const r = q.getBoundingClientRect(), rw = wrap.getBoundingClientRect();
-          const f = fr.getBoundingClientRect();
+          const R = e => { const r = e.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height }; };
+          const r = R(q), rw = R(wrap), f = R(fr), st = R(document.querySelector('#stage'));
           const hudB = Math.max(0, ...[...document.querySelectorAll('.stage__hud .hud__slot')]
             .map(e => e.getBoundingClientRect().bottom));
-          /* the box that actually PAINTS the card: its clipping ancestor, itself
-             inside the window. Above 1100 the page cannot scroll, so anything
-             outside this is gone rather than reachable. */
+          const ov = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
+          const under = [...document.querySelectorAll('.stage__hud .hud__slot, .stage__arrow, .stage-wrap > .steps, .stage__band')]
+            .filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden')
+            .map(e => [e.id || e.className.split(' ')[0], ov(r, R(e))]).filter(x => x[1]);
+          const langs = document.querySelector('#langs');
+          const lr = langs ? R(langs) : null;
+          /* the box that actually PAINTS the price: its clipping ancestor,
+             itself inside the window. Above 1100 the page cannot scroll. */
           const vis = { l: Math.max(rw.left, 0), r: Math.min(rw.right, innerWidth) };
-          const mid = (f.left + f.right) / 2;
-          const wall = (r.left + r.right) / 2 > mid
-            ? vis.r - f.right : f.left - vis.l;
           return {
+            pos: getComputedStyle(q).position,
+            ground: getComputedStyle(q).backgroundColor,
             card: Math.round(r.width),
-            wall: Math.round(wall),
+            wall: Math.round(f.left - vis.l),
             cut: Math.round(Math.max(0, r.right - vis.r) + Math.max(0, vis.l - r.left)),
-            onDoor: Math.round(Math.max(0, Math.min(r.right, f.right) - Math.max(r.left, f.left))),
-            /* the anchor: 8 px outside the casing's right edge, level with its
+            onDoor: ov(r, f),
+            /* the anchor: 8 px outside the casing's LEFT edge, level with its
                head or 8 px under the wall chrome, whichever is lower */
-            dx: Math.round((r.left - (f.right + 8)) * 10) / 10,
+            dx: Math.round((r.right - (f.left - 8)) * 10) / 10,
             dy: Math.round((r.top - Math.max(f.top, hudB + 8)) * 10) / 10,
-            hudClear: Math.round(r.top - hudB),
+            under,
+            picker: lr ? { right: Math.round(st.right - lr.right), left: Math.round(lr.left - st.left) } : null,
+            fig: R(q.querySelector('.send__figure')), send: R(q.querySelector('.quote__send')),
           };
         });
         const tag = `${lang} ${w}x${h} ${size}`;
-        if (!m) { fault('quote-wall', `${tag}: no price card, stage wrap or #frame on the `
+        if (!m) { fault('quote-wall', `${tag}: no price, stage wrap or #frame on the `
           + 'page — this sweep has no subject'); continue; }
         measured++;
-        /* 1 — where there is room, the card must be whole */
+        if (m.pos !== 'absolute') fault('quote-wall', `${tag}: the price is ${m.pos} — it is not on the wall`);
+        if (!/rgba\(0, 0, 0, 0\)|transparent/.test(m.ground)) fault('quote-wall', `${tag}: the price stands on a ground (${m.ground}) — "not on a white thing but directly on the image"`);
+        /* 1 — where there is room, the price must be whole */
         if (m.wall >= m.card + 2 * GAP) {
           room++;
           if (m.cut > 0) {
-            fault('quote-wall', `${tag}: ${m.cut} px of the price card is cut off by the edge `
-              + `of the stage, in a wall ${m.wall} px wide holding a ${m.card} px card. The `
-              + 'card is pinned to the lamp and nothing holds it inside the picture');
+            fault('quote-wall', `${tag}: ${m.cut} px of the price is cut off by the edge `
+              + `of the stage, in a wall ${m.wall} px wide holding a ${m.card} px price`);
           }
         } else if (m.cut > 0) {
           tight.push(`${tag} ${m.cut}px`);
         }
-        /* 4 — and it stands at the door's head corner, not under the lamp */
-        /* 1.2 px: the three published lengths are whole pixels, so rounding
-           accounts for up to 1; the 2 px of a card placed during the frame's
-           entrance (the fault `fitStage`'s settled geometry fixed) must fire */
+        /* 4 — and it stands left of the door, high */
+        /* 1.2 px: the published lengths are whole pixels, so rounding accounts
+           for up to 1; a price placed during the frame's entrance (2 px) fires */
         if (Math.abs(m.dx) > 1.2 || Math.abs(m.dy) > 1.2) {
-          fault('quote-wall', `${tag}: the price card is ${m.dx} px across and ${m.dy} px down from `
-            + 'the door\'s top-right corner (8 px outside the casing, at its head or under the wall '
+          fault('quote-wall', `${tag}: the price is ${m.dx} px across and ${m.dy} px down from `
+            + 'the door\'s top-left corner (8 px outside the casing, at its head or under the wall '
             + 'chrome) — it is not where the owner\'s son asked for it');
         } else anchored++;
-        if (m.hudClear < 0) {
-          fault('quote-wall', `${tag}: the price card reaches ${-m.hudClear} px up into the wall chrome`);
-        }
-        /* 2 — and nowhere at all may it be pulled onto the leaf */
+        /* 2 — and nowhere at all may it stand on the leaf */
         if (m.onDoor > 0) {
           if (ON_DOOR_OK.has(tag)) stillOverlapping.add(tag);
-          else fault('quote-wall', `${tag}: the price card stands ${m.onDoor} px into the door `
-            + `(${m.wall} px of wall for a ${m.card} px card). Pulling the card in off the edge `
-            + 'must not push it onto the leaf');
+          else fault('quote-wall', `${tag}: the price stands ${m.onDoor} px² on the door `
+            + `(${m.wall} px of wall for a ${m.card} px price)`);
+        }
+        /* 5 — and under nothing else on the wall */
+        for (const [n, x] of m.under) fault('quote-wall', `${tag}: the price and the ${n} overlap by ${x} px²`);
+        /* 7 — the picker at the top right, physically */
+        if (!m.picker) fault('quote-wall', `${tag}: no #langs on the wall — the picker clause has no subject`);
+        else if (m.picker.right > 16 || m.picker.left < m.picker.right) {
+          fault('quote-wall', `${tag}: the language picker stands ${m.picker.right} px from the stage's right `
+            + `edge and ${m.picker.left} from its left — it belongs top-RIGHT in every language`);
+        }
+        /* 6 — readable on the picture: the standard door at every shape */
+        if (size === 'standard') {
+          await p.addStyleTag({ content: '.quote .send__figure, .quote .send__chev, .quote .quote__send '
+            + '{ color: transparent !important; text-decoration-color: transparent !important; } '
+            + '.quote .quote__ico { visibility: hidden !important; }' });
+          await p.waitForTimeout(60);
+          for (const [k, bx] of [['figure', m.fig], ['send', m.send]]) {
+            const x0 = Math.max(0, bx.left), clip = { x: x0, y: Math.max(0, bx.top),
+              width: Math.max(1, Math.min(bx.right, w) - x0), height: Math.max(1, bx.height) };
+            await p.screenshot({ path: '/tmp/audit-price-ground.png', clip });
+            const im = load('/tmp/audit-price-ground.png');
+            const ls = [];
+            for (let i = 0; i < im.d.length; i += 4) ls.push(0.2126 * rel(im.d[i]) + 0.7152 * rel(im.d[i + 1]) + 0.0722 * rel(im.d[i + 2]));
+            ls.sort((a2, c2) => a2 - c2);
+            const cr = (ls[Math.floor(ls.length * 0.05)] + 0.05) / (INK + 0.05);
+            contrasts++;
+            if (cr < lowest) { lowest = cr; lowestAt = `${tag} ${k}`; }
+            if (cr < 4.5) fault('quote-wall', `${tag}: the ${k} is ink on a picture whose darkest 5 % reads `
+              + `${cr.toFixed(2)}:1 against it — under 4.5, so it needs a wash there (css/app.css, \`.quote\`)`);
+          }
         }
       }
-      /* 3 — and the popover that hangs off the card is centred on it */
-      await p.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=standard`);
+      /* 3 — and the breakdown hangs centred on the figure, or held inside */
+      await p.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=halfextra2`);
       await p.waitForTimeout(260);
       const bd = await p.evaluate(async () => {
         const t = document.querySelector('#price-toggle');
         if (!t) return null;
         t.click();
-        /* ⚠ NOT A FIXED WAIT — 27.9.2026. This slept 240 ms and measured, and
-           the breakdown's `fitPart` entrance was still running then: re-read
-           five times at 1920x918 it came back 0.5-3.8 px off, 9.7 once under
-           the audit's load (a fault), and exactly 0 in every language once the
-           animation had finished. §7: an instrument that measures during an
-           animation measures the animation. So: two frames for the animations
-           to start, then every finite one must finish — and one that never
-           does inside three seconds is a fault of its own. */
+        /* ⚠ NOT A FIXED WAIT — 27.9.2026: two frames for the animations to
+           start, then every finite one must finish (§7: an instrument that
+           measures during an animation measures the animation). */
         await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
         const finite = document.getAnimations()
           .filter(a => a.effect && a.effect.getComputedTiming().iterations !== Infinity);
@@ -6574,55 +7455,63 @@ try {
           Promise.all(finite.map(a => a.finished.catch(() => {}))).then(() => true),
           new Promise(r => setTimeout(() => r(false), 3000))]);
         if (!settled) return { unsettled: true };
-        const b = document.querySelector('#breakdown'), q = document.querySelector('.quote');
-        if (!b || !q) return null;
-        const rb = b.getBoundingClientRect(), rq = q.getBoundingClientRect();
+        /* the figure's own button (the figure and its chevron) is what it
+           hangs from and what a customer tapped */
+        const bx = document.querySelector('#breakdown'), fig = document.querySelector('#price-toggle');
+        const wrap = document.querySelector('.stage-wrap');
+        if (!bx || !fig || !wrap) return null;
+        const rb = bx.getBoundingClientRect(), rf = fig.getBoundingClientRect(), rw = wrap.getBoundingClientRect();
         if (!rb.width) return { shut: true };
-        return { off: Math.round(((rb.left + rb.right) / 2 - (rq.left + rq.right) / 2) * 10) / 10 };
+        const lo = Math.max(rw.left, 0) + 8, hi = Math.min(rw.right, innerWidth) - 8;
+        return { off: Math.round(((rb.left + rb.right) / 2 - (rf.left + rf.right) / 2) * 10) / 10,
+                 atLo: Math.abs(rb.left - lo) < 1.5, atHi: Math.abs(rb.right - hi) < 1.5,
+                 inside: rb.left >= lo - 1 && rb.right <= hi + 1 };
       });
+      const where = `${lang} ${w}x${h}`;
       if (bd && bd.unsettled) {
-        fault('quote-wall', `${lang} ${w}x${h}: the price breakdown was still animating three `
+        fault('quote-wall', `${where}: the price breakdown was still animating three `
           + 'seconds after it was opened — its placement cannot be read');
       } else if (!bd || bd.shut) {
-        fault('quote-wall', `${lang} ${w}x${h}: the price breakdown would not open, so its `
+        fault('quote-wall', `${where}: the price breakdown would not open, so its `
           + 'placement is measuring nothing');
       } else {
         popovers++;
-        if (Math.abs(bd.off) > 8) {
-          fault('quote-wall', `${lang} ${w}x${h}: the price breakdown's centre is ${bd.off} px `
-            + 'from the price card it hangs off — a logical inset with a physical transform '
-            + 'does not centre anything in RTL, and what it hangs over here is the door');
+        if (!bd.inside) fault('quote-wall', `${where}: the price breakdown leaves the stage — its edge is cut`);
+        if (Math.abs(bd.off) > 1.5) {
+          if (bd.atLo || bd.atHi) shifted.push(`${where} ${bd.off}px`);
+          else fault('quote-wall', `${where}: the price breakdown's centre is ${bd.off} px from the figure `
+            + 'it hangs off, and it is not held at the stage\'s edge either');
         }
       }
     }
   }
   await p.close();
   /* §5.15: if the wall never has room, every clause above passes by having no
-     subject — which is what a narrower card or a wider door range would do to
-     this check without anybody coming back to it. */
+     subject. */
   if (room < measured / 2) {
-    fault('quote-wall', `the wall had room for the card on only ${room} of ${measured} readings — `
+    fault('quote-wall', `the wall had room for the price on only ${room} of ${measured} readings — `
       + 'this sweep is measuring almost nothing');
   }
   if (popovers < 27) {
     fault('quote-wall', `only ${popovers} of 27 price breakdowns opened — the placement clause `
       + 'is measuring almost nothing');
   }
+  if (contrasts < 54) fault('quote-wall', `only ${contrasts} of 54 contrast readings were made`);
   /* and the exemption cannot outlive the fault */
   for (const tag of ON_DOOR_OK) {
     if (!stillOverlapping.has(tag)) {
-      fault('quote-wall', `${tag} is named as a reading where the price card stands on the door `
-        + 'and it no longer does. If the wall has been fixed, take it off the list here and out '
-        + 'of CLAUDE.md §9 — an exemption nobody removes is how a fault becomes a feature');
+      fault('quote-wall', `${tag} is named as a reading where the price stands on the door `
+        + 'and it no longer does — take it off the list here and out of CLAUDE.md §9');
     }
   }
   if (faults === before) {
     console.log(`    ${measured} readings in three languages x nine desktop widths x all six `
-      + `sizes: the price card stands at the door's head corner on ${anchored}, is whole on all ${room} `
-      + `where the wall can hold it, it stands on `
-      + `the door on ${ON_DOOR_OK.size ? `none but the ${ON_DOOR_OK.size} §9 names` : 'none'}, and its breakdown is centred on `
-      + `it in all ${popovers}. ${tight.length} cut where the wall cannot hold it (§9): `
-      + tight.slice(0, 4).join(', ') + (tight.length > 4 ? ` +${tight.length - 4} more` : ''));
+      + `sizes: the price stands left of the door, high, on no ground, on ${anchored}; whole on all ${room} `
+      + `where the wall can hold it, on the door on none, under no picker, arrow, column or band; `
+      + `the picker top-right in all three languages; the ink at least ${lowest.toFixed(1)}:1 on the picture `
+      + `(${lowestAt}, ${contrasts} readings); the breakdown centred on the figure in ${popovers - shifted.length} `
+      + `of ${popovers} and held inside the stage on ${shifted.length}${shifted.length ? ` (${shifted.join(', ')})` : ''}. `
+      + `${tight.length} cut where the wall cannot hold it${tight.length ? ': ' + tight.slice(0, 4).join(', ') + (tight.length > 4 ? ` +${tight.length - 4} more` : '') : ''}`);
   }
 } catch (e) {
   /* ⚠ THE LONGEST BLOCK IN THIS FILE AND THE LAST, so a renderer death here
@@ -6633,7 +7522,7 @@ try {
   console.log('  ⚠ chromium died during the price-card sweep — it was NOT completed');
   fault('quote-wall', 'chromium died before this sweep finished, so the price card is unchecked');
   await b.close().catch(() => {});
-  b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+  b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 }
 
 await b.close();

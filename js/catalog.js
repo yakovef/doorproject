@@ -1980,22 +1980,30 @@ export function gripFinish(state) {
 export const gripTakesFinish = state => !!byId(HANDLES, state.handle).finishes;
 
 /**
- * Is there anything on this door the pull handle's finish paints?
+ * Is there a PULL HANDLE on this door for the finish to paint?
  *
  * ⚠ ASKED BY THE PAGE, 27.9.2026 — the owner's son: *"in the section with the
  * pull handles make the color options only appear if there is a pull handle,
- * either vertical or horizontal."* The three objects are the three `price.js`
- * charges `finishExtra` on: the bar (when it takes a finish at all — the
- * channel is painted with the door), the horizontal bow, and the פעמון. The
- * bell is the one his sentence does not name; it takes this finish on
- * Peretz's 20.9 word, and hiding the choice while a bell is on the door would
- * strand its metal — a decision recorded as ours in CLAUDE.md §0a, for him to
- * reverse in a line. `npm test` holds this to the price: the group is shown
- * exactly when a finish changes what the door costs.
+ * either vertical or horizontal."* The bar (when it takes a finish at all —
+ * the channel is painted with the door) and the horizontal bow.
+ * ⚠ THE BELL WENT FROM THIS LIST ON 28.9.2026 — *"The option to choose a colour
+ * for a pull handle opens only when there is a pull handle on the door."* It
+ * had been added on 27.9 as a decision taken FOR them (a bell takes this finish
+ * on Peretz's 20.9 word, and hiding the choice would strand its metal), named
+ * in CLAUDE.md §0a for them to reverse in a line, and this is the line. So a
+ * bell ALONE wears nickel — `bellFinish` below — and a bell beside a bar or a
+ * bow still wears theirs. `npm test` holds this to the price: the group is
+ * shown exactly when a finish changes what the door costs.
  */
 export const finishHasSubject = state => gripTakesFinish(state)
-  || (state.grab || 'nograb') !== 'nograb'
-  || (state.bell || 'nobell') !== 'nobell';
+  || (state.grab || 'nograb') !== 'nograb';
+
+/** The finish the פעמון is actually made in: the pull handle's, while there is
+ *  one; nickel (the axis's first entry) when the bell is alone (28.9). One
+ *  answer for the drawing, the price and the order. */
+export const bellFinish = state => finishHasSubject(state)
+  ? byId(HANDLE_FINISHES, state.handleFinish)
+  : HANDLE_FINISHES[0];
 
 /* Aliases count: a superseded id must resolve to its replacement rather than
    silently falling through to the first entry, which is how a stale link
@@ -2042,9 +2050,10 @@ export const leafGlazed = state => glassRows(byId(WINDOWS, state.window)) > 0;
  * The narrowest side OPENING that can carry a copy of the leaf's window, in
  * millimetres of opening (not of leaf).
  *
- * A דלת וחצי side leaf mirrors the main leaf's aperture, clamped by the
- * renderer to `sideW - 240`; below this there is not enough glass left to be a
- * window at all. Both sizes that carry a side leaf declare `side: 400`, so the
+ * A דלת וחצי side leaf carries the main leaf's window as the same FRACTIONS of
+ * its own width (28.9.2026 — it was the main pane clamped to `sideW - 240`,
+ * 110 mm on every window); below this there is not enough leaf left to carry a
+ * window and its casing at all. Both sizes that carry a side leaf declare `side: 400`, so the
  * guard passes today — it is here for the day somebody adds a narrower one,
  * because this number decides HOW MANY PANELS EXIST and panels are charged
  * for now.
@@ -2124,13 +2133,16 @@ export function glazedPanels(state) {
                is:   { he: 'זיגוג קבוע', en: 'Fixed glazing',   ru: 'Глухое остекление' } });
   } else if (rows && size.side > SIDE_OPENING_MIN) {
     /* ⚠ NOT "חלון זהה". The דלת וחצי side leaf does NOT get an identical
-       window: the renderer clamps its aperture to `min(rects[0].w, sideW-240)`,
-       which comes out at 110 mm on every window in the catalogue, against a
-       leaf light of 272–425 mm. Calling it identical would put a NEW false
-       sentence into the one artefact this whole change exists to make true —
-       Peretz would build a 425 mm light in the small leaf, or ring up. It is a
-       narrow matching light, and whether it is even a full panel of ironwork
-       at 110 mm is a question for Peretz: ASK-PERETZ.md §4b. */
+       window: it takes the main light's FRACTIONS of its own 350 mm width
+       (28.9.2026; until then a clamp gave 110 mm on every window) — the square
+       window 148 mm against the leaf's 359–464, the slot 86–112 against 272.
+       Calling it identical would put a NEW false sentence into the one
+       artefact this whole change exists to make true — Peretz would build a
+       full-size light in the small leaf, or ring up. It is a narrow matching
+       light, and whether it is even a full panel of ironwork at that width is
+       a question for Peretz — behind ASK-PERETZ.md §0g (A18), whether his
+       דו כנפי has a narrow fixed leaf at all. (This cited a §4b that the file
+       no longer has.) */
     out.push({ id: 'side', panes: 1,
                name: { he: 'הכנף הצדדית',  en: 'Side leaf',        ru: 'Боковая створка' },
                at:   { he: 'בכנף הצדדית', en: 'in the side leaf', ru: 'в боковой створке' },

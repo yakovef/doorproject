@@ -52,7 +52,7 @@
  */
 
 import { T } from './copy.js';
-import { byId, DETAILS, glassRows, GRILLES, HANDLES, isGlazed, leafGlazed, LOCKSETS,
+import { byId, DETAILS, finishHasSubject, glassRows, GRILLES, HANDLE_FINISHES, HANDLES, isGlazed, leafGlazed, LOCKSETS,
          PEEPHOLES, STRIPE_MAX, WINDOWS }
   from './catalog.js';
 import { bowFits, gripFitsAnywhere,
@@ -731,6 +731,8 @@ const SAID = {
   /* 26.9.2026: the bow has no home on this door (a link, or a window tapped
      beside it) — see repair. */
   bowGone:      'fix.bowGone',
+  /* 28.9.2026: no pull handle left for a finish to belong to — see repair. */
+  finishHome:   'fix.finishHome',
 };
 
 /* Which reason a face greyed for the window gives, by what `panelUnderGlass`
@@ -762,7 +764,7 @@ const BOW_WHY = { window: 'why.bowWindow', face: 'why.bowFace', door: 'why.bowDo
  */
 const NOTHING = /^(none|no[a-z]*)$/;
 const OWNED = { stripes: ['stripeDir', 'stripeCount', 'stripeTight'], handle: ['handle', 'handleLen'] };
-const NOT_A_LOSS = new Set(['handleLen', 'stripeTight']);
+const NOT_A_LOSS = new Set(['handleLen', 'stripeTight', 'handleFinish']);
 export function displacedBy(before, after, tapped, restored = []) {
   const own = new Set(OWNED[tapped] || [tapped]);
   return Object.keys(after).filter(k => !own.has(k) && !restored.includes(k) && !NOT_A_LOSS.has(k)
@@ -1074,6 +1076,20 @@ export function repair(state, intent = null) {
      is still visible and still theirs. */
   if (!isGlazed(s)) {
     if (s.grille !== 'none') { s.grille = 'none'; change('grille', SAID.grilleGone); }
+  }
+
+  /* ⚠ AND A FINISH WITH NO PULL HANDLE TO BELONG TO GOES HOME TO NICKEL —
+     28.9.2026 (*"the option to choose a colour for a pull handle opens only
+     when there is a pull handle on the door"*). The page hides the choice with
+     no bar and no bow; a bell alone wears nickel (`bellFinish`). A field left
+     at gold there would be a choice nobody can see or change riding in the
+     address, and an old link carrying a gold bell and no bar would open at a
+     different price in silence — so it is put back, and said. Last, because
+     every repair above can take the bar or the bow away. Not a loss the
+     confirm dialog asks about (`NOT_A_LOSS`): it goes with the handle. */
+  if (!finishHasSubject(s) && s.handleFinish && s.handleFinish !== HANDLE_FINISHES[0].id) {
+    s.handleFinish = HANDLE_FINISHES[0].id;
+    change('handleFinish', SAID.finishHome);
   }
 
   return { state: s, changed, said };

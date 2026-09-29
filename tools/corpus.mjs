@@ -38,6 +38,7 @@
  */
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import { assertFreshBundle, stampSheets } from './fresh.mjs';
 import { canvas, blit, load, rect, save, text } from './imglib.mjs';
 import { COLOURS, DETAILS, GRILLES, HANDLES, LOCKSETS, SIZES, STRIPE_MAX, WINDOWS, byId }
@@ -641,7 +642,7 @@ if (QUIET) process.exit(0);
 /* ── the sheets ──────────────────────────────────────────────────── */
 
 await assertFreshBundle();
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 /* Three pairs to a sheet. Six fitted on one row and produced a 6,390 px strip
    that is unreadable at any size a person actually looks at it — the point of
    a contact sheet is to be looked at, not to be compact. */

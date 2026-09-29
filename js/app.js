@@ -54,6 +54,7 @@ import { canSharePicture, copyMessage, drawingCaveat, fallbackWhatsappUrl,
 import { counted, L, LANGS, lang, pickLang, setLang, T, withLang } from './copy.js';
 import { DEFAULTS, encodeCode, fromQuery, isUntouched, toQuery } from './url-state.js';
 import { WORKS } from './works.js';
+import { startTour } from './tour.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -164,7 +165,28 @@ const GROUPS = [
      the paint on screen and re-drawn when it changes — `retintOptions`. */
   { key: 'grille', title: 'g.grille', in: 'glass', kind: 'sq', list: () => GRILLES,
     glyph: o => grilleGlyph(o, byId(COLOURS, state.colour).hex), tinted: true,
-    hint: 'g.grille.h' },
+    hint: 'g.grille.h',
+    /* ⚠ TWO HEADED GROUPS, AND EACH DESIGN'S TWO COLOURS SIDE BY SIDE — 28.9,
+       the owner's son: *"Put the expensive window designs apart from the
+       regular ones, and keep the same designs in different colours near each
+       other."* Split on the list's own `delta` (the included designs, then
+       the priced ones with the surcharge in the heading, as the colours do),
+       and inside each the black design then its door-colour twin. The SCREEN's
+       order only: the array is the code's index order and never moves — the
+       `-light` twins were appended at its end, which is why they drew apart. */
+    split: list => {
+      const base = o => o.id.replace(/-light$/, '');
+      const at = id => list.findIndex(o => o.id === id);
+      const paired = items => items.slice().sort((a, b) =>
+        (at(base(a)) - at(base(b))) || (a.light ? 1 : 0) - (b.light ? 1 : 0));
+      const free = paired(list.filter(o => !o.delta));
+      const paid = paired(list.filter(o => o.delta));
+      const deltas = [...new Set(paid.map(o => o.delta))];
+      const plus = deltas.length === 1
+        ? T('g.grille.plus', formatAgorot(deltas[0]))
+        : T('g.grille.plusMany');
+      return [[T('g.grille.free'), free], [plus, paid]];
+    } },
 
   { key: 'handle', title: 'g.handle', in: 'grip', kind: 'hw', list: () => HANDLES,
     glyph: handleGlyph, hint: 'g.handle.h' },
@@ -205,7 +227,7 @@ const GROUPS = [
      lever, a smart lock and a keypad at once and Peretz prices all three
      independently. Putting them in `LOCKSETS` would have made three products
      mutually exclusive that are not. */
-  { key: 'speciallock', title: 'g.speciallock', in: 'lock', kind: 'hw',
+  { key: 'speciallock', title: 'g.speciallock', in: 'xlock', kind: 'hw',
     list: () => SPECIAL_LOCKS, glyph: specialLockGlyph,
     hint: 'g.speciallock.h' },
 
@@ -398,10 +420,21 @@ const SECTIONS = [
      navigator rather than a pair-wise rule — so a half-finished reorder fails
      there rather than shipping. */
   { key: 'lock',   title: 'step.lock.t',   sub: 'step.lock.s',   lede: 'step.lock.l', exp: 'exp.lock',
-    expArgs: () => [formatAgorot(byId(SPECIAL_LOCKS, 'kasefet').delta),
-                    formatAgorot(byId(SPECIAL_LOCKS, 'kodan').delta)] },
+    expArgs: () => [] },
   { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz',
     expArgs: () => [L(byId(LOCKSETS, 'cadoor')), L(byId(LOCKSETS, 'sapir'))] },
+  /* ⚠ THE EXTRA LOCK HAS ITS OWN STEP, 28.9.2026 — the owner's son: *"The extra
+     locks as a separate section, right after the pirzul section — they don't
+     fit on the screen and I need to scroll for them."* They were the lock
+     step's second group, under the levers. A new key, so no link goes stale
+     and no `VERSION` moves (the key is not in the wire format); what moved with
+     it is `WANT_ORDER` in the audit, the tenth navigator mark
+     (`SECTION_ICON.xlock` — the קודן's own case, which the summary's row
+     already drew) and every walk that counted nine steps. Its explainer is the
+     lock step's old one: the two figures still come through arguments. */
+  { key: 'xlock',  title: 'step.xlock.t',  sub: 'step.xlock.s',  lede: 'step.xlock.l', exp: 'exp.xlock',
+    expArgs: () => [formatAgorot(byId(SPECIAL_LOCKS, 'kasefet').delta),
+                    formatAgorot(byId(SPECIAL_LOCKS, 'kodan').delta)] },
   { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face',
     expArgs: () => [formatAgorot(STRIPE_A.h), formatAgorot(STRIPE_A.v),
                     L(byId(DETAILS, 'panel2')), L(byId(DETAILS, 'panel3'))] },
@@ -564,12 +597,28 @@ function init() {
   $('#undo-btn').addEventListener('click', undo);
   $('#redo-btn').addEventListener('click', redo);
   $('#save-btn').addEventListener('click', saveCurrent);
-  /* The wall's save (27.9.2026): the SAME function, so the two buttons cannot
-     save two different things or say two different sentences. */
+  /* The wall's save (27.9.2026) ASKS since 28.9 (*"a window with two options,
+     save or view a saved door"*): it opens `#savedlg`, whose first choice is
+     the SAME `saveCurrent` the summary's button calls — so the two cannot save
+     two different things or say two different sentences — and whose second
+     opens the list. */
   const saveHud = $('#save-hud');
   if (saveHud) {
     saveHud.innerHTML = hudIcon('save');
-    saveHud.addEventListener('click', saveCurrent);
+    saveHud.addEventListener('click', () => openDialog($('#savedlg')));
+  }
+  $('#savedlg-save').addEventListener('click', () => { saveCurrent(); closeDialog($('#savedlg')); });
+  $('#savedlg-list').addEventListener('click', () => {
+    closeDialog($('#savedlg'));
+    openDialog($('#saved'));
+  });
+  $('#savedlg-close').addEventListener('click', () => closeDialog($('#savedlg')));
+  $('#saved-close').addEventListener('click', () => closeDialog($('#saved')));
+  /* A click whose target is the <dialog> itself landed on the backdrop,
+     outside the card — the same "close" as Escape (which the platform gives a
+     modal dialog on its own). */
+  for (const d of [$('#savedlg'), $('#saved')]) {
+    d.addEventListener('click', ev => { if (ev.target === ev.currentTarget) closeDialog(d); });
   }
 
   /* The price opens its own breakdown. `hidden` and `aria-expanded` move
@@ -580,6 +629,7 @@ function init() {
     const open = btn.getAttribute('aria-expanded') === 'true';
     btn.setAttribute('aria-expanded', String(!open));
     box.hidden = open;
+    placeBreakdown();
   });
   $('#works-close').addEventListener('click', closeWorks);
   /* The confirm dialog's three buttons, its Escape and its backdrop. A click
@@ -655,12 +705,9 @@ function init() {
       window.location.href = el.href;
     });
   });
-  $('#saved-btn').addEventListener('click', () => {
-    const box = $('#saved'), btn = $('#saved-btn');
-    const show = box.hidden;
-    box.hidden = !show;
-    btn.setAttribute('aria-expanded', String(show));
-  });
+  /* The summary's "העיצוב שלי" opens the same list, a dialog since 28.9 (it
+     was a drawer inside the send card). */
+  $('#saved-btn').addEventListener('click', () => openDialog($('#saved')));
   paintSaved();
 
   /* The crop depends on the stage's shape, so it has to be recomputed
@@ -670,6 +717,14 @@ function init() {
     new ResizeObserver(fitStage).observe($('#stage'));
   } else {
     window.addEventListener('resize', fitStage);
+  }
+  /* ⚠ AND WHEN A FACE ARRIVES (28.9). The page's own type swaps in after the
+     first paint, and the things placed off measured WIDTHS on the wall — the
+     band's centre inside its free span, the picker it keeps clear of — were
+     measured in the fallback. The stage does not change size for that, so the
+     observer above never hears of it. */
+  if (document.fonts && typeof document.fonts.addEventListener === 'function') {
+    document.fonts.addEventListener('loadingdone', () => fitStage());
   }
 
   /* ── THE PANEL SAYS WHEN THERE IS MORE OF IT ─────────────────────────
@@ -816,6 +871,15 @@ function init() {
     goStep(carries ? SUMMARY.key : SECTIONS[0].key, false);
   }
 
+  /* ⚠ THE FIRST-VISIT TOUR (28.9, js/tour.js) — on a bare arrival at the
+     design flow only: never on a link that carries a door (Peretz opening a
+     customer's link is not a first visit), never in bare mode or on the sheet.
+     After the door has assembled, so the cut-out is round a door at rest. */
+  const root0 = document.documentElement.classList;
+  if (!carries && !root0.contains('is-bare') && !root0.contains('is-sheet')) {
+    setTimeout(() => { if (!document.querySelector('dialog[open]')) startTour(); }, 1100);
+  }
+
   /* ⚠ M1: THE DOOR ASSEMBLES, ONCE. `is-arriving` is on `<html>` for one
      animation's length and then removed, so nothing else in the session
      re-triggers it — a door that reassembles itself every time somebody picks
@@ -849,6 +913,8 @@ function init() {
      rest of this file already tests for. */
   if (typeof window.matchMedia === 'function') {
     window.matchMedia('(min-width: 1100px)').addEventListener('change', placeSend);
+    /* and the navigator, which stands on the photograph above 1100 (28.9) */
+    window.matchMedia('(min-width: 1100px)').addEventListener('change', () => { placeNav(); fitStage(); });
   }
 }
 
@@ -1003,6 +1069,26 @@ function showDialog(text, two) {
 }
 function askConfirm(text, yes) { onYes = yes; showDialog(text, true); }
 function tellOne(text) { onYes = null; showDialog(text, false); }
+/**
+ * The save's two dialogs (28.9): `showModal` behind the same guard as the
+ * gallery's and the confirm's (focus trapped, Escape closes, the page behind
+ * inert). Focus goes back to the wall's save when either closes — and that is
+ * the platform's own dialog focus-restoring, not code here: the list is opened
+ * after the save dialog has closed and handed focus back to the save, so the
+ * save is what the list restores to as well. A carried `returnTo` was written
+ * first, and the audit's clause stayed green with it deleted; it is not here.
+ */
+function openDialog(d) {
+  if (!d) return;
+  if (typeof d.showModal === 'function') { if (!d.open) d.showModal(); }
+  else d.setAttribute('open', '');
+}
+function closeDialog(d) {
+  if (!d) return;
+  if (typeof d.close === 'function') { if (d.open) d.close(); }
+  else d.removeAttribute('open');
+}
+
 function closeConfirm(answer) {
   const d = $('#confirm');
   if (!d) return;
@@ -1191,6 +1277,11 @@ function buildPanel() {
   const tel = document.getElementById('send-tel');
   if (wa && tel && tel.previousElementSibling !== wa) wa.after(tel);
   if (send && wrap.contains(send)) $('.layout').appendChild(send);
+  /* ⚠ AND A NAVIGATOR LEFT ON THE PHOTOGRAPH (28.9). Above 1100 the column
+     lives in `.stage-wrap`, outside this element, so `replaceChildren` below
+     would not reach it — and a language switch would build a second column
+     over the first. Removed here, rebuilt below, placed by `placeNav`. */
+  document.querySelectorAll('.stage-wrap > .steps').forEach(n => n.remove());
   wrap.replaceChildren();
 
   /* The first offer the panel makes, above the navigator: somewhere to start
@@ -1284,6 +1375,8 @@ function buildPanel() {
     nav.appendChild(b);
   }
   wrap.appendChild(nav);
+  /* Built in the panel, where the phone's fixed row lives; `placeNav` carries
+     it onto the photograph above 1100 once the steps are in place below. */
 
   /* ── THE STEPS ─────────────────────────────────────────────────────
      Every step is built once and hidden; `goStep` shows one. Building them all
@@ -1459,6 +1552,7 @@ function buildPanel() {
   }
   sum.querySelector('.sect__back').addEventListener('click', () => stepBy(-1));
   wrap.appendChild(sum);
+  placeNav();
 }
 
 /**
@@ -2032,6 +2126,41 @@ function buildLengthStepper(host) {
  * put right. There is exactly one thing now, and this is it — it moves one
  * element and reshapes nothing.
  */
+/* ── THE NAVIGATOR STANDS ON THE PHOTOGRAPH ABOVE 1100 — 28.9.2026 ────
+   The owner's son: *"In some categories there appears a scroll wheel that
+   messes up with the section icons. The rectangle with the icons needs to be
+   not endless, but just the size it needs to host all the section icons, a
+   little separated from the options choosing thing, the image needs to be
+   behind it — on the image and not on some white thing."*
+   So above 1100 `.steps` is a child of `.stage-wrap`: absolute, on the
+   stage's edge that faces the panel, as tall as its targets, centred on the
+   door's mid-height — the photograph behind it. It was the panel's second
+   grid column (27.9) with the PANEL's background painting its ink, so the ink
+   ran the card's full height whatever the step, and in RTL the panel's own
+   scrollbar sat on that same edge and ran down the column on every step long
+   enough to scroll: the "scroll wheel".
+   ⚠ ONE ELEMENT MOVED, THE WAY `placeSend` MOVES ONE. Below 1100 the fixed
+   row stays in the panel, unchanged: `.stage-wrap` is sticky at z-index 3
+   there, a stacking context, and a fixed row inside it would paint UNDER its
+   own ink strip (the panel's `::before`, z-index 5). Appended LAST in the wrap
+   so the tab order is what it was — the wall's controls, then the steps, then
+   the options (the order asks for the column before the options).
+   Focus rides the move: a focused circle that is re-parented is blurred by
+   the browser, so it is given back. */
+function placeNav() {
+  const nav = document.querySelector('.steps');
+  const panel = $('#choices'), wrap = $('.stage-wrap');
+  if (!nav || !panel || !wrap) return;
+  const wide = typeof window.matchMedia === 'function'
+    && window.matchMedia('(min-width: 1100px)').matches;
+  const home = wide ? wrap : panel;
+  if (nav.parentElement === home) return;
+  const had = nav.contains(document.activeElement) ? document.activeElement : null;
+  if (wide) wrap.appendChild(nav);
+  else panel.insertBefore(nav, panel.querySelector('.sect') || null);
+  if (had) had.focus({ preventScroll: true });
+}
+
 function placeSend() {
   const wa = $('#wa-btn');
   const card = document.querySelector('.panel--send .send');
@@ -2299,7 +2428,17 @@ function arrowStep(dir) {
   noteEngaged();
   const g = firstGroup(liveStep);
   if (!g) return;
-  const list = g.list();
+  /* ⚠ IN THE ORDER THE TILES ARE DRAWN — 28.9.2026, the owner's son: *"The
+     arrows choose very randomly in the colour section — I want it to go nicely
+     one by one, in every section."* They walked the LIST's order, which is the
+     code's index order, and on the colour step (grouped by price on screen)
+     and the glass step (twins side by side) that jumps about. So the order is
+     read off the group's live tiles; a group drawn without per-option tiles
+     (the משקוף's rows) keeps the list's. */
+  const all = g.list();
+  const drawn = [...document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"][data-id]`)]
+    .map(b => all.find(o => o.id === b.dataset.id)).filter(Boolean);
+  const list = drawn.length === all.length ? drawn : all;
   const blocked = conflicts(state)[g.key] || {};
   const at = list.findIndex(o => o.id === state[g.key]);
   for (let k = 1; k < list.length; k++) {
@@ -2373,17 +2512,11 @@ function paintSaved() {
   const btn = $('#saved-btn');
   if (!btn) return;
   btn.hidden = !list.length;
-  /* ⚠ AND SHUT THE DRAWER WITH IT. Hiding the toggle used to be all this did,
-     so deleting the last saved design left the open panel pinned under the
-     header — "עדיין לא שמרתם עיצוב." — with its only control removed from the
-     page and `aria-expanded="true"` still claiming it was open. Nothing but a
-     reload could close it. A disclosure whose button is gone has to be shut,
-     not merely orphaned. */
-  if (!list.length) {
-    const box = $('#saved');
-    if (box) box.hidden = true;
-    btn.setAttribute('aria-expanded', 'false');
-  }
+  /* ⚠ THE DRAWER THAT OUTLIVED ITS BUTTON (13.9) cannot happen to a dialog:
+     deleting the last saved design leaves the list open saying
+     "עדיין לא שמרתם עיצוב." with its own close button, Escape and the
+     backdrop — nothing on the page is orphaned by the summary's toggle
+     hiding. */
   document.querySelectorAll('[data-saved-count]').forEach(e => { e.textContent = String(list.length); });
   const box = $('[data-saved-list]');
   const none = $('[data-saved-empty]');
@@ -2432,8 +2565,7 @@ function paintSaved() {
          is standing in front of the drawer having just tapped a row. */
       const { state: st, notice, said } = fromQuery(q);
       set(st);
-      $('#saved').hidden = true;
-      $('#saved-btn').setAttribute('aria-expanded', 'false');
+      closeDialog($('#saved'));
       if (notice) toast(said && said.length ? said.join(' · ') : T('notice.some'));
     });
     const drop = document.createElement('button');
@@ -2513,8 +2645,12 @@ function markSteps() {
   const bandT = document.querySelector('[data-band-title]');
   const bandN = document.querySelector('[data-band-now]');
   const fg = firstGroup(liveStep);
+  /* Written only when it changes, and then placed again (28.9): the band is
+     on the photograph and its width decides where it may stand (`placeBand`). */
+  const bandWas = `${bandT?.textContent}|${bandN?.textContent}`;
   if (bandT && sec) bandT.textContent = T(sec.title);
   if (bandN) bandN.textContent = fg ? nowLabel(fg) : '';
+  if (`${bandT?.textContent}|${bandN?.textContent}` !== bandWas) placeBand();
   const wrapEl = document.querySelector('.stage-wrap');
   if (wrapEl) wrapEl.dataset.step = liveStep;
 
@@ -3273,6 +3409,10 @@ function paint() {
      that at 23,021 pixels. */
   $('#undo-btn').disabled = !canUndo();
   $('#redo-btn').disabled = !canRedo();
+  /* ⚠ SINCE 28.9 A DISABLED PILL IS NOT SHOWN AT ALL (the stylesheet), so the
+     two can appear and go on any paint — and where they stand depends on how
+     many are showing. */
+  placeUndo();
 }
 
 /* ── the handle does not move ─────────────────────────────────────
@@ -3555,6 +3695,227 @@ function armRoom() {
   img.src = href;
 }
 
+/**
+ * ⚠ UNDO YOU CAN SEE, AT THE STAGE'S FOOT — 28.9.2026. The owner's son: *"The
+ * undo option rethought: not noticeable on pc and in the way on the phone —
+ * more noticeable, but not colliding with the door."* Two labelled ink pills
+ * (a disabled one is not shown), 8 px inside the stage's bottom-right corner —
+ * the picker's side, physically, in every language. The floor band under the
+ * threshold is 13–47 px and a pill is 44, so a pill always reaches up beside
+ * the door's foot. Four shapes, the first that touches nothing:
+ *   row      the two labelled, side by side;
+ *   stack    the two labelled, redo above undo;
+ *   iconrow  the glyphs alone, side by side (the word stays in `aria-label`
+ *            and `title`);
+ *   icon     the glyphs alone, stacked.
+ * "Nothing" is the door (`#frame`, its settled box), the two arrows and the
+ * price on the wall. ⚠ AND ON A DESKTOP THE TRUST BAND'S WORDS RUN ALONG THAT
+ * SAME FOOT — in Russian they reach the corner at 1100–1280, in Hebrew at
+ * 1100–1152, measured by the audit the day this was built (up to 1,646 px²
+ * of pill on "Персональный сервис") — so where a shape's width meets the words
+ * it stands 8 px ABOVE the band instead, still at the corner. The navigator
+ * column (Hebrew, above 1100, the same corner) is placed above the pills, not
+ * the other way round, and the toast is lifted clear of them when it is up.
+ */
+function placeUndo() {
+  const box = document.querySelector('.stage__undo');
+  const wrapEl = document.querySelector('.stage-wrap');
+  const stage = $('#stage');
+  if (!box || !wrapEl || !stage) return;
+  const ws = wrapEl.style;
+  const v = k => parseFloat(ws.getPropertyValue(k));
+  const wrap = wrapEl.getBoundingClientRect(), st = stage.getBoundingClientRect();
+  if (!st.width || !Number.isFinite(v('--frame-right'))) return;
+  const frame = { left: wrap.left + v('--frame-left'), right: wrap.left + v('--frame-right'),
+                  top: wrap.top + v('--frame-top'), bottom: wrap.top + v('--frame-bot') };
+  const q = document.querySelector('#quote');
+  const obstacles = [frame,
+    ...[...document.querySelectorAll('.stage__arrow')].map(e => e.getBoundingClientRect()),
+    ...(q && getComputedStyle(q).position !== 'fixed' ? [q.getBoundingClientRect()] : [])]
+    .filter(r => r.right > r.left);
+  const words = [...document.querySelectorAll('.trust__i')].map(e => e.getBoundingClientRect())
+    .filter(r => r.width && r.bottom > st.top && r.top < st.bottom);
+  const wordsTop = words.length ? Math.min(...words.map(r => r.top)) : null;
+  const hits = (a, c) => a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
+  const was = box.offsetHeight;
+  box.style.setProperty('--undo-r', `${Math.round(wrap.right - st.right + 8)}px`);
+  const place = m => {
+    box.dataset.mode = m;
+    box.style.setProperty('--undo-b', `${Math.round(wrap.bottom - st.bottom + 8)}px`);
+    let g = box.getBoundingClientRect();
+    if (wordsTop !== null && words.some(w => w.left < g.right && w.right > g.left)) {
+      box.style.setProperty('--undo-b', `${Math.round(wrap.bottom - wordsTop + 8)}px`);
+      g = box.getBoundingClientRect();
+    }
+    return !obstacles.some(o => hits(g, o));
+  };
+  const SHAPES = ['row', 'stack', 'iconrow', 'icon'];
+  if (!SHAPES.some(place)) place('icon');
+  if (box.offsetHeight !== was) placeSteps();
+}
+
+/**
+ * ⚠ THE BAND STANDS ON THE PHOTOGRAPH, ABOVE THE DOOR'S HEAD — 28.9.2026.
+ * The owner's son: *"The header of the section needs to be on the image and
+ * closer to the door, in some good font — that also goes for the little text
+ * below that shows the current option."* It was a flow item above the stage,
+ * and above 1100 every pixel of it came out of the drawing.
+ *
+ * Placed here and not by the stylesheet, because two of its three numbers
+ * depend on what else stands on the wall:
+ *   top    its foot 8 px above the casing's head (`--frame-top`, which
+ *          `fitStage` reads off the frame's SETTLED box), never above the
+ *          stage's own top — the crop leaves room for that everywhere but the
+ *          two tallest doors at 320×568, where the gap to the casing narrows
+ *          instead (CLAUDE.md §9);
+ *   span   the free wall between the controls that stand on those same rows
+ *          (`--band-w`) — on a phone the language picker and the save stand
+ *          level with the band over most doors, and a band laid across them
+ *          was the first thing measured the day it moved (up to 738 px² on
+ *          the picker at 320);
+ *   left   centred on the door, moved off-centre only as far as that span
+ *          requires once the band's own width is known.
+ * Physical `left`, like the frame it is read from: the drawing does not
+ * mirror, so nothing placed against it may (§0c). Two layout reads — its
+ * height, then its width inside the span it has just been given.
+ */
+function placeBand() {
+  const band = document.querySelector('.stage__band');
+  const wrapEl = document.querySelector('.stage-wrap');
+  const stage = $('#stage');
+  if (!band || !wrapEl || !stage || !band.getClientRects().length) return;
+  const ws = wrapEl.style;
+  const fTop = parseFloat(ws.getPropertyValue('--frame-top'));
+  const fL = parseFloat(ws.getPropertyValue('--frame-left'));
+  const fR = parseFloat(ws.getPropertyValue('--frame-right'));
+  if (![fTop, fL, fR].every(Number.isFinite)) return;
+  const wrap = wrapEl.getBoundingClientRect(), box = stage.getBoundingClientRect();
+  const sTop = Math.ceil(box.top - wrap.top);
+  const h = band.getBoundingClientRect().height;
+  const top = Math.max(sTop, Math.floor(fTop - 8 - h));
+  const cx = (fL + fR) / 2;
+  let L = box.left - wrap.left + 8, R = box.right - wrap.left - 8;
+  for (const el of wrapEl.querySelectorAll('.stage__hud .hud__slot, #quote, .stage__arrow, .stage-wrap > .steps')) {
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height) continue;
+    if (r.bottom - wrap.top <= top || r.top - wrap.top >= top + h) continue;
+    const l = r.left - wrap.left, rr = r.right - wrap.left;
+    if (rr <= cx) L = Math.max(L, rr + 8);
+    else if (l >= cx) R = Math.min(R, l - 8);
+    else { L = cx; R = cx; }              // something stands across the door's centre
+  }
+  band.style.setProperty('--band-top', `${top}px`);
+  band.style.setProperty('--band-w', `${Math.max(0, Math.floor(R - L))}px`);
+  const w = band.offsetWidth;
+  band.style.setProperty('--band-l', `${Math.round(Math.max(L, Math.min(cx - w / 2, R - w)))}px`);
+}
+
+/**
+ * ⚠ THE BREAKDOWN IS CENTRED ON THE FIGURE, AND KEPT INSIDE THE PICTURE —
+ * 28.9.2026. Since the price moved to the LEFT of the door it can stand close
+ * to the stage's left edge (the wall beside the widest double at 1100 is
+ * ~137 px), and `.stage-wrap` is `overflow: hidden`: a breakdown centred on
+ * the figure there would lose its left half to the edge, not to a fold. So it
+ * is centred on the figure and then moved inboard by exactly what keeps it
+ * 8 px inside the stage (`--bd-shift`), and no further. Computed from the
+ * layout box and the anchor — never from `getBoundingClientRect` of the
+ * popover itself, whose entrance is a transform (§7: a placement read during
+ * an animation is placed by the animation). Only on the wall; the phone's bar
+ * opens it upward over the page and the window is its edge.
+ */
+function placeBreakdown() {
+  const box = $('#breakdown');
+  if (!box) return;
+  box.style.setProperty('--bd-shift', '0px');
+  const q = document.querySelector('.quote');
+  const wrap = document.querySelector('.stage-wrap');
+  if (box.hidden || !q || !wrap || getComputedStyle(q).position !== 'absolute') return;
+  const a = box.parentElement.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+  const width = box.offsetWidth;
+  const left = a.left + a.width / 2 - width / 2;
+  const lo = Math.max(w.left, 0) + 8, hi = Math.min(w.right, window.innerWidth) - 8;
+  const d = left < lo ? lo - left : left + width > hi ? hi - (left + width) : 0;
+  if (d) box.style.setProperty('--bd-shift', `${Math.round(d)}px`);
+}
+
+/**
+ * ⚠ WHERE THE NAVIGATOR COLUMN STANDS (28.9), when it is on the photograph.
+ * Centred on the door's mid-height, as asked — UNLESS that puts it under the
+ * wall's other furniture on its side: measured the day it moved, the price
+ * card then at the door's head covered its top two marks in Hebrew at 1100 on
+ * every size (up to 5,246 px²), so "fit" and "colour" could not be tapped. So
+ * it stands 8 px under whatever chrome its own x-range meets above the door's
+ * middle, and 8 px above the trust band at the stage's foot. The chrome is read
+ * off the page, never listed as numbers.
+ * ⚠ AND WHERE THE ROOM UNDER THE PRICE IS SHORT, THE GAPS GIVE (28.9, the
+ * same day the price moved beside it). In English and Russian the column and
+ * the price both stand LEFT of the door, and at 1100–1152 the price is in the
+ * column's own x-range: the room between it and the trust band measured
+ * 436–450 px against the column's 464, so the floor pulled the column back up
+ * UNDER the price (665 px² at 1100×800 in Russian on the half door). The
+ * eight gaps give first, then the two paddings, by exactly the shortfall.
+ * (A second placement after `paint` writes the figure was tried too, and
+ * measured to change nothing on a load or on a tap that took the figure from
+ * four digits to five: the stage's observer re-fits after the first paint,
+ * and the column is pushed by the price's FOOT, which a wider figure does not
+ * move. So it is not here.) Its height is `offsetHeight` — the layout box,
+ * which a transform cannot distort.
+ */
+function placeSteps() {
+  const col = document.querySelector('.stage-wrap > .steps');
+  const wrapEl = document.querySelector('.stage-wrap');
+  if (!col || !wrapEl) return;
+  const mid0 = parseFloat(wrapEl.style.getPropertyValue('--frame-mid'));
+  if (!Number.isFinite(mid0)) return;
+  const wrap = wrapEl.getBoundingClientRect();
+  const mid = wrap.y + mid0;
+  col.style.removeProperty('--steps-gap');
+  col.style.removeProperty('--steps-pad');
+  let H = col.offsetHeight;
+  const cx = col.getBoundingClientRect();
+  let top = mid - H / 2;
+  const inX = r => r.width && r.right > cx.left && r.left < cx.right;
+  for (const el of document.querySelectorAll('#quote, .stage__hud .hud__slot')) {
+    const r = el.getBoundingClientRect();
+    if (inX(r) && r.top < mid && r.bottom + 8 > top) top = r.bottom + 8;
+  }
+  /* ⚠ THE FLOOR IS THE TRUST BAND'S WORDS, NOT ITS BOX — 28.9.2026 (the
+     extra lock's step made the column ten marks, 514 px, ≥ 470 even with its
+     gaps given). The band's box is the whole floor strip, but its four claims
+     are centred and never reach the stage's corner where the column stands;
+     measured at 1100–1152 in English and Russian, where the column is under
+     the price, that strip was the 41 px the ten marks were short of. So the
+     column stops 8 px above any WORD in its own x-range, and otherwise 8 px
+     above the stage's foot. */
+  const st = document.querySelector('#stage')?.getBoundingClientRect();
+  let floor = (st ? st.bottom : wrap.bottom) - 8;
+  for (const w of document.querySelectorAll('.trust__i')) {
+    const r = w.getBoundingClientRect();
+    if (r.width && inX(r) && r.top > mid) floor = Math.min(floor, r.top - 8);
+  }
+  /* the undo pills at the stage's foot, where they share the column's corner
+     (Hebrew): their box is kept even with nothing to undo, so the column does
+     not jump on the first change */
+  const un = document.querySelector('.stage__undo');
+  const ur = un && un.getBoundingClientRect();
+  if (ur && ur.width && inX(ur) && ur.top > mid) floor = Math.min(floor, ur.top - 8);
+  /* Short of room below what pushed it down: the eight gaps give first (to
+     2 px), then the two paddings (to 6) — by exactly the shortfall, and never
+     the 44 px targets. What is still short after that is pulled up, and the
+     audit names it. */
+  let short = top + H - floor;
+  if (short > 0) {
+    const g = Math.max(2, 6 - short / 8);
+    short -= (6 - g) * 8;
+    const pad = Math.max(6, 10 - Math.max(0, short) / 2);
+    col.style.setProperty('--steps-gap', `${g.toFixed(2)}px`);
+    col.style.setProperty('--steps-pad', `${pad.toFixed(2)}px`);
+    H = col.offsetHeight;
+  }
+  if (top + H > floor) top = floor - H;
+  wrapEl.style.setProperty('--steps-top', `${Math.round(top - wrap.y)}px`);
+}
+
 function fitStage() {
   /* Bare mode is the measurement harness (tools/frame.mjs, recreate.mjs and
      friends), and a harness wants the drawing's own frame: the door filling
@@ -3818,7 +4179,14 @@ function fitStage() {
     /* and the other edge and the middle, for the two arrows (27.9, commit 4) */
     sw.setProperty('--frame-left', `${Math.round(f.left - wrap.x)}px`);
     sw.setProperty('--frame-mid', `${Math.round((f.top + f.bottom) / 2 - wrap.y)}px`);
+    sw.setProperty('--frame-bot', `${Math.round(f.bottom - wrap.y)}px`);
     sw.setProperty('--hud-b', `${Math.round(hudB - wrap.y)}px`);
+    placeBand();
+
+    /* the undo pills, then the navigator column above them, after the
+       variables above so the price is already where they put it */
+    placeUndo();
+    placeSteps();
 
     const root = document.documentElement.style;
     root.setProperty('--stage-l', `${Math.round(wrap.x)}px`);
@@ -3928,6 +4296,7 @@ function fitStage() {
     }
     document.documentElement.style.setProperty(
       '--bd-room', `${Math.max(0, Math.round(clip - a.bottom))}px`);
+    placeBreakdown();
   }
 
   /* ⚠ AND HOW MUCH OF THE DESKTOP PANEL IS SPOKEN FOR, for the
@@ -3947,7 +4316,15 @@ function fitStage() {
      reason: these exist whether or not the drawing came up. */
   const style = document.documentElement.style;
   const choose = document.querySelector('.panel--choose');
+  /* ⚠ ONLY A RAIL INSIDE THE PANEL takes part (28.9): above 1100 the column
+     stands on the photograph, outside it, and the panel's band is then its own
+     padding alone — without this branch the CSS fallback of 83 px would
+     over-pad every scroll by the height of a row that is not there. */
   const railEl = choose && choose.querySelector('.steps');
+  if (choose && !railEl) {
+    const pad = parseFloat(getComputedStyle(choose).paddingBlockStart) || 0;
+    style.setProperty('--rail-band', `${Math.round(pad)}px`);
+  }
   const footEl = document.querySelector('.sect:not([hidden]) .sect__foot');
   if (choose && railEl && getComputedStyle(railEl).position === 'sticky') {
     /* ⚠ THE BAND, NOT THE HEIGHT, AND THE DIFFERENCE IS 10 px OF TILE.
@@ -4024,7 +4401,22 @@ function toast(text) {
   if (!text) return;
   const el = $('#toast');
   el.textContent = text;
+  el.style.removeProperty('margin-block-end');
   el.hidden = false;
+  /* ⚠ AND IT STACKS ABOVE THE UNDO PILLS (28.9) — they stand at the stage's
+     foot, which is where this hangs on a phone and near where it hangs on a
+     desktop. Read off the LAYOUT box (`offset*`, which a transform does not
+     move — the toast's entrance is one), and lifted by exactly the overlap
+     plus 8 px. */
+  const un = document.querySelector('.stage__undo');
+  const shown = un && un.querySelector('.undo-pill:not(:disabled)');
+  if (shown) {
+    const u = un.getBoundingClientRect();
+    const top = el.offsetTop, bot = top + el.offsetHeight, l = el.offsetLeft, r = l + el.offsetWidth;
+    if (r > u.left && l < u.right && bot > u.top - 8) {
+      el.style.setProperty('margin-block-end', `${Math.ceil(bot - (u.top - 8))}px`);
+    }
+  }
   clearTimeout(toastTimer);
   const ms = Math.min(12000, Math.max(4000, 2000 + 55 * text.length));
   toastTimer = setTimeout(() => { el.hidden = true; }, ms);

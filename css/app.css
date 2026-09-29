@@ -400,17 +400,12 @@ svg { direction: ltr; }
    with it — which is what happened, and which is also exactly how the
    navigator circles did it one screen further down. These two lines mean this
    control can never do that again, whatever a fourth language is called. */
-/* ── undo / redo, under the door ─────────────────────────────────────
-   Two circles, no words. `disabled` rather than hidden, and the row keeps its
-   height either way: anything that appears in the strip under the leaf takes
-   its height out of the door above — measured at 23,021 pixels the one time
-   it was allowed to. */
-/* ⚠ 52 px, UP FROM 44 — 27.9.2026, the owner's son: *"make the undo buttons
+/* ── the wall's round buttons ───────────────────────────────────────
+   ⚠ 52 px, UP FROM 44 — 27.9.2026, the owner's son: *"make the undo buttons
    bigger and put a save button near them."* 44 is the floor this page keeps
-   everywhere, not a size; these are the only two controls in their corner and
-   the first a customer reaches for after a tap they regret. The glyph grows
-   with them (20 → 22 px). The third button, `#save-hud`, is the same class. */
-.steps-back { display: flex; gap: 6px; align-items: center; }
+   everywhere, not a size. Undo and redo were this class until 28.9, when they
+   became labelled pills at the stage's foot (`.undo-pill`, below the arrows);
+   the save is what is left of the round trio. */
 .hud__slot--end { gap: 6px; }
 .iconbtn {
   appearance: none; background: none; cursor: pointer;
@@ -1119,11 +1114,34 @@ svg { direction: ltr; }
    before the title shrank, less 4 px. Each line is ONE line in every language
    (ellipsis rather than a wrap), so the band — and with it the door — is the
    same height on every step. */
+/* ⚠ ON THE PHOTOGRAPH SINCE 28.9.2026 — the owner's son: *"The header of the
+   section needs to be on the image and closer to the door, in some good font —
+   that also goes for the little text below that shows the current option."*
+   It was a flow item between the `<h1>` and the stage, and above 1100 every
+   pixel of it came out of the drawing. Now it is absolute in `.stage-wrap`,
+   placed by `placeBand` (js/app.js) off the frame's settled box: its FOOT 8 px
+   above the casing's head, centred across on the door — physical, like the
+   frame it is read from; the drawing does not mirror. It takes no height, so
+   the stage gets the band's ~52–63 px back and the door grows with it.
+   ⚠ IT NEVER LANDS ON THE CASING BECAUSE THE CROP MAKES ROOM FOR IT, not
+   because it is pushed: `FIT_TRIM.top` in js/renderer.js was given exactly the
+   wall the band needs over the tallest door (the table is there).
+   ⚠ AND IT NEVER LANDS ON THE WALL'S CONTROLS, because it is given only the
+   free span between them on its own rows (`--band-w`) and its centre is moved
+   off the door's only as far as that span requires (`--band-l`). On a phone
+   the controls stand on those rows over most doors — the language picker in
+   one top corner, the save in the other — so there the band is the room
+   between them, and an option's name too long for it ends in an ellipsis. */
 .stage__band {
-  flex: 0 0 auto;
+  position: absolute; z-index: 4;
+  inset-block-start: var(--band-top, 0px);
+  left: var(--band-l, 16px);
+  inline-size: max-content;
+  max-inline-size: var(--band-w, calc(100% - 32px));
   display: grid; justify-items: center; gap: 0;
-  padding: 2px 16px 6px;
+  padding: 0;
   text-align: center;
+  pointer-events: none;
 }
 .band__title, .band__now {
   margin: 0; max-inline-size: 100%;
@@ -1140,17 +1158,20 @@ svg { direction: ltr; }
   font: 400 clamp(13px, 1.1vw, 15px)/1.35 var(--sans);
   color: var(--ink-2); min-block-size: 1.35em;
 }
-/* ⚠ ON A PHONE IT IS ONE LINE, and the stage gives up exactly that line
-   (`--band-h`, in `.stage`'s phone rules) — the question below the door does
-   not move down for it. The title then the option, the way the two lines read
-   above 1100, in the interface's direction. */
+/* ⚠ ON A PHONE IT IS ONE LINE, AND SINCE 28.9 IT TOO STANDS ON THE PICTURE at
+   the same anchor — the stage no longer gives up a line for it (`--band-h` is
+   gone from `.stage`'s phone rules), so the door has those 30 px back. The
+   title then the option, the way the two lines read above 1100, in the
+   interface's direction. */
 @media (max-width: 1099px) {
-  :root { --band-h: 30px; }
   .stage__band {
     display: flex; justify-content: center; align-items: baseline; gap: 8px;
-    block-size: var(--band-h); padding: 4px 14px 0; overflow: hidden;
+    padding: 0; overflow: hidden; white-space: nowrap;
   }
-  .band__title { font-size: 1.02rem; font-weight: 700; flex: 0 1 auto; min-inline-size: 0; }
+  /* The option's name gives way before the step's: where the free span is
+     short (the controls stand level with the band), the second part ends in
+     an ellipsis first and the title keeps its whole width while it can. */
+  .band__title { font-size: 1.02rem; font-weight: 700; flex: 0 0 auto; max-inline-size: 100%; }
   .band__now { font-size: .86rem; flex: 0 1 auto; min-inline-size: 0; min-block-size: 0; }
   .band__now:not(:empty)::before { content: '·'; margin-inline-end: 8px; color: var(--ink-3); }
 }
@@ -1177,6 +1198,50 @@ svg { direction: ltr; }
 @supports not (background: color-mix(in srgb, red 50%, transparent)) {
   .stage__arrow { background: var(--paper); }
 }
+
+/* ── UNDO YOU CAN SEE, AT THE STAGE'S FOOT — 28.9.2026 ──────────────────
+   The owner's son: *"The undo option rethought: not noticeable on pc and in
+   the way on the phone — more noticeable, but not colliding with the door."*
+   Two labelled pills, paper on ink, 8 px inside the stage's bottom-right
+   corner — physically right in every language, the picker's side — shown from
+   the first change (a disabled pill takes no room and paints nothing; the
+   group's own 44 px box is kept, so the navigator column above it does not
+   jump on the first tap). `placeUndo` (js/app.js) publishes `--undo-b` and
+   `--undo-r` off the stage's rect and picks the shape: `row`, `stack` (redo
+   above undo), `iconrow` or `icon` (the glyph alone, the word in
+   `aria-label`/`title`), the first that touches neither the door, an arrow
+   nor the price — standing above the trust band's words where they reach the
+   corner. The undo
+   is always the one in the corner. Absolute, for `.stage__hud`'s reason. */
+.stage__undo {
+  position: absolute; z-index: 4;
+  inset-block-end: var(--undo-b, 8px);
+  right: var(--undo-r, 8px);
+  display: flex; gap: 6px; align-items: flex-end; flex-direction: row;
+  min-inline-size: 44px; min-block-size: 44px;
+  pointer-events: none;
+}
+html:not([dir="rtl"]) .stage__undo { flex-direction: row-reverse; }
+.stage__undo[data-mode="stack"], .stage__undo[data-mode="icon"],
+html:not([dir="rtl"]) .stage__undo[data-mode="stack"],
+html:not([dir="rtl"]) .stage__undo[data-mode="icon"] { flex-direction: column-reverse; }
+.undo-pill {
+  pointer-events: auto; appearance: none; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-block-size: 44px; min-inline-size: 44px; padding: 0 16px 0 13px;
+  border: 0; border-radius: var(--r-pill, 999px);
+  background: var(--ink); color: var(--paper);
+  font: 600 .9rem/1 var(--sans); white-space: nowrap;
+  box-shadow: 0 4px 14px rgb(0 0 0 / .22);
+}
+.undo-pill:disabled { display: none; }
+.undo-pill .btn__ico { inline-size: 19px; block-size: 19px; }
+.undo-pill:hover { filter: brightness(1.25); }
+.undo-pill:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
+.stage__undo[data-mode="icon"] .undo-pill,
+.stage__undo[data-mode="iconrow"] .undo-pill { padding: 0; inline-size: 44px; }
+.stage__undo[data-mode="icon"] .undo-pill__w,
+.stage__undo[data-mode="iconrow"] .undo-pill__w { display: none; }
 .stage__arrow:hover { border-color: var(--ink-3); background: var(--paper); }
 .stage__chev {
   inline-size: 20px; block-size: 20px;
@@ -1226,7 +1291,7 @@ svg { direction: ltr; }
      out of the door rather than out of the question under it — at 320x568 the
      answers already arrive below the fold (§9), and a sticky block 30 px
      taller would have pushed them further. The door shrinks by that line. */
-  .stage { block-size: calc(clamp(40vh, 100vw, 56vh) - var(--band-h, 0px)); }
+  .stage { block-size: clamp(40vh, 100vw, 56vh); }
 }
 @media (min-width: 1100px) {
   .stage { block-size: auto; flex: 1 1 auto; min-block-size: 0; }
@@ -1455,6 +1520,22 @@ svg { direction: ltr; }
   padding-block-start: 6px;
   pointer-events: none;
 }
+/* ⚠ THE LANGUAGE PICKER STANDS TOP-RIGHT IN EVERY LANGUAGE — 28.9.2026. It is
+   the row's START slot, and a row starts on the right in Hebrew and on the
+   left in English and Russian, so the picker changed walls with the language
+   — and since the price moved to the LEFT of the door (physically, it is
+   pinned to the drawing), in English and Russian the two would have stood in
+   one corner. A left-to-right row runs the other way here, so the picker is
+   on the physical right whatever the page's direction, and the undo and save
+   on the left (§9's note on two controls pinned by rules that mirror
+   differently is why this is stated rather than left to the direction). */
+html:not([dir="rtl"]) .stage__hud { flex-direction: row-reverse; }
+/* …and the slot the price now shares a wall with keeps the SAVE outermost, as
+   Hebrew always had it: in Russian at 320 px, with the slot on the left and its
+   own row running left-to-right, the save became the innermost of the three and
+   put 263 px² of its glyph on the door (measured by the audit's wall-ink check
+   the day the picker moved). */
+html:not([dir="rtl"]) .hud__slot--end { flex-direction: row-reverse; }
 /* ⚠ EACH SLOT CARRIES ITS OWN GROUND. The wall is nearly the same colour as
    the paper, so on a wide screen these three read as if they were painted on
    it — which is what was drawn. On a 390 px phone the door is tall and the
@@ -1514,7 +1595,7 @@ svg { direction: ltr; }
    `nowrap` is what stops any of them growing downward instead of sideways. */
 .hud__slot--end { display: flex; justify-content: flex-end; }
 .hud__slot--start, .hud__slot--end { flex: 0 0 auto; }
-.stage__hud .langs, .stage__hud .steps-back { flex-wrap: nowrap; }
+.stage__hud .langs { flex-wrap: nowrap; }
 .stage__hud .lang { white-space: nowrap; }
 
 /* The language buttons lose their pill chrome up here — on a wall they are
@@ -1591,10 +1672,10 @@ svg { direction: ltr; }
   justify-items: start;
   min-inline-size: 0;
 }
-.quote__price .send__label {
-  font-size: .64rem; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--ink-2); line-height: 1.2;
-}
+/* ⚠ THE CAPTION OVER THE FIGURE ("מחיר משוער") WENT ON 28.9.2026 — the
+   owner's son: *"Remove the 'מחיר משוער' text above the price."* Its rules
+   went with it (a rule for a class nothing emits reads as load-bearing); the
+   A4 sheet keeps the words in its own fine print. */
 /* ⚠ 44 px, LIKE EVERYTHING ELSE THAT CAN BE TAPPED, and 44 px WIDE as well as
    tall. An earlier version let this shrink to `min-inline-size: 0` and the
    figure still rendered — text overflow is visible by default — so it LOOKED
@@ -1743,45 +1824,52 @@ html[dir="rtl"] .quote__back .quote__chev { transform: none; }
    the screen with the least of it. */
 @media (max-width: 359px) {
   .quote { padding-inline: 10px; gap: 8px; }
-  .quote__price .send__label { display: none; }
   .quote__price .send__figure { font-size: 1.25rem; }
   .quote__send { padding: 0 11px; font-size: .8rem; }
 }
 
-/* ── ≥1100 px · THE BAR GOES BACK ON THE WALL, AT THE DOOR'S CORNER ──
-   ⚠ MOVED 27.9.2026 — the owner's son: *"move the pricing to another place
-   that is better, it looks bad under the lamp, move to near the door, at the
-   up right corner."* It hung under the right-hand lamp since 28.8, when the
-   same person drew a circle there (*"on the right side below the lamps"*); he
-   is the one moving it. Chosen in chat: the top-right corner of the DOOR, on
-   the wall outside the frame's head, below the language buttons.
-   `--frame-top`, `--frame-right` and `--hud-b` are published by `fitStage`
-   off `#frame`'s own box and the chrome's — a percentage of the stage would
-   be the wrong instrument, as it was for the lamp. 8 px outside the casing,
-   the gap the lamp clamp kept; level with the head, or 8 px under the chrome
-   where the head stands higher than the chrome's foot (the tall doubles).
-   `left`, not `inset-inline-start`, and no translate: this is pinned to a
-   feature of the DRAWING, and the drawing does not mirror when the interface
-   does. `--lamp-*` is still published; nothing here reads it. */
+/* ── ≥1100 px · THE PRICE AND THE SEND STAND ON THE PHOTOGRAPH, LEFT OF THE
+   DOOR, HIGH ────────────────────────────────────────────────────────────
+   ⚠ MOVED 28.9.2026 — the owner's son: *"The price bigger and not on a white
+   thing but directly on the image … Move the WhatsApp button with the price to
+   the left of the door, between the door and the lamp, on the higher end."*
+   It was a paper card at the door's top-right corner (27.9, his *"move to near
+   the door, at the up right corner"*) and under the right-hand lamp before
+   that (28.8, his circle) — every placement his, and he is the one moving it.
+   So: NO GROUND. No card, no border, no shadow; the figure in `--display` at
+   2.4 rem, and the send under it as a line of ink with the WhatsApp mark.
+   Anchored PHYSICALLY, like everything pinned to the drawing (§0c — the
+   drawing does not mirror): its right edge 8 px outside the casing's LEFT edge
+   (`--frame-left`, published by `fitStage` off the frame's settled box), its
+   top level with the casing's head (`--frame-top`) or 8 px under the wall's
+   chrome where that reaches lower (`--hud-b`, the tall doubles). The text is
+   set toward the door — flush right in every language.
+   ⚠ INK ON A PHOTOGRAPH IS A CONTRAST QUESTION, and it was measured, not
+   assumed: `npm run audit` samples the picture under the figure's box and the
+   send's with the element hidden and holds the darkest of it to 4.5:1 against
+   `--ink` at every desktop viewport. The wall there is the lamp-lit plaster
+   left of the door (see the audit for the readings); no wash was needed. */
 @media (min-width: 1100px) {
   .quote {
     position: absolute;
     inset-block-start: max(var(--frame-top, 12%), calc(var(--hud-b, 0px) + 8px));
     inset-block-end: auto;
     inset-inline: auto;
-    left: calc(var(--frame-right, 62%) + 8px);
+    right: calc(100% - var(--frame-left, 38%) + 8px);
     transform: none;
-    flex-direction: column; align-items: center; gap: 7px;
-    padding: 5px 16px 9px;
-    background: var(--paper);
+    flex-direction: column; align-items: flex-end; gap: 0;
+    padding: 0;
+    background: none;
     --surface: var(--paper);
-    border: 0;
-    border-radius: var(--r-card, 16px);
-    box-shadow: 0 1px 2px rgb(0 0 0 / .05);
+    border: 0; border-radius: 0; box-shadow: none;
+    text-align: right;
   }
-  .quote__price { justify-items: center; }
-  .quote__price .send__label { font-size: .66rem; letter-spacing: .16em; }
-  .quote__price .send__figure { font-size: 1.9rem; }
+  /* The column's cross axis follows the writing direction, and the door is on
+     the right in every language — so in Hebrew "flush right" is the START. */
+  html[dir="rtl"] .quote { align-items: flex-start; }
+  .quote__price { justify-items: end; }
+  html[dir="rtl"] .quote__price { justify-items: start; }
+  .quote__price .send__figure { font-size: 2.4rem; line-height: 1; color: var(--ink); }
   /* Back the right way up: there is a whole wall below it here.
      ⚠ AND "A WHOLE WALL" WAS NOT MEASURED, AND ON HALF THE DESKTOP SHAPES IT
      IS NOT THERE — 13.9.2026. `46vh` is a guess at the room under the chip;
@@ -1790,45 +1878,42 @@ html[dir="rtl"] .quote__back .quote__chev { transform: none; }
      else, the column ran 25 px past the foot of the window and took the
      `סה״כ` row with it — and above 1100 `body` is `100dvh; overflow: hidden`,
      so that row was not below the fold, it was unreachable by any gesture.
-     Four of six desktop shapes, two of them audit viewports.
      `--bd-gap` is the margin, said ONCE and subtracted where it is applied.
      The `max()` is a floor: a screen too short to hold four rows under the
-     chip gets a small overhang rather than a popover of zero height, which
-     would be the same fault wearing the fix's clothes. Measured: the tightest
-     shape tried is a 1280x600 window at 165 px of room, so nothing reaches the
-     floor today — it is there for a window nobody has yet dragged that small.
-     ⚠ AND THE COLUMN IS SHORTER FOR THIS, WHICH IS THE HONEST TRADE AND IS
-     RECORDED RATHER THAN FUDGED. A twelve-row door at 1280x720 gets 198 px of
-     column — about five rows and the pinned total — where it used to get 414
-     px of which the last five rows could not be reached at all. Everything is
-     now reachable; less of it is on screen at once. CLAUDE.md §9 carries the
-     residual and what would actually close it, which is a question about where
-     the chip stands rather than a number to nudge. */
+     price gets a small overhang rather than a popover of zero height.
+     ⚠ It hangs off `.quote__price`, whose box is the FIGURE's since the
+     caption went (28.9), so `left: 50%` centres it on the figure. And where
+     the wall left of a wide door is narrower than half the breakdown, the
+     stage's edge would cut it: `placeBreakdown` (js/app.js) moves it inboard
+     by exactly that much (`--bd-shift`), and the audit names every reading
+     where it did. */
   .quote .bd {
     --bd-gap: 8px;
     inset-block-end: auto; inset-block-start: 100%;
-    /* ⚠ `left`, NOT `inset-inline-start`, AND IT HAS BEEN WRONG IN HEBREW
-       SINCE THE WALL PLACEMENT SHIPPED — 14.9.2026. A LOGICAL inset with a
+    /* ⚠ `left`, NOT `inset-inline-start` — 14.9.2026. A LOGICAL inset with a
        PHYSICAL transform does not centre anything: in RTL `inset-inline-start`
-       resolves to `right`, so the popover's right edge landed half the CARD's
-       width in from the card's right and `translateX(-50%)` then moved it half
-       the POPOVER's width further left again. Measured at 1440×900: in English
-       and Russian the two centres agree to 0.0 px; in Hebrew the popover's
-       centre sat **145.6 px** — its own half-width — to the left of the card's,
-       which on this page is straight onto the door. `left: 50%` is measured
-       from `.quote`'s own left edge in both directions, so the pair centres in
-       both. §0c's rule one box further in: the interface mirrors, and a
-       transform does not mirror with it. */
-    inset-inline: auto; left: 50%; transform: translateX(-50%);
+       resolves to `right`, and the popover sat its own half-width off its
+       anchor (145.6 px at 1440×900, straight onto the door). `left: 50%` is
+       measured from the anchor's left edge in both directions. */
+    inset-inline: auto; left: 50%;
+    transform: translateX(calc(-50% + var(--bd-shift, 0px)));
     margin-block-end: 0; margin-block-start: var(--bd-gap);
     max-block-size: max(132px, min(46vh, calc(var(--bd-room, 100vh) - var(--bd-gap) - 12px)));
+    text-align: start;
   }
-  /* ⚠ 44 px HERE TOO. The first draft said 36 — small enough to sit quietly
-     under the price on a wall with room to spare — and `npm run audit` failed
-     it at all four desktop viewports within a minute: `quote__send 136x36`.
-     The floor is a floor, and it does not soften because the control is meant
-     to be quiet. Quiet is a matter of colour and weight, not of size. */
-  .quote__send { font-size: .8rem; min-block-size: 44px; padding: 0 14px; }
+  /* ⚠ A LINE OF INK, NOT A PILL — and still 44 px tall: the floor is a floor,
+     and quiet is a matter of colour and weight, not of size (the first draft
+     of the card said 36 and the audit failed it within a minute). The mark is
+     ink too: the WhatsApp green on lamp-lit plaster is under 2:1, and the word
+     beside it says where it goes. The one green button is still the summary's. */
+  .quote__send {
+    min-block-size: 44px; padding: 0; gap: 6px;
+    background: none; color: var(--ink); box-shadow: none; border: 0;
+    border-radius: 0;
+    font-size: .95rem; font-weight: 600;
+    text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px;
+  }
+  .quote__send:hover { filter: none; text-decoration-thickness: 2px; }
 }
 
 /* ⚠ `.grip-bar`, `.grip-live`, `.grip-bad` AND THE FOCUS RING STOOD HERE —
@@ -2480,22 +2565,37 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
   border-radius: 3px;
 }
 
-/* The question itself, in the display voice — light and large, one step down
-   from the page's `<h1>`. This is the line a customer reads on every one of
-   nine screens, and it was 16 px semibold.
-   ⚠ AND SINCE 27.9.2026 IT IS READ ABOVE THE DOOR, NOT HERE — the owner's son:
-   *"above the door the name of the section we are at, big — moved from the
-   panel."* The `<h2>` stays, visually hidden: `goStep` still focuses it and a
-   screen reader still hears the step (`.stage__band` is `aria-hidden`). The
-   type is kept for the day it is shown again. */
+/* The question itself. ⚠ HIDDEN FROM 27.9 TO 28.9, AND SHOWN AGAIN — on 27.9
+   the owner's son moved the step's name above the door (*"the name of the
+   section we are at, big — moved from the panel"*) and this `<h2>` was kept
+   only for `goStep`'s focus and a screen reader; on 28.9: *"The title of the
+   section also above the options."* So both: the band over the door and this,
+   in the band's own face and weight, smaller — it heads the answers, it does
+   not compete with the door. Kept compact on purpose: every pixel of it comes
+   out of what a phone shows under the door (the audit's answer-on-screen
+   clauses read it). */
 .sect__title {
-  margin: 0 0 10px;
-  font: 300 clamp(22px, 2.4vw, 30px)/1.15 var(--sans);
-  letter-spacing: -.015em;
+  margin: 0 0 6px;
+  font: 700 clamp(19px, 1.5vw, 22px)/1.2 var(--display);
+  letter-spacing: 0;
   color: var(--ink);
   text-wrap: balance;
-  position: absolute; inline-size: 1px; block-size: 1px;
-  padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+@media (max-width: 1099px) {
+  .sect__title { font-size: 1.12rem; margin-block-end: 4px; }
+}
+/* ⚠ EXCEPT ON A SCREEN UNDER 500 px TALL — a phone on its side, a laptop at
+   200 %. Measured the day it was shown: at 844×390 the steps that showed an
+   answer went 5 → 0, at 640×360 2 → 0 — the title's 25 px was the margin they
+   had. There the band over the door, which stays in the sticky block and is
+   always on screen, is the only place it is read; the `<h2>` goes back to
+   visually hidden (still focused by `goStep`, still heard). Ours to have
+   decided, named in CLAUDE.md §0a. */
+@media (max-width: 1099px) and (max-height: 499px) {
+  .sect__title {
+    position: absolute; inline-size: 1px; block-size: 1px; margin: 0;
+    padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
 }
 /* What the question means, for the customer who does not already know. Capped
    at a readable measure rather than run to the full width of a 380 px card. */
@@ -2598,7 +2698,7 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
    above, and `.sect__where` / `.sect__title` / `.sect__lede` directly above).
    §8, five times in this file and twice by me. */
 @media (max-width: 1099px) and (max-height: 700px) {
-  .stage { block-size: calc(clamp(36vh, 100vw, 42vh) - var(--band-h, 0px)); }
+  .stage { block-size: clamp(36vh, 100vw, 42vh); }
   .sect__where { margin-block-end: 3px; }
   .sect__title { margin-block-end: 4px; }
   /* ⚠ AND SMALLER, WHICH IS THE ONE PLACE THIS ROUND TOUCHES TYPE SIZE — the
@@ -2926,6 +3026,58 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
 .confirm .confirm__yes { background: var(--danger); color: #fff; border-color: var(--danger); }
 .confirm .confirm__no, .confirm .confirm__ok { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .is-bare .works, .is-bare .works-open, .is-bare .confirm { display: none; }
+
+/* ── THE FIRST-VISIT TOUR — 28.9.2026 (js/tour.js) ──────────────────
+   A modal dialog over the whole viewport with no ground of its own: the scrim
+   is the SVG under it (ink at .6, cut out over the live target), the callout a
+   paper card placed by the script, the arrows white lines from its edge to
+   each cut-out. Its fade is the one animation it has, and it goes under
+   reduced motion and in bare mode with every other (T9, T13). */
+.tour {
+  position: fixed; inset: 0; margin: 0; padding: 0; border: 0;
+  inline-size: 100vw; block-size: 100vh; max-inline-size: none; max-block-size: none;
+  background: transparent; overflow: hidden; color: var(--ink);
+}
+.tour::backdrop { background: transparent; }
+.tour__scrim, .tour__arrows {
+  position: absolute; inset: 0; inline-size: 100%; block-size: 100%;
+  pointer-events: none;
+}
+.tour__arrow { stroke: #fff; stroke-width: 2.5; stroke-linecap: round; }
+.tour__card {
+  position: absolute; inline-size: min(300px, calc(100vw - 32px));
+  padding: 16px 16px 12px; border-radius: var(--r-card);
+  background: var(--paper); box-shadow: 0 10px 30px rgb(0 0 0 / .28);
+  animation: tourIn .25s var(--ease) both;
+}
+.tour__n { margin: 0 0 4px; font: 600 .72rem var(--sans); color: var(--ink-2); letter-spacing: .04em; }
+.tour__t { margin: 0 0 12px; font: 400 .98rem/1.5 var(--sans); }
+.tour__row { display: flex; justify-content: space-between; gap: 10px; }
+.tour .tour__skip, .tour .tour__next { min-block-size: 44px; min-inline-size: 72px; }
+.tour .tour__skip { background: none; color: var(--ink); border-color: var(--rule); }
+.tour .tour__next { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+@keyframes tourIn { from { opacity: 0; } }
+.is-bare .tour { display: none; }
+
+/* ── the save's two dialogs — 28.9.2026 ─────────────────────────────
+   The confirm dialog's card and backdrop (they carry `.confirm`, so the bare
+   rule above covers them too, and they animate as little as it does). The
+   save dialog is three stacked choices — the first the ink primary, the list
+   a quiet outline carrying its count, then a plain close — and the list is
+   the drawer's own rows (`.saved`, above) in a wider card. */
+.savedlg__col { display: grid; gap: 10px; }
+.savedlg .savedlg__save, .savedlg .savedlg__list, .savedlg .savedlg__close {
+  min-block-size: 48px; justify-content: center;
+}
+.savedlg .savedlg__save { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.savedlg .savedlg__list { background: none; color: var(--ink); border-color: var(--rule); }
+.savedlg .savedlg__close { min-block-size: 44px; background: none; border-color: transparent; color: var(--ink-2); }
+.saved-dlg { inline-size: min(560px, 94vw); }
+.saved-dlg .saved {
+  padding: 0; margin-block-end: 14px;
+  background: none; border: 0;
+  max-block-size: 60vh;
+}
 
 /* ── swatches ─────────────────────────────────────────────── */
 
@@ -3597,35 +3749,20 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    is untouched. */
 @media (max-width: 1099px) { .sect__foot { display: none; } }
 
-/* ⚠ AND BELOW 1100 THE CAPTION YIELDS, NOT THE SEND — 27.9.2026. The 11.9
-   note on `.quote__price` said its grid "stops the CAPTION setting the box's
-   width"; measured, it did not: in Russian "ОРИЕНТИРОВОЧНАЯ ЦЕНА" is 152 px
-   and the box was 152 wide at every width (81 in Hebrew, 103 in English), so
-   at 360-390 the send — "Отправить", 120 px natural, one word now on the
-   owner's son's instruction — was cut to "Отправ…".
-   ⚠ AND THE FLOOR IS REAL, WHICH THE FIRST VERSION'S WAS NOT. It said "never
-   below its min-content, which is the figure"; falsified with a worded back
-   beside a worded next, the box went to 13.6 px under a 57.8 px figure,
-   because a `minmax(0, 1fr)` column has no minimum. Now the column's minimum
-   IS the figure (`minmax(min-content, 1fr)`: the caption may break anywhere,
-   so its own minimum is a letter, and it is clamped to one line with an
-   ellipsis), the box shrinks only down to that, and the one-word send keeps
-   its width. Where even that does not fit the row overflows the bar, which
-   the audit asserts against. Measured in he, en and ru at 320/360/375/390/834,
-   the standard door and an ₪18,085 one: nothing cut but the Russian caption
-   between 360 and about 480 px, the bar 67.0 and 71.3 px as before. The
-   caption still goes below 360 (the rule above). After the base rules (§8). */
+/* ⚠ BELOW 1100 THE PRICE'S BOX IS THE FIGURE, AND IT DOES NOT YIELD — 27.9,
+   restated 28.9.2026. On 27.9 the CAPTION yielded here ("ОРИЕНТИРОВОЧНАЯ ЦЕНА"
+   was 152 px and set the box's width at every width, cutting the one-word send
+   to "Отправ…" at 360-390); the caption itself went on 28.9 (*"Remove the
+   'מחיר משוער' text above the price"*), so what is left of the rule is its
+   floor: the column's minimum IS the figure (`minmax(min-content, 1fr)` — a
+   bare `minmax(0, 1fr)` let the box go to 13.6 px under a 57.8 px figure when
+   it was falsified), and the one-word send keeps its width. Where even that
+   does not fit, the row overflows the bar, which the audit asserts against.
+   After the base rules (§8). */
 @media (max-width: 1099px) {
   .quote__price { flex: 0 1 auto; min-inline-size: min-content;
                   grid-template-columns: minmax(min-content, 1fr); }
   .quote__send { flex-shrink: 0; }
-}
-@media (min-width: 360px) and (max-width: 1099px) {
-  .quote__price .send__label {
-    justify-self: stretch; min-inline-size: 0;
-    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1;
-    overflow: hidden; overflow-wrap: anywhere; white-space: normal;
-  }
 }
 
 /* ⚠ AND ON A DESKTOP THE FOOT IS PINNED TO THE BOTTOM OF THE CARD, because it
@@ -3734,33 +3871,63 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    its content, so the column is ink from the card's top to its foot whatever
    the step's length, and the nav itself is transparent. The card's inline-end
    padding moves into the column's gap. */
+/* ⚠ AND SINCE 28.9 IT STANDS ON THE PHOTOGRAPH, NOT ON THE PANEL — the owner's
+   son: *"The rectangle with the icons needs to be not endless, but just the
+   size it needs to host all the section icons, a little separated from the
+   options choosing thing, the image needs to be behind it — on the image and
+   not on some white thing."* The 27.9 column above was the panel's second grid
+   column with the PANEL's background painting the ink, so the ink ran the
+   card's whole height whatever the step, and the panel's scrollbar — on the
+   door-facing edge in RTL — ran down it on any step long enough to scroll.
+   Now `placeNav` (js/app.js) carries `.steps` into `.stage-wrap` above 1100
+   and this places it there:
+     · on the stage's edge that faces the panel — `inset-inline-start`, since
+       the panel is the grid's first column in both directions — 12 px off it;
+     · centred on the door's mid-height, its height its content: 44 px
+       targets 6 px apart inside 10 px of ink, 9 × 44 + 8 × 6 + 20 = 464 px,
+       which no desktop `VIEW` stage is shorter than — and moved DOWN only
+       where the centred place is under the wall's other furniture on its side
+       (`--steps-top`, computed in `fitStage`);
+     · its own ink, `--r-card` corners, the photograph round it.
+   ⚠ THE WALL IS ARITHMETIC. The column (56) and its gap (12) share the wall
+   on that side with the arrow (44, at 8 px off the casing): 120 px. The wall
+   is 140–150 px at 1100–1200 on the standard door and fits; the widest double
+   at 1100 has 73 and does not — the audit gates the standard door at every
+   width and every door from 1280 up, and NAMES the readings that overlap.
+   The panel goes back to one column, and `scrollbar-gutter: stable` reserves
+   the scrollbar's lane on every step, so the tiles no longer shift sideways
+   between a step that scrolls and one that does not. */
 @media (min-width: 1100px) {
-  .panel--choose {
-    grid-template-columns: minmax(0, 1fr) 56px;
-    column-gap: 18px;
-    padding-inline-end: 0;
-    background: linear-gradient(to left, var(--ink) 0 56px, var(--surface) 56px);
-  }
-  [dir="rtl"] .panel--choose {
-    background: linear-gradient(to right, var(--ink) 0 56px, var(--surface) 56px);
-  }
-  .panel--choose > * { grid-column: 1; }
-  .panel--choose > .steps {
-    grid-column: 2; grid-row: 1 / span 40;
-    align-self: start;
-    flex-direction: column; align-items: center; gap: 6px;
-    margin: 0; padding: 0 0 12px;
-    border: 0; box-shadow: none;
+  .panel--choose { scrollbar-gutter: stable; }
+  .stage-wrap > .steps {
+    position: absolute;
+    inset-inline-start: 12px;
+    /* `fitStage` publishes the top: the door's mid-height less half the
+       column, or 8 px under the wall chrome on its side where that is lower
+       (see `--steps-top` there). Before the first fit, centred on the stage. */
+    inset-block-start: var(--steps-top, calc(50% - 257px));
+    z-index: 4;
+    /* ⚠ THE GAPS GIVE, NEVER THE TARGETS — 28.9, with the price's move. In
+       English and Russian at 1100–1152 the price stands in the column's own
+       x-range and the room between it and the trust band is 436–450 px against
+       the column's 464; `placeSteps` then tightens these two lengths (6 → no
+       less than 2, 10 → no less than 6) by exactly the shortfall. Nine 44 px
+       targets stay nine 44 px targets. */
+    flex-direction: column; align-items: center; gap: var(--steps-gap, 6px);
+    margin: 0; padding: var(--steps-pad, 10px) 6px;
+    inline-size: 56px;
+    background: var(--ink);
+    border: 0; border-radius: var(--r-card);
+    box-shadow: 0 6px 18px rgb(0 0 0 / .18);
     min-block-size: 0; overflow: visible;
     -webkit-mask-image: none; mask-image: none;
   }
 }
 
-/* `.btn--undo` and its `is-off` twin are GONE. Undo is two icon circles now —
-   `.iconbtn`, defined up beside the language picker — always on the page and
-   `disabled` when there is nothing to take back, so the strip below the door
-   holds one height for ever instead of two. The 23,021-pixel lesson that made
-   `is-off` necessary is what keeps them both mounted. */
+/* `.btn--undo` and its `is-off` twin are GONE, and so are the two icon circles
+   that replaced them (28.9: `.undo-pill` at the stage's foot). The 23,021-pixel
+   lesson that made `is-off` necessary still holds — nothing in the flow — and
+   the pills are absolute for exactly that reason. */
 .btn__ico {
   inline-size: 18px; block-size: 18px;
   stroke-linecap: round; stroke-linejoin: round;
@@ -4156,7 +4323,7 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    it. Anything added to the stage wrap belongs here the same day. */
 .is-bare .bar, .is-bare .strip, .is-bare .panel, .is-bare .stage__bar,
 .is-bare .stage__h1, .is-bare .steps, .is-bare .trust, .is-bare .saved,
-.is-bare .stage__hud, .is-bare .quote, .is-bare .stage__band, .is-bare .stage__arrow,
+.is-bare .stage__hud, .is-bare .quote, .is-bare .stage__band, .is-bare .stage__arrow, .is-bare .stage__undo,
 /* ⚠ `.brand` JOINS THE LIST THE DAY IT IS ADDED, which is the standing rule
    for anything put inside `.stage-wrap` — the one page element `?bare=1`
    keeps. Bare mode exists so the harnesses photograph THE DRAWING and no page

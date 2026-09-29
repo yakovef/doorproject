@@ -53,6 +53,644 @@ oldest lines move to the top of the "moved" section.
     with the ball on `nickelSoft` and the rose on `gripSoft` all three fail.
   · **Not changed:** the escutcheon (§9 — it varies door to door, it is every
     lockset's) and the 105 mm knob-to-keyway (this door 96-99, the corpus 102-105).
+- **28.9 — THE HALF DOOR'S FACE FOLLOWS THE MAIN LEAF'S (9 of 10).** The owner's
+  son: *"On the half door the proportions between windows and panels need to be
+  the same as on the main door — a window and a panel at the same width, just
+  like the main door — and with 3 panels there should be 3 panels on the half
+  door too."*
+
+  **WHAT WAS WRONG.** The fixed leaf of a דלת וחצי drew a face only under glass:
+  a solid pair or trio stood beside a BARE half leaf. Under the square window it
+  drew the window's lone panel at `PANEL_INSET` whatever the face (0.68–0.90,
+  189 mm under a 288 mm casing), so a glazed pair or trio did not repeat. The
+  slot there was the main pane clamped to `sideW − 240`, 110 mm on every size.
+
+  **WHAT IT DOES.** The branch asks the main leaf's own statement,
+  `faceRowsOn(detail, win, openings, sideW, leafH)`, of the fixed leaf and draws
+  what it answers through the same `appliedFrame`. Solid: the pair's two rows,
+  the trio's three with its plate, at `PANEL_INSET` of the leaf's own width.
+  Glazed: the rows the face KEEPS (the window replaces the upper panel), and
+  behind a plain face the window's lone panel. The rows are fractions of the
+  one height both leaves share, so the panels line up across the door (within
+  0.5 mm, asserted). The glass is the main light's fractions of the fixed leaf's
+  width. The square window was already `classicFixedLight` (148 mm). The slot
+  now takes the fractions its cut opening comes to on the main leaf: 0.320 on
+  `half` (112 mm), 0.294 on `halfextra1` (103), 0.247 on `halfextra2` (86).
+  The ornament stays at the main pane's scale (`ornW`). The Greek set's branch
+  is untouched.
+
+  **OURS, NAMED IN §0a: UNDER GLASS THE ROWS TAKE THE CASING'S WIDTH.** The
+  order's technical line said `PANEL_INSET` of the leaf's own width. On the main
+  leaf that happens to read as the casing's width: 459 mm under 499 (0.92). The
+  casing is 70 mm of stock whatever the leaf, so on 350 mm the same inset gives
+  189 under 288 (0.66), the very mismatch his sentence names. So under glass
+  every fixed-leaf row lines up with the casing, as the lone panel always has;
+  solid, `PANEL_INSET` stands as ordered. The cost: switching the window on
+  widens that leaf's lower panel 189 → 288, where the main leaf's stays put.
+  **d119 is overruled by his word:** its narrow leaf reads the panel at 0.50 of
+  the leaf under a 0.34 window. Measured, overruled, kept in the comment.
+
+  **THE MONEY, ASSERTED AGAIN.** The drawing doubled and the charge must not.
+  Across the three doubles × solid/square window × pair/trio, the face adds
+  exactly what it adds on the standard door. A glazed double counts two panes
+  (`paneCount`), and a priced grille adds exactly twice its one-pane figure.
+
+  **THE GROUP** ("the half door carries the main leaf's face, and is charged
+  for one", 138 assertions) reads the drawing leaf by leaf. It checks: the same
+  number of panels on both leaves, with a §5.15 guard that the main leaf
+  yielded some; the same rows; solid, the same x fractions of each leaf;
+  glazed, every fixed-leaf panel on the casing's edges (pane ± band); and the
+  pane at the main pane's fractions of its own leaf. It counts what it asked
+  (≥ 18 doors, ≥ 9 glazed, all 3 slots). **Falsified three ways**, each
+  restored. The old branch back → 27 faults: solid faces bare, rows apart, the
+  slot's 0.343/0.657 against 0.340–0.376 on all three bands. The kept rows at
+  `PANEL_INSET` under glass → 9 "not the casing's width". The face priced × 2
+  on a double → 9 money faults.
+
+  **THE REST.** `npm run collide -- all`: 1,638 designs (1,468 base, 602 with the
+  bow, 170 face-detail), `half` and `halfextra2` among the swept sizes; the
+  fixed leaf's panes against its new mouldings, "nothing overlaps", and
+  `faceObstacles` agrees everywhere. (1,468 is 8 fewer than the 1,476 §0c
+  carried. Traced by running the sweep at each commit: 82eb150 1,476/610,
+  `86eb6fa` 1,468/602, the same ever since. The bow's redraw off four doors
+  moved its box, and eight designs carrying it left the buildable set. Not this
+  round's; the figure had simply not been re-read.) In `catalog.js`
+  the `SIDE_OPENING_MIN` and `glazedPanels` notes described the clamp; they
+  describe the fractions now, and the latter's dead citation of an
+  `ASK-PERETZ.md` §4b (no longer in the file) points at §0g (A18). No gallery
+  door is a double, so only `recreate-d122` (`s=sidelight` → `half`, the square
+  window, plain) shows the change, and it will move at commit 10.
+
+- **28.9 — A FIRST VISIT GETS A TOUR (8 of 10).** The owner's son: *"A little
+  tutorial when a person first joins: at every step a grey overlay on everything
+  but the thing described, an arrow from the text to the thing. First the door …
+  Then the sections (the black rectangle with the icons) … Then the options …
+  Then save and undo … Only on the first visit; incognito or another user on the
+  same device sees it again."*
+
+  **WHAT IT IS.** `js/tour.js` and `<dialog id="tour">`: an SVG scrim
+  (`#171715` at 0.6 — the page's ink, not a grey) with a MASK, one rounded
+  cut-out per target, 8 px round it; a callout (the step's sentence, "n of 4",
+  Skip, Next/Done) and an arrow per cut-out, from the callout's edge point
+  nearest the cut-out to the cut-out's edge. Four steps: the door's `#frame`;
+  `.steps` (the column above 1100, the fixed row below); the options (the panel
+  above 1100 — on a phone, the live step between the sticky door and the quote
+  bar, scrolled up first); `#save-hud` and `.stage__undo` (the pills are hidden
+  until something can be undone, so their resting corner is what is shown).
+  The sentences are his, one per step, in three languages; the door's carries
+  the illustration note (*"the real door may look a little different: this is a
+  drawing"*) because a tour that says "this is your door" and nothing else
+  makes a promise the page does not.
+
+  **PLACEMENT IS COMPUTED, EVERY STEP AND EVERY RESIZE.** The callout tries
+  below / above / after / before the first cut-out, then the foot and the head
+  of the viewport, and takes the first that is inside the viewport with 12 px
+  and covers no cut-out; "after" is read off `dir`, never assumed — the door
+  never mirrors and the chrome does, so a fixed side would be right in one
+  language only (§9's two-rules-that-mirror-differently, again).
+
+  **MODAL, AND WHY.** `showModal`: the page behind is inert, so a finger on the
+  target through the cut-out does nothing (a tour, not homework), focus is
+  trapped on Next, Escape skips (`oncancel` → `end`). The flag is remembered on
+  Done, Skip and Escape — `localStorage` `dm.tour.v1` behind a try: a window
+  that refuses storage sees it every visit, which is what "first visit" means
+  there, and nothing throws. **Never on a link carrying a door** (Peretz opening
+  a customer's link is not a first visit), bare or the sheet — `init` asks
+  before `startTour`, 1.1 s after arrival, and not over another open dialog.
+
+  **§5.28 AGAIN, ON PURPOSE.** A new modal in the page is a change to every
+  instrument that drives it. `tourless(browser)` in `tools/browser.mjs` wraps
+  `newPage` and `newContext` with an init script that sets the flag, and all
+  sixteen tools that launch Chromium launch through it (the pool too). The
+  audit's own tour block launches a RAW browser, so the one walk that must see
+  the tour does, and it asserts the tour opened — it cannot go quiet.
+
+  **THE AUDIT BLOCK** (1280 he, 390 ru, 320 ru — 12 steps, all measured): a
+  first bare load opens a modal on step 1; on each step a target exists
+  (§5.15), sits whole inside a cut-out, cannot be pressed through the scrim
+  (`elementFromPoint` at the target's centre is inside `#tour`), the callout is
+  inside the viewport and off every cut-out, and every arrow runs callout edge
+  → cut-out edge; after Done the flag is `seen` and a reload shows nothing. Skip
+  and Escape end and remember; a link, `?bare=1` and `?sheet=1` never open it;
+  with `localStorage` throwing it shows, ends and throws nothing.
+  **Falsified three ways**, each restored: started on links too → "the tour
+  opened on a link carrying a door"; the callout placed at the first try
+  regardless → "the callout covers a cut-out"; `remember` a no-op → the flag
+  `null` and "the tour came back on the second visit".
+
+  **FOUND ON THE WAY.** A scrim written `fill="rgb(… / .6)"` in the SVG
+  attribute painted far fainter than the same colour in CSS — `fill` +
+  `fill-opacity` now. The phone's third step had no target at first (the panel
+  is not a box there); it is the live step's visible slice. Pre-existing, not
+  this commit's: in English and Russian the desktop step foot's "Next ›" wraps
+  to two lines at every desktop width.
+
+- **28.9 — THE EXTRA LOCK'S OWN STEP (7 of 10).** The owner's son: *"The extra
+  locks as a separate section, right after the pirzul section — they don't fit
+  on the screen and I need to scroll for them."*
+
+  **WHAT IT IS.** `SECTIONS` gains `xlock` (מנעול נוסף / Extra lock /
+  Дополнительный замок) after `pz`, and the `speciallock` group moved to it:
+  fit · colour · lock · pz · **xlock** · face · glass · grip · mk · sum. A new
+  key, never in the wire format, so no `VERSION`; the summary's row finds its
+  step through `sectionOf` (derived from the group's `in`). The lock step's
+  explainer was the extra lock's — it moved with it (`exp.xlock`, the two
+  figures still through `{0}`/`{1}`), and the lock step has its own now (what
+  comes with the lock, where its tone and the extra lock are chosen); its
+  one-line summary and lede no longer promise the extra lock there.
+
+  **THE TENTH MARK** is the קודן's own case — the mark the summary's row already
+  drew (`SPEC_ICON.speciallock` now refers to `SECTION_ICON.xlock`: one idea,
+  one mark). Ten nav marks at 21 px, 45 pairs, closest lock ~ grip at 60 %
+  (floor 50); falsified by drawing it as the lock's → "differ on 0 %".
+
+  **THE COLUMN IS 514 px NOW, AND AT 1100–1152 IT DID NOT FIT.** In English and
+  Russian it stands under the price there, with 436–450 px of room against
+  ≥ 470 even with its gaps given (ten 44 px targets are 440 on their own). The
+  room was the trust band: its box is the whole floor strip, but its four
+  claims are centred and never reach the column's corner. So the column's
+  floor is the band's WORDS in its own x-range, else 8 px above the stage's
+  foot — the ~41 px the ten marks needed. Measured over six desktop widths ×
+  three languages × six sizes: on no price, hud, pill, arrow, word or door,
+  inside the stage, no mark cut. Falsified: the band's box back as the floor →
+  "the price and the steps overlap" on five readings.
+
+  **THE WALK'S LENGTH, STATED ONCE.** Sixteen places in the audit had typed 8
+  or 9 by hand — every walk would have gone one step short, green. They read
+  `QUESTIONS` (9) and `STEPS` (10) now, and `WANT_ORDER` (the arrival clause)
+  holds the navigator to that sequence. The band's walk, the navigator's
+  gate, the marks block: run alone on this tree, clean.
+
+  **GATES.** `node --check` (app, icons, copy, audit); `npm run build`; `npm
+  test` **9,440,999 passed / 5 failed** — the five sheet-staleness rows (the
+  new step's hint and explainer counted in all three languages, T15). Sheets:
+  0 bare.
+
+- **28.9 — FOUR SMALL PAGE THINGS (6 of 10).** The owner's son, four
+  sentences: *"The arrows choose very randomly in the colour section — I want
+  it to go nicely one by one, in every section."* · *"Put the expensive window
+  designs apart from the regular ones, and keep the same designs in different
+  colours near each other."* · *"The option to choose a colour for a pull
+  handle opens only when there is a pull handle on the door."* · *"The title
+  of the section also above the options."*
+
+  **THE ARROWS** walked `g.list()` — the code's INDEX order — while the colour
+  step draws its paints grouped by price and the glass step its designs by
+  twin; so "next" jumped about the screen. `arrowStep` reads the order off the
+  group's live tiles (`[role=radio][data-id]` in DOM order), falling back to the
+  list only where a group is not one tile per option (the משקוף's rows).
+  Asserted: on every step, at 1280×720 he and 390×844 ru, each "next" lands on
+  the next FREE tile drawn, wrapping, and "prev" on the one before — 94 presses,
+  4 of them asking first (a bar beside the lever) and answered yes (§5.28).
+  Falsified as the order said: the array's order back → the colour step fails
+  in both languages.
+
+  **THE WINDOW DESIGNS** are two headed groups on screen — split on the list's
+  own `delta` (a `split` like the colours'): "עיצובים רגילים", then "עיצובים
+  מיוחדים · תוספת ₪700 לחלון" (the figure through `{0}`, and PER WINDOW:
+  ironwork is sold by the pane, so a two-pane door's tiles say ₪1,400 and the
+  heading must not pretend otherwise) — each black design with its `-light`
+  twin beside it. The array does not move: it is the code's index order, and
+  the twins drew apart because they were appended at its end on 27.9.
+  Asserted: two headings, the split on price, every twin beside its design,
+  every design once, the surcharge in the heading.
+
+  **THE FINISH GROUP** shows only with a pull handle — a bar that takes a
+  finish, or the bow. ⚠ **This reverses a decision taken FOR them on 27.9**
+  (the bell alone had kept the group, since it takes the finish on Peretz's
+  20.9 word); named in §0a then for exactly this. So a bell alone wears nickel
+  — `bellFinish`, one answer for the drawing (`bellTone`), the price (the bell
+  row) and the order (its row still names the finish: "ניקל") — and a state
+  carrying another finish with nothing to wear it is put back by `repair`, LAST,
+  with a sentence (`fix.finishHome`), so an old link with a gold bell and no
+  bar is told rather than silently repriced. The confirm dialog does not ask
+  about it (`NOT_A_LOSS`: it goes with the handle). The 30 gallery doors all
+  still arrive unrepaired. Asserted (unit): for every finish a lone bell costs
+  the bell alone, its row names nickel, and a non-nickel state is repaired with
+  its sentence; beside an Idan the bell and the bar each still pay the finish
+  (§5.22). The biconditional "shown exactly when a finish moves the price"
+  holds unchanged over every handle × bow × bell. (Audit) a bell alone hides
+  the group, a bell beside an Idan shows it, and `?bl=bell&hf=hf-gold` arrives
+  nickel WITH a notice — read off the door's code (the first draft read
+  `location.search`, which the page does not rewrite on arrival).
+
+  **THE TITLE** — the step's `<h2>`, hidden since 27.9 when the band over the
+  door took the name — is shown again above the options, compact (700 in the
+  band's `--display`, 19–22 px, 1.12 rem on a phone). ⚠ **Measured first on
+  the short screens**: shown there it took every answer off a phone on its
+  side (5 → 0 steps at 844×390) and a zoomed laptop (2 → 0 at 640×360), and
+  that exemption may only narrow — so under 500 px tall it stays visually
+  hidden and the band over the door, always on screen, carries it (a decision
+  of ours, named in §0a). "Name twice" restated: the band and the `<h2>` agree
+  and the `<h2>` is drawn at 390×844; a group heading repeating it is still
+  refused.
+
+  **GATES.** `node --check` (renderer, app, catalog, price, rules, spec,
+  copy, audit, units); `npm run build`; `npm test` **9,440,951 passed / 5
+  failed** — the five sheet-staleness rows. Two unit tests encoded the rule the
+  instruction reversed and are restated to the new rule, equally strong, the
+  reason beside each: "a gold finish gilds a פעמון on a door with no pull
+  handle" is now "…does NOT gild a lone bell, and beside the bow it does"; "the
+  bell's line names the chosen finish" is now "…names the finish it WEARS"
+  (nickel alone). Falsified: `bellFinish` back to the raw field → 53 unit
+  faults (the bell's line, the price biconditional, the lone-bell block); the
+  grille split removed → "0 headings" in both languages; the bell back as a
+  finish subject → the audit's lone-bell, link and notice clauses; the title
+  hidden again → 24 of 24 steps; the arrows on the array → the colour step in
+  both languages. The new and restated audit blocks run alone on this tree:
+  clean. Sheets: none expected to move — a lone bell with a non-nickel finish
+  is a state `repair` no longer keeps, and no committed sheet draws one (the
+  sheet run is after commit 10).
+
+- **28.9 — UNDO YOU CAN SEE, AND A SAVE THAT ASKS (5 of 10).** The owner's son:
+  *"The undo option rethought: not noticeable on pc and in the way on the phone
+  — more noticeable, but not colliding with the door."* And: *"The save
+  button's function changed: on clicking, a window with two options, save or
+  view a saved door."*
+
+  **WHAT WAS THERE.** Undo and redo were two 52 px ghost circles in the wall's
+  top row beside the save (27.9), disabled rather than hidden; the save saved at
+  once; the saved doors were a drawer inside the summary's send card.
+
+  **UNDO.** Two labelled ink pills ("↶ ביטול", "↷ חזרה" — `undo.short`,
+  `redo.short`; the long names stay their `aria-label`/`title`) in
+  `.stage__undo`, 8 px inside the stage's bottom-right corner, the picker's
+  side in every language. A disabled pill is not painted, so nothing shows
+  until there is something to undo and the redo only while there is something
+  to redo; the group keeps a 44 px box so the navigator column (Hebrew, above
+  1100, the same corner) does not jump on the first tap. `placeUndo` tries four
+  shapes and keeps the first that touches neither the door (`#frame`'s settled
+  box, `--frame-bot` published for it), an arrow nor the price: side by side,
+  stacked, the glyphs side by side, the glyphs stacked. ⚠ **The first build
+  chose by the wall's WIDTH alone, and the new audit block caught it twice**:
+  on a desktop the trust band's words run along that same foot (Russian at
+  1100–1280, Hebrew at 1100–1152: up to 1,646 px² of pill on them), and at 320
+  the stacked redo reached the arrow beside the door (up to 943 px²). Now a
+  shape whose width meets the words stands 8 px above the band, and each shape
+  is tested against the real obstacles. Measured over 8 viewports × he/ru × six
+  sizes: side by side 52, stacked 25, glyphs side by side 12, glyphs stacked 7;
+  lifted over the words on 24. ⚠ **One reading is named**: at 320×568 beside
+  the two widest doors, with both pills up, the wall is 93 px — an arrow and a
+  pill — and the stacked redo touches the arrow by 66 / 115 px² (§9). The toast
+  is lifted clear of the pills (read off its layout box, `offset*`, which its
+  entrance transform does not move).
+
+  **THE SAVE.** `#save-hud`, alone in its slot now, opens `<dialog id="savedlg">`:
+  "שמירת הדלת" (the same `saveCurrent` — its toast, then closes) and "הדלתות
+  השמורות שלי (N)", which opens `<dialog id="saved">`. That list is the drawer's
+  own rows moved into a dialog — the summary's "העיצוב שלי" opens it too, and
+  its "שמירת העיצוב" still saves at once. Both modal (the confirm dialog's card
+  and backdrop), Escape and the backdrop close them, and focus goes back to the
+  save it was reached from — the platform's own dialog focus-restoring does
+  that (the list opens after the save dialog has handed focus back to the
+  save). ⚠ A carried opener was written first; the falsification deleted it and
+  the clause stayed green, so it is gone and the comment says why. The toast now says where the list is:
+  *"— the list opens from the save button"*. No animation (T9, T13); both in
+  the bare hide-list through `.confirm`.
+
+  **ASSERTED.** New: **the undo pills** — every viewport × he/ru × six sizes
+  (96): none painted before a change, the undo alone after two, both after an
+  undo; at the corner (or 8 px over the trust words); ≥ 44; on no door, words,
+  price, arrow, column or band; the first shape that touches nothing (each
+  earlier shape put back and re-measured); the undo's toast above them.
+  **The save asks** — four shapes × three languages: a modal with focus
+  inside, saving only when asked, counting, opening the list as a modal,
+  closing on Escape and the backdrop, focus back on the save. Restated: "an
+  undo says what came back" presses the pill (asserted to be the pill); the
+  drawer block asks its subjects of the dialog and adds that it is modal; the
+  wall-press clause makes a change first so both pills are there to press and
+  requires the save too; the wall-overlap clause pairs every control on the
+  wall (hud, pills, price, arrows, column), not only the hud's. Falsified: a disabled pill painted → "painted before anything could be
+  undone" (48); the pills at the left corner → the corner clause (48); one
+  shape only → "the first shape that fits is …" (43) and the arrow (2); no lift
+  over the words → the words (19) and the foot (14); the toast not lifted →
+  "the toast covers the pills" (29); the wall's save saving at once → "did not
+  open its dialog", "focus stayed outside", the count; `show()` for
+  `showModal()` → "not as a modal". The eighth — the focus return deleted —
+  fired nothing, because the platform does it (above).
+
+  **GATES.** `node --check` (renderer, app, audit); `npm run build`;
+  `npm test` 9,440,902 passed / 5 failed — the five sheet-staleness rows (shot,
+  recreate, corpus, against, lockset). **`npm run audit`, the full run the
+  order asks for after this commit: 46 faults, four families, none of them a
+  fault of this commit's page:**
+  · **the floor detector at 1100 read −18.6 px** — the INSTRUMENT: its
+    screenshot hides the wall's chrome before looking for the floor line, and
+    the navigator column (on the photograph since commit 2) was not on that
+    list; its foot is a hard ink edge just above the floor. The column, the
+    band, the arrows and the pills are hidden now; the floor agrees to 0.0–1.8
+    px at all eight viewports (0.4 at 1100).
+  · **the tap sweep failed every desktop step** ("the live mark is cut by …
+    the panel it stands in") — ⚠ **commit 2's miss, owned here**: its record
+    said the tap sweep's live-target clause had been restated for the column
+    on the photograph; it had not, and it still asked for the mark inside the
+    PANEL. Restated: above 1100 the box is the stage, and the column must be in
+    the wrap. 48 steps whole.
+  · **the band's centring clause (commit 3) fired 11 times at 390** — MY
+    GATE'S logic: it allowed off-centre only when the band FILLS its span,
+    which is right only for a span symmetric about the door; with the save
+    alone in its corner the phone's span became asymmetric and roomy. Now it
+    asks the right thing — off-centre only where the band abuts an edge of its
+    span; falsified (a 12 px nudge → 72 faults).
+  · **the landscape exemption must narrow**: at 844×390 five steps show an
+    answer, not two (pz, face and mk joined — the band out of the flow, the bar
+    4.3 px shorter). Narrowed here and in §9; 640×360 unchanged.
+  Each family's block re-run alone after its fix: clean. The whole audit runs
+  again after commit 10. Sheets: 0 bare.
+- **28.9 — THE TYPE'S TWO PROMISES, ASSERTED (1c, AN AUDIT BLOCK ONLY).**
+  Commit 1 (`0f73fb9`) promised two things it measured once and nothing
+  asserted: the page makes no request outside its own folder (the reason the
+  Google Fonts script went), and the tuned fallback keeps the page's lines when
+  Rubik swaps in (fitted on the nine explainers per language). The per-viewport
+  clause at the top of the audit proves each face LOADED; neither promise had a
+  test, so either could lapse in silence — a `<link>` pasted from a font site,
+  a face swapped for another with the fallback left behind.
+  · **What it asserts.** A new top-level block in `tools/audit.mjs`, "the page
+    asks nothing of anywhere else, and the swap moves no line": every request
+    a load makes (1280×720, then 390×844 and 1280×720 × he/en/ru) is a
+    `file://` under the page's folder or a `data:` URL; and every block of text
+    on every step (`#choices p`, the field hints, the section's where-line,
+    summaries, tile and spec names) is measured in Rubik and again with Rubik
+    taken out of `--sans`, ~720 readings. No block may move by more than one
+    line, and at most 2 readings in 100 may move at all.
+  · **Why not zero.** On 8bbd134, 6 of 720 flip, each by one line (on 3615dfd,
+    9): strings on a knife edge of their box — "Кодовый замок" in a 91 px tile,
+    a twelve-line explainer at 1280 — which two typefaces never agree on string
+    by string. Built and measured in this session before the other commit 1
+    landed: a fallback of nine faces (script × weight class 300–499 / 500–599 /
+    600–900, each within 0.1 % of Rubik over the page's own text at that
+    weight — Rubik ÷ Arial is 0.959 / 0.991 / 0.948 in Hebrew, 1.036 / 1.067 /
+    1.031 in English, 1.036 / 1.068 / 1.023 in Russian) flipped the same 4–9
+    on other strings. So the residue is the strings, not the tuning, and the
+    three-face fallback that shipped stays. The ceiling was 1 in 100 on a
+    single reading of 4 and moved to 2 when the full audit read 9 on the same
+    fallback; written down, not quietly widened.
+  · **What it separates.** Swapping `css/app.css`'s three faces for 28.8's
+    Assistant numbers: 107 of 720 flip, 12 by more than a line (125 / 17 on
+    3615dfd) — two faults. The faces renamed so the fallback matches nothing
+    (a raw, untuned Arial): 38 of 720 (36) — the ceiling fault. A Google Fonts
+    stylesheet in the head: "the page asked for 6 thing(s) outside its own
+    folder". Each run on the tree it was committed to, and restored.
+  · **Dropped from this session's own commit 1**, as a duplicate of `0f73fb9`
+    and `3615dfd` (the same files, the same faces): the nine-face fallback,
+    `stampCss` in the build (theirs declares the faces in the head), the sheet
+    rows at line-height 1.4 (theirs: 6 → 4 px on paper), the picker hiding the
+    current language at every width (theirs: weight 400, 5 / 4 px). A negative
+    clause first written as "the other script's subset stays unloaded" was
+    wrong and is not here: the picker's own labels and the ₪ sign bring all
+    three scripts onto every page.
+  · **Gates:** node --check; npm run build; npm test 9,440,832 passed / 5
+    failed (the five sheet-staleness rows, red since commit 2: shot, recreate,
+    corpus, against, lockset). The block itself on 8bbd134: 6 of 720, no
+    faults. Sheets: none (an audit block; no page file changed).
+
+- **28.9 — THE PRICE AND THE SEND STAND ON THE PHOTOGRAPH, LEFT OF THE DOOR
+  (4 of 10).** The owner's son: *"The price bigger and not on a white thing but
+  directly on the image; change the font … Remove the 'מחיר משוער' text above
+  the price. Move the WhatsApp button with the price to the left of the door,
+  between the door and the lamp, on the higher end."*
+
+  **WHAT WAS THERE.** A paper card at the door's top-right corner (27.9, his
+  *"move to near the door, at the up right corner"*), a caption "מחיר משוער" over
+  a 1.9 rem figure and a green pill under it; on a phone the same caption over
+  the bar's figure, yielding to an ellipsis between 360 and ~480 px in Russian.
+  The third placement of this element, and every one of them his.
+
+  **WHAT IT IS.** Above 1100: no ground — no card, border or shadow — the figure
+  in `--display` at 2.4 rem, and the send under it as a line of ink with the
+  WhatsApp mark, underlined, 44 px tall. Anchored PHYSICALLY: `right` 8 px
+  outside the casing's LEFT edge (`--frame-left`), `top` at the casing's head or
+  8 px under the wall chrome (`--hud-b`), flush toward the door in every
+  language (in Hebrew the column's cross-axis start is the right, so the
+  alignment is stated per direction). The caption is off the figure everywhere;
+  the key stays for the A4 sheet's fine print. The mark is ink too: WhatsApp's
+  green on lamp-lit plaster is under 2:1. The one green button is still the
+  summary's.
+
+  **CONTRAST, MEASURED BEFORE ANY WASH WAS CONSIDERED.** With the ink made
+  transparent, the photograph under the figure's box and the send's was sampled
+  at nine desktop widths in three languages and its darkest 5 % compared with
+  `--ink`: the lowest reading is **10.6:1** (English, 1536×864, the figure),
+  the highest 13.1. The gate is 4.5; no wash was needed, so none was added.
+
+  **THE PICKER MOVED WITH IT.** The language picker was the hud's START slot —
+  right in Hebrew, LEFT in English and Russian — so in two languages it would
+  have shared the price's corner. A left-to-right hud row now runs reversed:
+  the picker is top-right in every language, the undo and save top-left.
+
+  **WHAT THE MOVE BROKE, AND ITS FIX.** In English and Russian the navigator
+  column stands on the same wall, and at 1100–1152 in the price's own x-range
+  (five readings, up to 665 px² at 1100×800, Russian, the half door). Under the
+  price there was 436–450 px of room against the column's 464, so the
+  trust-band floor pulled the column back up under it. Its eight gaps now give
+  first (6 → no less than 2) and then its paddings (10 → no less than 6), by
+  exactly the shortfall — 2.5 px gaps at the worst reading; the nine 44 px
+  targets never shrink. `placeSteps` is its own function. ⚠ **A wrong cause was
+  written down first and caught:** the figure is painted after `fitStage`, so a
+  second placement after the figure changes looked necessary; built, then
+  measured with and without it — on a load and on a tap from ₪6,390 to ₪10,190 —
+  it changed nothing (the stage's observer re-fits after the first paint, and
+  the column is pushed by the price's FOOT, which a wider figure does not
+  move). The falsification of the gate found it by firing nothing. Removed, and
+  the comment says why it is not there.
+
+  **THE BREAKDOWN** hangs off the figure's box (`.quote__price` is the figure's
+  since the caption went), centred on it; where the wall left of a wide door is
+  narrower than half of it, the stage's edge would cut it, so `placeBreakdown`
+  moves it inboard by exactly what keeps it 8 px inside (`--bd-shift`) — read
+  off the layout box and the anchor, never off the popover during its
+  entrance. Held on 6 of 27 readings: he 1100 22 px, en 1100 50, en 1152 24,
+  ru 1100 49, ru 1152 28, ru 1200 3. The rows whole on a thirteen-row door are
+  unchanged by the move: 10 / 10 / 11 / 12 / 13 at 1280×720 / 1366×768 /
+  1100×800 / 1440×900 / 1920×918, before and after (§9).
+
+  **THE PHONE BAR** keeps its layout; with the caption gone it is 67.0 px at
+  every width (it was 71.3 above 360) — 4.3 px more room under every fold
+  check, which the audit after commit 5 reads.
+
+  **ASSERTED.** The 14.9 sweep (162 readings, nine widths × three languages ×
+  six sizes) keeps its subjects on the new anchor — whole where the wall holds
+  it (159 of 159), never on the door, its breakdown centred on the figure or
+  held inside the stage (every held reading named) — plus: the anchor itself
+  (left of the door; a price drifting back right fails); on no ground; under no
+  picker, arrow, column or band; the ink ≥ 4.5:1 on the picture (54 readings);
+  the picker top-right in all three languages. The lamps block's "inside the
+  stage, clear of the chrome" holds unchanged. Falsified: a paper ground put back → "stands on a ground" at every
+  reading; the old right-hand anchor → the anchor clause everywhere; the picker
+  by direction again → the picker clause in English and Russian; a dark layer
+  under the ink → the contrast clause, figure and send; the breakdown not held
+  → "leaves the stage" at 1100 in all three languages; the column's gaps not
+  giving → "the price and the steps overlap" on the five readings above.
+
+  **GATES.** `node --check js/renderer.js`, `js/app.js`,
+  `tools/audit.mjs`; `npm run build`; `npm test` 9,440,832 passed / 5 failed — two assertions fewer than commit 3: the caption's `data-t` key left the markup, and its copy check went with it (the five sheet-staleness
+  rows: shot, recreate, corpus, against, lockset). The restated sweep, the band
+  gate (288 readings), the navigator's gate and the wall-ink gate re-run
+  standalone on this tree: clean. The wall-ink gate first caught one thing the
+  move did — in Russian at 320 the save, now the innermost of the undo trio,
+  put up to 263 px² of glyph on the door; the save is kept outermost in every
+  language (and the Russian widest double went 90 → 70 px²). Sheets: 0 bare —
+  the price is chrome, hidden in bare mode.
+
+- **28.9 — THE BAND STANDS ON THE PHOTOGRAPH, OVER THE DOOR (3 of 10).** The
+  owner's son: *"The header of the section needs to be on the image and closer
+  to the door, in some good font — that also goes for the little text below that
+  shows the current option."*
+
+  **WHAT WAS THERE (27.9).** `.stage__band` was a flow item between the `<h1>`
+  and the stage. Above 1100 every pixel of it — 52–63 px with its padding — came
+  out of the drawing, paid for by the title shrinking the same day; on a phone
+  the stage gave up a 30 px line for it (`--band-h`).
+
+  **WHAT IT IS.** Absolute in `.stage-wrap`, placed by `placeBand` (js/app.js):
+  its foot 8 px above the casing's head (`--frame-top`, off the frame's settled
+  box), centred on the door, physical like the frame. Title in `--display`, the
+  option under it in `--sans`, as asked. Out of the flow, so the stage has its
+  height back at every width, and `--band-h` is gone from the phone's stage.
+
+  **THE WALL ABOVE THE DOOR IS ARITHMETIC, AND IT WAS SHORT.** With the band out
+  of the flow and the crop unchanged, measured on the live page (stage top to
+  the TALLEST door's casing head, the band's own height + 8):
+  1280×720 17.0 px against 57.9, 1440×900 21.3 against 62.8, 1920×918 21.7
+  against 62.8, 390×844 9.6 against 26.8 — the band landed 32–43 px above the
+  stage on a desktop, over the page's title. So `FIT_TRIM.top` took exactly the
+  worst shortfall in units: 1280×720 needs 272 units over that casing
+  (H·650.6/(2776+H) = 57.9), so 110 − 272 = **−162** (it was +40: the crop now
+  reaches 162 units ABOVE the scene, which the drawn room covers — `SCENE` is
+  8000 past it — and the photograph is placed to cover the stage whatever the
+  crop). The ceiling was 1100×800: more than 288 units would have made its door
+  smaller than before. `PAD` and the bare `viewBox` are untouched — the page's
+  crop is `data-fit-*`, which paints nothing in bare mode.
+
+  **THE DOOR GREW ANYWAY** — the band gave back more than the wall took. The
+  standard leaf, before → after, measured: 1280×720 426.2 → 436.9, 1440×900
+  550.2 → 556.0, 1920×918 562.4 → 567.4, 1100×800 490.1 → 492.6, 390×844 259.3
+  → 262.3, 320×568 150.2 → 160.4 (predicted from the arithmetic to 0.1 px
+  before the change was built).
+
+  ⚠ **320×568 IS SHORT, AND NAMED.** Its stage is 238.5 px and it would want 351
+  units; over the two tallest doors the band keeps the stage's top and its gap
+  to the casing narrows to 2.5 px — never onto it.
+
+  **AND THE WALL'S CONTROLS WERE ON ITS ROWS.** The first build centred the band
+  on the door and laid it across the language picker and the undo/save slot on
+  every phone (up to 738 px² at 320). So `placeBand` gives it only the free span
+  between the controls on its own rows (`--band-w`) and moves its centre off the
+  door's only as far as that span requires (`--band-l`); on a phone the option's
+  name yields to an ellipsis before the step's title. ⚠ **Until commit 5 that
+  span on a phone is ~70 px** — the undo, redo and save stand on those rows in
+  one 176 px slot — so the phone's band reads "יד… · ל…" in this commit's tree;
+  commit 5 takes undo to the stage's foot and leaves the save alone there.
+  Recorded, not worked round with a rule commit 5 makes pointless. A face's late
+  arrival changes widths the placement was measured in, so `fitStage` now runs
+  on `document.fonts`' `loadingdone` as well.
+
+  **WHAT ELSE IT MOVED.** Every door now stands lower under the wall's top
+  row, and the audit's wall-ink clause said so through its "still needed"
+  branches: the widest double at 1152×800 went 17/18 px² (he/ru, commit 1b) →
+  0/0, so `WIDE_KNOWN` is empty; `half` went to 0 at every phone width and is
+  gated clear with `standard` and `extra1`. The three still named read 57/0,
+  35/0, 261/90 (were 81/0, 194/74, 494/466). The navigator's gate from commit 2
+  re-run on the new crop: 60 doors × widths × directions, nothing on the column.
+  The price card at the door's head corner was not re-measured — commit 4 takes
+  it off that corner.
+
+  **ASSERTED.** The leaf-budget block keeps its subject and is STRONGER: it held
+  the leaf to `0c6e4ac`'s (421.0 / 550.3 / 563.3) less 4 px; it holds it to
+  `fc30c08`'s — the commit before this — with no tolerance, so a later change
+  that spends the gain fails. The band's one-height-on-every-step clause stays
+  (a second line would now climb toward the stage's top rather than resize the
+  door). New: **the band stands on the photograph** — every viewport × three
+  languages × six sizes × two steps (the first and the grip, the longest
+  option names), 288 readings: absolute and in the wrap; inside the stage; its
+  foot ≥ 7.5 px above the casing and never on `#frame`; on no wall control,
+  price, arrow or column; centred on the door unless it fills its span. The
+  320 pair is named and asserted STILL NEEDED. Falsified: the band back in the flow → "static" at every
+  reading; the span taken away (`placeBand` ignoring the controls) → 142 faults
+  at 390 and 320, on the hud slot and the picker; the old crop (+40) → the band,
+  held inside the stage, stands on the casing (48 faults at 320 and 1280).
+  The landscape and "name twice" clauses read the band's text, which is
+  unchanged; their comments were corrected (the `--band-h` they cited is gone).
+
+  **GATES.** `node --check`, `npm run build`, `npm test` 9,440,834 passed / 5 failed — the five sheet-staleness rows (shot, recreate, corpus, against, lockset). Sheets: 0 bare — the
+  crop is the page's, not the bare `viewBox`.
+
+- **28.9 — THE NAVIGATOR STANDS ON THE PHOTOGRAPH (2 of 10).** The owner's son:
+  *"In some categories there appears a scroll wheel that messes up with the
+  section icons. The rectangle with the icons needs to be not endless, but just
+  the size it needs to host all the section icons, a little separated from the
+  options choosing thing, the image needs to be behind it — on the image and not
+  on some white thing."*
+
+  **WHAT WAS THERE (27.9, `3c0aef4`).** Above 1100 the nine marks were the
+  panel's second grid column and the PANEL's background painted their ink as a
+  56 px stripe — so the ink ran the card's whole height whatever the step, and
+  in RTL the panel's own scrollbar sat on that same edge and ran down the column
+  on every step long enough to scroll. That is the "scroll wheel": the bar
+  appeared on some steps only.
+
+  **WHAT IT IS.** `placeNav` (js/app.js) moves `.steps` into `.stage-wrap` above
+  1100 and back into the panel below it, on a `matchMedia` listener beside
+  `placeSend`'s; `buildPanel` clears a column left in the wrap first, or a
+  language switch would build a second over it. ⚠ **The phone row stays in the
+  panel on purpose**: `.stage-wrap` is sticky at z-index 3 below 1100 — a
+  stacking context — and a fixed row inside it would paint UNDER its own ink
+  strip (the panel's `::before`, z-index 5). The column is absolute, 12 px off
+  the stage's panel-facing edge (inline-START: the panel is the grid's first
+  column in both directions), its own ink with `--r-card` corners, 464 px tall
+  (9 × 44 + 8 × 6 + 20). The panel is one column again with `scrollbar-gutter:
+  stable`, so the tiles no longer shift between a step that scrolls and one
+  that does not. Appended LAST in the wrap, so the keyboard reaches the steps
+  before the options, as asked. `--rail-band` (the panel's scroll padding) was
+  measured off a rail INSIDE the panel; with none there it would have fallen to
+  the stylesheet's 83 px and over-padded every scroll, so it is the panel's own
+  padding when the rail is elsewhere.
+
+  **WHERE IT STANDS VERTICALLY — MEASURED, NOT ASSUMED.** Centred on the door's
+  mid-height, as asked — and the first build did exactly that and put the price
+  CARD over its top two marks in Hebrew at 1100 on every size (up to 5,246 px²)
+  and at 1152 on the four larger doors: "fit" and "colour" could not be tapped.
+  So `fitStage` publishes `--steps-top`: centred, or 8 px under whatever wall
+  chrome its own x-range meets above the door's middle (read off the live rects,
+  never a list of numbers — the price moves in commit 4), and never below 8 px
+  over the trust band. ⚠ **In THIS commit's tree the Hebrew card still overlaps
+  it at 1100–1152** — the room between the card's foot and the trust band is
+  411–432 px against the column's 464 — down to at most 1,982 px². The card
+  leaves that corner in commit 4 (the price block that replaces it is half its
+  height), and commit 4 gates "never under the price". Recorded rather than
+  papered over with an adaptive gap that commit 4 would make pointless.
+
+  **THE WALL, MEASURED THE DAY IT MOVED.** At 1100, 1152, 1280, 1366, 1440, 1680
+  and 1920, every size, Hebrew and English (the column changes sides with the
+  direction): on no door, no arrow, no wall control, inside the stage —
+  nothing to name. ⚠ The brief expected the widest double at 1100 not to fit on
+  "73 px of wall"; the wall there is **137 px** (73 is §9's PHONE figure), and
+  column 56 + gap 12 + arrow 44 + 8 = 120 leaves 17. So the gate is stronger than
+  the brief's: every door at every desktop width, not the standard door and
+  ≥ 1280 only.
+
+  **ASSERTED, RESTATED.** The `3c0aef4` block keeps its subjects — a column
+  ≤ 60 px, nine whole ≥ 44 px targets, the live one a light square, the checks
+  exactly the steps walked — and asks them of the new place: a child of the wrap
+  inside the stage and clear of the panel ("on the photograph"); 12 px off the
+  panel-facing edge; centred or pushed down, never up; on no door, arrow or wall
+  control; inside the stage; its OWN ink; the panel painting no stripe and
+  reserving its gutter. A wall gate over five desktop widths × two directions ×
+  six sizes, with a §5.15 count of what it read. The keyboard walk asserts every
+  circle precedes the first option in the document and that no element carries
+  a positive tabindex (the DOM order being what Tab follows). Falsified: the
+  column back in the panel → "not on the photograph" and its dependents, and the
+  wall gate reads 0 of 60; no gutter → the gutter clause at each desktop view.
+
+  **SEEN AND NOT TOUCHED.** The step foot's "Next ›" wraps to two lines in
+  English and Russian at every desktop width — and did at `9abc298` too (67 px,
+  two lines), so it is not this round's; listed for the owner's son rather than
+  fixed in passing.
+
+  **GATES.** `node --check`, `npm run build`, `npm test` 9,440,830 passed / 5 failed — the five sheet-staleness rows (shot, recreate, corpus, against, lockset). The audit after
+  commit 1b ran in its own worktree while this was built: **no faults** at every viewport, EXIT 0 — the wall readings the 1b re-cut predicted (he 17, ru 18 at 1152 on the widest double) and the print clause holding all six on one page. Sheets: 0 bare
+  (the column is chrome; `?bare=1` hides it).
+
 - **28.9 — NEITHER VIEWER FOLLOWS THE פרזול.** *"remove it from the regular
   peephole too."* The optical ring is `#lockUnit` too (its 26.8 note — Peretz's
   list names the עינית — kept above it as the record, reversed on the owner's
@@ -1892,6 +2530,67 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.9** The price on the photograph (4 of 10) — *"not on a white thing …
+  left of the door, between the door and the lamp, on the higher end"*: no
+  ground, figure 2.4 rem, the send a line of ink; `right` 8 px off the casing's
+  left edge, at its head. Ink ≥ 10.6:1 on the picture (gate 4.5, no wash).
+  "מחיר משוער" off the figure (bar 71.3 → 67.0 px). Picker top-RIGHT in every
+  language. In en/ru the column shares that wall: its gaps give (≥ 2 px). Long
+  form: `HISTORY.md`.
+- **28.9** The band on the photograph (3 of 10) — *"on the image and closer to
+  the door"*: absolute, `placeBand` sets it 8 px over the casing in the span the
+  wall's controls leave. `FIT_TRIM.top` 40 → −162, exactly the wall 1280×720
+  lacked; the leaf still GREW (426.2 → 436.9 / 550.2 → 556.0 / 562.4 → 567.4),
+  now asserted no smaller. 320's tallest pair: gap 2.5 px, named. `half` and the
+  1152 pair left the wall-ink exemptions. ⚠ Until commit 5 the phone band is
+  ~70 px (the undo trio shares its row). Long form: `HISTORY.md`.
+- **28.9** The navigator on the photograph (2 of 10) — *"not endless … the image
+  needs to be behind it"*: `.stage-wrap > .steps` above 1100 (`placeNav`), its
+  own ink, 12 px off the panel, centred on the door or pushed below the wall's
+  chrome (`--steps-top`); the panel one column with a reserved scrollbar lane.
+  On no door, arrow or wall control at any size or width. ⚠ Until commit 4 the
+  Hebrew price CARD still covers its top at 1100–1152 (≤ 1,982 px²); commit 4
+  takes the card from that corner. Long form: `HISTORY.md`.
+- **28.9** What the new face moved, put back (1b) — the audit on commit 1, eleven
+  faults, all widths. **Print:** English's widest double went to two pages
+  (276.5 mm), Russian past its 280 ceiling (283.9); rows 6 → 4 px on paper put all
+  six prints on ONE page (Russian 270.2) — its 30.8 exemption is gone. **Picker:**
+  109.7 → 128.3 px (the old fallback drew Latin at 89%); weight 400, 5/4 px, `.75/
+  .74rem` clears every gate. **Landscape:** grip now shows an answer too — the
+  exemption narrows. Long form: `HISTORY.md`.
+- **28.9** **The bow** (`grab`) redrawn off four installed doors (*"now i want
+  you to copy the horizontal handle"*): 300 tip to tip (was 280), a 25.5 shaft
+  (was 18.7), posts at 0.175/0.825 confirmed, 42 mm roses with 28 mm balls, a
+  double-cone finial and a knob at each end (`GRAB`, `GRAB_END`). Footprint
+  `in` + 10 → + 5 (the trio's field, §9); channel + Coral + bow no longer fits
+  on two sizes. Sheets: `against-grab` only.
+- **28.9** The page's own type, in its folder (1 of 10) — *"change the font …
+  Hebrew first"*: **Rubik** for the text (the face Peretz's own site uses),
+  **Bona Nova** for the price, `<h1>` and band — the only candidates with
+  Cyrillic (`research/fonts/contact.png`, rejections by name). Nine woff2 in
+  `assets/fonts/`, 165 KB, stamped; the Google script gone, no request leaves
+  the folder. Fallback re-measured PER SCRIPT (one value lost 5 en / 8 ru lines):
+  0 he, 0 ru, 1 en paragraph moves. `--mono` off four Hebrew captions (§9
+  closed); Russian grille names hyphenate inside their tile (4 → 6 → 0 outside).
+  Test 9,440,830 / 5 (sheets). Long form: `HISTORY.md`.
+- **28.9** The digital viewer drawn off the owner's son's photograph (*"make the
+  digital peephole look like this"*, `research/viewer/digital.png`): round black
+  face in a rounded-square bezel, lens, two lights, sensor ring, bell button; the
+  maker's badge left off. Face constant; size still 54 mm (no scale). 0 bare
+  sheets. Then its bezel stopped following the פרזול (*"remove the pirzul effect
+  from them"*, then *"…from the regular peephole too"*): both viewers `#lockUnit`,
+  out of the פרזול tile and its copy; the test sweeps both.
+- **28.9** **כדור על אורך** (`knobplate`) redrawn off ONE photograph (*"i only
+  have one image of this but i want it in … refine it"*): a waisted plate 90 ×
+  216 (waist 70 at 0.54 — the עילי's family, 8 mm narrower), a 54 mm knob on a
+  62 mm rose at 0.287, the Rotem's egg. Was a 96 × 300 stadium. Footprint 53/48/
+  198 → 48/48/157; `satinPlate` shared with עילי (its render byte-identical).
+  `KEYWAY_BACKSET` 63 kept though no longer "derived" (max is now 58).
+- **28.9** The swing bar lock withdrawn — *"remove the bar lock quickly."*
+  Out of the catalogue, the code (`VERSION` 27; 26 is burnt), the drawing, the
+  rules, the price's null-state and every sweep; `lt=` retired. The פרזול
+  tiles stay a composite of the door (lock furniture, hinges, viewer). Long
+  form: `HISTORY.md`.
 - **28.9** **עילי** (`ilai`), a new lockset, INCLUDED (*"very similar to rotem, it
   is also in the price, i want you to call it 'עילי'"*): the waisted backplate —
   220 tall, 91 at head and foot, 78 at a waist 0.54 down, a slim 14 mm bar under

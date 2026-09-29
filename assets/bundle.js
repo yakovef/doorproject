@@ -113,6 +113,11 @@
     "redo": ["החזרת השינוי", "Redo the change", "Вернуть изменение"],
     "redo.done": ["החזרנו את השינוי", "Change restored", "Изменение возвращено"],
     "undo.done": ["הצעד האחרון בוטל", "Last step undone", "Последний шаг отменён"],
+    /* The words ON the two pills at the stage's foot (28.9 — *"the undo option
+       rethought … more noticeable"*); the longer names above stay their
+       `aria-label` and `title`. */
+    "undo.short": ["ביטול", "Undo", "Отменить"],
+    "redo.short": ["חזרה", "Redo", "Вернуть"],
     /* ⚠ WHAT AN UNDO SAYS WHEN IT TOOK SOMETHING OFF THE DOOR. `specRows` omits
        a row whose option is "none", so a field the step removed has no row to
        print a value from — and `stripes.none` beside it is not reusable, its
@@ -172,11 +177,20 @@
       "Скоба, за которую тянут дверь. Можно обойтись без неё, длину выбираете вы."
     ],
     "step.lock.t": ["מנעול", "The lock", "Замок"],
-    "step.lock.s": ["הידית המסתובבת ונעילה נוספת", "The lever, and any extra lock", "Нажимная ручка и дополнительный замок"],
+    "step.lock.s": ["הידית המסתובבת והצילינדר", "The lever and the cylinder", "Нажимная ручка и цилиндр"],
     "step.lock.l": [
-      "הידית שמסובבים והצילינדר — יש בכל דלת. אפשר להוסיף כספת או קודן.",
-      "The lever and the cylinder — every door has them. A safe lock or a keypad can be added.",
-      "Нажимная ручка и цилиндр — есть в каждой двери. Можно добавить сейфовый или кодовый замок."
+      "הידית שמסובבים והצילינדר — יש בכל דלת. כספת או קודן — בשלב משלהם, אחרי הפרזול.",
+      "The lever and the cylinder — every door has them. A safe lock or a keypad has its own step, after the hardware finish.",
+      "Нажимная ручка и цилиндр — есть в каждой двери. Сейфовый или кодовый замок — на своём шаге, после отделки фурнитуры."
+    ],
+    /* the extra lock's own step, 28.9.2026 (*"the extra locks as a separate
+       section, right after the pirzul section"*) */
+    "step.xlock.t": ["מנעול נוסף", "Extra lock", "Дополнительный замок"],
+    "step.xlock.s": ["כספת או קודן, לצד המנעול", "A safe lock or a keypad, beside the lock", "Сейфовый или кодовый, рядом с основным"],
+    "step.xlock.l": [
+      "נעילה שנייה לצד המנעול הרגיל — כספת, קודן, או בלי.",
+      "A second lock beside the ordinary one — a safe lock, a keypad, or none.",
+      "Второй замок рядом с основным — сейфовый, кодовый или никакого."
     ],
     "step.pz.t": ["פרזול", "Hardware finish", "Отделка фурнитуры"],
     "step.pz.s": ["גוון הידית והצירים", "The tone of the lever and the hinges", "Оттенок ручки и петель"],
@@ -344,6 +358,12 @@
     "g.colour.free": ["כלול במחיר", "Included in the price", "Входит в цену"],
     "g.colour.plus": ["תוספת {0}", "{0} extra", "Доплата {0}"],
     "g.colour.plusMany": ["בתוספת תשלום", "At extra cost", "За доплату"],
+    /* the window designs' two groups, 28.9 — the figure arrives as {0}, and it
+       is PER WINDOW: ironwork is sold by the panel (price.js), so a door with
+       two panes pays it twice and its tiles say so. */
+    "g.grille.free": ["עיצובים רגילים", "Regular designs", "Обычные узоры"],
+    "g.grille.plus": ["עיצובים מיוחדים · תוספת {0} לחלון", "Special designs · {0} extra per window", "Особые узоры · доплата {0} за окно"],
+    "g.grille.plusMany": ["עיצובים מיוחדים", "Special designs", "Особые узоры"],
     "g.detail.h": [
       "לא משלבים פאנלים עם פסי מתכת על אותה דלת.",
       "Panels and metal strips do not go on the same door.",
@@ -461,7 +481,15 @@
       "The pull handle is the bar you pull to open the door. There is a round bar and a rectangular one, and each has two prices: up to a metre, and past a metre. The length is capped by the height of the leaf, so a short door cannot take a bar that would not fit. The finish can be black or gold — the surcharge is per item: on the handle, on the {0} and on the doorbell. Going without one is a choice too. The {1} has no length to choose — it is cut into the door itself.",
       "Ручка-скоба — это то, за что тянут дверь. Есть круглая и прямоугольная, и у каждой две цены: до метра и свыше метра. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Отделку можно выбрать чёрную или золотую — доплата за каждый предмет: за ручку, за «{0}» и за звонок. Можно обойтись и без ручки. У «{1}» длина не выбирается — она врезана в само полотно."
     ],
-    "exp.lock.q": ["כספת וקודן — במקום המנעול או בנוסף?", "Safe lock and keypad — instead of the lock, or as well?", "Сейфовый и кодовый замок — вместо основного или вдобавок?"],
+    /* ⚠ THE LOCK STEP'S OWN QUESTION SINCE 28.9 — the extra lock went to its own
+       step, and took the question below (`exp.xlock`) with it. */
+    "exp.lock.q": ["מה כלול במנעול?", "What comes with the lock?", "Что входит в замок?"],
+    "exp.lock.a": [
+      "בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כאן בוחרים את צורת הידית; את הגוון שלה בוחרים בשלב הבא, בפרזול. מנעול נוסף — כספת או קודן — נבחר אחרי הפרזול, בשלב משלו. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.",
+      "Every door has a lever and a cylinder, included in the price — that is the ordinary lock. Here you choose the lever's shape; its tone is chosen in the next step, the hardware finish. An extra lock — a safe lock or a keypad — is chosen after the hardware finish, on its own step. A smart lock is a different product and is in the lever list.",
+      "В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Здесь выбирают форму ручки; её оттенок — на следующем шаге, в отделке фурнитуры. Дополнительный замок — сейфовый или кодовый — выбирают после отделки фурнитуры, на отдельном шаге. Умный замок — отдельный продукт, он в списке ручек."
+    ],
+    "exp.xlock.q": ["כספת וקודן — במקום המנעול או בנוסף?", "Safe lock and keypad — instead of the lock, or as well?", "Сейфовый и кодовый замок — вместо основного или вдобавок?"],
     /* ⚠ THE TWO FIGURES WERE TYPED HERE AND THEY WENT STALE — 25.9.2026. This
        paragraph said ₪700 and ₪900 in all three languages for five days after
        Peretz corrected himself on 20.9 — *"kasefet - 690 · kodan 880"* — and
@@ -472,7 +500,7 @@
        They come through `{0}` and `{1}` now, out of `SPECIAL_LOCKS[].delta`,
        which is the same place the tiles read. A figure that cannot be typed
        cannot drift. */
-    "exp.lock.a": [
+    "exp.xlock.a": [
       "בנוסף. בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כספת ({0}) וקודן ({1}) מותקנים לצדו ולא במקומו, ולכן אפשר לבחור גם וגם. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.",
       "As well. Every door has a lever and a cylinder, included in the price — that is the ordinary lock. A safe lock ({0}) and a keypad ({1}) are fitted BESIDE it rather than instead of it, so you can have both. A smart lock is a different product and is in the lever list.",
       "Вдобавок. В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Сейфовый ({0}) и кодовый ({1}) ставятся РЯДОМ с ним, а не вместо, поэтому можно выбрать оба. Умный замок — отдельный продукт, он в списке ручек."
@@ -627,10 +655,12 @@
     /* ⚠ THE COUNT AND WHERE THE LIST LIVES, 27.9.2026 — the save is also a
        button beside undo now (`#save-hud`), steps away from the drawer that
        holds what it saved, so "saved" alone left the customer asking where. */
+    /* ⚠ AND SINCE 28.9 THE LIST OPENS FROM THE SAVE BUTTON ITSELF (its dialog's
+       second choice), so the toast points there rather than eight steps away. */
     "saved.ok": [
-      'העיצוב נשמר בדפדפן הזה ({0}) — הרשימה בסיכום, תחת "העיצוב שלי"',
-      'Saved in this browser ({0}) — the list is on the summary, under "My designs"',
-      "Сохранено в этом браузере ({0}) — список в итоге, в разделе «Мои дизайны»"
+      "העיצוב נשמר בדפדפן הזה ({0}) — הרשימה נפתחת מכפתור השמירה",
+      "Saved in this browser ({0}) — the list opens from the save button",
+      "Сохранено в этом браузере ({0}) — список открывается кнопкой сохранения"
     ],
     "saved.noun": [
       "עיצוב שמור|עיצובים שמורים",
@@ -649,6 +679,14 @@
       "Door loaded. Change anything you like.",
       "Дверь загружена. Меняйте что угодно."
     ],
+    /* ⚠ THE SAVE ASKS, SINCE 28.9 — the owner's son: *"The save button's function
+       changed: on clicking, a window with two options, save or view a saved
+       door."* The dialog's heading, its two choices (the second carries the
+       count beside it, in markup) and the list's own dialog. */
+    "savedlg.h": ["הדלתות שלכם", "Your doors", "Ваши двери"],
+    "savedlg.save": ["שמירת הדלת", "Save this door", "Сохранить дверь"],
+    "savedlg.list": ["הדלתות השמורות שלי", "My saved doors", "Мои сохранённые двери"],
+    "savedlg.close": ["סגירה", "Close", "Закрыть"],
     /* ── the gallery ──────────────────────────────────────────────── */
     "works.h": ["דלתות שכבר התקנו", "Doors we have fitted", "Установленные нами двери"],
     "works.close": ["סגירת הגלריה", "Close the gallery", "Закрыть галерею"],
@@ -688,6 +726,34 @@
       "Для этой двери нет другого варианта: {0}"
     ],
     "dlg.ok": ["הבנתי", "OK", "Понятно"],
+    /* ── the first-visit tour, 28.9.2026 (js/tour.js) ─────────────────
+       The Hebrew is the owner's son's own four sentences, word for word as the
+       order gave them; English and Russian are ours. */
+    "tour.label": ["היכרות קצרה עם הדף", "A quick tour", "Краткое знакомство"],
+    "tour.door": [
+      "זו הדלת שתעצבו — כל בחירה תופיע כאן. (הדלת האמיתית עשויה להיראות מעט אחרת: זה איור.)",
+      "This is the door you are designing — every choice appears here. (The real door may look a little different: this is an illustration.)",
+      "Это дверь, которую вы создаёте, — каждый выбор появится здесь. (Настоящая дверь может выглядеть немного иначе: это иллюстрация.)"
+    ],
+    "tour.steps": [
+      "אלה השלבים שתעברו בדרך לדלת שחלמתם עליה.",
+      "These are the steps you go through on the way to the door of your dreams.",
+      "Это шаги, которые вы пройдёте на пути к двери своей мечты."
+    ],
+    "tour.options": [
+      "בכל שלב בוחרים כאן מה שאוהבים — או לוחצים על החצים שליד הדלת כדי לעבור מהר.",
+      "At each step, choose what you like here — or tap the arrows beside the door to flip through quickly.",
+      "На каждом шаге выбирайте здесь то, что нравится, — или нажимайте стрелки у двери, чтобы листать быстрее."
+    ],
+    "tour.undo": [
+      "הכפתורים האלה עוזרים לחזור אחורה או לשמור.",
+      "These buttons help you go back or save.",
+      "Эти кнопки помогают вернуться назад или сохранить."
+    ],
+    "tour.count": ["{0} מתוך {1}", "{0} of {1}", "{0} из {1}"],
+    "tour.next": ["הבא", "Next", "Далее"],
+    "tour.done": ["סיום", "Done", "Готово"],
+    "tour.skip": ["דלגו", "Skip", "Пропустить"],
     "dlg.close": ["סגירת ההודעה", "Close this message", "Закрыть сообщение"],
     /* ── the print sheet ──────────────────────────────────────────── */
     "sheet.label": ["דף הזמנה", "Order sheet", "Бланк заказа"],
@@ -814,6 +880,7 @@
     "fix.noPanelRoom": ["הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום", "We removed the panel — the tall window leaves no room for it", "Мы убрали панель — высокому окну не хватает места"],
     "fix.faceCleared": ["החלקנו את הדלת — ידית שקועה דורשת פנים חלקות", "We smoothed the face — a recessed channel needs it plain", "Мы сделали полотно гладким — врезная ручка этого требует"],
     "fix.grilleGone": ["הסרנו את הסורג — אין חלון", "We removed the grille — there is no window", "Мы убрали решётку — окна нет"],
+    "fix.finishHome": ["גוון הידית חזר לניקל — אין ידית משיכה על הדלת", "The handle finish is back to nickel — there is no pull handle on the door", "Отделка ручки снова никель — на двери нет ручки-скобы"],
     "fix.gripGone": ["הסרנו את ידית המשיכה — אין לה מקום כאן", "We removed the pull handle — there is no room for it here", "Мы убрали ручку-скобу — для неё здесь нет места"],
     "fix.bowGone": ["הסרנו את המאחז האופקי — אין לו מקום כאן", "We removed the horizontal pull — there is no room for it here", "Мы убрали горизонтальную скобу — для неё здесь нет места"],
     "fix.locksetSwapped": ["החלפנו את המנעול — אין לו מקום ליד המאחז", "We swapped the lockset — there is no room for it beside the grip", "Мы заменили замок — рядом со скобой ему нет места"],
@@ -2618,7 +2685,8 @@
     return byId(FINISHES, hf.tone);
   }
   var gripTakesFinish = (state2) => !!byId(HANDLES, state2.handle).finishes;
-  var finishHasSubject = (state2) => gripTakesFinish(state2) || (state2.grab || "nograb") !== "nograb" || (state2.bell || "nobell") !== "nobell";
+  var finishHasSubject = (state2) => gripTakesFinish(state2) || (state2.grab || "nograb") !== "nograb";
+  var bellFinish = (state2) => finishHasSubject(state2) ? byId(HANDLE_FINISHES, state2.handleFinish) : HANDLE_FINISHES[0];
   var byId = (list, id) => list.find((o) => o.id === id) || list.find((o) => (o.aliases || []).includes(id)) || list[0];
   var leafGlazed = (state2) => glassRows(byId(WINDOWS, state2.window)) > 0;
   var SIDE_OPENING_MIN = 370;
@@ -2854,8 +2922,12 @@
       /* ⚠ AND THE BELL FOLLOWS THE PULL HANDLE'S FINISH, 20.9.2026 — *"the
          pirzul for it changes its price by 100 or 200"*, the pull-handle finish
          on his son's word, per object: a nickel ring is ₪300, black ₪400, gold
-         ₪500. Nothing on a door with no bell. */
-      bell: byId(BELLS, state2.bell).delta + (state2.bell !== "nobell" ? finishExtra(state2) : 0),
+         ₪500. Nothing on a door with no bell.
+         ⚠ AND ONLY WHILE THERE IS A PULL HANDLE FOR THE FINISH TO BELONG TO, since
+         28.9 (*"the option to choose a colour for a pull handle opens only when
+         there is a pull handle on the door"*): a bell alone is nickel, ₪300
+         (`bellFinish`). */
+      bell: byId(BELLS, state2.bell).delta + (state2.bell !== "nobell" ? bellFinish(state2).delta : 0),
       peephole: byId(PEEPHOLES, state2.peephole).delta,
       /* A grille needs a window to sit in — and so does worked glass, which is
          in the same list now. Neither can be charged on a solid door: the
@@ -3005,7 +3077,7 @@
       rows.push({ key: "speciallock", label: T("row.speciallock"), id: xl.id, value: L(xl) });
     }
     if (bl.id !== "nobell") {
-      rows.push({ key: "bell", label: T("row.bell"), id: bl.id, value: `${L(bl)} · ${L(hf)}` });
+      rows.push({ key: "bell", label: T("row.bell"), id: bl.id, value: `${L(bl)} · ${L(bellFinish(state2))}` });
     }
     if (ep.id !== "nopeep") {
       rows.push({ key: "peephole", label: T("row.peephole"), id: ep.id, value: L(ep) });
@@ -3515,7 +3587,7 @@ ${stops}
   var FLOOR_RUN = RETURN;
   var BASE_Y = PAD.top + CASING + RET_HEAD + SCENE_MAX.leafH + FLOOR_RUN;
   var STAGE_BOX = { x: 0, y: 0, w: MID_X * 2, h: BASE_Y + PAD.bottom };
-  var FIT_TRIM = { top: 40, bottom: 130 };
+  var FIT_TRIM = { top: -162, bottom: 130 };
   var FIT_BOX = {
     x: STAGE_BOX.x,
     y: STAGE_BOX.y + FIT_TRIM.top,
@@ -3665,7 +3737,7 @@ ${stops}
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
     const hwTone = FINISH_TONES[byId(PIRZUL2, state2.pirzul).tone] || FINISH_TONES.steel;
     const cyl = cylinderRamp(hwTone);
-    const bellTone = bellRamp(tone);
+    const bellTone = bellRamp(FINISH_TONES[byId(FINISHES, bellFinish(state2).tone).id] || FINISH_TONES.steel);
     const stripeTone = byId(PIRZUL2, state2.pirzul).tone === "nickel" ? tone : hwTone;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const sideW = size.side ? size.side - REBATE : 0;
@@ -4741,7 +4813,7 @@ ${stops}
          on a black door and follows every other finish by construction.
          Same defect as CLAUDE.md §5 item 8, on a different object. -->
     <linearGradient id="blackRod" x1="0" y1="0" x2="0" y2="1">
-      ${[[0, 5], [0.2, 1], [0.34, 0], [0.55, 4], [0.86, 3], [1, 4]].map(([at, k]) => `<stop offset="${at}" stop-color="${tone[k]}"/>`).join("")}
+      ${[[0, 5], [0.2, 1], [0.34, 0], [0.55, 4], [0.86, 3], [1, 4]].map(([at2, k]) => `<stop offset="${at2}" stop-color="${tone[k]}"/>`).join("")}
     </linearGradient>
     <linearGradient id="lampGlow" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="0.42"/>
@@ -5133,19 +5205,24 @@ ${stops}
         PANEL_INSET,
         mouldOf(detail)
       ) : "");
-    })() : openings.length && sideW > 320 ? (() => {
+    })() : sideW > 320 ? (() => {
       const main = openings[0];
-      const own = win.frac ? classicFixedLight(sideW, leafH) : null;
-      const paneW = own ? own.w : Math.min(main.w, sideW - 240);
-      const paneX = own ? own.x : (sideW - paneW) / 2;
-      const paneTop = y0 + (own ? own.top : main.top);
-      const paneH = own ? own.h : main.h;
-      return aperture({
-        x: sideX + paneX,
-        y: paneTop,
-        w: paneW,
-        h: paneH,
-        /* The ornament at the MAIN leaf's scale — see grillePaths. */
+      const scale = sideW / leafW;
+      const own = !main ? null : win.frac ? { ...classicFixedLight(sideW, leafH), splits: [] } : {
+        x: main.x * scale,
+        w: main.w * scale,
+        top: main.top,
+        h: main.h,
+        splits: main.splits.map((sp) => ({ x: sp.x * scale, w: sp.w * scale }))
+      };
+      const f = faceRowsOn(detail, win, own ? [own] : [], sideW, leafH);
+      const alignTo = own ? Math.max(0, own.x - MOULD_BAND) : null;
+      return (own ? aperture({
+        x: sideX + own.x,
+        y: y0 + own.top,
+        w: own.w,
+        h: own.h,
+        splits: own.splits.map((sp) => ({ x: sideX + sp.x, w: sp.w })),
         ornW: main.w,
         paint: paint2,
         edge,
@@ -5153,19 +5230,19 @@ ${stops}
         key: "s",
         profile: mouldOf(detail),
         leaf: { x: sideX, y: y0, w: sideW, h: leafH }
-      }) + (detail.panel || win.panel ? appliedFrame(
+      }) : "") + (f.rows.length ? appliedFrame(
         sideX,
         y0,
         sideW,
         leafH,
         paint2,
         pale,
-        paneTop + paneH,
-        null,
+        own ? y0 + own.top + own.h : y0,
+        f.lone ? null : f.rows,
         0,
         "s",
-        null,
-        PANEL_INSET,
+        alignTo,
+        panelInset(detail),
         mouldOf(detail)
       ) : "");
     })() : ""}</g>` : ""}
@@ -5541,7 +5618,7 @@ ${body}
   }
   function mouldGradients(paint2, pale) {
     const relief = pale ? 0.34 : 1;
-    const stops = (p, lift) => MOULDS[p].map(([at, tone]) => `<stop offset="${at}" stop-color="${scaleTone(paint2, 1 + (tone - 1) * relief * lift)}"/>`).join("");
+    const stops = (p, lift) => MOULDS[p].map(([at2, tone]) => `<stop offset="${at2}" stop-color="${scaleTone(paint2, 1 + (tone - 1) * relief * lift)}"/>`).join("");
     const g = (p, id, x1, y1, x2, y2, lift) => `<linearGradient id="mould-${p}-${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stops(p, lift)}</linearGradient>`;
     return MOULD_PROFILES.map((p) => g(p, "t", 0, 0, 0, 1, MOULD_SIDE.top) + g(p, "b", 0, 1, 0, 0, MOULD_SIDE.bottom) + g(p, "l", 0, 0, 1, 0, MOULD_SIDE.left) + g(p, "r", 1, 0, 0, 0, MOULD_SIDE.right)).join("");
   }
@@ -5669,14 +5746,14 @@ ${body}
       });
     }
     if (state2.peephole && state2.peephole !== "nopeep") {
-      const R = peepholeR(state2);
+      const R2 = peepholeR(state2);
       out.push({
         kind: "fitting",
         band: 0,
-        x: leafW / 2 - R,
-        y: leafH - PEEPHOLE_AFF - R,
-        w: R * 2,
-        h: R * 2
+        x: leafW / 2 - R2,
+        y: leafH - PEEPHOLE_AFF - R2,
+        w: R2 * 2,
+        h: R2 * 2
       });
     }
     const sp = SPECIAL_BOX[state2.speciallock];
@@ -5746,8 +5823,8 @@ ${body}
     const openings = apertureLayout(byId(WINDOWS, state2.window), leafW, leafH);
     if (!openings.length) return true;
     const cx = leafW / 2, cy = leafH - PEEPHOLE_AFF;
-    const R = peepholeR(state2) + 8;
-    return !openings.some((o) => cx + R > o.x && cx - R < o.x + o.w && cy + R > o.top && cy - R < o.top + o.h);
+    const R2 = peepholeR(state2) + 8;
+    return !openings.some((o) => cx + R2 > o.x && cx - R2 < o.x + o.w && cy + R2 > o.top && cy - R2 < o.top + o.h);
   }
   function bellFits(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
@@ -5971,8 +6048,8 @@ ${body}
     const size = SIZES[state2.size] || SIZES.standard;
     const handle = gripOf(state2);
     const p = place || gripAt(state2);
-    const at = { ...p, ok: true, why: null };
-    if (handle.style === "none") return at;
+    const at2 = { ...p, ok: true, why: null };
+    if (handle.style === "none") return at2;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const feet = gripFeet(state2, p);
     const obstacles = faceObstacles(state2);
@@ -6052,7 +6129,7 @@ ${body}
       }
       return bad(ob.kind === "window" ? T("why.gripCrossesWindow") : ob.kind === "moulding" ? T("why.feetOnFace") : ob.kind === "bow" ? T("why.gripOnBow") : T("why.feetOnPanel"));
     }
-    return at;
+    return at2;
   }
   var SPAWN = [
     [0, 0],
@@ -6320,13 +6397,13 @@ ${body}
         const use = FING.slice(0, n).map((f, i) => FING[(i + (5 - n)) % 5]);
         for (const [spread, len] of use) {
           const a = ang + spread;
-          const R = hw * 6.4 * len;
+          const R2 = hw * 6.4 * len;
           const mid = [
-            px + Math.cos(a - spread * 0.35) * R * 0.55,
-            py + Math.sin(a - spread * 0.35) * R * 0.55
+            px + Math.cos(a - spread * 0.35) * R2 * 0.55,
+            py + Math.sin(a - spread * 0.35) * R2 * 0.55
           ];
           o.push(fill(ribbon(
-            [[px, py], mid, [px + Math.cos(a) * R, py + Math.sin(a) * R]],
+            [[px, py], mid, [px + Math.cos(a) * R2, py + Math.sin(a) * R2]],
             (t) => hw * (0.92 - 0.55 * t * t)
           )));
         }
@@ -6428,12 +6505,12 @@ ${body}
       const lo = edges[0][0], hi = edges[edges.length - 1][1];
       const half = Math.max(c - lo, hi - c);
       const k = half > maxHalf ? Math.max(0, maxHalf) / half : 1;
-      const at = (x) => c + (x - c) * k;
+      const at2 = (x) => c + (x - c) * k;
       const splits = [];
       for (let i = 1; i < edges.length; i++) {
-        splits.push({ x: at(edges[i - 1][1]), w: at(edges[i][0]) - at(edges[i - 1][1]) });
+        splits.push({ x: at2(edges[i - 1][1]), w: at2(edges[i][0]) - at2(edges[i - 1][1]) });
       }
-      out.push({ x: at(lo), w: at(hi) - at(lo), top: sorted[0].top, h: sorted[0].h, splits });
+      out.push({ x: at2(lo), w: at2(hi) - at2(lo), top: sorted[0].top, h: sorted[0].h, splits });
     }
     return out;
   }, (win, leafW, leafH) => `${win.id}|${leafW}|${leafH}`);
@@ -6701,13 +6778,13 @@ ${body}
           const run = gap - w * 0.38;
           const seq2 = [[0.115, 0.03], [0.079, 0.06], [0.06, 0.03], [0.079, 0.06], [0.115, 0.03]];
           const total = seq2.reduce((a, s) => a + s[0], 0);
-          let at = top + (run - total * w) / 2;
+          let at2 = top + (run - total * w) / 2;
           for (const [lh, lw] of seq2) {
-            const cy2 = at + w * lh / 2;
+            const cy2 = at2 + w * lh / 2;
             out.push(solid(`M ${n2(cx)} ${n2(cy2 - w * lh / 2)}
                           Q ${n2(cx + w * lw)} ${n2(cy2)} ${n2(cx)} ${n2(cy2 + w * lh / 2)}
                           Q ${n2(cx - w * lw)} ${n2(cy2)} ${n2(cx)} ${n2(cy2 - w * lh / 2)} Z`, w * lw));
-            at += w * lh;
+            at2 += w * lh;
           }
         }
       }
@@ -6909,12 +6986,12 @@ ${body}
     };
   }
   function classicPieces(leafW, leafH, glazed = true, fixed = false) {
-    const R = CLASSIC_ROWS, C = CLASSIC_COLS;
+    const R2 = CLASSIC_ROWS, C = CLASSIC_COLS;
     const of = (row, x0, x1) => ({
       x: leafW * x0,
-      y: leafH * R[row][0],
+      y: leafH * R2[row][0],
       w: leafW * (x1 - x0),
-      h: leafH * (R[row][1] - R[row][0])
+      h: leafH * (R2[row][1] - R2[row][0])
     });
     return [
       { piece: "cornice", kind: "moulding", ...of("cornice", ...C.cornice) },
@@ -6937,9 +7014,9 @@ ${body}
         piece: r ? "corbelR" : "corbelL",
         kind: "moulding",
         x: leafW * (r ? C.band[1] + CLASSIC_CORBEL.gap : C.band[0] - CLASSIC_CORBEL.gap - CLASSIC_CORBEL.w),
-        y: leafH * R.shelf[1],
+        y: leafH * R2.shelf[1],
         w: leafW * CLASSIC_CORBEL.w,
-        h: leafH * (R.band[1] - R.shelf[1])
+        h: leafH * (R2.band[1] - R2.shelf[1])
       })),
       { piece: "panel", kind: "panel", ...of("panel", ...C.panel) },
       { piece: "plinth", kind: "moulding", ...of("plinth", ...C.plinth) },
@@ -7082,7 +7159,7 @@ ${body}
     const REEDS = 4;
     const pitch = w / REEDS;
     const BOW2 = w * 0.07;
-    const at = (t) => ox + s * t;
+    const at2 = (t) => ox + s * t;
     let out = `
     ${/* ⚠ `data-face`: the bracket is part of the BAND piece, and the band's
         declared span reaches out to cover it. Without this mark the drift
@@ -7091,27 +7168,27 @@ ${body}
         centimetres a side — which is the drift that check exists to find,
         arriving from the tagging rather than from the geometry. */
     ""}
-    <path data-face d="M ${n(ox)} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
+    <path data-face d="M ${n(ox)} ${n(y)} L ${n(at2(w))} ${n(y)} L ${n(at2(w))} ${n(y + h)}
              L ${n(ox)} ${n(y + h)} Z" fill="${paint2}"/>`;
     for (let i = 0; i < REEDS; i++) {
       const top = (i + 0.5) * pitch;
       const bot = top * 0.58;
       const waist = (top + bot) / 2 - BOW2;
       const foot = y + h * (0.86 + 0.14 * i / (REEDS - 1));
-      const d = `M ${n(at(top))} ${n(y)}
-               C ${n(at(top))} ${n(y + h * 0.18)}
-                 ${n(at(waist))} ${n(y + h * 0.32)}
-                 ${n(at(waist))} ${n(y + h * 0.58)}
-               C ${n(at(waist))} ${n(y + h * 0.78)}
-                 ${n(at(bot))} ${n(y + h * 0.88)}
-                 ${n(at(bot))} ${n(foot)}`;
+      const d = `M ${n(at2(top))} ${n(y)}
+               C ${n(at2(top))} ${n(y + h * 0.18)}
+                 ${n(at2(waist))} ${n(y + h * 0.32)}
+                 ${n(at2(waist))} ${n(y + h * 0.58)}
+               C ${n(at2(waist))} ${n(y + h * 0.78)}
+                 ${n(at2(bot))} ${n(y + h * 0.88)}
+                 ${n(at2(bot))} ${n(foot)}`;
       const stroke = (wd, col, dx, op = 1) => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${n(wd)}"
              stroke-linecap="round" stroke-opacity="${op}"
              transform="translate(${n(dx)} 0)"/>`;
       out += stroke(pitch * 1.14, darken(paint2, 0.34), s * pitch * 0.22) + stroke(pitch * 0.98, paint2, 0) + stroke(pitch * 0.3, lighten(paint2, 0.22), -s * pitch * 0.2, 0.85);
     }
-    out += `<path d="M ${n(ox)} ${n(y + h - h * 0.1)} L ${n(at(w))} ${n(y + h - h * 0.16)}
-                   L ${n(at(w))} ${n(y + h)} L ${n(ox)} ${n(y + h)} Z"
+    out += `<path d="M ${n(ox)} ${n(y + h - h * 0.1)} L ${n(at2(w))} ${n(y + h - h * 0.16)}
+                   L ${n(at2(w))} ${n(y + h)} L ${n(ox)} ${n(y + h)} Z"
                 fill="#000" opacity="0.14"/>`;
     return out;
   }
@@ -7173,7 +7250,7 @@ ${body}
   }
   function classicSet(lx, ly, lw, lh, paint2, pale, tone, glazed = true, side = "") {
     const n = (v) => Number(v.toFixed(1));
-    const R = CLASSIC_ROWS, C = CLASSIC_COLS;
+    const R2 = CLASSIC_ROWS, C = CLASSIC_COLS;
     const Y = (f) => ly + lh * f;
     const X = (f) => lx + lw * f;
     const leaf = { x: lx, y: ly, w: lw, h: lh };
@@ -7209,10 +7286,10 @@ ${body}
       ends,
       mid
     );
-    const at = (q) => [lx + q.x, ly + q.y, q.w, q.h];
-    piece("frieze", block(...at(P.frieze)) + inBand(...at(P.frieze), "cfb" + side, "flute", "oval"));
+    const at2 = (q) => [lx + q.x, ly + q.y, q.w, q.h];
+    piece("frieze", block(...at2(P.frieze)) + inBand(...at2(P.frieze), "cfb" + side, "flute", "oval"));
     if (!glazed) piece("light", moulding(
-      ...at(P.light),
+      ...at2(P.light),
       CLASSIC_BAND,
       paint2,
       pale,
@@ -7230,26 +7307,26 @@ ${body}
          row, so the head reads as one assembly. */
       beadRun(
         X(C.frieze[0]),
-        Y(R.beads[0] + (R.beads[1] - R.beads[0]) * 0.42),
+        Y(R2.beads[0] + (R2.beads[1] - R2.beads[0]) * 0.42),
         (C.frieze[1] - C.frieze[0]) * lw,
         beadR,
         paint2
-      ) + classicCap(...at(P.cornice), paint2, "cn" + side, false, 0.77)
+      ) + classicCap(...at2(P.cornice), paint2, "cn" + side, false, 0.77)
     );
     const faceX = X(C.band[0]), faceW = (C.band[1] - C.band[0]) * lw;
     piece(
       "band",
-      block(faceX, Y(R.band[0]), faceW, (R.band[1] - R.band[0]) * lh) + inBand(
+      block(faceX, Y(R2.band[0]), faceW, (R2.band[1] - R2.band[0]) * lh) + inBand(
         faceX,
-        Y(R.band[0]),
+        Y(R2.band[0]),
         faceW,
-        (R.band[1] - R.band[0]) * lh,
+        (R2.band[1] - R2.band[0]) * lh,
         "cbt" + side,
         "tablet",
         "plain"
       )
     );
-    piece("shelf", classicCap(...at(P.shelf), paint2, "sh" + side, false, 0.51));
+    piece("shelf", classicCap(...at2(P.shelf), paint2, "sh" + side, false, 0.51));
     for (const r of [0, 1]) {
       const q = P[r ? "corbelR" : "corbelL"];
       piece(
@@ -7257,7 +7334,7 @@ ${body}
         classicCorbel(lx + q.x, ly + q.y, q.w, q.h, paint2, !!r)
       );
     }
-    const pn = at(P.panel);
+    const pn = at2(P.panel);
     out.push(`<g data-detail="panel" data-panels="1" data-top="${pn[1].toFixed(1)}">` + moulding(
       pn[0],
       pn[1],
@@ -7272,15 +7349,15 @@ ${body}
     ) + `</g>`);
     piece(
       "plinth",
-      block(...at(P.plinth)) + inBand(...at(P.plinth), "cpb" + side, "flute", "oval") + beadRun(
+      block(...at2(P.plinth)) + inBand(...at2(P.plinth), "cpb" + side, "flute", "oval") + beadRun(
         X(C.plinth[0]) - lw * 6e-3,
-        Y((R.pbeads[0] + R.pbeads[1]) / 2),
+        Y((R2.pbeads[0] + R2.pbeads[1]) / 2),
         (C.plinth[1] - C.plinth[0]) * lw + lw * 0.012,
         beadR,
         paint2
       )
     );
-    piece("foot", classicCap(...at(P.foot), paint2, "ft" + side, true));
+    piece("foot", classicCap(...at2(P.foot), paint2, "ft" + side, true));
     return `<g data-set="classic">${out.join("")}</g>`;
   }
   function handleFootprint(handle, leafH, panelled = false) {
@@ -7539,25 +7616,25 @@ ${body}
     const L2 = GRAB.len;
     const n1 = (v) => v.toFixed(1);
     const both = (f) => f((m) => x0 + m) + f((m) => x0 + L2 - m);
-    const span = (at, [a, b, dia], fill, rx = dia / 2) => {
-      const x1 = Math.min(at(a), at(b)), x2 = Math.max(at(a), at(b));
+    const span = (at2, [a, b, dia], fill, rx = dia / 2) => {
+      const x1 = Math.min(at2(a), at2(b)), x2 = Math.max(at2(a), at2(b));
       return `
         <rect x="${n1(x1)}" y="${n1(by - dia / 2)}" width="${n1(x2 - x1)}" height="${n1(dia)}"
               rx="${n1(Math.min(rx, (x2 - x1) / 2))}" fill="${fill}"/>`;
     };
     const posts = GRAB.post.map((t) => x0 + L2 * t);
     const [f0, f1, fd] = GRAB_END.finial, fPeak = 18.5;
-    const finial = (at) => `
-        <path d="M ${n1(at(f0))} ${n1(by - GRAB_END.neck[2] / 2)} L ${n1(at(fPeak - 1))} ${n1(by - fd / 2)}
-                 L ${n1(at(fPeak + 1))} ${n1(by - fd / 2)} L ${n1(at(f1))} ${n1(by - GRAB_END.stem[2] / 2)}
-                 L ${n1(at(f1))} ${n1(by + GRAB_END.stem[2] / 2)} L ${n1(at(fPeak + 1))} ${n1(by + fd / 2)}
-                 L ${n1(at(fPeak - 1))} ${n1(by + fd / 2)} L ${n1(at(f0))} ${n1(by + GRAB_END.neck[2] / 2)} Z"
+    const finial = (at2) => `
+        <path d="M ${n1(at2(f0))} ${n1(by - GRAB_END.neck[2] / 2)} L ${n1(at2(fPeak - 1))} ${n1(by - fd / 2)}
+                 L ${n1(at2(fPeak + 1))} ${n1(by - fd / 2)} L ${n1(at2(f1))} ${n1(by - GRAB_END.stem[2] / 2)}
+                 L ${n1(at2(f1))} ${n1(by + GRAB_END.stem[2] / 2)} L ${n1(at2(fPeak + 1))} ${n1(by + fd / 2)}
+                 L ${n1(at2(fPeak - 1))} ${n1(by + fd / 2)} L ${n1(at2(f0))} ${n1(by + GRAB_END.neck[2] / 2)} Z"
               fill="url(#gripHard)"/>
-        <path d="M ${n1(at(fPeak - 1))} ${n1(by - fd / 2 + 1.2)} L ${n1(at(fPeak + 1))} ${n1(by - fd / 2 + 1.2)}"
+        <path d="M ${n1(at2(fPeak - 1))} ${n1(by - fd / 2 + 1.2)} L ${n1(at2(fPeak + 1))} ${n1(by - fd / 2 + 1.2)}"
               stroke="#fff" stroke-opacity="0.45" stroke-width="1.6"/>`;
     const [k0, k1, kd] = GRAB_END.knob;
-    const knob = (at) => `
-        <ellipse cx="${n1((at(k0) + at(k1)) / 2)}" cy="${n1(by)}" rx="${n1((k1 - k0) / 2)}" ry="${n1(kd / 2)}"
+    const knob = (at2) => `
+        <ellipse cx="${n1((at2(k0) + at2(k1)) / 2)}" cy="${n1(by)}" rx="${n1((k1 - k0) / 2)}" ry="${n1(kd / 2)}"
                  fill="url(#gripHard)"/>`;
     const drew = { x: x0, y: by - GRAB.rose, w: L2, h: GRAB.rose * 2 };
     const svg = `
@@ -7584,19 +7661,19 @@ ${body}
         <!-- The turned ends: a stem out of the post, the double-cone finial, a
              neck and the knob at the tip; inboard, the ball's neck and the
              collar ring the shaft ends in. -->
-        ${both((at) => span(at, GRAB_END.stem, "url(#gripHard)"))}
-        ${both((at) => span(at, GRAB_END.neck, "url(#gripHard)"))}
+        ${both((at2) => span(at2, GRAB_END.stem, "url(#gripHard)"))}
+        ${both((at2) => span(at2, GRAB_END.neck, "url(#gripHard)"))}
         ${both(finial)}
         ${both(knob)}
-        ${both((at) => span(at, GRAB_END.inner, "url(#gripHard)"))}
+        ${both((at2) => span(at2, GRAB_END.inner, "url(#gripHard)"))}
 
         <!-- The shaft: constant diameter, and the tone runs ACROSS it (grabRod,
              read off the photographs: a dark top line, a specular a quarter
              down, a dark core, a bounce along the bottom). -->
         ${span((m) => x0 + m, [GRAB_END.collar[1] - 1, L2 - GRAB_END.collar[1] + 1, GRAB_D], "url(#grabRod)", GRAB_D * 0.16)}
-        ${both((at) => span(at, GRAB_END.collar, "url(#grabRod)", 3))}
-        ${both((at) => `
-        <path d="M ${n1(at(GRAB_END.collar[1]))} ${n1(by - GRAB_END.collar[2] / 2 + 1)} v ${n1(GRAB_END.collar[2] - 2)}"
+        ${both((at2) => span(at2, GRAB_END.collar, "url(#grabRod)", 3))}
+        ${both((at2) => `
+        <path d="M ${n1(at2(GRAB_END.collar[1]))} ${n1(by - GRAB_END.collar[2] / 2 + 1)} v ${n1(GRAB_END.collar[2] - 2)}"
               stroke="#000" stroke-opacity="0.35" stroke-width="1"/>`)}
 
         <!-- the post balls, turned and standing in front of their roses -->
@@ -7625,9 +7702,9 @@ ${body}
     const half = barHalf(handle.len, leafH, panelled);
     const w = handle.w || 30, r = w * spec.rx;
     const top = cy - half, bot = cy + half, L2 = half * 2;
-    const at = (t) => top + L2 * t;
+    const at2 = (t) => top + L2 * t;
     const feet = spec.fix.t.map((t) => `
-      <ellipse cx="${(cx + w * 0.55).toFixed(1)}" cy="${(at(t) + w * 0.45).toFixed(1)}"
+      <ellipse cx="${(cx + w * 0.55).toFixed(1)}" cy="${(at2(t) + w * 0.45).toFixed(1)}"
                rx="${(w * 0.7).toFixed(1)}" ry="${(w * 0.7).toFixed(1)}"
                fill="#000" opacity="0.17" filter="url(#hwShadow)"/>`).join("");
     return `
@@ -7672,7 +7749,7 @@ ${body}
     const k = PLATE.head, fy = r * PLATE.foot;
     const yF = bot - fy;
     const f = (n) => n.toFixed(2);
-    const at = (t) => cx + dir * t;
+    const at2 = (t) => cx + dir * t;
     const u = Math.round(cx) + "-" + Math.round(cy);
     const outline = `M ${f(cx - r)} ${f(top + k)}
     A ${k} ${k} 0 0 1 ${f(cx - r + k)} ${f(top)} L ${f(cx + r - k)} ${f(top)}
@@ -7686,14 +7763,14 @@ ${body}
     const sw = dir > 0 ? 1 : 0;
     const blade = (a, b, yT, yB, tipR = rc) => {
       const rr = (yB - yT) / 2;
-      return `M ${f(at(a))} ${f(yT)} L ${f(at(b - tipR))} ${f(yT)}
-      A ${f(tipR)} ${f(tipR)} 0 0 ${sw} ${f(at(b))} ${f(yT + tipR)} L ${f(at(b))} ${f(yB - tipR)}
-      A ${f(tipR)} ${f(tipR)} 0 0 ${sw} ${f(at(b - tipR))} ${f(yB)} L ${f(at(a))} ${f(yB)}
-      A ${f(rr)} ${f(rr)} 0 0 ${sw} ${f(at(a))} ${f(yT)} Z`;
+      return `M ${f(at2(a))} ${f(yT)} L ${f(at2(b - tipR))} ${f(yT)}
+      A ${f(tipR)} ${f(tipR)} 0 0 ${sw} ${f(at2(b))} ${f(yT + tipR)} L ${f(at2(b))} ${f(yB - tipR)}
+      A ${f(tipR)} ${f(tipR)} 0 0 ${sw} ${f(at2(b - tipR))} ${f(yB)} L ${f(at2(a))} ${f(yB)}
+      A ${f(rr)} ${f(rr)} 0 0 ${sw} ${f(at2(a))} ${f(yT)} Z`;
     };
     const body = blade(t0, L2, T2, B);
     const band = (fr, bw, a) => {
-      const x = at(L2 * fr) - bw / 2;
+      const x = at2(L2 * fr) - bw / 2;
       return `<rect x="${f(x)}" y="${f(T2 + D * 0.1)}" width="${bw}" height="${f(D * 0.8)}"
                   fill="url(#rotemBand-${u})" opacity="${a}"/>`;
     };
@@ -7750,7 +7827,7 @@ ${body}
       <!-- the bend back into the plate: dark from the root end to PLATE.bend
            on the tip side of the spindle -->
       <path d="${blade(t0, PLATE.bend, T2 + 1.2, B - 1.2, hd * 0.8)}" fill="#000" opacity="0.72"/>
-      <path d="${arcPath(at(t0), cy, hd - 1.2, dir > 0 ? 110 : 290, dir > 0 ? 250 : 70)}" fill="none"
+      <path d="${arcPath(at2(t0), cy, hd - 1.2, dir > 0 ? 110 : 290, dir > 0 ? 250 : 70)}" fill="none"
             stroke="#fff" stroke-opacity="0.22" stroke-width="1.2"/>
     </g>`;
   }
@@ -7803,37 +7880,37 @@ ${body}
     A ${rc} ${rc} 0 0 1 ${f(cx - hT + rc)} ${f(yTs)}
     Q ${f(cx - (hT - rc) * 0.55)} ${f(T2)} ${f(cx)} ${f(T2)} Z`;
   }
-  function ilaiBar(cx, cy, dir, grow = 0) {
+  function ilaiBar(cx, cy, dir, grow2 = 0) {
     const f = (n) => n.toFixed(2);
-    const at = (t) => cx + dir * t;
-    const hd = ILAI.depth / 2 + grow, ht = ILAI.tip / 2 + grow;
+    const at2 = (t) => cx + dir * t;
+    const hd = ILAI.depth / 2 + grow2, ht = ILAI.tip / 2 + grow2;
     const L2 = ILAI.reach, r0 = -ILAI.root + hd, sw = dir > 0 ? 1 : 0;
-    return `M ${f(at(r0))} ${f(cy - hd)} L ${f(at(L2 - 25))} ${f(cy - hd)}
-    Q ${f(at(L2 - 10))} ${f(cy - hd)} ${f(at(L2 - ht))} ${f(cy - ht)}
-    A ${f(ht)} ${f(ht)} 0 0 ${sw} ${f(at(L2 - ht))} ${f(cy + ht)}
-    Q ${f(at(L2 - 10))} ${f(cy + hd)} ${f(at(L2 - 25))} ${f(cy + hd)}
-    L ${f(at(r0))} ${f(cy + hd)}
-    A ${f(hd)} ${f(hd)} 0 0 ${sw} ${f(at(r0))} ${f(cy - hd)} Z`;
+    return `M ${f(at2(r0))} ${f(cy - hd)} L ${f(at2(L2 - 25))} ${f(cy - hd)}
+    Q ${f(at2(L2 - 10))} ${f(cy - hd)} ${f(at2(L2 - ht))} ${f(cy - ht)}
+    A ${f(ht)} ${f(ht)} 0 0 ${sw} ${f(at2(L2 - ht))} ${f(cy + ht)}
+    Q ${f(at2(L2 - 10))} ${f(cy + hd)} ${f(at2(L2 - 25))} ${f(cy + hd)}
+    L ${f(at2(r0))} ${f(cy + hd)}
+    A ${f(hd)} ${f(hd)} 0 0 ${sw} ${f(at2(r0))} ${f(cy - hd)} Z`;
   }
   function ilaiNeck(cx, cy, dir) {
     const f = (n) => n.toFixed(2);
-    const at = (t) => cx + dir * t;
+    const at2 = (t) => cx + dir * t;
     const [a0, a1, rise, band] = ILAI.arch;
     const yN = cy + rise + band / 2, yB = cy - ILAI.depth / 2 + 0.5;
     const k = (a1 - a0) * 0.35;
-    return `M ${f(at(a0))} ${f(yN)} L ${f(at(a0 + k))} ${f(yN)}
-    C ${f(at(a0 + k + 12))} ${f(yN)} ${f(at(a1))} ${f(yN + 3)} ${f(at(a1))} ${f(yB)}`;
+    return `M ${f(at2(a0))} ${f(yN)} L ${f(at2(a0 + k))} ${f(yN)}
+    C ${f(at2(a0 + k + 12))} ${f(yN)} ${f(at2(a1))} ${f(yN + 3)} ${f(at2(a1))} ${f(yB)}`;
   }
   function ilaiHandle(cx, cy, dir) {
     const f = (n) => n.toFixed(2);
-    const at = (t) => cx + dir * t;
+    const at2 = (t) => cx + dir * t;
     const u = Math.round(cx) + "-" + Math.round(cy);
     const outline = ilaiOutline(cx, cy);
     const plate = satinPlate(outline, "ilai", u);
     const hd = ILAI.depth / 2;
     const arch = ilaiNeck(cx, cy, dir);
     const band2 = (fr, bw, a) => {
-      const x = at(ILAI.reach * fr) - bw / 2;
+      const x = at2(ILAI.reach * fr) - bw / 2;
       return `<rect x="${f(x)}" y="${f(cy - hd + ILAI.depth * 0.12)}" width="${bw}" height="${f(ILAI.depth * 0.76)}"
                   fill="url(#ilaiBand-${u})" opacity="${a}"/>`;
     };
@@ -7857,36 +7934,36 @@ ${plate.body}
 
       <!-- the neck: a dark hollow under a band that leaves the plate above the
            bar and curves down into it -->
-      <path d="${arch} L ${f(at(ILAI.arch[0]))} ${f(cy - hd)} Z" fill="#000" opacity="0.46"/>
+      <path d="${arch} L ${f(at2(ILAI.arch[0]))} ${f(cy - hd)} Z" fill="#000" opacity="0.46"/>
       <path d="${arch}" fill="none" stroke="url(#rotemLever)" stroke-width="${ILAI.arch[3]}" stroke-linecap="round"/>
       <path d="${arch}" fill="none" stroke="#fff" stroke-opacity="0.50" stroke-width="1.2"
             transform="translate(0 -1.5)"/>
 
       <!-- the bar: a slim satin strap, lit along its top, rolled away under -->
       <path d="${ilaiBar(cx, cy, dir)}" fill="url(#rotemLever)"/>
-      <path d="M ${f(at(-ILAI.root + hd + 1))} ${f(cy - hd + 1.2)} L ${f(at(ILAI.reach - 12))} ${f(cy - hd + 1.2)}"
+      <path d="M ${f(at2(-ILAI.root + hd + 1))} ${f(cy - hd + 1.2)} L ${f(at2(ILAI.reach - 12))} ${f(cy - hd + 1.2)}"
             stroke="#fff" stroke-opacity="0.42" stroke-width="1.4" stroke-linecap="round"/>
-      <path d="M ${f(at(-ILAI.root + hd + 1))} ${f(cy + hd - 1.4)} L ${f(at(ILAI.reach - 12))} ${f(cy + hd - 1.4)}"
+      <path d="M ${f(at2(-ILAI.root + hd + 1))} ${f(cy + hd - 1.4)} L ${f(at2(ILAI.reach - 12))} ${f(cy + hd - 1.4)}"
             stroke="#000" stroke-opacity="0.22" stroke-width="2" stroke-linecap="round"/>
       ${band2(0.55, 20, 0.4)}
       ${band2(0.82, 10, 0.32)}
     </g>`;
   }
   function almogLever(cx, cy, dir) {
-    const R = 39, D = R * 2;
+    const R2 = 39, D = R2 * 2;
     const L2 = D * 2.8;
     const rake = Math.tan(14.8 * Math.PI / 180);
-    const at = (t) => cx + dir * t;
+    const at2 = (t) => cx + dir * t;
     const mid = (t) => cy + D * 0.269 - rake * t;
     const halfT = (t) => D * (0.211 + 0.057 * (t / L2)) / 2;
-    const pt = (t, s) => `${at(t)} ${mid(t) + s * halfT(t)}`;
+    const pt = (t, s) => `${at2(t)} ${mid(t) + s * halfT(t)}`;
     return `
     <g>
       <path d="M ${pt(6, -1)} L ${pt(L2 - 22, -1)} Q ${pt(L2, -0.4)} ${pt(L2 - 16, 1)}
                L ${pt(6, 1)} Z"
             transform="translate(${dir * 7} 11)" fill="#000" opacity="0.30"
             filter="url(#hwShadow)"/>
-      ${disc(cx, cy, R)}
+      ${disc(cx, cy, R2)}
       <!-- the neck leaves the rose tangentially at the lower quarter: on this
            handle the collar and the blade are one swept surface -->
       <path d="M ${pt(0, -1.15)} L ${pt(L2 - 24, -1)}
@@ -7918,7 +7995,7 @@ ${plate.defs}${plate.body}
       ${roseKnob(cx, cy, KNOBPLATE.rose, KNOBPLATE.ball)}
     </g>`;
   }
-  function roseKnob(cx, cy, R, r) {
+  function roseKnob(cx, cy, R2, r) {
     const f = (n) => n.toFixed(2);
     return `
       <!-- the knob stands ~55 mm proud: its shadow falls on what is below -->
@@ -7926,10 +8003,10 @@ ${plate.defs}${plate.body}
               filter="url(#hwShadow)"/>
       <!-- the rose it turns on: the plates' satin, a dark step round it, lit
            along the key light's side -->
-      <circle data-part="rose" cx="${f(cx)}" cy="${f(cy)}" r="${R}" fill="url(#rotemFace)"/>
-      <circle cx="${f(cx)}" cy="${f(cy)}" r="${R}" fill="none" stroke="#000"
+      <circle data-part="rose" cx="${f(cx)}" cy="${f(cy)}" r="${R2}" fill="url(#rotemFace)"/>
+      <circle cx="${f(cx)}" cy="${f(cy)}" r="${R2}" fill="none" stroke="#000"
               stroke-opacity="0.40" stroke-width="1.6" transform="translate(0.6 0.8)"/>
-      <path d="${arcPath(cx, cy, R - 1.4, 150, 300)}" fill="none"
+      <path d="${arcPath(cx, cy, R2 - 1.4, 150, 300)}" fill="none"
             stroke="#fff" stroke-opacity="0.45" stroke-width="1.4"/>
       <!-- the knob: a ball lit from above, a bright band at its equator over
            a darker lower half (knobBall, the פרזול's), its rim darkened so it
@@ -8056,31 +8133,31 @@ ${plate.defs}${plate.body}
   function shiranPull(cx, cy, leafH) {
     const H = SHIRAN.h(leafH), W = H / 5.49;
     const top = cy - H / 2;
-    const at = (t) => top + H * t;
+    const at2 = (t) => top + H * t;
     const wAt = (f) => W * f;
     const disc2 = (t, f) => `
-      <circle data-mount="shiran-disc" cx="${cx}" cy="${at(t)}"
+      <circle data-mount="shiran-disc" cx="${cx}" cy="${at2(t)}"
               r="${wAt(f) / 2}" fill="url(#brassDisc)"/>
-      <circle cx="${cx}" cy="${at(t)}" r="${wAt(f) / 2 - 1.5}" fill="none"
+      <circle cx="${cx}" cy="${at2(t)}" r="${wAt(f) / 2 - 1.5}" fill="none"
               stroke="#FFF3D4" stroke-opacity="0.55" stroke-width="2"/>
-      <circle cx="${cx}" cy="${at(t)}" r="${wAt(f) * 0.31}" fill="#000" opacity="0.45"/>`;
+      <circle cx="${cx}" cy="${at2(t)}" r="${wAt(f) * 0.31}" fill="#000" opacity="0.45"/>`;
     const bulge = (t, f) => `
-      <path d="M ${cx - wAt(f) / 2} ${at(t)}
-               Q ${cx - wAt(f) * 0.16} ${at(t) - H * 0.03} ${cx} ${at(t) - H * 0.03}
-               Q ${cx + wAt(f) * 0.16} ${at(t) - H * 0.03} ${cx + wAt(f) / 2} ${at(t)}
-               Q ${cx + wAt(f) * 0.16} ${at(t) + H * 0.03} ${cx} ${at(t) + H * 0.03}
-               Q ${cx - wAt(f) * 0.16} ${at(t) + H * 0.03} ${cx - wAt(f) / 2} ${at(t)} Z"
+      <path d="M ${cx - wAt(f) / 2} ${at2(t)}
+               Q ${cx - wAt(f) * 0.16} ${at2(t) - H * 0.03} ${cx} ${at2(t) - H * 0.03}
+               Q ${cx + wAt(f) * 0.16} ${at2(t) - H * 0.03} ${cx + wAt(f) / 2} ${at2(t)}
+               Q ${cx + wAt(f) * 0.16} ${at2(t) + H * 0.03} ${cx} ${at2(t) + H * 0.03}
+               Q ${cx - wAt(f) * 0.16} ${at2(t) + H * 0.03} ${cx - wAt(f) / 2} ${at2(t)} Z"
             fill="url(#barBrass)"/>`;
     return `
     <g>
-      <rect x="${cx - W * 0.3}" y="${at(0.04) + 12}" width="${W * 0.55}" height="${H * 0.92}"
+      <rect x="${cx - W * 0.3}" y="${at2(0.04) + 12}" width="${W * 0.55}" height="${H * 0.92}"
             rx="${W * 0.2}" fill="#000" opacity="0.32" filter="url(#hwShadow)"/>
       <!-- terminal spigots -->
       ${[0, 0.966].map((t) => `
-      <rect x="${cx - wAt(0.15) / 2}" y="${at(t)}" width="${wAt(0.15)}" height="${H * 0.034}"
+      <rect x="${cx - wAt(0.15) / 2}" y="${at2(t)}" width="${wAt(0.15)}" height="${H * 0.034}"
             rx="${wAt(0.06)}" fill="url(#barBrass)"/>`).join("")}
       <!-- the shaft, and the discs it lands on -->
-      <rect x="${cx - wAt(0.48) / 2}" y="${at(0.269)}" width="${wAt(0.48)}" height="${H * 0.465}"
+      <rect x="${cx - wAt(0.48) / 2}" y="${at2(0.269)}" width="${wAt(0.48)}" height="${H * 0.465}"
             fill="url(#barBrass)"/>
       ${disc2(SHIRAN.fix[0], SHIRAN.disc)}
       ${disc2(SHIRAN.fix[1], 0.989)}
@@ -8088,7 +8165,7 @@ ${plate.defs}${plate.body}
       ${bulge(0.938, 0.577)}
       <!-- the turned bulbs standing proud of each disc -->
       ${[0.188, 0.813].map((t) => `
-      <ellipse cx="${cx}" cy="${at(t)}" rx="${wAt(0.61) / 2}" ry="${H * 0.042}"
+      <ellipse cx="${cx}" cy="${at2(t)}" rx="${wAt(0.61) / 2}" ry="${H * 0.042}"
                fill="url(#barBrass)"/>`).join("")}
     </g>`;
   }
@@ -8159,12 +8236,12 @@ ${plate.defs}${plate.body}
     </g>`;
   function coralStadium(cx, dir, t0, t1, top, bot) {
     const r = (bot - top) / 2;
-    const at = (t) => (cx + dir * t).toFixed(2);
+    const at2 = (t) => (cx + dir * t).toFixed(2);
     const sw = dir > 0 ? 1 : 0;
-    return `M ${at(t0 + r)} ${top.toFixed(2)} L ${at(t1 - r)} ${top.toFixed(2)}
-          A ${r.toFixed(2)} ${r.toFixed(2)} 0 0 ${sw} ${at(t1 - r)} ${bot.toFixed(2)}
-          L ${at(t0 + r)} ${bot.toFixed(2)}
-          A ${r.toFixed(2)} ${r.toFixed(2)} 0 0 ${sw} ${at(t0 + r)} ${top.toFixed(2)} Z`;
+    return `M ${at2(t0 + r)} ${top.toFixed(2)} L ${at2(t1 - r)} ${top.toFixed(2)}
+          A ${r.toFixed(2)} ${r.toFixed(2)} 0 0 ${sw} ${at2(t1 - r)} ${bot.toFixed(2)}
+          L ${at2(t0 + r)} ${bot.toFixed(2)}
+          A ${r.toFixed(2)} ${r.toFixed(2)} 0 0 ${sw} ${at2(t0 + r)} ${top.toFixed(2)} Z`;
   }
   function lever(cx, cy, dir) {
     const L2 = LEVER_REACH;
@@ -8294,25 +8371,25 @@ ${plate.defs}${plate.body}
         <rect x="-2" y="-4" width="3" height="1.4" fill="#6B7075" opacity="0.7"/>
       </g>`;
   var peephole = (cx, cy) => {
-    const R = PEEPHOLE_R;
+    const R2 = PEEPHOLE_R;
     return `
     <g data-hw="peephole" data-owner="peephole" data-kind="peephole"
-       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
-      <ellipse cx="${cx}" cy="${cy + R * 0.18}" rx="${(R * 0.95).toFixed(1)}"
-               ry="${(R * 0.88).toFixed(1)}" fill="#000" opacity="0.18"/>
-      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#lockUnit)"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R2}">
+      <ellipse cx="${cx}" cy="${cy + R2 * 0.18}" rx="${(R2 * 0.95).toFixed(1)}"
+               ry="${(R2 * 0.88).toFixed(1)}" fill="#000" opacity="0.18"/>
+      <circle cx="${cx}" cy="${cy}" r="${R2}" fill="url(#lockUnit)"
               stroke="#000" stroke-opacity=".26"/>
       ${/* the glass inside the ring — dark, because behind it is an unlit hall,
         which is the same reasoning the obscured glazing is drawn on */
-    ""}<circle cx="${cx}" cy="${cy}" r="${(R * 0.52).toFixed(1)}"
+    ""}<circle cx="${cx}" cy="${cy}" r="${(R2 * 0.52).toFixed(1)}"
                fill="#000" fill-opacity=".58"/>
-      <circle cx="${(cx - R * 0.18).toFixed(1)}" cy="${(cy - R * 0.2).toFixed(1)}"
-              r="${(R * 0.2).toFixed(1)}" fill="#fff" fill-opacity=".30"/>
+      <circle cx="${(cx - R2 * 0.18).toFixed(1)}" cy="${(cy - R2 * 0.2).toFixed(1)}"
+              r="${(R2 * 0.2).toFixed(1)}" fill="#fff" fill-opacity=".30"/>
     </g>`;
   };
   var peepholeDigital = (cx, cy) => {
-    const R = PEEPHOLE_DIGITAL_R;
-    const S = R * 2;
+    const R2 = PEEPHOLE_DIGITAL_R;
+    const S = R2 * 2;
     const n1 = (v) => v.toFixed(1);
     const n2 = (v) => v.toFixed(2);
     const X = (f) => n2(cx + f * S), Y = (f) => n2(cy + f * S), L2 = (f) => n2(f * S);
@@ -8322,11 +8399,11 @@ ${plate.defs}${plate.body}
     const bell = `M${n2(bx - 3 * u)} ${n2(by + 2 * u)}C${n2(bx - 3 * u)} ${n2(by + 0.6 * u)} ${n2(bx - 2.2 * u)} ${n2(by + 0.3 * u)} ${n2(bx - 2.2 * u)} ${n2(by - 1.1 * u)}A${n2(2.2 * u)} ${n2(2.2 * u)} 0 0 1 ${n2(bx + 2.2 * u)} ${n2(by - 1.1 * u)}C${n2(bx + 2.2 * u)} ${n2(by + 0.3 * u)} ${n2(bx + 3 * u)} ${n2(by + 0.6 * u)} ${n2(bx + 3 * u)} ${n2(by + 2 * u)}Z`;
     return `
     <g data-hw="peephole" data-owner="peephole" data-kind="peephole" data-digital="1"
-       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
-      <rect x="${n1(cx - R * 0.95)}" y="${n1(cy - R * 0.95 + R * 0.16)}"
-            width="${n1(R * 1.9)}" height="${n1(R * 1.9)}" rx="${n1(S * 0.36)}"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R2}">
+      <rect x="${n1(cx - R2 * 0.95)}" y="${n1(cy - R2 * 0.95 + R2 * 0.16)}"
+            width="${n1(R2 * 1.9)}" height="${n1(R2 * 1.9)}" rx="${n1(S * 0.36)}"
             fill="#000" opacity="0.18"/>
-      <rect x="${cx - R}" y="${cy - R}" width="${S}" height="${S}" rx="${n1(S * 0.36)}"
+      <rect x="${cx - R2}" y="${cy - R2}" width="${S}" height="${S}" rx="${n1(S * 0.36)}"
             fill="url(#lockUnit)" stroke="#000" stroke-opacity=".26"/>
       <circle cx="${X(0)}" cy="${Y(0)}" r="${L2(F / 2)}" fill="#111111"/>
       <circle cx="${X(0)}" cy="${Y(-0.29)}" r="${L2(0.075)}" fill="#0d0d0f"
@@ -8344,16 +8421,16 @@ ${plate.defs}${plate.body}
     </g>`;
   };
   var bellKnocker = (cx, cy) => {
-    const R = KNOCKER_R;
-    const RING = R * 0.78;
-    const BOSS = R * 0.42;
-    const top = cy - R * 0.62;
+    const R2 = KNOCKER_R;
+    const RING = R2 * 0.78;
+    const BOSS = R2 * 0.42;
+    const top = cy - R2 * 0.62;
     return `
     <g data-hw="bell" data-owner="bell" data-kind="bell"
-       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
+       data-cx="${cx}" data-cy="${cy}" data-r="${R2}">
       ${/* the whole fitting stands proud, so it drops one soft shadow */
-    ""}<ellipse cx="${cx}" cy="${(cy + R * 0.1).toFixed(1)}"
-               rx="${(R * 0.86).toFixed(1)}" ry="${(R * 0.92).toFixed(1)}"
+    ""}<ellipse cx="${cx}" cy="${(cy + R2 * 0.1).toFixed(1)}"
+               rx="${(R2 * 0.86).toFixed(1)}" ry="${(R2 * 0.92).toFixed(1)}"
                fill="#000" opacity="0.16"/>
       ${/* the ring: a heavy annulus, lit along its upper left like every other
         round fitting in this file, and slightly flattened because a
@@ -8361,15 +8438,15 @@ ${plate.defs}${plate.body}
     ""}<ellipse cx="${cx}" cy="${(cy + 2).toFixed(1)}"
                rx="${RING.toFixed(1)}" ry="${(RING * 0.98).toFixed(1)}"
                fill="none" stroke="#000" stroke-opacity=".22"
-               stroke-width="${(R * 0.2).toFixed(1)}"/>
+               stroke-width="${(R2 * 0.2).toFixed(1)}"/>
       <ellipse cx="${cx}" cy="${cy}" rx="${RING.toFixed(1)}"
                ry="${(RING * 0.98).toFixed(1)}"
                fill="none" stroke="url(#bellMetal)"
-               stroke-width="${(R * 0.18).toFixed(1)}"/>
+               stroke-width="${(R2 * 0.18).toFixed(1)}"/>
       <ellipse cx="${cx}" cy="${cy}" rx="${RING.toFixed(1)}"
                ry="${(RING * 0.98).toFixed(1)}"
                fill="none" stroke="#fff" stroke-opacity=".20"
-               stroke-width="${(R * 0.05).toFixed(1)}"
+               stroke-width="${(R2 * 0.05).toFixed(1)}"
                stroke-dasharray="${(RING * 1.5).toFixed(1)} ${(RING * 9).toFixed(1)}"
                transform="rotate(-142 ${cx} ${cy})"/>
       ${/* the boss the ring hangs from, with the small crown the cast ones
@@ -8398,50 +8475,50 @@ ${plate.defs}${plate.body}
               rx="${r * 0.1}" fill="#1E2023"/>
       </g>`;
   function coveredEscutcheon(cx, cy, owned) {
-    const R = CORAL_LOCK_R;
+    const R2 = CORAL_LOCK_R;
     const kx = cx, ky = cy - 5;
     const dome = `dome-${Math.round(cx)}-${Math.round(cy)}`;
     return `
     <g data-hw="lock"${owned ? ' data-owner="lockset"' : ""} data-kind="cylinder"
-       data-cx="${cx}" data-cy="${cy}" data-r="${R}" data-plate="covered">
+       data-cx="${cx}" data-cy="${cy}" data-r="${R2}" data-plate="covered">
       <g data-mount="rose">
-        <circle cx="${cx + 2}" cy="${cy + 4}" r="${R}" fill="#000" opacity="0.36"
+        <circle cx="${cx + 2}" cy="${cy + 4}" r="${R2}" fill="#000" opacity="0.36"
                 filter="url(#hwShadow)"/>
-        <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#roseFace)"/>
-        <circle cx="${cx}" cy="${cy}" r="${R}" fill="#000" opacity="${CORAL_ROSE_WASH}"/>
-        ${coralStep(cx, cy, R - 1.2, 2.4, 0.62, 0.4)}
-        ${coralStep(cx, cy, R * 0.83, 1.8, 0.24, 0.44)}
-        ${coralStep(cx, cy, R * 0.61, 2.2, 0.3, 0.55)}
-        ${brushing(cx, cy, R * 0.16, R * 0.58)}
+        <circle cx="${cx}" cy="${cy}" r="${R2}" fill="url(#roseFace)"/>
+        <circle cx="${cx}" cy="${cy}" r="${R2}" fill="#000" opacity="${CORAL_ROSE_WASH}"/>
+        ${coralStep(cx, cy, R2 - 1.2, 2.4, 0.62, 0.4)}
+        ${coralStep(cx, cy, R2 * 0.83, 1.8, 0.24, 0.44)}
+        ${coralStep(cx, cy, R2 * 0.61, 2.2, 0.3, 0.55)}
+        ${brushing(cx, cy, R2 * 0.16, R2 * 0.58)}
       </g>
       <radialGradient id="${dome}" cx="0.36" cy="0.30" r="0.78">
         <stop offset="0"    stop-color="#fff" stop-opacity="0.30"/>
         <stop offset="0.55" stop-color="#fff" stop-opacity="0.04"/>
         <stop offset="1"    stop-color="#000" stop-opacity="0.16"/>
       </radialGradient>
-      <circle cx="${cx}" cy="${cy}" r="${R * 0.6}" fill="url(#${dome})"/>
-      ${coralSlot(kx, ky, R * 0.3)}
-      <ellipse cx="${cx - R * 0.55}" cy="${cy - R * 0.55}" rx="5" ry="2.6"
-               fill="#fff" opacity="0.45" transform="rotate(-45 ${cx - R * 0.55} ${cy - R * 0.55})"/>
-      <circle cx="${cx + R * 0.62}" cy="${cy + R * 0.58}" r="1.8" fill="#fff" opacity="0.28"/>
+      <circle cx="${cx}" cy="${cy}" r="${R2 * 0.6}" fill="url(#${dome})"/>
+      ${coralSlot(kx, ky, R2 * 0.3)}
+      <ellipse cx="${cx - R2 * 0.55}" cy="${cy - R2 * 0.55}" rx="5" ry="2.6"
+               fill="#fff" opacity="0.45" transform="rotate(-45 ${cx - R2 * 0.55} ${cy - R2 * 0.55})"/>
+      <circle cx="${cx + R2 * 0.62}" cy="${cy + R2 * 0.58}" r="1.8" fill="#fff" opacity="0.28"/>
     </g>`;
   }
   var cylinder = (cx, cy, owned = false, shape = "round") => {
     if (shape === "covered") return coveredEscutcheon(cx, cy, owned);
-    const R = LOCK_R;
+    const R2 = LOCK_R;
     const kx = cx, ky = cy + 2;
-    const plate = shape === "square" ? squareRose(cx, cy, R) : disc(cx, cy, R);
-    const domed = shape === "square" ? `<rect x="${cx - R * 0.9}" y="${cy - R * 0.9}" width="${R * 1.8}" height="${R * 1.8}"
-             rx="${R * 0.1}"` : `<circle cx="${cx}" cy="${cy}" r="${R * 0.9}"`;
+    const plate = shape === "square" ? squareRose(cx, cy, R2) : disc(cx, cy, R2);
+    const domed = shape === "square" ? `<rect x="${cx - R2 * 0.9}" y="${cy - R2 * 0.9}" width="${R2 * 1.8}" height="${R2 * 1.8}"
+             rx="${R2 * 0.1}"` : `<circle cx="${cx}" cy="${cy}" r="${R2 * 0.9}"`;
     return `
     <g data-hw="lock"${owned ? ' data-owner="lockset"' : ""} data-kind="cylinder"
-       data-cx="${cx}" data-cy="${cy}" data-r="${R}" data-plate="${shape}">
+       data-cx="${cx}" data-cy="${cy}" data-r="${R2}" data-plate="${shape}">
       ${plate}
       <!-- The escutcheon is DOMED, not a flat plate. On d026 and d030 it is
            plainly a little hemisphere standing off the door with a highlight
            up its top-left and a crescent of shade under it; drawn flat it
            reads as a sticker. -->
-      <ellipse cx="${cx}" cy="${cy + R * 0.16}" rx="${R * 0.92}" ry="${R * 0.86}"
+      <ellipse cx="${cx}" cy="${cy + R2 * 0.16}" rx="${R2 * 0.92}" ry="${R2 * 0.86}"
                fill="#000" opacity="0.16"/>
       <radialGradient id="dome-${Math.round(cx)}-${Math.round(cy)}" cx="0.36" cy="0.30" r="0.78">
         <stop offset="0"    stop-color="#fff" stop-opacity="0.42"/>
@@ -8467,12 +8544,12 @@ ${plate.defs}${plate.body}
       <path d="${arcPath(kx, ky - 15, 10, 315, 135)}" fill="none" stroke="#000"
             stroke-opacity="0.3" stroke-width="1.8"/>
 
-      ${keySlot(kx, ky, R * 0.33)}
+      ${keySlot(kx, ky, R2 * 0.33)}
 
       <!-- two crisp speculars: the tell of polished metal -->
-      <ellipse cx="${cx - R * 0.42}" cy="${cy - R * 0.5}" rx="7" ry="4"
-               fill="#fff" opacity="0.4" transform="rotate(-38 ${cx - R * 0.42} ${cy - R * 0.5})"/>
-      <circle cx="${cx + R * 0.5}" cy="${cy + R * 0.46}" r="2.4" fill="#fff" opacity="0.18"/>
+      <ellipse cx="${cx - R2 * 0.42}" cy="${cy - R2 * 0.5}" rx="7" ry="4"
+               fill="#fff" opacity="0.4" transform="rotate(-38 ${cx - R2 * 0.42} ${cy - R2 * 0.5})"/>
+      <circle cx="${cx + R2 * 0.5}" cy="${cy + R2 * 0.46}" r="2.4" fill="#fff" opacity="0.18"/>
     </g>`;
   };
   function describe(state2) {
@@ -8676,12 +8753,12 @@ ${plate.defs}${plate.body}
     // door's own outline (knobPlateOutline) and numbers (28.9; until then a
     // 96 x 300 stadium, a third taller than the fitting).
     knobplate: () => {
-      const R = KNOBPLATE.rose, r = KNOBPLATE.ball;
+      const R2 = KNOBPLATE.rose, r = KNOBPLATE.ball;
       const [bw, bh, bc] = KNOBPLATE.bezel, e1 = bw / 2 * 0.8, e2 = e1 * 0.59;
       const c1 = bc - bh / 2 + bw / 2, c2 = bc + bh / 2 - bw / 2 * 0.59;
       return { box: [-(KNOBPLATE.head + 16), KNOBPLATE.top - 16, KNOBPLATE.head + 16, KNOBPLATE.foot + 16], art: `
     <path d="${knobPlateOutline(0, 0)}"/>
-    <circle cx="0" cy="0" r="${R}" fill="var(--paper, #EFEDE8)"/>
+    <circle cx="0" cy="0" r="${R2}" fill="var(--paper, #EFEDE8)"/>
     <circle cx="0" cy="0" r="${r - 3}"/>
     <path d="M ${-e1} ${c1} A ${e1} ${e1} 0 0 1 ${e1} ${c1} L ${e2.toFixed(2)} ${c2.toFixed(2)}
              A ${e2.toFixed(2)} ${e2.toFixed(2)} 0 0 1 ${-e2.toFixed(2)} ${c2.toFixed(2)} Z"
@@ -8752,8 +8829,8 @@ ${plate.defs}${plate.body}
     grab: () => {
       const k = 560 / GRAB.len, L2 = GRAB.len;
       const n = (v) => (v * k).toFixed(1);
-      const at = (m) => m - L2 / 2;
-      const both = (f) => f((m) => at(m)) + f((m) => at(L2 - m));
+      const at2 = (m) => m - L2 / 2;
+      const both = (f) => f((m) => at2(m)) + f((m) => at2(L2 - m));
       const span = (a2, [a, b, dia], r = dia / 2) => {
         const x1 = Math.min(a2(a), a2(b)), x2 = Math.max(a2(a), a2(b));
         return `<rect x="${n(x1)}" y="${n(-dia / 2)}" width="${n(x2 - x1)}" height="${n(dia)}" rx="${n(Math.min(r, (x2 - x1) / 2))}"/>`;
@@ -8764,13 +8841,13 @@ ${plate.defs}${plate.body}
       L ${n(a2(fp))} ${n(fd / 2)} L ${n(a2(f0))} ${n(GRAB_END.neck[2] / 2)} Z"/>`;
       const [k0, k1, kd] = GRAB_END.knob;
       const knob = (a2) => `<ellipse cx="${n((a2(k0) + a2(k1)) / 2)}" cy="0" rx="${n((k1 - k0) / 2)}" ry="${n(kd / 2)}"/>`;
-      const posts = GRAB.post.map((t) => at(L2 * t));
-      const R = GRAB.rose * k;
-      return { box: [-L2 * k / 2 - 6, -R - 4, L2 * k / 2 + 6, R + 4], art: `
+      const posts = GRAB.post.map((t) => at2(L2 * t));
+      const R2 = GRAB.rose * k;
+      return { box: [-L2 * k / 2 - 6, -R2 - 4, L2 * k / 2 + 6, R2 + 4], art: `
     ${posts.map((x) => `<circle cx="${n(x)}" cy="0" r="${n(GRAB.rose)}" opacity="0.55"/>`).join("")}
     ${both((a2) => span(a2, GRAB_END.stem))}${both((a2) => span(a2, GRAB_END.neck))}
     ${both(finial)}${both(knob)}${both((a2) => span(a2, GRAB_END.inner))}
-    ${span(at, [GRAB_END.collar[1] - 1, L2 - GRAB_END.collar[1] + 1, GRAB.d], GRAB.d * 0.16)}
+    ${span(at2, [GRAB_END.collar[1] - 1, L2 - GRAB_END.collar[1] + 1, GRAB.d], GRAB.d * 0.16)}
     ${both((a2) => span(a2, GRAB_END.collar, 2))}
     ${posts.map((x) => `<circle cx="${n(x)}" cy="0" r="${n(GRAB.ball)}"/>`).join("")}` };
     },
@@ -9271,13 +9348,15 @@ ${plate.defs}${plate.body}
     trioPlate: "fix.trioPlate",
     /* 26.9.2026: the bow has no home on this door (a link, or a window tapped
        beside it) — see repair. */
-    bowGone: "fix.bowGone"
+    bowGone: "fix.bowGone",
+    /* 28.9.2026: no pull handle left for a finish to belong to — see repair. */
+    finishHome: "fix.finishHome"
   };
   var WHY_UNDER_GLASS = { top: "why.winTakesTop", plate: "why.winPlate", room: "why.noRoomBelow" };
   var BOW_WHY = { window: "why.bowWindow", face: "why.bowFace", door: "why.bowDoor" };
   var NOTHING = /^(none|no[a-z]*)$/;
   var OWNED = { stripes: ["stripeDir", "stripeCount", "stripeTight"], handle: ["handle", "handleLen"] };
-  var NOT_A_LOSS = /* @__PURE__ */ new Set(["handleLen", "stripeTight"]);
+  var NOT_A_LOSS = /* @__PURE__ */ new Set(["handleLen", "stripeTight", "handleFinish"]);
   function displacedBy(before, after, tapped, restored2 = []) {
     const own = new Set(OWNED[tapped] || [tapped]);
     return Object.keys(after).filter((k) => !own.has(k) && !restored2.includes(k) && !NOT_A_LOSS.has(k) && typeof after[k] !== "object" && before[k] !== after[k] && !(typeof before[k] === "string" && NOTHING.test(before[k])) && !(typeof before[k] === "number" && before[k] === 0));
@@ -9386,6 +9465,10 @@ ${plate.defs}${plate.body}
         change("grille", SAID.grilleGone);
       }
     }
+    if (!finishHasSubject(s) && s.handleFinish && s.handleFinish !== HANDLE_FINISHES[0].id) {
+      s.handleFinish = HANDLE_FINISHES[0].id;
+      change("handleFinish", SAID.finishHome);
+    }
     return { state: s, changed, said };
   }
 
@@ -9405,6 +9488,9 @@ ${plate.defs}${plate.body}
     /* open at the foot: two nested CLOSED rectangles, which this was, are a
        picture frame or a monitor */
     mk: '<path d="M3.4 20.6V3.2h17.2v17.4"/><path d="M7.8 20.6V7.6h8.4v13"/><path d="M1.8 20.6h20.4"/>',
+    /* the extra lock's step, 28.9.2026: the קודן's own case — the summary's row
+       drew it first (`SPEC_ICON.speciallock`, which now refers here) */
+    xlock: '<rect x="7.4" y="3.6" width="9.2" height="16.8" rx="4.6"/><path d="M10.6 8.6h.01M13.4 8.6h.01M10.6 12.2h.01M13.4 12.2h.01"/><circle cx="12" cy="16.6" r="1.6"/>',
     sum: '<path d="M5.4 3h8.8l4.4 4.4V21H5.4Z"/><path d="M14.2 3v4.4h4.4"/><path d="m8.4 14 2.4 2.6 4.8-5.4"/>'
   };
   function sectionIcon(key) {
@@ -9446,7 +9532,7 @@ ${plate.defs}${plate.body}
     pirzul: SECTION_ICON.pz,
     stripes: '<path d="M4.6 7.4h14.8M4.6 12h14.8M4.6 16.6h14.8"/>',
     /* the קודן's own case — the one of the two a stranger names */
-    speciallock: '<rect x="7.4" y="3.6" width="9.2" height="16.8" rx="4.6"/><path d="M10.6 8.6h.01M13.4 8.6h.01M10.6 12.2h.01M13.4 12.2h.01"/><circle cx="12" cy="16.6" r="1.6"/>'
+    speciallock: SECTION_ICON.xlock
   };
   var specIcon = (key) => Object.prototype.hasOwnProperty.call(SPEC_ICON, key) ? `<svg class="spec__ico" viewBox="0 0 24 24" aria-hidden="true">${SPEC_ICON[key]}</svg>` : '<span class="spec__ico" aria-hidden="true"></span>';
   var HUD_ICON = {
@@ -9980,6 +10066,179 @@ ${plate.defs}${plate.body}
     { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "strip", grille: "none", handle: "idan", handleFinish: "hf-nickel", grab: "nograb", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } }
   ];
 
+  // js/tour.js
+  var TOUR_KEY = "dm.tour.v1";
+  var tourSeen = () => {
+    try {
+      return localStorage.getItem(TOUR_KEY) === "seen";
+    } catch {
+      return false;
+    }
+  };
+  var remember = () => {
+    try {
+      localStorage.setItem(TOUR_KEY, "seen");
+    } catch {
+    }
+  };
+  var PAD2 = 8;
+  var GAP = 18;
+  var EDGE2 = 12;
+  var R = (el) => {
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return r.width && r.height ? { left: r.left, top: r.top, right: r.right, bottom: r.bottom } : null;
+  };
+  var grow = (r, m) => r && { left: r.left - m, top: r.top - m, right: r.right + m, bottom: r.bottom + m };
+  var meets = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+  var clamp2 = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  function optionsRect() {
+    const wide = window.matchMedia && window.matchMedia("(min-width: 1100px)").matches;
+    if (wide) return R(document.querySelector(".panel--choose"));
+    const live = document.querySelector(".sect.is-live");
+    const r = R(live);
+    if (!r) return null;
+    const wrap = R(document.querySelector(".stage-wrap"));
+    const bar = document.querySelector(".quote");
+    const foot = bar && getComputedStyle(bar).position === "fixed" ? bar.getBoundingClientRect().top : window.innerHeight;
+    const top = Math.max(r.top, wrap ? wrap.bottom : 0);
+    const bottom = Math.min(r.bottom, foot);
+    return bottom - top > 24 ? { left: Math.max(r.left, 0), right: Math.min(r.right, window.innerWidth), top, bottom } : null;
+  }
+  var TOUR_STEPS = [
+    { text: "tour.door", targets: () => [R(document.querySelector("#stage .door-svg #frame"))] },
+    { text: "tour.steps", targets: () => [R(document.querySelector(".steps"))] },
+    {
+      text: "tour.options",
+      targets: () => [optionsRect()],
+      /* a phone's options can start below the fold: bring the first ones up
+         under the door before the cut-out is measured */
+      before: () => {
+        const wide = window.matchMedia && window.matchMedia("(min-width: 1100px)").matches;
+        if (!wide) document.querySelector(".sect.is-live")?.scrollIntoView({ block: "start" });
+      }
+    },
+    { text: "tour.undo", targets: () => [R(document.querySelector("#save-hud")), R(document.querySelector(".stage__undo"))] }
+  ];
+  var dlg = null;
+  var at = 0;
+  var onResize = null;
+  function card() {
+    return dlg.querySelector(".tour__card");
+  }
+  function placeCard(holes) {
+    const c = card();
+    c.style.left = "0px";
+    c.style.top = "0px";
+    const W = window.innerWidth, H = window.innerHeight;
+    const cw = c.offsetWidth, ch = c.offsetHeight;
+    const h = holes[0];
+    const midX = (h.left + h.right) / 2, midY = (h.top + h.bottom) / 2;
+    const rtl = document.documentElement.dir === "rtl";
+    const cx = (x) => clamp2(x, EDGE2, W - EDGE2 - cw), cy = (y) => clamp2(y, EDGE2, H - EDGE2 - ch);
+    const after = { x: rtl ? h.left - GAP - cw : h.right + GAP, y: cy(midY - ch / 2) };
+    const before = { x: rtl ? h.right + GAP : h.left - GAP - cw, y: cy(midY - ch / 2) };
+    const tries = [
+      { x: cx(midX - cw / 2), y: h.bottom + GAP },
+      { x: cx(midX - cw / 2), y: h.top - GAP - ch },
+      after,
+      before,
+      { x: cx(W / 2 - cw / 2), y: cy(H - EDGE2 - ch) },
+      { x: cx(W / 2 - cw / 2), y: EDGE2 }
+    ];
+    const fits = (t) => t.x >= EDGE2 - 0.5 && t.y >= EDGE2 - 0.5 && t.x + cw <= W - EDGE2 + 0.5 && t.y + ch <= H - EDGE2 + 0.5 && !holes.some((o) => meets({ left: t.x, top: t.y, right: t.x + cw, bottom: t.y + ch }, grow(o, 4)));
+    const pick = tries.find(fits) || tries[tries.length - 2];
+    c.style.left = `${Math.round(pick.x)}px`;
+    c.style.top = `${Math.round(pick.y)}px`;
+    return { left: pick.x, top: pick.y, right: pick.x + cw, bottom: pick.y + ch };
+  }
+  function arrows(box, holes) {
+    const svg = dlg.querySelector(".tour__arrows");
+    svg.replaceChildren();
+    const NS = "http://www.w3.org/2000/svg";
+    for (const h of holes) {
+      const hx = (h.left + h.right) / 2, hy = (h.top + h.bottom) / 2;
+      const ax = clamp2(hx, box.left, box.right), ay = clamp2(hy, box.top, box.bottom);
+      const bx = clamp2(ax, h.left, h.right), by = clamp2(ay, h.top, h.bottom);
+      if (Math.hypot(bx - ax, by - ay) < 6) continue;
+      const line = document.createElementNS(NS, "line");
+      line.setAttribute("x1", ax.toFixed(1));
+      line.setAttribute("y1", ay.toFixed(1));
+      line.setAttribute("x2", bx.toFixed(1));
+      line.setAttribute("y2", by.toFixed(1));
+      line.setAttribute("class", "tour__arrow");
+      line.setAttribute("marker-end", "url(#tour-head)");
+      svg.append(line);
+    }
+  }
+  function paintScrim(holes) {
+    const mask = dlg.querySelector("#tour-cut");
+    const r = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--r-tile")) || 12;
+    mask.querySelectorAll(".tour__hole").forEach((n) => n.remove());
+    const NS = "http://www.w3.org/2000/svg";
+    for (const h of holes) {
+      const rect = document.createElementNS(NS, "rect");
+      rect.setAttribute("class", "tour__hole");
+      rect.setAttribute("x", h.left.toFixed(1));
+      rect.setAttribute("y", h.top.toFixed(1));
+      rect.setAttribute("width", (h.right - h.left).toFixed(1));
+      rect.setAttribute("height", (h.bottom - h.top).toFixed(1));
+      rect.setAttribute("rx", String(r));
+      rect.setAttribute("fill", "#000");
+      mask.append(rect);
+    }
+  }
+  function show() {
+    const s = TOUR_STEPS[at];
+    if (s.before) s.before();
+    const holes = s.targets().filter(Boolean).map((r) => grow(r, PAD2));
+    dlg.dataset.step = String(at + 1);
+    dlg.querySelector(".tour__n").textContent = T("tour.count", at + 1, TOUR_STEPS.length);
+    dlg.querySelector(".tour__t").textContent = T(s.text);
+    dlg.querySelector(".tour__next").textContent = T(at === TOUR_STEPS.length - 1 ? "tour.done" : "tour.next");
+    paintScrim(holes);
+    if (!holes.length) {
+      arrows({ left: 0, top: 0, right: 0, bottom: 0 }, []);
+      placeCard([{ left: 0, top: 0, right: 0, bottom: 0 }]);
+      return;
+    }
+    arrows(placeCard(holes), holes);
+  }
+  function end() {
+    remember();
+    if (onResize) window.removeEventListener("resize", onResize);
+    onResize = null;
+    if (dlg && dlg.open) dlg.close();
+    document.documentElement.classList.remove("is-touring");
+  }
+  function startTour() {
+    dlg = document.querySelector("#tour");
+    if (!dlg || tourSeen() || typeof dlg.showModal !== "function") return false;
+    at = 0;
+    dlg.querySelector(".tour__skip").onclick = end;
+    dlg.querySelector(".tour__next").onclick = () => {
+      if (at >= TOUR_STEPS.length - 1) {
+        end();
+        return;
+      }
+      at++;
+      show();
+    };
+    dlg.oncancel = (ev) => {
+      ev.preventDefault();
+      end();
+    };
+    onResize = () => {
+      if (dlg.open) show();
+    };
+    window.addEventListener("resize", onResize);
+    document.documentElement.classList.add("is-touring");
+    dlg.showModal();
+    show();
+    dlg.querySelector(".tour__next").focus();
+    return true;
+  }
+
   // js/app.js
   var $ = (sel) => document.querySelector(sel);
   var state = { ...DEFAULTS };
@@ -10090,7 +10349,25 @@ ${plate.defs}${plate.body}
       list: () => GRILLES,
       glyph: (o) => grilleGlyph(o, byId(COLOURS, state.colour).hex),
       tinted: true,
-      hint: "g.grille.h"
+      hint: "g.grille.h",
+      /* ⚠ TWO HEADED GROUPS, AND EACH DESIGN'S TWO COLOURS SIDE BY SIDE — 28.9,
+         the owner's son: *"Put the expensive window designs apart from the
+         regular ones, and keep the same designs in different colours near each
+         other."* Split on the list's own `delta` (the included designs, then
+         the priced ones with the surcharge in the heading, as the colours do),
+         and inside each the black design then its door-colour twin. The SCREEN's
+         order only: the array is the code's index order and never moves — the
+         `-light` twins were appended at its end, which is why they drew apart. */
+      split: (list) => {
+        const base = (o) => o.id.replace(/-light$/, "");
+        const at2 = (id) => list.findIndex((o) => o.id === id);
+        const paired = (items) => items.slice().sort((a, b) => at2(base(a)) - at2(base(b)) || (a.light ? 1 : 0) - (b.light ? 1 : 0));
+        const free = paired(list.filter((o) => !o.delta));
+        const paid = paired(list.filter((o) => o.delta));
+        const deltas = [...new Set(paid.map((o) => o.delta))];
+        const plus = deltas.length === 1 ? T("g.grille.plus", formatAgorot(deltas[0])) : T("g.grille.plusMany");
+        return [[T("g.grille.free"), free], [plus, paid]];
+      }
     },
     {
       key: "handle",
@@ -10158,7 +10435,7 @@ ${plate.defs}${plate.body}
     {
       key: "speciallock",
       title: "g.speciallock",
-      in: "lock",
+      in: "xlock",
       kind: "hw",
       list: () => SPECIAL_LOCKS,
       glyph: specialLockGlyph,
@@ -10293,10 +10570,7 @@ ${plate.defs}${plate.body}
       sub: "step.lock.s",
       lede: "step.lock.l",
       exp: "exp.lock",
-      expArgs: () => [
-        formatAgorot(byId(SPECIAL_LOCKS, "kasefet").delta),
-        formatAgorot(byId(SPECIAL_LOCKS, "kodan").delta)
-      ]
+      expArgs: () => []
     },
     {
       key: "pz",
@@ -10305,6 +10579,26 @@ ${plate.defs}${plate.body}
       lede: "step.pz.l",
       exp: "exp.pz",
       expArgs: () => [L(byId(LOCKSETS, "cadoor")), L(byId(LOCKSETS, "sapir"))]
+    },
+    /* ⚠ THE EXTRA LOCK HAS ITS OWN STEP, 28.9.2026 — the owner's son: *"The extra
+       locks as a separate section, right after the pirzul section — they don't
+       fit on the screen and I need to scroll for them."* They were the lock
+       step's second group, under the levers. A new key, so no link goes stale
+       and no `VERSION` moves (the key is not in the wire format); what moved with
+       it is `WANT_ORDER` in the audit, the tenth navigator mark
+       (`SECTION_ICON.xlock` — the קודן's own case, which the summary's row
+       already drew) and every walk that counted nine steps. Its explainer is the
+       lock step's old one: the two figures still come through arguments. */
+    {
+      key: "xlock",
+      title: "step.xlock.t",
+      sub: "step.xlock.s",
+      lede: "step.xlock.l",
+      exp: "exp.xlock",
+      expArgs: () => [
+        formatAgorot(byId(SPECIAL_LOCKS, "kasefet").delta),
+        formatAgorot(byId(SPECIAL_LOCKS, "kodan").delta)
+      ]
     },
     {
       key: "face",
@@ -10419,13 +10713,29 @@ ${plate.defs}${plate.body}
     const saveHud = $("#save-hud");
     if (saveHud) {
       saveHud.innerHTML = hudIcon("save");
-      saveHud.addEventListener("click", saveCurrent);
+      saveHud.addEventListener("click", () => openDialog($("#savedlg")));
+    }
+    $("#savedlg-save").addEventListener("click", () => {
+      saveCurrent();
+      closeDialog($("#savedlg"));
+    });
+    $("#savedlg-list").addEventListener("click", () => {
+      closeDialog($("#savedlg"));
+      openDialog($("#saved"));
+    });
+    $("#savedlg-close").addEventListener("click", () => closeDialog($("#savedlg")));
+    $("#saved-close").addEventListener("click", () => closeDialog($("#saved")));
+    for (const d of [$("#savedlg"), $("#saved")]) {
+      d.addEventListener("click", (ev) => {
+        if (ev.target === ev.currentTarget) closeDialog(d);
+      });
     }
     $("#price-toggle").addEventListener("click", () => {
       const box = $("#breakdown"), btn = $("#price-toggle");
       const open = btn.getAttribute("aria-expanded") === "true";
       btn.setAttribute("aria-expanded", String(!open));
       box.hidden = open;
+      placeBreakdown();
     });
     $("#works-close").addEventListener("click", closeWorks);
     $("#confirm-yes").addEventListener("click", () => closeConfirm("yes"));
@@ -10463,17 +10773,15 @@ ${plate.defs}${plate.body}
         window.location.href = el.href;
       });
     });
-    $("#saved-btn").addEventListener("click", () => {
-      const box = $("#saved"), btn = $("#saved-btn");
-      const show = box.hidden;
-      box.hidden = !show;
-      btn.setAttribute("aria-expanded", String(show));
-    });
+    $("#saved-btn").addEventListener("click", () => openDialog($("#saved")));
     paintSaved();
     if (typeof ResizeObserver === "function") {
       new ResizeObserver(fitStage).observe($("#stage"));
     } else {
       window.addEventListener("resize", fitStage);
+    }
+    if (document.fonts && typeof document.fonts.addEventListener === "function") {
+      document.fonts.addEventListener("loadingdone", () => fitStage());
     }
     const panelEl = $(".panel--choose");
     if (panelEl) {
@@ -10506,11 +10814,21 @@ ${plate.defs}${plate.body}
     if (!document.documentElement.classList.contains("is-sheet")) {
       goStep(carries ? SUMMARY.key : SECTIONS[0].key, false);
     }
+    const root0 = document.documentElement.classList;
+    if (!carries && !root0.contains("is-bare") && !root0.contains("is-sheet")) {
+      setTimeout(() => {
+        if (!document.querySelector("dialog[open]")) startTour();
+      }, 1100);
+    }
     document.documentElement.classList.add("is-arriving");
     setTimeout(() => document.documentElement.classList.remove("is-arriving"), 1e3);
     armRoom();
     if (typeof window.matchMedia === "function") {
       window.matchMedia("(min-width: 1100px)").addEventListener("change", placeSend);
+      window.matchMedia("(min-width: 1100px)").addEventListener("change", () => {
+        placeNav();
+        fitStage();
+      });
     }
   }
   var markMore = () => {
@@ -10585,6 +10903,18 @@ ${plate.defs}${plate.body}
   function tellOne(text) {
     onYes = null;
     showDialog(text, false);
+  }
+  function openDialog(d) {
+    if (!d) return;
+    if (typeof d.showModal === "function") {
+      if (!d.open) d.showModal();
+    } else d.setAttribute("open", "");
+  }
+  function closeDialog(d) {
+    if (!d) return;
+    if (typeof d.close === "function") {
+      if (d.open) d.close();
+    } else d.removeAttribute("open");
   }
   function closeConfirm(answer) {
     const d = $("#confirm");
@@ -10689,6 +11019,7 @@ ${plate.defs}${plate.body}
     const tel = document.getElementById("send-tel");
     if (wa && tel && tel.previousElementSibling !== wa) wa.after(tel);
     if (send && wrap.contains(send)) $(".layout").appendChild(send);
+    document.querySelectorAll(".stage-wrap > .steps").forEach((n) => n.remove());
     wrap.replaceChildren();
     const opener = document.createElement("button");
     opener.type = "button";
@@ -10790,6 +11121,7 @@ ${plate.defs}${plate.body}
     }
     sum.querySelector(".sect__back").addEventListener("click", () => stepBy(-1));
     wrap.appendChild(sum);
+    placeNav();
   }
   function tilePrice(g, o, state2) {
     const after = { ...repair({ ...state2, [g.key]: o.id }).state, [g.key]: o.id };
@@ -11076,16 +11408,28 @@ ${plate.defs}${plate.body}
     }
     host.appendChild(box);
   }
+  function placeNav() {
+    const nav = document.querySelector(".steps");
+    const panel = $("#choices"), wrap = $(".stage-wrap");
+    if (!nav || !panel || !wrap) return;
+    const wide = typeof window.matchMedia === "function" && window.matchMedia("(min-width: 1100px)").matches;
+    const home = wide ? wrap : panel;
+    if (nav.parentElement === home) return;
+    const had = nav.contains(document.activeElement) ? document.activeElement : null;
+    if (wide) wrap.appendChild(nav);
+    else panel.insertBefore(nav, panel.querySelector(".sect") || null);
+    if (had) had.focus({ preventScroll: true });
+  }
   function placeSend() {
     const wa = $("#wa-btn");
-    const card = document.querySelector(".panel--send .send");
-    if (!wa || !card) return;
+    const card2 = document.querySelector(".panel--send .send");
+    if (!wa || !card2) return;
     const wide = typeof window.matchMedia === "function" && window.matchMedia("(min-width: 1100px)").matches;
     const foot = document.querySelector(".sect--sum .sect__foot");
     if (wide && foot) {
       if (wa.parentElement !== foot) foot.appendChild(wa);
-    } else if (wa.parentElement !== card) {
-      card.querySelector(".send__alt")?.before(wa);
+    } else if (wa.parentElement !== card2) {
+      card2.querySelector(".send__alt")?.before(wa);
     }
     const tel = $("#send-tel");
     if (tel && tel.previousElementSibling !== wa) wa.after(tel);
@@ -11147,11 +11491,13 @@ ${plate.defs}${plate.body}
     noteEngaged();
     const g = firstGroup(liveStep);
     if (!g) return;
-    const list = g.list();
+    const all = g.list();
+    const drawn = [...document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"][data-id]`)].map((b) => all.find((o) => o.id === b.dataset.id)).filter(Boolean);
+    const list = drawn.length === all.length ? drawn : all;
     const blocked = conflicts(state)[g.key] || {};
-    const at = list.findIndex((o) => o.id === state[g.key]);
+    const at2 = list.findIndex((o) => o.id === state[g.key]);
     for (let k = 1; k < list.length; k++) {
-      const o = list[((at + dir * k) % list.length + list.length) % list.length];
+      const o = list[((at2 + dir * k) % list.length + list.length) % list.length];
       if (o.id !== state[g.key] && !blocked[o.id]) {
         choose(g, o.id);
         return;
@@ -11199,11 +11545,6 @@ ${plate.defs}${plate.body}
     const btn = $("#saved-btn");
     if (!btn) return;
     btn.hidden = !list.length;
-    if (!list.length) {
-      const box2 = $("#saved");
-      if (box2) box2.hidden = true;
-      btn.setAttribute("aria-expanded", "false");
-    }
     document.querySelectorAll("[data-saved-count]").forEach((e) => {
       e.textContent = String(list.length);
     });
@@ -11237,8 +11578,7 @@ ${plate.defs}${plate.body}
       open.addEventListener("click", () => {
         const { state: st, notice, said } = fromQuery(q);
         set(st);
-        $("#saved").hidden = true;
-        $("#saved-btn").setAttribute("aria-expanded", "false");
+        closeDialog($("#saved"));
         if (notice) toast(said && said.length ? said.join(" · ") : T("notice.some"));
       });
       const drop = document.createElement("button");
@@ -11276,8 +11616,10 @@ ${plate.defs}${plate.body}
     const bandT = document.querySelector("[data-band-title]");
     const bandN = document.querySelector("[data-band-now]");
     const fg = firstGroup(liveStep);
+    const bandWas = `${bandT?.textContent}|${bandN?.textContent}`;
     if (bandT && sec) bandT.textContent = T(sec.title);
     if (bandN) bandN.textContent = fg ? nowLabel(fg) : "";
+    if (`${bandT?.textContent}|${bandN?.textContent}` !== bandWas) placeBand();
     const wrapEl = document.querySelector(".stage-wrap");
     if (wrapEl) wrapEl.dataset.step = liveStep;
     const live = document.querySelector(".steps__step.is-on");
@@ -11539,6 +11881,7 @@ ${plate.defs}${plate.body}
     announce(describe(state));
     $("#undo-btn").disabled = !canUndo();
     $("#redo-btn").disabled = !canRedo();
+    placeUndo();
   }
   function markGroup(g, blocked) {
     if (g.kind === "mashkof") return markMashkof(g);
@@ -11659,6 +12002,132 @@ ${plate.defs}${plate.body}
     });
     img.src = href;
   }
+  function placeUndo() {
+    const box = document.querySelector(".stage__undo");
+    const wrapEl = document.querySelector(".stage-wrap");
+    const stage = $("#stage");
+    if (!box || !wrapEl || !stage) return;
+    const ws = wrapEl.style;
+    const v = (k) => parseFloat(ws.getPropertyValue(k));
+    const wrap = wrapEl.getBoundingClientRect(), st = stage.getBoundingClientRect();
+    if (!st.width || !Number.isFinite(v("--frame-right"))) return;
+    const frame = {
+      left: wrap.left + v("--frame-left"),
+      right: wrap.left + v("--frame-right"),
+      top: wrap.top + v("--frame-top"),
+      bottom: wrap.top + v("--frame-bot")
+    };
+    const q = document.querySelector("#quote");
+    const obstacles = [
+      frame,
+      ...[...document.querySelectorAll(".stage__arrow")].map((e) => e.getBoundingClientRect()),
+      ...q && getComputedStyle(q).position !== "fixed" ? [q.getBoundingClientRect()] : []
+    ].filter((r) => r.right > r.left);
+    const words = [...document.querySelectorAll(".trust__i")].map((e) => e.getBoundingClientRect()).filter((r) => r.width && r.bottom > st.top && r.top < st.bottom);
+    const wordsTop = words.length ? Math.min(...words.map((r) => r.top)) : null;
+    const hits = (a, c) => a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
+    const was = box.offsetHeight;
+    box.style.setProperty("--undo-r", `${Math.round(wrap.right - st.right + 8)}px`);
+    const place = (m) => {
+      box.dataset.mode = m;
+      box.style.setProperty("--undo-b", `${Math.round(wrap.bottom - st.bottom + 8)}px`);
+      let g = box.getBoundingClientRect();
+      if (wordsTop !== null && words.some((w) => w.left < g.right && w.right > g.left)) {
+        box.style.setProperty("--undo-b", `${Math.round(wrap.bottom - wordsTop + 8)}px`);
+        g = box.getBoundingClientRect();
+      }
+      return !obstacles.some((o) => hits(g, o));
+    };
+    const SHAPES = ["row", "stack", "iconrow", "icon"];
+    if (!SHAPES.some(place)) place("icon");
+    if (box.offsetHeight !== was) placeSteps();
+  }
+  function placeBand() {
+    const band = document.querySelector(".stage__band");
+    const wrapEl = document.querySelector(".stage-wrap");
+    const stage = $("#stage");
+    if (!band || !wrapEl || !stage || !band.getClientRects().length) return;
+    const ws = wrapEl.style;
+    const fTop = parseFloat(ws.getPropertyValue("--frame-top"));
+    const fL = parseFloat(ws.getPropertyValue("--frame-left"));
+    const fR = parseFloat(ws.getPropertyValue("--frame-right"));
+    if (![fTop, fL, fR].every(Number.isFinite)) return;
+    const wrap = wrapEl.getBoundingClientRect(), box = stage.getBoundingClientRect();
+    const sTop = Math.ceil(box.top - wrap.top);
+    const h = band.getBoundingClientRect().height;
+    const top = Math.max(sTop, Math.floor(fTop - 8 - h));
+    const cx = (fL + fR) / 2;
+    let L2 = box.left - wrap.left + 8, R2 = box.right - wrap.left - 8;
+    for (const el of wrapEl.querySelectorAll(".stage__hud .hud__slot, #quote, .stage__arrow, .stage-wrap > .steps")) {
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height) continue;
+      if (r.bottom - wrap.top <= top || r.top - wrap.top >= top + h) continue;
+      const l = r.left - wrap.left, rr = r.right - wrap.left;
+      if (rr <= cx) L2 = Math.max(L2, rr + 8);
+      else if (l >= cx) R2 = Math.min(R2, l - 8);
+      else {
+        L2 = cx;
+        R2 = cx;
+      }
+    }
+    band.style.setProperty("--band-top", `${top}px`);
+    band.style.setProperty("--band-w", `${Math.max(0, Math.floor(R2 - L2))}px`);
+    const w = band.offsetWidth;
+    band.style.setProperty("--band-l", `${Math.round(Math.max(L2, Math.min(cx - w / 2, R2 - w)))}px`);
+  }
+  function placeBreakdown() {
+    const box = $("#breakdown");
+    if (!box) return;
+    box.style.setProperty("--bd-shift", "0px");
+    const q = document.querySelector(".quote");
+    const wrap = document.querySelector(".stage-wrap");
+    if (box.hidden || !q || !wrap || getComputedStyle(q).position !== "absolute") return;
+    const a = box.parentElement.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+    const width = box.offsetWidth;
+    const left = a.left + a.width / 2 - width / 2;
+    const lo = Math.max(w.left, 0) + 8, hi = Math.min(w.right, window.innerWidth) - 8;
+    const d = left < lo ? lo - left : left + width > hi ? hi - (left + width) : 0;
+    if (d) box.style.setProperty("--bd-shift", `${Math.round(d)}px`);
+  }
+  function placeSteps() {
+    const col = document.querySelector(".stage-wrap > .steps");
+    const wrapEl = document.querySelector(".stage-wrap");
+    if (!col || !wrapEl) return;
+    const mid0 = parseFloat(wrapEl.style.getPropertyValue("--frame-mid"));
+    if (!Number.isFinite(mid0)) return;
+    const wrap = wrapEl.getBoundingClientRect();
+    const mid = wrap.y + mid0;
+    col.style.removeProperty("--steps-gap");
+    col.style.removeProperty("--steps-pad");
+    let H = col.offsetHeight;
+    const cx = col.getBoundingClientRect();
+    let top = mid - H / 2;
+    const inX = (r) => r.width && r.right > cx.left && r.left < cx.right;
+    for (const el of document.querySelectorAll("#quote, .stage__hud .hud__slot")) {
+      const r = el.getBoundingClientRect();
+      if (inX(r) && r.top < mid && r.bottom + 8 > top) top = r.bottom + 8;
+    }
+    const st = document.querySelector("#stage")?.getBoundingClientRect();
+    let floor = (st ? st.bottom : wrap.bottom) - 8;
+    for (const w of document.querySelectorAll(".trust__i")) {
+      const r = w.getBoundingClientRect();
+      if (r.width && inX(r) && r.top > mid) floor = Math.min(floor, r.top - 8);
+    }
+    const un = document.querySelector(".stage__undo");
+    const ur = un && un.getBoundingClientRect();
+    if (ur && ur.width && inX(ur) && ur.top > mid) floor = Math.min(floor, ur.top - 8);
+    let short = top + H - floor;
+    if (short > 0) {
+      const g = Math.max(2, 6 - short / 8);
+      short -= (6 - g) * 8;
+      const pad = Math.max(6, 10 - Math.max(0, short) / 2);
+      col.style.setProperty("--steps-gap", `${g.toFixed(2)}px`);
+      col.style.setProperty("--steps-pad", `${pad.toFixed(2)}px`);
+      H = col.offsetHeight;
+    }
+    if (top + H > floor) top = floor - H;
+    wrapEl.style.setProperty("--steps-top", `${Math.round(top - wrap.y)}px`);
+  }
   function fitStage() {
     if (document.documentElement.classList.contains("is-bare")) return;
     const stage = $("#stage");
@@ -11736,7 +12205,11 @@ ${plate.defs}${plate.body}
       sw.setProperty("--frame-right", `${Math.round(f.right - wrap.x)}px`);
       sw.setProperty("--frame-left", `${Math.round(f.left - wrap.x)}px`);
       sw.setProperty("--frame-mid", `${Math.round((f.top + f.bottom) / 2 - wrap.y)}px`);
+      sw.setProperty("--frame-bot", `${Math.round(f.bottom - wrap.y)}px`);
       sw.setProperty("--hud-b", `${Math.round(hudB - wrap.y)}px`);
+      placeBand();
+      placeUndo();
+      placeSteps();
       const root = document.documentElement.style;
       root.setProperty("--stage-l", `${Math.round(wrap.x)}px`);
       root.setProperty("--stage-w", `${Math.round(wrap.width)}px`);
@@ -11765,10 +12238,15 @@ ${plate.defs}${plate.body}
         "--bd-room",
         `${Math.max(0, Math.round(clip - a.bottom))}px`
       );
+      placeBreakdown();
     }
     const style = document.documentElement.style;
     const choose2 = document.querySelector(".panel--choose");
     const railEl = choose2 && choose2.querySelector(".steps");
+    if (choose2 && !railEl) {
+      const pad = parseFloat(getComputedStyle(choose2).paddingBlockStart) || 0;
+      style.setProperty("--rail-band", `${Math.round(pad)}px`);
+    }
     const footEl = document.querySelector(".sect:not([hidden]) .sect__foot");
     if (choose2 && railEl && getComputedStyle(railEl).position === "sticky") {
       const pad = parseFloat(getComputedStyle(choose2).paddingBlockStart) || 0;
@@ -11797,7 +12275,17 @@ ${plate.defs}${plate.body}
     if (!text) return;
     const el = $("#toast");
     el.textContent = text;
+    el.style.removeProperty("margin-block-end");
     el.hidden = false;
+    const un = document.querySelector(".stage__undo");
+    const shown = un && un.querySelector(".undo-pill:not(:disabled)");
+    if (shown) {
+      const u = un.getBoundingClientRect();
+      const top = el.offsetTop, bot = top + el.offsetHeight, l = el.offsetLeft, r = l + el.offsetWidth;
+      if (r > u.left && l < u.right && bot > u.top - 8) {
+        el.style.setProperty("margin-block-end", `${Math.ceil(bot - (u.top - 8))}px`);
+      }
+    }
     clearTimeout(toastTimer);
     const ms = Math.min(12e3, Math.max(4e3, 2e3 + 55 * text.length));
     toastTimer = setTimeout(() => {

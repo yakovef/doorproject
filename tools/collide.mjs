@@ -36,6 +36,7 @@
  * fitting, run this, paste what it says, run it again to see the ✓.
  */
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import { assertFreshBundle } from './fresh.mjs';
 import { DETAILS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
 import { conflicts } from '../js/rules.js';
@@ -77,7 +78,7 @@ const SWEEP_SIZES = ['standard', 'extra1', 'extra2', 'half', 'halfextra2'];
 
 await assertFreshBundle();
 
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 const p = await b.newPage({ viewport: { width: 800, height: 1100 }, deviceScaleFactor: 1 });
 await p.goto(`file://${process.cwd()}/index.html?bare=1`);
 await p.waitForFunction(() => typeof window.__render === 'function');

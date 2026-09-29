@@ -43,6 +43,7 @@
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import { assertFreshBundle } from './fresh.mjs';
 import { PNG } from 'pngjs';
 import { REBATE } from '../js/renderer.js';
@@ -102,7 +103,7 @@ function patch(img, x, y, w, h) {
 
 await assertFreshBundle();
 
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 
 async function measure(colourId) {
   const p = await b.newPage({ viewport: { width: 700, height: 1000 }, deviceScaleFactor: 2 });

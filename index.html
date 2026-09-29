@@ -13,7 +13,7 @@
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=04a0b10e">
+<link rel="stylesheet" href="css/app.css?v=1b0e8f28">
 
 <!-- ⚠ THE PHOTOGRAPHED ROOM, IN TWO CROPS, AND ONLY ONE IS EVER FETCHED.
      The owner supplied the same entrance framed 3:4 and 16:9 and both ship:
@@ -201,6 +201,71 @@
   </div>
 </dialog>
 
+<!-- ⚠ THE SAVE ASKS — 28.9.2026, the owner's son: "The save button's function
+     changed: on clicking, a window with two options, save or view a saved
+     door." Opened by `#save-hud` in the wall; the summary's own
+     "שמירת העיצוב" (`#save-btn`) still saves at once, beside the list's
+     toggle. The first choice saves (`saveCurrent`: its toast, then this
+     closes); the second opens `#saved` over it. The confirm dialog's card and
+     backdrop; no animation (T9, T13); Escape and the backdrop close it. -->
+<dialog class="confirm savedlg" id="savedlg" aria-labelledby="savedlg-h">
+  <p class="confirm__p savedlg__h" id="savedlg-h" data-t="savedlg.h">הדלתות שלכם</p>
+  <div class="savedlg__col">
+    <button class="btn savedlg__save" id="savedlg-save" type="button" data-t="savedlg.save">שמירת הדלת</button>
+    <button class="btn savedlg__list" id="savedlg-list" type="button" aria-haspopup="dialog"><span><span data-t="savedlg.list">הדלתות השמורות שלי</span> (<span data-saved-count>0</span>)</span></button>
+    <button class="btn savedlg__close" id="savedlg-close" type="button" data-t="savedlg.close">סגירה</button>
+  </div>
+</dialog>
+
+<!-- ⚠ THE SAVED DOORS ARE A DIALOG SINCE 28.9 — it was a drawer that opened
+     inside the summary's send card (13.9), and it is reached now from the
+     save dialog above as well as from the summary's "העיצוב שלי". The same
+     rows: what the door is, what it costs, a whole 44 px ×; an unbuildable
+     design still says so when it is opened. Modal, so the summary card under
+     it cannot move while it is open. -->
+<dialog class="confirm saved-dlg" id="saved" aria-labelledby="saved-h">
+  <p class="confirm__p" id="saved-h"><span data-t="savedlg.list">הדלתות השמורות שלי</span> (<span data-saved-count>0</span>)</p>
+  <div class="saved">
+    <p class="saved__none" data-saved-empty data-t="saved.none">עדיין לא שמרתם עיצוב.</p>
+    <ul class="saved__list" data-saved-list></ul>
+  </div>
+  <div class="confirm__row">
+    <button class="btn confirm__ok" id="saved-close" type="button" data-t="savedlg.close">סגירה</button>
+  </div>
+</dialog>
+
+<!-- ⚠ THE FIRST-VISIT TOUR — 28.9.2026 (js/tour.js). A modal dialog laid
+     over the whole viewport: an ink scrim with cut-outs over each step's live
+     target (the SVG mask `#tour-cut`, written per step), a callout, and an
+     arrow from the callout to each cut-out. Opened only on a first visit to
+     the design flow — never on a link carrying a door, in bare mode, on the
+     sheet, or without script. Hidden in bare mode like everything else. -->
+<dialog class="tour" id="tour" aria-labelledby="tour-t" aria-describedby="tour-n">
+  <svg class="tour__scrim" aria-hidden="true">
+    <defs>
+      <mask id="tour-cut" maskUnits="userSpaceOnUse">
+        <rect x="0" y="0" width="100%" height="100%" fill="#fff"/>
+      </mask>
+    </defs>
+    <rect x="0" y="0" width="100%" height="100%" fill="#171715" fill-opacity=".6" mask="url(#tour-cut)"/>
+  </svg>
+  <svg class="tour__arrows" aria-hidden="true">
+    <defs>
+      <marker id="tour-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+        <path d="M0 0 10 5 0 10Z" fill="#fff"/>
+      </marker>
+    </defs>
+  </svg>
+  <div class="tour__card">
+    <p class="tour__n" id="tour-n"></p>
+    <p class="tour__t" id="tour-t"></p>
+    <div class="tour__row">
+      <button class="btn tour__skip" type="button" data-t="tour.skip">דלגו</button>
+      <button class="btn tour__next" type="button" data-t="tour.next">הבא</button>
+    </div>
+  </div>
+</dialog>
+
 <p class="strip" id="placeholder-note" hidden>
   <strong data-t="strip.dev.b">גרסת פיתוח.</strong>
   <span data-t="strip.dev">חלק מהמחירים כאן עדיין לא אושרו על ידי פרץ.</span>
@@ -261,7 +326,7 @@
      telephone number is why it holds at all. -->
 <noscript id="down-css"><style>
   #down[hidden] { display: block !important; }
-  #choices, .stage, .stage__bar, .stage__hud, .stage__band, .stage__arrow,
+  #choices, .stage, .stage__bar, .stage__hud, .stage__band, .stage__arrow, .stage__undo,
   .send__spec, .send__lead, .send__alt, .send__tel { display: none; }
   /* ⚠ THE QUOTE BAR'S PRICE GOES AND ITS SEND STAYS, and the second half of
      that is not tidiness — it is the only send button guaranteed to survive.
@@ -346,11 +411,13 @@
          first group. `aria-hidden`: the step's name is still the panel's
          <h2> (visually hidden now, still focused by goStep), and the chosen
          option is the checked radio — a screen reader hears both there.
-         ⚠ IN THE FLOW above 1100, so its height comes out of the drawing
-         (§0c): its budget is the height the title gave back, and the audit
-         holds the leaf to within 4 px of its size before the title shrank.
-         Each line is one line in every language (ellipsis), so the door does
-         not resize between steps. -->
+         ⚠ ON THE PHOTOGRAPH SINCE 28.9 (*"the header of the section needs to
+         be on the image and closer to the door"*): absolute in the wrap, its
+         foot 8 px above the casing's head, placed by `placeBand` in the span
+         the wall's controls leave it. Out of the flow, so the door has its
+         height back; the crop gave the wall above the tallest door exactly
+         what the band needs (`FIT_TRIM` in js/renderer.js). Each line is one
+         line in every language (ellipsis), so it never climbs. -->
     <div class="stage__band" aria-hidden="true">
       <p class="band__title" data-band-title></p>
       <p class="band__now" data-band-now></p>
@@ -375,35 +442,51 @@
       <div class="hud__slot hud__slot--start" id="langs" role="group"
            aria-label="שפה" data-ta="aria-label=nav.lang"></div>
 
+      <!-- ⚠ THE SAVE ALONE IN THIS SLOT SINCE 28.9 — undo and redo went to
+           the stage's foot (`.stage__undo`, below). A floppy disk (27.9, the
+           owner's son: "put a save button near them, with the icon of an old
+           hard drive"; `HUD_ICON.save` in js/icons.js, written in by app.js).
+           ⚠ AND IT ASKS NOW (28.9: "on clicking, a window with two options,
+           save or view a saved door"): it opens `#savedlg`, never saves by
+           itself. `aria-haspopup` says so before the tap. -->
       <div class="hud__slot hud__slot--end">
-        <div class="steps-back" role="group" aria-label="ביטול וחזרה"
-             data-ta="aria-label=undo.group">
-          <button type="button" class="iconbtn" id="undo-btn" disabled
-                  aria-label="ביטול השינוי האחרון" title="ביטול השינוי האחרון"
-                  data-ta="aria-label=undo,title=undo">
-            <svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">
-              <path d="M4.2 9.2h10.3a5 5 0 0 1 0 10h-5.5"/>
-              <path d="M8 5.2 4 9.2l4 4"/>
-            </svg>
-          </button>
-          <button type="button" class="iconbtn" id="redo-btn" disabled
-                  aria-label="החזרת השינוי" title="החזרת השינוי"
-                  data-ta="aria-label=redo,title=redo">
-            <svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">
-              <path d="M19.8 9.2H9.5a5 5 0 0 0 0 10H15"/>
-              <path d="M16 5.2l4 4-4 4"/>
-            </svg>
-          </button>
-        </div>
-        <!-- ⚠ AND A SAVE BESIDE THEM, 27.9.2026 — the owner's son: "put a save
-             button near them, with the icon of an old hard drive." The same
-             `saveCurrent` the summary's "שמירת העיצוב" calls; its floppy disk
-             is `HUD_ICON.save` in js/icons.js, written in by app.js. Never
-             disabled: there is always a door to save. -->
-        <button type="button" class="iconbtn" id="save-hud"
+        <button type="button" class="iconbtn" id="save-hud" aria-haspopup="dialog"
                 aria-label="שמירת העיצוב" title="שמירת העיצוב"
                 data-ta="aria-label=saved.hud,title=saved.hud"></button>
       </div>
+    </div>
+
+    <!-- ⚠ UNDO YOU CAN SEE — 28.9.2026, the owner's son: "The undo option
+         rethought: not noticeable on pc and in the way on the phone — more
+         noticeable, but not colliding with the door." It was two 52 px ghost
+         circles in the wall's top row. It is a labelled pill now — ink, the
+         word on it — at the STAGE'S FOOT on the picker's side (physically
+         right, like the picker), over the floor band; shown from the first
+         change (a disabled pill is not shown at all), redo beside it only
+         while there is something to redo. `placeUndo` (js/app.js) keeps it
+         off the door: side by side where the wall beside the door's foot is
+         wide enough, stacked where it is not, and as the icon alone where
+         even that is too narrow — the word then in `aria-label` and `title`,
+         as before. Absolute, for `.stage__hud`'s reason (nothing in the flow
+         here), and never a child of `.stage`, whose markup `paint` rewrites. -->
+    <div class="stage__undo" role="group" aria-label="ביטול וחזרה"
+         data-ta="aria-label=undo.group">
+      <button type="button" class="undo-pill" id="undo-btn" disabled
+              aria-label="ביטול השינוי האחרון" title="ביטול השינוי האחרון"
+              data-ta="aria-label=undo,title=undo">
+        <svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">
+          <path d="M4.2 9.2h10.3a5 5 0 0 1 0 10h-5.5"/>
+          <path d="M8 5.2 4 9.2l4 4"/>
+        </svg><span class="undo-pill__w" data-t="undo.short">ביטול</span>
+      </button>
+      <button type="button" class="undo-pill undo-pill--redo" id="redo-btn" disabled
+              aria-label="החזרת השינוי" title="החזרת השינוי"
+              data-ta="aria-label=redo,title=redo">
+        <svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">
+          <path d="M19.8 9.2H9.5a5 5 0 0 0 0 10H15"/>
+          <path d="M16 5.2l4 4-4 4"/>
+        </svg><span class="undo-pill__w" data-t="redo.short">חזרה</span>
+      </button>
     </div>
 
     <!-- ⚠ TWO ARROWS BESIDE THE DOOR — 27.9.2026, the owner's son: "two arrows
@@ -445,8 +528,12 @@
 
     <!-- ── THE QUOTE BAR — what it costs, and how to send it ──────────────
          ⚠ ONE ELEMENT, TWO PLACEMENTS, AND STILL EXACTLY ONE PRICE. Above
-         1100 px it stands in the wall under the right-hand lamp, which is
-         where the owner's son drew a circle and asked for the price to go.
+         1100 px it stands on the photograph LEFT of the door, high, between
+         the casing and the lamp (28.9 — the owner's son: "Move the WhatsApp
+         button with the price to the left of the door, between the door and
+         the lamp, on the higher end"; it was a card at the door's top-right
+         corner from 27.9, and under the right-hand lamp before that — both
+         his placements, and he is the one moving it).
          Below 1100 px it is a slim bar pinned to the foot of the screen,
          because the wall on a 390 px phone is ~140 px of plaster and the pill
          landed ON the leaf — measured, and at 320 px it landed on it every
@@ -469,9 +556,13 @@
          one. Its href is the same "the page did not load for me" message the
          send card rests on, and `paint()` upgrades BOTH the moment there is a
          real door — one writer over `[data-wa]`, never an id. -->
+    <!-- ⚠ NO CAPTION OVER THE FIGURE SINCE 28.9.2026 — the owner's son: "Remove
+         the 'מחיר משוער' text above the price." The key `price.est` stays in
+         copy.js: the A4 sheet's fine print still says what the figure is.
+         And above 1100 this whole element stands ON THE PHOTOGRAPH, left of the
+         door, high, with no card under it (css/app.css, `.quote`). -->
     <div class="quote" id="quote">
       <div class="quote__price">
-        <span class="send__label" data-t="price.est">מחיר משוער</span>
         <button class="send__toggle" id="price-toggle" type="button"
                 aria-expanded="false" aria-controls="breakdown">
           <strong class="send__figure" id="price" data-price>—</strong>
@@ -632,7 +723,7 @@
         <button class="btn btn--ghost" id="copy-btn" type="button" data-t="send.copy">העתקת הפרטים</button>
         <button class="btn btn--ghost" id="save-btn" type="button" data-t="send.save">שמירת העיצוב</button>
         <button class="saved__btn" id="saved-btn" type="button" hidden
-              aria-expanded="false" aria-controls="saved">
+              aria-haspopup="dialog" aria-controls="saved">
         <svg class="saved__ico" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
           <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"
                 d="M6.5 3.5h11v17l-5.5-4-5.5 4Z"/>
@@ -640,10 +731,6 @@
         <span data-t="saved.mine">העיצוב שלי</span> <span class="saved__n" data-saved-count>0</span>
     </button>
         <span class="send__code"><span data-t="send.code">קוד:</span> <b id="code">—</b></span>
-      <div class="saved" id="saved" hidden>
-      <p class="saved__none" data-saved-empty data-t="saved.none">עדיין לא שמרתם עיצוב.</p>
-      <ul class="saved__list" data-saved-list></ul>
-</div>
       </div>
 
       <!-- ⚠ This sentence is `PRICE_CAVEAT` in js/share.js and `npm test`
@@ -771,7 +858,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=e247775e"></script>
+<script src="assets/bundle.js?v=8bcc98cc"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

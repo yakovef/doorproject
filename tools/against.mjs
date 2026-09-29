@@ -28,6 +28,7 @@
  */
 import { readFileSync, mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import { assertFreshBundle, stampSheets } from './fresh.mjs';
 import { PNG } from 'pngjs';
 import { load, canvas, blit, save, text } from './imglib.mjs';
@@ -105,7 +106,7 @@ const GRIP_BAND = { x0: 0.00, x1: 1.00, y0: 0.00, y1: 1.00 };
 
 await assertFreshBundle();
 
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 const page = await b.newPage({ viewport: { width: 700, height: 1100 }, deviceScaleFactor: 2 });
 const leafW = SIZES.standard.w - REBATE * 2;
 const leafH = SIZES.standard.h - REBATE;

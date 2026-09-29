@@ -274,6 +274,11 @@ export const UI = {
   'redo':             ['החזרת השינוי', 'Redo the change', 'Вернуть изменение'],
   'redo.done':        ['החזרנו את השינוי', 'Change restored', 'Изменение возвращено'],
   'undo.done':        ['הצעד האחרון בוטל', 'Last step undone', 'Последний шаг отменён'],
+  /* The words ON the two pills at the stage's foot (28.9 — *"the undo option
+     rethought … more noticeable"*); the longer names above stay their
+     `aria-label` and `title`. */
+  'undo.short':       ['ביטול', 'Undo', 'Отменить'],
+  'redo.short':       ['חזרה', 'Redo', 'Вернуть'],
   /* ⚠ WHAT AN UNDO SAYS WHEN IT TOOK SOMETHING OFF THE DOOR. `specRows` omits
      a row whose option is "none", so a field the step removed has no row to
      print a value from — and `stripes.none` beside it is not reusable, its
@@ -322,10 +327,17 @@ export const UI = {
                        'The bar you pull on. You can go without one, and the length is yours to choose.',
                        'Скоба, за которую тянут дверь. Можно обойтись без неё, длину выбираете вы.'],
   'step.lock.t':      ['מנעול', 'The lock', 'Замок'],
-  'step.lock.s':      ['הידית המסתובבת ונעילה נוספת', 'The lever, and any extra lock', 'Нажимная ручка и дополнительный замок'],
-  'step.lock.l':      ['הידית שמסובבים והצילינדר — יש בכל דלת. אפשר להוסיף כספת או קודן.',
-                       'The lever and the cylinder — every door has them. A safe lock or a keypad can be added.',
-                       'Нажимная ручка и цилиндр — есть в каждой двери. Можно добавить сейфовый или кодовый замок.'],
+  'step.lock.s':      ['הידית המסתובבת והצילינדר', 'The lever and the cylinder', 'Нажимная ручка и цилиндр'],
+  'step.lock.l':      ['הידית שמסובבים והצילינדר — יש בכל דלת. כספת או קודן — בשלב משלהם, אחרי הפרזול.',
+                       'The lever and the cylinder — every door has them. A safe lock or a keypad has its own step, after the hardware finish.',
+                       'Нажимная ручка и цилиндр — есть в каждой двери. Сейфовый или кодовый замок — на своём шаге, после отделки фурнитуры.'],
+  /* the extra lock's own step, 28.9.2026 (*"the extra locks as a separate
+     section, right after the pirzul section"*) */
+  'step.xlock.t':     ['מנעול נוסף', 'Extra lock', 'Дополнительный замок'],
+  'step.xlock.s':     ['כספת או קודן, לצד המנעול', 'A safe lock or a keypad, beside the lock', 'Сейфовый или кодовый, рядом с основным'],
+  'step.xlock.l':     ['נעילה שנייה לצד המנעול הרגיל — כספת, קודן, או בלי.',
+                       'A second lock beside the ordinary one — a safe lock, a keypad, or none.',
+                       'Второй замок рядом с основным — сейфовый, кодовый или никакого.'],
   'step.pz.t':        ['פרזול', 'Hardware finish', 'Отделка фурнитуры'],
   'step.pz.s':        ['גוון הידית והצירים', 'The tone of the lever and the hinges', 'Оттенок ручки и петель'],
   /* ⚠ THE KEYHOLE JOINED THE LIST ON 31.8, AND THE ADDITIONAL LOCK LEFT IT
@@ -465,6 +477,12 @@ export const UI = {
   'g.colour.free':    ['כלול במחיר', 'Included in the price', 'Входит в цену'],
   'g.colour.plus':    ['תוספת {0}', '{0} extra', 'Доплата {0}'],
   'g.colour.plusMany':['בתוספת תשלום', 'At extra cost', 'За доплату'],
+  /* the window designs' two groups, 28.9 — the figure arrives as {0}, and it
+     is PER WINDOW: ironwork is sold by the panel (price.js), so a door with
+     two panes pays it twice and its tiles say so. */
+  'g.grille.free':    ['עיצובים רגילים', 'Regular designs', 'Обычные узоры'],
+  'g.grille.plus':    ['עיצובים מיוחדים · תוספת {0} לחלון', 'Special designs · {0} extra per window', 'Особые узоры · доплата {0} за окно'],
+  'g.grille.plusMany':['עיצובים מיוחדים', 'Special designs', 'Особые узоры'],
   'g.detail.h':       ['לא משלבים פאנלים עם פסי מתכת על אותה דלת.',
                        'Panels and metal strips do not go on the same door.',
                        'Панели и металлические полосы не сочетаются на одной двери.'],
@@ -563,7 +581,13 @@ export const UI = {
   'exp.grip.a':           ['ידית המשיכה היא המוט שמושכים בו כדי לפתוח. יש מוט עגול ומוט מלבני, ולכל אחד שני מחירים: עד מטר, ומעל מטר. האורך מוגבל לגובה הכנף, כך שדלת נמוכה לא תקבל מוט ארוך מדי. אפשר לבחור גימור שחור או זהב — התוספת היא לכל פריט בנפרד: לידית, ל{0} ולפעמון. אפשר גם בלי ידית משיכה בכלל. ל{1} אין בחירת אורך — היא חרוצה בדלת עצמה.',
                        'The pull handle is the bar you pull to open the door. There is a round bar and a rectangular one, and each has two prices: up to a metre, and past a metre. The length is capped by the height of the leaf, so a short door cannot take a bar that would not fit. The finish can be black or gold — the surcharge is per item: on the handle, on the {0} and on the doorbell. Going without one is a choice too. The {1} has no length to choose — it is cut into the door itself.',
                        'Ручка-скоба — это то, за что тянут дверь. Есть круглая и прямоугольная, и у каждой две цены: до метра и свыше метра. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Отделку можно выбрать чёрную или золотую — доплата за каждый предмет: за ручку, за «{0}» и за звонок. Можно обойтись и без ручки. У «{1}» длина не выбирается — она врезана в само полотно.'],
-  'exp.lock.q':           ['כספת וקודן — במקום המנעול או בנוסף?', 'Safe lock and keypad — instead of the lock, or as well?', 'Сейфовый и кодовый замок — вместо основного или вдобавок?'],
+  /* ⚠ THE LOCK STEP'S OWN QUESTION SINCE 28.9 — the extra lock went to its own
+     step, and took the question below (`exp.xlock`) with it. */
+  'exp.lock.q':           ['מה כלול במנעול?', 'What comes with the lock?', 'Что входит в замок?'],
+  'exp.lock.a':           ['בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כאן בוחרים את צורת הידית; את הגוון שלה בוחרים בשלב הבא, בפרזול. מנעול נוסף — כספת או קודן — נבחר אחרי הפרזול, בשלב משלו. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.',
+                           'Every door has a lever and a cylinder, included in the price — that is the ordinary lock. Here you choose the lever\'s shape; its tone is chosen in the next step, the hardware finish. An extra lock — a safe lock or a keypad — is chosen after the hardware finish, on its own step. A smart lock is a different product and is in the lever list.',
+                           'В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Здесь выбирают форму ручки; её оттенок — на следующем шаге, в отделке фурнитуры. Дополнительный замок — сейфовый или кодовый — выбирают после отделки фурнитуры, на отдельном шаге. Умный замок — отдельный продукт, он в списке ручек.'],
+  'exp.xlock.q':          ['כספת וקודן — במקום המנעול או בנוסף?', 'Safe lock and keypad — instead of the lock, or as well?', 'Сейфовый и кодовый замок — вместо основного или вдобавок?'],
   /* ⚠ THE TWO FIGURES WERE TYPED HERE AND THEY WENT STALE — 25.9.2026. This
      paragraph said ₪700 and ₪900 in all three languages for five days after
      Peretz corrected himself on 20.9 — *"kasefet - 690 · kodan 880"* — and
@@ -574,7 +598,7 @@ export const UI = {
      They come through `{0}` and `{1}` now, out of `SPECIAL_LOCKS[].delta`,
      which is the same place the tiles read. A figure that cannot be typed
      cannot drift. */
-  'exp.lock.a':           ['בנוסף. בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כספת ({0}) וקודן ({1}) מותקנים לצדו ולא במקומו, ולכן אפשר לבחור גם וגם. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.',
+  'exp.xlock.a':          ['בנוסף. בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כספת ({0}) וקודן ({1}) מותקנים לצדו ולא במקומו, ולכן אפשר לבחור גם וגם. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.',
                        'As well. Every door has a lever and a cylinder, included in the price — that is the ordinary lock. A safe lock ({0}) and a keypad ({1}) are fitted BESIDE it rather than instead of it, so you can have both. A smart lock is a different product and is in the lever list.',
                        'Вдобавок. В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Сейфовый ({0}) и кодовый ({1}) ставятся РЯДОМ с ним, а не вместо, поэтому можно выбрать оба. Умный замок — отдельный продукт, он в списке ручек.'],
   'exp.pz.q':             ['מה הפרזול משנה?', 'What does the hardware finish change?', 'На что влияет отделка фурнитуры?'],
@@ -720,9 +744,11 @@ export const UI = {
   /* ⚠ THE COUNT AND WHERE THE LIST LIVES, 27.9.2026 — the save is also a
      button beside undo now (`#save-hud`), steps away from the drawer that
      holds what it saved, so "saved" alone left the customer asking where. */
-  'saved.ok':         ['העיצוב נשמר בדפדפן הזה ({0}) — הרשימה בסיכום, תחת "העיצוב שלי"',
-                       'Saved in this browser ({0}) — the list is on the summary, under "My designs"',
-                       'Сохранено в этом браузере ({0}) — список в итоге, в разделе «Мои дизайны»'],
+  /* ⚠ AND SINCE 28.9 THE LIST OPENS FROM THE SAVE BUTTON ITSELF (its dialog's
+     second choice), so the toast points there rather than eight steps away. */
+  'saved.ok':         ['העיצוב נשמר בדפדפן הזה ({0}) — הרשימה נפתחת מכפתור השמירה',
+                       'Saved in this browser ({0}) — the list opens from the save button',
+                       'Сохранено в этом браузере ({0}) — список открывается кнопкой сохранения'],
   'saved.noun':       ['עיצוב שמור|עיצובים שמורים', 'saved design|saved designs',
                        'сохранённый дизайн|сохранённых дизайна|сохранённых дизайнов'],
   'saved.hud':        ['שמירת העיצוב', 'Save this design', 'Сохранить дизайн'],
@@ -731,6 +757,14 @@ export const UI = {
   'saved.remove':     ['הסרת {0}', 'Remove {0}', 'Удалить {0}'],
   'saved.loaded':     ['טענו את הדלת. אפשר לשנות כל פרט.', 'Door loaded. Change anything you like.',
                        'Дверь загружена. Меняйте что угодно.'],
+  /* ⚠ THE SAVE ASKS, SINCE 28.9 — the owner's son: *"The save button's function
+     changed: on clicking, a window with two options, save or view a saved
+     door."* The dialog's heading, its two choices (the second carries the
+     count beside it, in markup) and the list's own dialog. */
+  'savedlg.h':        ['הדלתות שלכם', 'Your doors', 'Ваши двери'],
+  'savedlg.save':     ['שמירת הדלת', 'Save this door', 'Сохранить дверь'],
+  'savedlg.list':     ['הדלתות השמורות שלי', 'My saved doors', 'Мои сохранённые двери'],
+  'savedlg.close':    ['סגירה', 'Close', 'Закрыть'],
 
   /* ── the gallery ──────────────────────────────────────────────── */
   'works.h':          ['דלתות שכבר התקנו', 'Doors we have fitted', 'Установленные нами двери'],
@@ -766,6 +800,27 @@ export const UI = {
   'dlg.noFit':        ['אין אפשרות אחרת של {0} שמתאימה לדלת שלכם', 'No other {0} fits this door',
                        'Для этой двери нет другого варианта: {0}'],
   'dlg.ok':           ['הבנתי', 'OK', 'Понятно'],
+
+  /* ── the first-visit tour, 28.9.2026 (js/tour.js) ─────────────────
+     The Hebrew is the owner's son's own four sentences, word for word as the
+     order gave them; English and Russian are ours. */
+  'tour.label':       ['היכרות קצרה עם הדף', 'A quick tour', 'Краткое знакомство'],
+  'tour.door':        ['זו הדלת שתעצבו — כל בחירה תופיע כאן. (הדלת האמיתית עשויה להיראות מעט אחרת: זה איור.)',
+                       'This is the door you are designing — every choice appears here. (The real door may look a little different: this is an illustration.)',
+                       'Это дверь, которую вы создаёте, — каждый выбор появится здесь. (Настоящая дверь может выглядеть немного иначе: это иллюстрация.)'],
+  'tour.steps':       ['אלה השלבים שתעברו בדרך לדלת שחלמתם עליה.',
+                       'These are the steps you go through on the way to the door of your dreams.',
+                       'Это шаги, которые вы пройдёте на пути к двери своей мечты.'],
+  'tour.options':     ['בכל שלב בוחרים כאן מה שאוהבים — או לוחצים על החצים שליד הדלת כדי לעבור מהר.',
+                       'At each step, choose what you like here — or tap the arrows beside the door to flip through quickly.',
+                       'На каждом шаге выбирайте здесь то, что нравится, — или нажимайте стрелки у двери, чтобы листать быстрее.'],
+  'tour.undo':        ['הכפתורים האלה עוזרים לחזור אחורה או לשמור.',
+                       'These buttons help you go back or save.',
+                       'Эти кнопки помогают вернуться назад или сохранить.'],
+  'tour.count':       ['{0} מתוך {1}', '{0} of {1}', '{0} из {1}'],
+  'tour.next':        ['הבא', 'Next', 'Далее'],
+  'tour.done':        ['סיום', 'Done', 'Готово'],
+  'tour.skip':        ['דלגו', 'Skip', 'Пропустить'],
   'dlg.close':        ['סגירת ההודעה', 'Close this message', 'Закрыть сообщение'],
 
   /* ── the print sheet ──────────────────────────────────────────── */
@@ -881,6 +936,7 @@ export const UI = {
   'fix.noPanelRoom':     ['הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום', 'We removed the panel — the tall window leaves no room for it', 'Мы убрали панель — высокому окну не хватает места'],
   'fix.faceCleared':     ['החלקנו את הדלת — ידית שקועה דורשת פנים חלקות', 'We smoothed the face — a recessed channel needs it plain', 'Мы сделали полотно гладким — врезная ручка этого требует'],
   'fix.grilleGone':      ['הסרנו את הסורג — אין חלון', 'We removed the grille — there is no window', 'Мы убрали решётку — окна нет'],
+  'fix.finishHome':      ['גוון הידית חזר לניקל — אין ידית משיכה על הדלת', 'The handle finish is back to nickel — there is no pull handle on the door', 'Отделка ручки снова никель — на двери нет ручки-скобы'],
   'fix.gripGone':        ['הסרנו את ידית המשיכה — אין לה מקום כאן', 'We removed the pull handle — there is no room for it here', 'Мы убрали ручку-скобу — для неё здесь нет места'],
   'fix.bowGone':         ['הסרנו את המאחז האופקי — אין לו מקום כאן', 'We removed the horizontal pull — there is no room for it here', 'Мы убрали горизонтальную скобу — для неё здесь нет места'],
   'fix.locksetSwapped':  ['החלפנו את המנעול — אין לו מקום ליד המאחז', 'We swapped the lockset — there is no room for it beside the grip', 'Мы заменили замок — рядом со скобой ему нет места'],

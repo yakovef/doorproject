@@ -44,7 +44,7 @@
 
 import { L, T, withLang } from './copy.js';
 import {
-  byId, colourCode, COLOURS, DETAILS, glassRows, glazedPanels, GRILLES, grillePlacement,
+  bellFinish, byId, colourCode, COLOURS, DETAILS, glassRows, glazedPanels, GRILLES, grillePlacement,
   gripTakesFinish, handleLength, HANDINGS, HANDLES, HANDLE_FINISHES, isGlazed, LOCKSETS,
   MASHKOFS, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BELLS, BOWS, PEEPHOLES,
 } from './catalog.js';
@@ -212,7 +212,9 @@ export function specRows(state) {
      Only when CHOSEN, like every optional row here: a door with no bell needs
      no line saying so. */
   if (bl.id !== 'nobell') {
-    rows.push({ key: 'bell', label: T('row.bell'), id: bl.id, value: `${L(bl)} · ${L(hf)}` });
+    /* its OWN finish — the pull handle's while there is one, nickel alone
+       (28.9, `bellFinish`); named either way, read down a telephone */
+    rows.push({ key: 'bell', label: T('row.bell'), id: bl.id, value: `${L(bl)} · ${L(bellFinish(state))}` });
   }
   if (ep.id !== 'nopeep') {
     rows.push({ key: 'peephole', label: T('row.peephole'), id: ep.id, value: L(ep) });

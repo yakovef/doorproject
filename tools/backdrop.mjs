@@ -64,6 +64,7 @@
  * curve points. A flat per-channel gain blew the lamp glow to white.
  */
 import { chromium } from 'playwright';
+import { tourless } from './browser.mjs';
 import { PNG } from 'pngjs';
 import { readFileSync, writeFileSync, statSync } from 'node:fs';
 
@@ -131,7 +132,7 @@ const ROOMS = [
 const hex = c => '#' + c.map(v => Math.round(v).toString(16).padStart(2, '0')).join('').toUpperCase();
 const luma = c => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
 
-const b = await chromium.launch({ executablePath: process.env.CHROME || '/opt/pw-browsers/chromium' });
+const b = tourless(await chromium.launch({ executablePath: process.env.CHROME || '/opt/pw-browsers/chromium' }));
 const page = await b.newPage();
 
 /* WebP in, RGBA out — the container has no image library, and the browser this

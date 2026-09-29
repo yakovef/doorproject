@@ -8,7 +8,7 @@
  */
 
 import { T } from './copy.js';
-import { BELLS, BOWS, BUILD_A, byId, COLOURS, DETAILS, GRILLES, gripTakesFinish, HANDLES,
+import { bellFinish, BELLS, BOWS, BUILD_A, byId, COLOURS, DETAILS, GRILLES, gripTakesFinish, HANDLES,
          HANDLE_BAND, HANDLE_FINISHES, isGlazed, PEEPHOLES,
          handleLength, MASHKOF_WIDER_A, MASHKOFS, paneCount,
          LOCKSETS, PIRZUL, SIZES, SPECIAL_LOCKS, stripePrice,
@@ -224,9 +224,13 @@ export function priceParts(state) {
     /* ⚠ AND THE BELL FOLLOWS THE PULL HANDLE'S FINISH, 20.9.2026 — *"the
        pirzul for it changes its price by 100 or 200"*, the pull-handle finish
        on his son's word, per object: a nickel ring is ₪300, black ₪400, gold
-       ₪500. Nothing on a door with no bell. */
+       ₪500. Nothing on a door with no bell.
+       ⚠ AND ONLY WHILE THERE IS A PULL HANDLE FOR THE FINISH TO BELONG TO, since
+       28.9 (*"the option to choose a colour for a pull handle opens only when
+       there is a pull handle on the door"*): a bell alone is nickel, ₪300
+       (`bellFinish`). */
     bell:    byId(BELLS, state.bell).delta
-             + (state.bell !== 'nobell' ? finishExtra(state) : 0),
+             + (state.bell !== 'nobell' ? bellFinish(state).delta : 0),
     peephole: byId(PEEPHOLES, state.peephole).delta,
     /* A grille needs a window to sit in — and so does worked glass, which is
        in the same list now. Neither can be charged on a solid door: the
