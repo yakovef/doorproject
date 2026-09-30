@@ -26,6 +26,50 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **30.9 — PROMPT A, THE CLOSING PASS: THE SLOW GATES, ON THE MERGED BRANCH,
+  AND THE RECORD.** The brief: *"`npm run sheets`, `collide -- boxes`,
+  `fuzz`, `latency` once after commit 5, in the background … Final `npm test`
+  0 failed on your rows."*
+  · **On A's 5 of 5 (`da1cde6`).** `npm run sheets`: 0 bare and 0 `lockset`
+    moved, as predicted — the 12 `shot` sheets and `.stamps.json` only.
+    `collide -- boxes` clean, the 28.9 figures (the כדור drawn 33/33/33 in
+    35/35/35; the deepest mount 109 under `MOUNT_REACH` 121). `fuzz`: 30,000
+    designs repaired and round-tripped; 1,800 clicks, 148 met the confirm
+    dialog, 79 yes / 69 no, the door unchanged after every no. `npm test`
+    10,595,454 passed, 0 failed.
+  · **Then B's 3 of 3 (`87af342`, the stripes as tiles) landed on top**, with
+    its own sheets refresh on the merged tree — mine was dropped for it
+    rather than committed twice. So the audit and latency ran on `87af342`,
+    the tree both rounds share, which no complete audit had read (B's was its
+    pre-rebase run): **no faults**, every block to the end — the pills from
+    load at 96 readings (shapes row 42, stack 35, iconrow 2, icon 17), the
+    scrim's wall 5.6 / 6.7 / 6.6 % of bare, the picker live on 12 steps, the
+    drawer's 30 rows at 5 shapes in he and ru, the band's 10 readings, B's
+    six-tile cycle. Latency 346 ms against 600, the elements 268 · 1,017 · 656
+    (B's own counts). `npm test` 10,595,593 passed, 0 failed — B's figure.
+  · **The two faults B's run left to this round's regions**, read on the
+    merged tree: the 320×568 `halfextra1` redo-on-arrow reading "gone" — B's
+    tree had the band commit (`08a59ed`) and not `893f851`, which had
+    already taken `halfextra1` out of `ARROW_KNOWN` (§9: `halfextra2`'s only);
+    and the drawer's toggle off the page — the seeding, an init script since
+    5 of 5. Neither reproduces.
+  · **Read, not assumed:** `tools/fuzz.mjs` opens the page `tourless` and
+    presses option tiles and the confirm dialog only, so the tour, the undo
+    pills and the saved list are not in its walks — written beside B's fuzz
+    row, which counted the tour among the fuzzed. The audit drives those.
+  · **The container restarted twice under the slow gates** (the sheets
+    half-written once, the audit twice): the partial sheets were discarded
+    and every run started again whole; no figure here is from a run that
+    did not finish.
+  · **The record:** §0a (the pills and the scrim as reversals, the picker,
+    the sends, the saved row), §0c's chrome paragraphs, §3's tour paragraph, §7's audit list
+    and its two instrument rules, §9's `ARROW_KNOWN` and leaf floors were
+    corrected in each of the five commits, and walked against the brief's list
+    here — which found §0a without their two chat answers (the × on the
+    picture, the title's face) and two of A's own decisions (the band's sizes
+    with the door giving it the wall, the greyed pills' ink): added; §0c "Green" merged by hand with B's rows (both chats' readings kept,
+    the drawer's "unexplained" corrected to its cause). `PROMPT-A.md` deleted.
+
 - **29.9 — THE STRIPES ARE TWO TILES ON THE FACE STEP; ONE CYCLE OF SIX
   (prompt B, 3 of 3).** The owner's son: *"If a user chooses a window, in the
   face section the stripes are greyed out; with no window the arrows go through
@@ -163,7 +207,9 @@ oldest lines move to the top of the "moved" section.
     against the white's 0.831 (the first door's gradients); no pictures drawn
     → "row N has no picture" at every case; the under-360 widening removed →
     "one column" at 320 (he, ru) and a × pushed off screen.
-  · **Sheets: 0 bare** (predicted: no `render()` change). {SHEETS}
+  · **Sheets: 0 bare** (predicted: no `render()` change). Run once after this
+    commit, in the closing pass: the 12 `shot` sheets and `.stamps.json`
+    moved, nothing else — 0 bare, 0 `lockset`, as predicted.
   · **Gates:** node --check (renderer, app, audit); npm run build; npm test
     10,595,453 passed / 5 failed — the five sheet-staleness rows. A unit check
     caught the tile's hover in the accent (kept for "chosen"): `--ink-3`.

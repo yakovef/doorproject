@@ -175,10 +175,14 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   · undo and redo as labelled ink pills at the stage's foot, the picker's
     side, ~~shown from the first change and never as a disabled pill~~ —
     **REVERSED BY THEM 29.9** (*"available but greyed out at the start"*):
-    both painted from load, greyed while disabled;
+    both painted from load, greyed while disabled (ours: `--ink` at .45, no
+    shadow, still `disabled`);
   · the language picker physically top-RIGHT in every language, so it never
     shares the price's corner;
-  · the phone's band stays one line (the option's name yields first);
+  · the phone's band stays one line (the option's name yields first), and
+    keeps its size when the desktop's grew (29.9, ours: title 26–36 px, the
+    option 19–27); the door gives the tallest doors' band its wall (the
+    crop, the leaf ~2 % smaller) rather than the band shrinking over them;
   · the saved doors in a dialog, reached from both saves;
   · the tour never on a link carrying a door, bare or the sheet, and set
     ink at ~~0.6~~ **.8 since 29.9, their word** (*"more black"*) rather than
@@ -217,6 +221,9 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   window or the face — **Peretz's rule stands**, refused with its reason and
   no dialog offering to take the window away. (The swing bar lock, settled
   the same way as an option with its price to follow, was withdrawn 28.9.)
+  And on 29.9: the saved doors keep **a small × on the picture** to delete,
+  and the option's name over the door is set in **the title's own face**
+  (Bona Nova).
 
 ---
 
@@ -226,6 +233,11 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **30.9** PROMPT A's closing pass: after its 5 of 5 the sheets moved 0 bare
+  (predicted), `boxes` and fuzz clean; on the merged branch (B's 3 of 3 on
+  A's five) a complete audit reads **no faults** — the drawer's flake and the
+  `halfextra1` reading B's pre-rebase run met are gone there — `npm test`
+  0 failed, latency 346 ms. Green rows merged with B's. Long form: `HISTORY.md`.
 - **29.9** The stripes are two tiles on the face step; one cycle of six (B, 3
   of 3) — *"2 panel, 3 panel, greek set, then horizontal stripes, then vertical
   stripes, then nothing … square buttons like every other option"*: screen-only
@@ -262,7 +274,7 @@ lines here. Dates are the day of the change.
   every-option walk now unlocks a `when` group first (§5.28). Long form: `HISTORY.md`.
 ---
 
-## 0c. Where it stands today — 28.9.2026
+## 0c. Where it stands today — 30.9.2026
 
 **The prices are real and the site is not deployed — deliberately.** Peretz
 gave the numbers on 26.8; `PLACEHOLDER` is `false`. Not deployed on the
@@ -480,14 +492,14 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | **10,595,593 assertions, 0 failed** with the stripes as tiles, prompt B's 3 of 3 on the A round's five (29.9; 10,595,605 before that rebase, 10,595,466 on B's 2 of 3, 10,595,363 on its 1). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 29.9 |
-| `npm run audit` | ⚠ **On prompt B's 3 of 3 (29.9): 5 faults, none in its rows** — the 320×568 `halfextra1` redo-on-arrow reading GONE in he and ru (the band commit `08a59ed` made the side-by-side glyphs fit there: 37 → 0 px², measured on `d3b54e6` against `08a59ed`; its region, and the exemption asks to come out) and 3 of the saved-designs drawer's (its toggle off the page in one case — the unexplained fault below, again). Its own blocks — the six-tile cycle, the designs unlocking, the stripe tiles' pictures (closest 58%) and fit — clean. the full run at the end of the 28.9 round read **4 faults, all fixed in commit 10** (§0b). ⚠ **The re-run after the fix did not finish** — the container restarted under it — and was clean through every block up to the navigator's (the undo and landscape blocks among them); the blocks after that were clean on the first run, before the fix, and are not re-run ⚠ **On `629f7d0` (the כדור merged onto 10 of 10): 6 faults, every one the saved-designs drawer's** — its toggle not on the page in ru at 390×844 and 834×1112, the stale design not reaching the drawer (he, ru), 8 of 10 cases opened, 24 of 30 rows. The drawer is the 5-of-10 save dialog's; the כדור touched no page code. Not fixed here ⚠ **And a COMPLETE run on `629f7d0` + the ironwork port (29.9, every block to the end) read no faults at all, the drawer's 30 rows at 5 shapes in two languages included** — so those 6 did not reproduce once; treat them as unexplained, not as fixed, and not as settled either | 28.9 |
+| `npm test` | **10,595,593 assertions, 0 failed** with the stripes as tiles, prompt B's 3 of 3 on the A round's five (29.9; 10,595,605 before that rebase, 10,595,466 on B's 2 of 3, 10,595,363 on its 1); re-read on the merged tree in A's closing pass, 30.9: the same 10,595,593, 0 failed (10,595,454 on A's 5 of 5 before B's 3 landed). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 29.9 |
+| `npm run audit` | **On `87af342` — B's 3 of 3 on A's five, the branch both rounds share — a COMPLETE run: no faults** (A's closing pass, 30.9). The two B's pre-rebase run below left to A's regions do not reproduce on the merged tree: `halfextra1` had left `ARROW_KNOWN` in A's 2 of 5 (`893f851`, §9 — B's tree had the band commit and not that one), and the drawer's toggle was the block's seeding, an init script since A's 5 of 5 (30 rows, 5 shapes, he and ru). A's 3 of 3 (`cc19850`), a complete run: no faults. ⚠ **On prompt B's 3 of 3 (29.9), before its rebase: 5 faults, none in its rows** — the 320×568 `halfextra1` redo-on-arrow reading GONE in he and ru (the band commit `08a59ed` made the side-by-side glyphs fit there: 37 → 0 px², measured on `d3b54e6` against `08a59ed`; its region, and the exemption asks to come out) and 3 of the saved-designs drawer's (its toggle off the page in one case — the unexplained fault below, again). Its own blocks — the six-tile cycle, the designs unlocking, the stripe tiles' pictures (closest 58%) and fit — clean. the full run at the end of the 28.9 round read **4 faults, all fixed in commit 10** (§0b). ⚠ **The re-run after the fix did not finish** — the container restarted under it — and was clean through every block up to the navigator's (the undo and landscape blocks among them); the blocks after that were clean on the first run, before the fix, and are not re-run ⚠ **On `629f7d0` (the כדור merged onto 10 of 10): 6 faults, every one the saved-designs drawer's** — its toggle not on the page in ru at 390×844 and 834×1112, the stale design not reaching the drawer (he, ru), 8 of 10 cases opened, 24 of 30 rows. The drawer is the 5-of-10 save dialog's; the כדור touched no page code. Not fixed here ⚠ **And a COMPLETE run on `629f7d0` + the ironwork port (29.9, every block to the end) read no faults at all, the drawer's 30 rows at 5 shapes in two languages included** — so those 6 did not reproduce once. ⚠ **Explained 29.9 (A's 5 of 5):** the block wrote the saved doors on one load and read them on the next, and a navigation can land in a new renderer before the write reaches it — seeded by an init script now | 30.9 |
 | `npm run collide` | re-read clean on prompt B's 3 of 3 (29.9), the same 1,638 — `all` (1,638 designs — 1,468 base, 602 with the bow, plus 170 face-detail) and `boxes` clean with the כדור redrawn (28.9: drawn 33/33/33, declared 35/35/35; the bow 0/300/21 in 4/305/26; the knob-plate 46/46/155 in 48/48/157; the deepest mount 109, the עילי's) | 28.9 |
-| `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, 195 of them met the confirm dialog — 107 yes, 88 no, the door unchanged after every no — nothing broke (prompt B's 3 of 3, 29.9: the face group's six tiles among the clicks, and the tour, the dialogs and the extra lock's step that went unfuzzed on 28.9) | 29.9 |
-| `npm run latency` | **413 ms** worst door against a 600 ms gate (29.9, prompt B's 3 of 3) — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · **1,017** · 656 for default · sidelight+ironwork · the heaviest. ⚠ The middle one was 531 until the ironwork port (`d797065`): that door is `g=iron`, aliased onto `grid` before and drawn as its own bars since — 532 → 1,018 tags in `render()`, measured at `4fbb96c` against `d797065` (prompt B moved nothing there). Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 29.9 |
+| `npm run fuzz` | 30,000 designs over every field, 1,800 clicks, 195 of them met the confirm dialog — 107 yes, 88 no, the door unchanged after every no — nothing broke (prompt B's 3 of 3, 29.9: the face group's six tiles among the clicks, and the tour, the dialogs and the extra lock's step that went unfuzzed on 28.9) ⚠ **Read in `tools/fuzz.mjs` in A's closing pass (29.9): the walks open the page `tourless` and press option tiles and the confirm dialog only** — the tour, the undo pills and the saved list are the audit's to drive. A's 5 of 5, before B's 3 of 3: 148 met the dialog, 79 yes / 69 no, nothing broke | 29.9 |
+| `npm run latency` | **413 ms** worst door against a 600 ms gate (29.9, prompt B's 3 of 3) — and ⚠ **the millisecond figure is not comparable across containers, so read the ELEMENT COUNTS**: **268** · **1,017** · 656 for default · sidelight+ironwork · the heaviest; re-read on the merged tree in A's closing pass (30.9): 346 ms, the same three counts. ⚠ The middle one was 531 until the ironwork port (`d797065`): that door is `g=iron`, aliased onto `grid` before and drawn as its own bars since — 532 → 1,018 tags in `render()`, measured at `4fbb96c` against `d797065` (prompt B moved nothing there). Established 27.9 by running a commit and `6934c0d` interleaved, three each: no difference between the code, and a single run's spread on one container is ~90 ms | 29.9 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
-| `npm run sheets` | the bare sheet files and 6 `lockset` sheets byte-stable across commits that do not touch the drawing. ⚠ The Rotem (27.9) moved 33, every one ONLY in a lever-sized patch at lock height: 10 `against-` by 231 px at their edge (they set no lockset, so they carry the default Rotem), 8 `corpus-`, 6 `recreate-`, `lockset-coral`, `lockset-plate` and 7 `shot`. The big round (27.9), run once after its commit 7 with the prediction written first: **0 bare and 0 lockset moved**, as predicted — the 12 `shot` sheets, `.stamps.json` and `corpus-links.md` (v=26, `lt=`) only. The knob-plate (28.9): exactly the two that show it, `corpus-06` (d092) and `lockset-knobplate`. The bow (28.9): `against-grab` only — no gallery door carries it. The 28.9 round, predicted first: exactly `recreate-d122` (the half door's fixed leaf). Prompt B (29.9), 0 predicted on each of its three commits: 0 bare moved each time — the stripe tiles are tile art | 29.9 |
+| `npm run sheets` | the bare sheet files and 6 `lockset` sheets byte-stable across commits that do not touch the drawing. ⚠ The Rotem (27.9) moved 33, every one ONLY in a lever-sized patch at lock height: 10 `against-` by 231 px at their edge (they set no lockset, so they carry the default Rotem), 8 `corpus-`, 6 `recreate-`, `lockset-coral`, `lockset-plate` and 7 `shot`. The big round (27.9), run once after its commit 7 with the prediction written first: **0 bare and 0 lockset moved**, as predicted — the 12 `shot` sheets, `.stamps.json` and `corpus-links.md` (v=26, `lt=`) only. The knob-plate (28.9): exactly the two that show it, `corpus-06` (d092) and `lockset-knobplate`. The bow (28.9): `against-grab` only — no gallery door carries it. The 28.9 round, predicted first: exactly `recreate-d122` (the half door's fixed leaf). Prompt B (29.9), 0 predicted on each of its three commits: 0 bare moved each time — the stripe tiles are tile art. PROMPT A (29.9), 0 predicted, run once after its 5 of 5: **0 bare and 0 lockset moved** — the 12 `shot` sheets and `.stamps.json` only (that refresh superseded by B's 3 of 3, run on the merged tree) | 29.9 |
 
 ⚠ **When a bare sheet moves on a commit that could not have moved it, find out
 what did** — that is how chrome painted across every sheet was found once. And
@@ -1947,6 +1959,13 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   asserted still needed. Not new: the same lift came after an undo before 29.9,
   where no clause looked. What would close it is a product question — the
   pills or the column somewhere other than one corner in Hebrew.
+- **The bigger band cost the door about 2 % above 1100** (29.9, their
+  *"bigger"*, the sizes ours). The crop gives the tallest doors exactly the
+  band's wall, so the standard leaf went 437.0 → 426.6 / 564.0 → 551.4 /
+  576.5 → 563.9 px at 1280×720 / 1440×900 / 1920×918 — the audit's floors
+  now. Below 1100 nothing moved (the phone's band kept its size). What would
+  give it back is a product question: a smaller band over the tallest doors
+  only.
 - **Two controls pinned by rules that mirror differently stand in opposite walls
   in one language and the same wall in another** — the mechanism behind a
   closed fault (the removed grip controls under the price card in Hebrew only).
