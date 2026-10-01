@@ -5679,7 +5679,16 @@ for (const v of VIEWS) {
      · pressing the other language on step 2 re-renders the callout in that
        language's script on the SAME step, the tour still up;
      · after the tour the picker stands where it stands with no tour (a second
-       load), within 1 px. */
+       load), within 1 px.
+   ⚠ AND SINCE 30.9 (*"in the tutorial … the save button is in the same place as
+   the languges, but when the tutorial ends it jumps back"*; *"i would like the
+   arrows to be shown in the third step"*):
+     · on every step the save stands where it stands after the tour, within
+       1 px, and never meets the picker;
+     · on the options step each of the door's two arrows is whole inside a
+       cut-out of its own, with a pointer ending on it; on a phone, where the
+       callout stands between them and the options, the options' on-screen
+       part below it is whole in a cut-out at least 64 px tall. */
 {
   console.log('\nthe first-visit tour: four cut-outs, once, and never on a link');
   const before = faults;
@@ -5706,7 +5715,9 @@ for (const v of VIEWS) {
     const step = +d.dataset.step;
     const targets = step === 1 ? [document.querySelector('#stage .door-svg #frame')]
       : step === 2 ? [document.querySelector('.steps')]
-      : step === 3 ? [wide ? document.querySelector('.panel--choose') : document.querySelector('.sect.is-live')]
+      : step === 3 ? [wide ? document.querySelector('.panel--choose') : document.querySelector('.sect.is-live'),
+        /* 30.9: and the door's two arrows, each a target of its own */
+        ...[...document.querySelectorAll('.stage__arrow')].filter(a => getComputedStyle(a).visibility !== 'hidden')]
       /* ⚠ RESTATED 29.9, same subject: the save and EACH pill, not the
          pills' group — whose 44 px placeholder box was inside the cut-out
          while nothing in it was painted, which is what he saw */
@@ -5731,9 +5742,28 @@ for (const v of VIEWS) {
          door and the fixed quote bar */
       const bar = document.querySelector('.quote');
       const foot = bar && getComputedStyle(bar).position === 'fixed' ? bar.getBoundingClientRect().top : innerHeight;
-      const sticky = !wide && step === 3 ? document.querySelector('.stage-wrap').getBoundingClientRect().bottom : 0;
+      const sticky0 = !wide && step === 3 ? document.querySelector('.stage-wrap').getBoundingClientRect().bottom : 0;
+      /* ⚠ RESTATED 30.9, same subject (the options' on-screen part inside a
+         cut-out): on a phone the callout may stand between the door's arrows
+         and the options (js/tour.js `yieldTop` — nowhere else is free once the
+         arrows are cut out), and what it covers is covered by the callout, not
+         greyed; the part below it is the subject, with a floor of its own
+         (`optsTall`, below) so it can never shrink to nothing */
+      const isOpts = step === 3 && t.classList.contains('sect');
+      const sticky = isOpts && card.top < sticky0 && card.bottom > sticky0 ? card.bottom : sticky0;   // the callout straddles the door's foot
       const vis = { left: Math.max(r.left, 0), top: Math.max(r.top, sticky, 0), right: Math.min(r.right, innerWidth), bottom: Math.min(r.bottom, innerHeight, step === 3 ? foot : innerHeight) };
-      if (holes.some(h => inside(vis, h))) out.whole++;
+      /* under a straddling callout the cut-out starts within the callout's own
+         gap from it (js/tour.js GAP, 18 px — the scrim between a callout and
+         its cut-out on every step), never further down */
+      const gap = sticky !== sticky0 ? 18 : 0;
+      const lit = h => inside({ ...vis, top: Math.min(Math.max(vis.top, h.top), vis.top + gap) }, h);
+      if (holes.some(lit)) out.whole++;
+      if (isOpts) out.optsTall = Math.max(0, ...holes.filter(lit).map(h => h.bottom - h.top));
+      if (t.classList.contains('stage__arrow')) {
+        out.doorArrows = (out.doorArrows || 0) + 1;
+        const hole = holes.find(h => inside(r, h));
+        if (hole && arrows.some(a => onEdge(a.x2, a.y2, hole))) out.pointed = (out.pointed || 0) + 1;
+      }
       const e = document.elementFromPoint((vis.left + vis.right) / 2, (vis.top + vis.bottom) / 2);
       if (!e || !e.closest('#tour')) out.clickThrough.push(t.id || t.className.baseVal || String(t.className).split(' ')[0]);
     }
@@ -5759,6 +5789,7 @@ for (const v of VIEWS) {
       const a = await state(pg);
       if (!a.open || !a.modal || a.step !== '1') { fault('tour', `${tag}: a first bare load did not open the tour as a modal on step 1 (${JSON.stringify(a)})`); continue; }
       let langNow = lang;
+      const saveDuring = [];
       for (let k = 1; k <= 4; k++) {
         await pg.waitForTimeout(120);
         const m = await measure(pg);
@@ -5834,11 +5865,33 @@ for (const v of VIEWS) {
         if (!m.cardIn) fault('tour', `${tag} step ${k}: the callout leaves the viewport`);
         if (m.cardOnHole) fault('tour', `${tag} step ${k}: the callout covers a cut-out`);
         if (!m.arrows || !m.arrowsOk) fault('tour', `${tag} step ${k}: ${m.arrows} arrow(s), and not every one runs from the callout's edge to a cut-out's edge`);
+        if (k === 3) {
+          if (m.doorArrows !== 2) fault('tour', `${tag} step 3: ${m.doorArrows || 0} of the door's two arrows on the page — the arrows clause has no subject`);
+          else if ((m.pointed || 0) < 2) fault('tour', `${tag} step 3: ${m.pointed || 0} of the door's two arrows has a pointer ending on its cut-out — the words say "the arrows beside the door"`);
+          if (w < 1100 && !(m.optsTall >= 64)) fault('tour', `${tag} step 3: the options' cut-out is ${m.optsTall || 0} px tall — under 64, it shows nothing to choose`);
+        }
+        /* the save stands where it stands after the tour, and apart from the picker */
+        saveDuring.push({ k, ...(await pg.evaluate(() => { const s = document.querySelector('#save-hud')?.getBoundingClientRect(), p = document.querySelector('#langs')?.getBoundingClientRect();
+          return s ? { lang: document.documentElement.lang, left: s.left, top: s.top, right: s.right, bottom: s.bottom, onPicker: !!p && s.left < p.right && s.right > p.left && s.top < p.bottom && s.bottom > p.top } : {}; })) });
         await pg.evaluate(() => document.querySelector('.tour__next').click());
       }
       await pg.waitForTimeout(150);
       const z = await state(pg);
       if (z.open || z.flag !== 'seen') fault('tour', `${tag}: after the last step the tour is ${z.open ? 'still open' : 'shut'} and the flag is ${z.flag}`);
+      /* the save did not move for the tour (30.9): each reading against the
+         page with no tour IN THE SAME LANGUAGE — step 2 presses the other
+         one, and the wall's row turns with the language (§0c), so steps 1 and
+         3 legitimately stand the save in different walls */
+      const saveRead = () => pg.evaluate(() => { const r = document.querySelector('#save-hud')?.getBoundingClientRect(); return r ? { left: r.left, top: r.top, right: r.right, bottom: r.bottom } : null; });
+      const saveAfter = { [langNow]: await saveRead() };
+      const saveCheck = () => {
+        if (saveDuring.length !== 4 || !saveDuring.every(d => saveAfter[d.lang])) { fault('tour', `${tag}: no save to read during and after the tour — the save clause has no subject`); return; }
+        for (const d of saveDuring) {
+          const z = saveAfter[d.lang];
+          if (d.onPicker) fault('tour', `${tag} step ${d.k}: the save stands on the language picker`);
+          if (['left', 'top', 'right', 'bottom'].some(q => !(Math.abs(d[q] - z[q]) <= 1))) fault('tour', `${tag} step ${d.k}: the save stands at x ${Math.round(d.left)}–${Math.round(d.right)}, y ${Math.round(d.top)}, and with no tour (${d.lang}) at ${Math.round(z.left)}–${Math.round(z.right)}, y ${Math.round(z.top)} — it jumps when the tour ends`);
+        }
+      };
       /* the picker went home, and the wall the scrim was over, bare */
       const pickAfter = await pg.evaluate(() => { const p = document.querySelector('#langs'); const r = p?.getBoundingClientRect();
         return p ? { home: !!p.closest('.stage__hud') && !p.closest('#tour'), left: r.left, top: r.top, right: r.right, bottom: r.bottom } : null; });
@@ -5856,6 +5909,12 @@ for (const v of VIEWS) {
       /* the second visit, in the language the tour ended in (step 2 changed
          it): the tour must not come back, and the picker stands where it
          stood when the tour put it home */
+      for (const L of new Set(saveDuring.map(d => d.lang).filter(L => !saveAfter[L]))) {
+        await pg.goto(`${URL0}?lang=${L}`);
+        await pg.waitForTimeout(1800);
+        saveAfter[L] = await saveRead();
+      }
+      saveCheck();
       await pg.goto(`${URL0}?lang=${langNow}`);
       await pg.waitForTimeout(1800);
       if ((await state(pg)).open) fault('tour', `${tag}: the tour came back on the second visit`);
@@ -5913,7 +5972,7 @@ for (const v of VIEWS) {
   await raw.close();
   if (steps < 12) fault('tour', `only ${steps} of 12 tour steps were measured`);
   console.log(`    the wall through the scrim, % of bare: ${scrimReadings.join(', ') || 'none read'}`);
-  if (faults === before) console.log(`    ${steps} steps at three shapes: a modal on a first bare load, the scrim .8 and the wall through it under ${SCRIM_GATE * 100} % of bare, the callout's words ≥ 4.5:1, the picker live in its own cut-out on every step and a language pressed there re-showing the same step in it, the picker home after, every target whole in its cut-out and not pressable through the scrim, the callout inside the viewport and off the cut-outs, every arrow edge to edge; remembered after the last step, skip and Escape; never on a link, bare or the sheet; with storage refused it shows and ends without throwing`);
+  if (faults === before) console.log(`    ${steps} steps at three shapes: a modal on a first bare load, the scrim .8 and the wall through it under ${SCRIM_GATE * 100} % of bare, the callout's words ≥ 4.5:1, the picker live in its own cut-out on every step and a language pressed there re-showing the same step in it, the picker home after, the save where it stands with no tour on every step and off the picker, the door's two arrows each in a cut-out with a pointer on the options step (a phone's options lit under the callout, ≥ 64 px), every target whole in its cut-out and not pressable through the scrim, the callout inside the viewport and off the cut-outs, every arrow edge to edge; remembered after the last step, skip and Escape; never on a link, bare or the sheet; with storage refused it shows and ends without throwing`);
 }
 
 /* ── THE SAVED DOORS: A DIALOG, AND THE CARD UNDER IT DOES NOT MOVE ───────

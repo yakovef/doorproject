@@ -26,6 +26,56 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **1.10 — THE TOUR: THE SAVE STAYS IN ITS PLACE, AND THE OPTIONS STEP LIGHTS
+  THE DOOR'S ARROWS.** The owner's son: *"in the tutorial for some reason the
+  save button is in the same place as the languges, but when the tutorial
+  ends it jumps back into place, i want it to be at the original place
+  separate from the languges both in the tutorial as its normaly. also i
+  would like the arrows to be shown in the third step."*
+  · **What was wrong.** 29.9's live picker moved `#langs` into the tour's
+    dialog, and the wall's row (`.stage__hud`) is two slots under
+    `justify-content: space-between`: with one child left, the save's slot
+    stood at the row's START — the picker's corner, under it (1280×720 he:
+    the save at x 792–844 inside the picker's 683–852 for all four steps,
+    16–68 after; 390×844 ru: 326–378 against 12–64). The step-4 cut-out lit
+    it there. The 29.9 audit held the picker home after the tour and never
+    read the save beside it. And the options step's words said *"or press the
+    arrows beside the door"* while both arrows stood under the scrim.
+  · **What it is.** `holdPicker` leaves an empty stand-in of the picker's own
+    box in its slot (`.tour__stand`, `visibility: hidden`, re-measured on
+    every step) and the picker goes home in its place: the save stands where
+    it stands with no tour at every step, and `placeBand`, `placeSteps` and
+    the card's `--hud-b`, which read the row's slots, read the same boxes. The
+    options step's targets are the options AND each visible `.stage__arrow`,
+    each a cut-out with a pointer. The callout's tries gained the free side
+    of a step's other cut-outs — under the arrows, over the door — which is
+    where it stands on the desktop now (1280 he 281–581 × 458–637; at 1100 ru
+    the only free place). On a phone nothing is free once the arrows are lit
+    (390×844 ru: 138 px between their cut-outs and the options', the callout
+    176), so the callout stands just under them and the options' cut-out
+    starts under it (`yieldTop`, never under 64 px): 276 px of the tiles lit
+    at 390 ru, 82 at 320×568 ru, the section's heading under the callout.
+  · **Audit (the tour block), restated and new.** NEW: on every step the save
+    where it stands with no tour IN THE SAME LANGUAGE, within 1 px, and off
+    the picker (step 2 presses the other language and the row turns with it,
+    so each reading is held to a tour-free load in its own language — the
+    first draft compared across languages and faulted 1280 step 1 on a
+    legitimate 16 → 436); on the options step the door's two arrows each
+    whole in a cut-out with a pointer ending on it; a phone's options cut-out
+    ≥ 64 px. RESTATED, same subject: a phone's options "on-screen part"
+    starts under the callout where the callout straddles the door's foot —
+    what it covers is covered by the callout, not greyed — with its cut-out
+    starting within the callout's gap (18 px, the tour's GAP) below it.
+  · **Falsified,** each in a throwaway copy: the stand-in removed (and the
+    picker's way home with it) → 12 faults at all three shapes — the save on
+    the picker, the save jumping when the tour ends, the picker not home; the arrows dropped from the options step → 6 (not whole, no
+    pointer); the phone crop off → 2 (the callout covers a cut-out at 390
+    and 320).
+  · **Not done:** the arrows pressable during the tour (the page stays inert
+    — a tour, not a lesson; the clause "not pressable through the scrim"
+    holds them too); a smaller callout on phones to keep the heading lit
+    (its words are already a size down under 400 px).
+
 - **30.9 — PROMPT A, THE CLOSING PASS: THE SLOW GATES, ON THE MERGED BRANCH,
   AND THE RECORD.** The brief: *"`npm run sheets`, `collide -- boxes`,
   `fuzz`, `latency` once after commit 5, in the background … Final `npm test`

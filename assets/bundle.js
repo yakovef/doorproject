@@ -10269,12 +10269,14 @@ ${plate.defs}${plate.body}
     const bottom = Math.min(r.bottom, foot);
     return bottom - top > 24 ? { left: Math.max(r.left, 0), right: Math.min(r.right, window.innerWidth), top, bottom } : null;
   }
+  var doorArrows = () => [...document.querySelectorAll(".stage__arrow")].filter((a) => getComputedStyle(a).visibility !== "hidden").map(R);
   var TOUR_STEPS = [
     { text: "tour.door", targets: () => [R(document.querySelector("#stage .door-svg #frame"))] },
     { text: "tour.steps", targets: () => [R(document.querySelector(".steps"))] },
     {
       text: "tour.options",
-      targets: () => [optionsRect()],
+      targets: () => [optionsRect(), ...doorArrows()],
+      yields: true,
       /* a phone's options can start below the fold: bring the first ones up
          under the door before the cut-out is measured */
       before: () => {
@@ -10292,13 +10294,20 @@ ${plate.defs}${plate.body}
   function holdPicker() {
     const p = document.getElementById("langs");
     if (!p || !dlg) return null;
-    if (home && p.parentElement === dlg) home.parent.insertBefore(p, home.next);
+    if (home && home.isConnected && p.parentElement === dlg) home.replaceWith(p);
     p.classList.remove("tour__langs");
     p.style.removeProperty("top");
     p.style.removeProperty("right");
     const r = p.getBoundingClientRect();
     if (!(r.width && r.height)) return null;
-    home = { parent: p.parentElement, next: p.nextSibling };
+    if (!home) {
+      home = document.createElement("div");
+      home.className = "hud__slot hud__slot--start tour__stand";
+      home.setAttribute("aria-hidden", "true");
+    }
+    home.style.inlineSize = `${r.width}px`;
+    home.style.blockSize = `${r.height}px`;
+    p.replaceWith(home);
     dlg.append(p);
     p.classList.add("tour__langs");
     p.style.top = `${r.top}px`;
@@ -10307,7 +10316,8 @@ ${plate.defs}${plate.body}
   }
   function releasePicker() {
     const p = document.getElementById("langs");
-    if (p && home && p.parentElement === dlg) home.parent.insertBefore(p, home.next);
+    if (p && home && home.isConnected && p.parentElement === dlg) home.replaceWith(p);
+    if (home) home.remove();
     if (p) {
       p.classList.remove("tour__langs");
       p.style.removeProperty("top");
@@ -10330,11 +10340,17 @@ ${plate.defs}${plate.body}
     const cx = (x) => clamp2(x, EDGE2, W - EDGE2 - cw), cy = (y) => clamp2(y, EDGE2, H - EDGE2 - ch);
     const after = { x: rtl ? h.left - GAP - cw : h.right + GAP, y: cy(midY - ch / 2) };
     const before = { x: rtl ? h.right + GAP : h.left - GAP - cw, y: cy(midY - ch / 2) };
+    const others = holes.slice(1, aimed);
+    const near = others.length ? [
+      { x: cx((Math.min(...others.map((o) => o.left)) + Math.max(...others.map((o) => o.right))) / 2 - cw / 2), y: Math.max(...others.map((o) => o.bottom)) + GAP },
+      { x: cx((Math.min(...others.map((o) => o.left)) + Math.max(...others.map((o) => o.right))) / 2 - cw / 2), y: Math.min(...others.map((o) => o.top)) - GAP - ch }
+    ] : [];
     const tries = [
       { x: cx(midX - cw / 2), y: h.bottom + GAP },
       { x: cx(midX - cw / 2), y: h.top - GAP - ch },
       after,
       before,
+      ...near,
       /* closer, before giving up (29.9): the picker's own cut-out can leave a
          narrow phone a gap only just the callout's height */
       { x: cx(midX - cw / 2), y: h.bottom + TIGHT },
@@ -10343,10 +10359,19 @@ ${plate.defs}${plate.body}
       { x: cx(W / 2 - cw / 2), y: EDGE2 }
     ];
     const fits = (t) => t.x >= EDGE2 - 0.5 && t.y >= EDGE2 - 0.5 && t.x + cw <= W - EDGE2 + 0.5 && t.y + ch <= H - EDGE2 + 0.5 && !holes.some((o, i) => meets({ left: t.x, top: t.y, right: t.x + cw, bottom: t.y + ch }, grow(o, i < aimed ? 4 : 2 - PAD2)));
-    const pick = tries.find(fits) || tries[tries.length - 2];
+    const found = tries.find(fits);
+    const pick = found || tries[tries.length - 2];
     c.style.left = `${Math.round(pick.x)}px`;
     c.style.top = `${Math.round(pick.y)}px`;
-    return { left: pick.x, top: pick.y, right: pick.x + cw, bottom: pick.y + ch };
+    return { left: pick.x, top: pick.y, right: pick.x + cw, bottom: pick.y + ch, fit: !!found };
+  }
+  var YIELD_MIN = 64;
+  function yieldTop(aimed) {
+    const others = aimed.slice(1);
+    if (!others.length) return null;
+    const top = Math.max(...others.map((o) => o.bottom)) + TIGHT;
+    const first = { ...aimed[0], top: Math.max(aimed[0].top, top + card().offsetHeight + TIGHT) };
+    return first.bottom - first.top >= YIELD_MIN ? [first, ...others] : null;
   }
   function arrows(box, holes) {
     const svg = dlg.querySelector(".tour__arrows");
@@ -10387,21 +10412,30 @@ ${plate.defs}${plate.body}
   function show() {
     const s = TOUR_STEPS[at];
     if (s.before) s.before();
-    const aimed = s.targets().filter(Boolean).map((r) => grow(r, PAD2));
+    let aimed = s.targets().filter(Boolean).map((r) => grow(r, PAD2));
     const picker = holdPicker();
-    const holes = picker ? [...aimed, grow(picker, PAD2)] : aimed;
+    const withPicker = (a) => picker ? [...a, grow(picker, PAD2)] : a;
     dlg.dataset.step = String(at + 1);
     dlg.querySelector(".tour__n").textContent = T("tour.count", at + 1, TOUR_STEPS.length);
     dlg.querySelector(".tour__t").textContent = T(s.text);
     dlg.querySelector(".tour__skip").textContent = T("tour.skip");
     dlg.querySelector(".tour__next").textContent = T(at === TOUR_STEPS.length - 1 ? "tour.done" : "tour.next");
-    paintScrim(holes, aimed.length);
     if (!aimed.length) {
+      paintScrim(withPicker(aimed), 0);
       arrows({ left: 0, top: 0, right: 0, bottom: 0 }, []);
       placeCard([{ left: 0, top: 0, right: 0, bottom: 0 }]);
       return;
     }
-    arrows(placeCard(holes, aimed.length), aimed);
+    let box = placeCard(withPicker(aimed), aimed.length);
+    if (!box.fit && s.yields) {
+      const given = yieldTop(aimed);
+      if (given) {
+        aimed = given;
+        box = placeCard(withPicker(aimed), aimed.length);
+      }
+    }
+    paintScrim(withPicker(aimed), aimed.length);
+    arrows(box, aimed);
   }
   function refreshTour() {
     if (dlg && dlg.open) show();

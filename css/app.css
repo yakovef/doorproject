@@ -3117,6 +3117,9 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
    are written by the script. Above the scrim, in its own cut-out; its slot's
    ground and its buttons' look come with it (`.hud__slot`, `.lang`). */
 .tour .tour__langs { position: absolute; z-index: 2; margin: 0; }
+/* …and its slot on the wall held by an empty box of its size meanwhile
+   (30.9: without it the save slid into the picker's corner), unseen. */
+.tour__stand { visibility: hidden; }
 .is-bare .tour { display: none; }
 
 /* ── the save's two dialogs — 28.9.2026 ─────────────────────────────

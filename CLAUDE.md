@@ -187,7 +187,11 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   · the tour never on a link carrying a door, bare or the sheet, and set
     ink at ~~0.6~~ **.8 since 29.9, their word** (*"more black"*) rather than
     a literal grey; the picker held live inside the tour's modal (29.9, ours:
-    the same node moved in, never a copy); the "I have a question" state
+    the same node moved in, never a copy; its slot held by a stand-in, 30.9,
+    so the save stays put — their report); the door's arrows lit on the
+    options step (30.9, theirs), and on a phone the callout then between them
+    and the options, over the section's heading (30.9, ours: nothing else is
+    free there); the "I have a question" state
     retired on BOTH sends (29.9, ours) — an untouched door sends the
     standard door's order, the desktop's quiet send reads "הזמינו את הדלת"
     in every state, the phone bar keeps "שלחו"; the saved door a `<button>`
@@ -233,6 +237,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **1.10** The tour: the SAVE STAYS IN ITS PLACE (*"the save button is in the
+  same place as the languges, but when the tutorial ends it jumps back"* —
+  with `#langs` lifted into the dialog the save's slot was the row's only
+  child and stood under the picker; a stand-in holds the slot now), and the
+  options step LIGHTS THE DOOR'S TWO ARROWS (*"the arrows … in the third
+  step"*), each with a pointer; on a phone the callout stands between them and
+  the options. Long form: `HISTORY.md`.
 - **30.9** PROMPT A's closing pass: after its 5 of 5 the sheets moved 0 bare
   (predicted), `boxes` and fuzz clean; on the merged branch (B's 3 of 3 on
   A's five) a complete audit reads **no faults** — the drawer's flake and the
@@ -449,7 +460,19 @@ placement is the other session's, merged at the owner's son's choice.
   stood, in a fifth cut-out on every step; a language pressed there re-shows
   the same step in that language (`refreshTour`), and `end` puts it home and
   re-fits the stage. On a narrow phone the callout may share the picker's
-  cut-out MARGIN, never the picker (320×568's options step has one free place). Never on a
+  cut-out MARGIN, never the picker. ⚠ **Since 30.9 the picker's slot is HELD
+  while it is away** (*"in the tutorial … the save button is in the same place
+  as the languges, but when the tutorial ends it jumps back"*): the wall's row
+  is `space-between`, so with `#langs` lifted out the save's slot stood at the
+  row's start, under the picker; an empty stand-in of the picker's box
+  (`.tour__stand`) keeps every slot where it is, and is where the picker goes
+  home. **And the options step lights the door's two arrows** (*"i would like
+  the arrows to be shown in the third step"* — its words already named them),
+  each a cut-out with a pointer; the callout's next place is under them, over
+  the door. On a phone nothing else is free once they are lit, so the callout
+  stands between them and the options and the options' cut-out starts under
+  it (`yieldTop`, never under 64 px; the section's heading goes under the
+  callout, the tiles stay lit). Never on a
   link carrying a door, bare or the sheet. ⚠ **Every instrument opens the
   page `tourless`** (`tools/browser.mjs`, §8); the audit's one tour block
   launches a raw browser and asserts the tour opened.
@@ -1061,9 +1084,10 @@ for the same half of the leaf and `repair` trades between them.
 - ⚠ **A first bare visit gets a TOUR** (28.9, the owner's son: *"A little
   tutorial when a person first joins … Only on the first visit"*; `js/tour.js`):
   a modal over the page, an ink scrim at .8 (29.9; .6 before) with cut-outs
-  over four live targets — the door's frame, the navigator, the options, the
-  save and the undo pills — and one over the language picker, which the tour
-  holds live in its dialog (29.9); a callout that covers none of the targets'
+  over four live targets — the door's frame, the navigator, the options with
+  the door's two arrows (30.9), the save and the undo pills — and one over the
+  language picker, which the tour holds live in its dialog (29.9), its slot
+  on the wall held by a stand-in meanwhile so nothing beside it moves (30.9); a callout that covers none of the targets'
   inside the viewport, an arrow from its edge to each. Next / Done and Skip on every step, Escape
   skips; remembered (`dm.tour.v1`) when it ends or is skipped. Never on a link
   that carries a door, in bare mode, on the sheet or without script; with
@@ -1629,7 +1653,11 @@ are not in `VIEWS`:
   of four steps the target whole in its cut-out and not pressable through the
   scrim (the fourth: the save and each undo pill, painted — 29.9), the
   language picker whole in its own cut-out and pressable, a language pressed
-  on step 2 re-showing that step in it, the picker home after within 1 px, the callout
+  on step 2 re-showing that step in it, the picker home after within 1 px; the
+  save on every step where it stands with no tour in that language, within
+  1 px, and off the picker (30.9); on the options step the door's two arrows
+  each whole in a cut-out with a pointer ending on it, and on a phone the
+  options lit under the callout, ≥ 64 px (30.9); the callout
   inside the viewport and off the cut-outs, every arrow edge to edge (1280 he,
   390 and 320 ru); remembered after the last step, skip and Escape, gone on
   the second visit; never on a link, bare or the sheet; with storage refused
