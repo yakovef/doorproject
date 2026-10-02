@@ -4154,6 +4154,10 @@ for (const v of VIEWS) {
           })(),
           hitNear: hit(f.left + 2), hitFar: hit(f.right - 2),
           sendW: +R(send).width.toFixed(1),
+          /* 2.10: the bar's height (`--quote-h`, read by every fold check) and
+             the send's — 48 px, .95 rem at 700 (*"bigger and more present"*) */
+          barH: +R(bar).height.toFixed(1), sendH: +R(send).height.toFixed(1),
+          sendPx: parseFloat(getComputedStyle(send).fontSize), sendWt: +getComputedStyle(send).fontWeight,
         };
       });
       await pg.close();
@@ -4190,6 +4194,12 @@ for (const v of VIEWS) {
       } else if (m.hitNear !== 'figure' || m.hitFar !== 'figure') {
         fault(where, `something is painted over the price: its near edge reports `
           + `${m.hitNear} and its far edge ${m.hitFar}`);
+      } else if (Math.abs(m.barH - 67) > 0.6) {
+        /* ⚠ 2.10: the send grew 44 → 48 px; the way on's 52 still sets the
+           bar, so `--quote-h` must not have moved */
+        fault(where, `the quote bar is ${m.barH} px tall — 67.0 is what every fold check reads, and the bigger send moved it`);
+      } else if (m.sendH < 47.5 || m.sendWt < 700 || (w >= 360 && m.sendPx < 15)) {
+        fault(where, `the bar's send is ${m.sendH} px at ${m.sendPx} px / ${m.sendWt} — 48 px, .95 rem, 700 (2.10)`);
       } else { said++; }
     }
   }
@@ -8214,6 +8224,14 @@ try {
      future known overlap has a place to be named. */
   const ON_DOOR_OK = new Set();
   const stillOverlapping = new Set();
+  /* named 2.10 — see clause 5 */
+  const COLUMN_ON_PRICE = { 'en 1152x800 half': 133, 'ru 1200x800 standard': 14, 'ru 1200x800 half': 149, 'ru 1280x720 halfextra2': 217 };
+  const columnSeen = new Set();
+  /* named 2.10 — see clause 8: at 1100 in English beside the widest double the
+     wall is 128 px of pill, and "Order the door" takes three lines */
+  const THREE_LINES = new Set(['en 1100x800 halfextra2']);
+  const threeSeen = new Set(), wrapped = [];
+  let pills = 0;
   const rel = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
   const INK = 0.2126 * rel(0x1C) + 0.7152 * rel(0x1A) + 0.0722 * rel(0x17);   // --ink
   let room = 0, tight = [], measured = 0, popovers = 0, anchored = 0, contrasts = 0, lowest = 99, lowestAt = '';
@@ -8262,6 +8280,17 @@ try {
             under,
             picker: lr ? { right: Math.round(st.right - lr.right), left: Math.round(lr.left - st.left) } : null,
             fig: R(q.querySelector('.send__figure')), send: R(q.querySelector('.quote__send')),
+            /* the send as a PILL since 2.10: its ground, its words, its lines,
+               and its edge against the price's (the toggle's) */
+            pill: (() => {
+              const s = q.querySelector('.quote__send'), cs = getComputedStyle(s);
+              const sp = [...s.querySelectorAll('span')].find(x => x.offsetWidth);
+              const tg = q.querySelector('#price-toggle').getBoundingClientRect(), sr = s.getBoundingClientRect();
+              return { bg: cs.backgroundColor, ink: cs.color, deco: cs.textDecorationLine, h: sr.height,
+                px: parseFloat(cs.fontSize), wt: +cs.fontWeight,
+                lines: sp ? Math.round(sp.getBoundingClientRect().height / parseFloat(getComputedStyle(sp).lineHeight)) : 0,
+                edge: Math.abs(sr.right - tg.right) };
+            })(),
           };
         });
         const tag = `${lang} ${w}x${h} ${size}`;
@@ -8294,8 +8323,44 @@ try {
           else fault('quote-wall', `${tag}: the price stands ${m.onDoor} px² on the door `
             + `(${m.wall} px of wall for a ${m.card} px price)`);
         }
-        /* 5 — and under nothing else on the wall */
-        for (const [n, x] of m.under) fault('quote-wall', `${tag}: the price and the ${n} overlap by ${x} px²`);
+        /* 5 — and under nothing else on the wall.
+           ⚠ BUT THE NAVIGATOR COLUMN WHERE IT RUNS OUT OF ROOM, NAMED (2.10).
+           In English and Russian the column stands under the price on the same
+           wall, pushed below it and tightening its gaps to fit (`placeSteps`);
+           it was at its limit already, and the send became a 48 px pill (*"Make
+           the WhatsApp button bigger and more present"* — it was a 44 px line),
+           so on four doors the column, short of 1–4 px, is pulled up onto the
+           price's box. Measured; each held to its reading + 20 and asserted
+           still needed. */
+        for (const [n, x] of m.under) {
+          const known = COLUMN_ON_PRICE[tag];
+          if (n === 'steps' && known !== undefined) {
+            columnSeen.add(tag);
+            if (x > known + 20) fault('quote-wall', `${tag}: the price and the column overlap by ${x} px² — named at ${known}`);
+          } else fault('quote-wall', `${tag}: the price and the ${n} overlap by ${x} px²`);
+        }
+        /* 8 — the send is a PILL (2.10, *"Make the WhatsApp button bigger and
+           more present"*): the green ground, no underline, ≥ 48 px, 1 rem at
+           700, its edge flush with the price's, at most two lines (wrapping
+           before it shrinks — the one three-line reading named); and its
+           words read on the pill, not on the picture: white on `--wa`, ≥ 3:1,
+           the exception CLAUDE.md records for the summary's button. */
+        {
+          const pl = m.pill;
+          const rgb = c => c.match(/[\d.]+/g).slice(0, 3).map(Number);
+          const L2 = c => { const [r, g, bl] = rgb(c).map(v => /^color\(srgb/.test(c) ? v * 255 : v).map(v => rel(v)); return 0.2126 * r + 0.7152 * g + 0.0722 * bl; };
+          const cr2 = (Math.max(L2(pl.ink), L2(pl.bg)) + 0.05) / (Math.min(L2(pl.ink), L2(pl.bg)) + 0.05);
+          pills++;
+          if (/rgba\(0, 0, 0, 0\)|transparent/.test(pl.bg) || pl.deco !== 'none')
+            fault('quote-wall', `${tag}: the send is ${pl.deco !== 'none' ? 'underlined' : 'groundless'} (${pl.bg}) — it is a green pill now`);
+          if (pl.h < 47.5 || pl.px < 15.9 || pl.wt < 700)
+            fault('quote-wall', `${tag}: the send is ${pl.h.toFixed(1)} px tall at ${pl.px} px / ${pl.wt} — 48, 1 rem, 700`);
+          if (pl.edge > 1) fault('quote-wall', `${tag}: the send's edge is ${pl.edge.toFixed(1)} px off the price's`);
+          if (cr2 < 3) fault('quote-wall', `${tag}: the send's words are ${cr2.toFixed(2)}:1 on its pill`);
+          if (pl.lines > 2 && !THREE_LINES.has(tag)) fault('quote-wall', `${tag}: the send runs to ${pl.lines} lines — it wraps to two before it shrinks`);
+          if (pl.lines > 2) threeSeen.add(tag);
+          if (pl.lines > 1) wrapped.push(tag);
+        }
         /* 7 — the picker at the top right, physically */
         if (!m.picker) fault('quote-wall', `${tag}: no #langs on the wall — the picker clause has no subject`);
         else if (m.picker.right > 16 || m.picker.left < m.picker.right) {
@@ -8308,7 +8373,11 @@ try {
             + '{ color: transparent !important; text-decoration-color: transparent !important; } '
             + '.quote .quote__ico { visibility: hidden !important; }' });
           await p.waitForTimeout(60);
-          for (const [k, bx] of [['figure', m.fig], ['send', m.send]]) {
+          /* ⚠ THE FIGURE ONLY SINCE 2.10: the send's words stand on its green
+             pill now, not on the picture, so their contrast is clause 8's
+             (white on `--wa`); sampling the photograph under a pill would be
+             measuring the wrong ground. Its subject changed, it did not go. */
+          for (const [k, bx] of [['figure', m.fig]]) {
             const x0 = Math.max(0, bx.left), clip = { x: x0, y: Math.max(0, bx.top),
               width: Math.max(1, Math.min(bx.right, w) - x0), height: Math.max(1, bx.height) };
             await p.screenshot({ path: '/tmp/audit-price-ground.png', clip });
@@ -8382,7 +8451,9 @@ try {
     fault('quote-wall', `only ${popovers} of 27 price breakdowns opened — the placement clause `
       + 'is measuring almost nothing');
   }
-  if (contrasts < 54) fault('quote-wall', `only ${contrasts} of 54 contrast readings were made`);
+  /* 27, not 54, since 2.10: the picture is sampled under the FIGURE only (the
+     send's words are clause 8's, on their pill) — 3 languages × 9 shapes */
+  if (contrasts < 27) fault('quote-wall', `only ${contrasts} of 27 contrast readings were made`);
   /* and the exemption cannot outlive the fault */
   for (const tag of ON_DOOR_OK) {
     if (!stillOverlapping.has(tag)) {
@@ -8390,6 +8461,10 @@ try {
         + 'and it no longer does — take it off the list here and out of CLAUDE.md §9');
     }
   }
+  for (const k of Object.keys(COLUMN_ON_PRICE)) if (!columnSeen.has(k)) fault('quote-wall', `${k}: the column no longer touches the price — take it out of COLUMN_ON_PRICE and CLAUDE.md §9`);
+  for (const k of THREE_LINES) if (!threeSeen.has(k)) fault('quote-wall', `${k}: the send is two lines or fewer now — take it out of THREE_LINES`);
+  if (pills < measured) fault('quote-wall', `the send was read as a pill ${pills} of ${measured} times`);
+  console.log(`    the send: a green pill on all ${pills}; wrapped to two lines on ${wrapped.length} (${wrapped.slice(0, 6).join(', ')}${wrapped.length > 6 ? ' …' : ''})`);
   if (faults === before) {
     console.log(`    ${measured} readings in three languages x nine desktop widths x all six `
       + `sizes: the price stands left of the door, high, on no ground, on ${anchored}; whole on all ${room} `

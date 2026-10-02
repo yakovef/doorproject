@@ -26,6 +26,46 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **2.10 — THE SEND BIGGER AND MORE PRESENT (prompt C, 3 of 3).** The owner's
+  son: *"Make the WhatsApp button bigger and more present."*
+  · **What was wrong.** Above 1100 the quiet send was a line of ink, underlined,
+    no ground, a 17 px mark (28.9: "quiet is a matter of colour and weight");
+    below 1100 a 44 px green pill at .875 rem / 600 in the bar.
+  · **What changed.** Desktop: a `--wa` pill under the figure — white, 1 rem at
+    700, 48 px, padding 6 × 18, a 20 px mark, a soft shadow, reading "הזמינו
+    את הדלת" in every state, its edge flush with the price's (asserted ≤ 1 px).
+    Where the wall left of the door cannot hold it on one line it WRAPS
+    (`white-space: normal`, never under 1 rem) up to the wall (`max-inline-size`
+    off `--frame-left`). Phone bar: the send 48 px, .95 rem at 700, a 20 px
+    mark, "שלחו"; under 360 it keeps .8 rem (the Russian row at 320 has no
+    spare). 48 is under the way on's 52, so the bar stays 67 px — asserted.
+  · **Contrast, and the clause that changed subject.** The send's words stand
+    on the green now, not on the picture: white on `--wa` is 3.05:1, the
+    exception already recorded for the bar and the summary's own button;
+    asserted ≥ 3:1. The picture under the price is sampled for the FIGURE
+    alone (27 readings, was 54) — sampling the photograph under a pill would
+    measure the wrong ground. ⚠ 1 rem at 700 is 16 px bold, under WCAG's
+    large-text size (18.66 px bold), so 3:1 is the floor the brief named and
+    the page's existing exception, not a WCAG AA pass for normal text; the
+    note at the bar's rule says the fix is darkening `--wa` itself, once, for
+    every send.
+  · **The wall, measured** (the audit's price block, 9 widths × 3 languages ×
+    6 sizes): one line at ≥ 1280 everywhere; wrapped to two lines on 24 of 162
+    at 1100–1200; THREE lines once, at 1100 in English beside the widest
+    double (128 px of wall for "Order the door"), named in `THREE_LINES`. ⚠ In
+    English and Russian the navigator column stands under the price and was
+    already at its limit (`placeSteps`): an 8 px gap above the pill put it on
+    the price at 1100–1152 (en) and 1280 (ru); with no gap the pill adds 4 px
+    over the old line and four readings are left — en 1152 `half` 133 px², ru
+    1200 `standard` 14, `half` 149, ru 1280 `halfextra2` 217 — named in
+    `COLUMN_ON_PRICE` (+ 20, asserted still needed). The column is the other
+    chat's; a column that tightened further, or a price anchored higher, would
+    close them.
+  · **Falsified:** the underlined line back → clause 8 fires on all 162
+    readings; a 60 px bar send → the bar-height clause on all 15 phone pairs.
+  · **Not done:** darkening `--wa` (one decision for every send, not this
+    one's); the column's last pixels (its region). No `VERSION`; 0 bare sheets.
+
 - **2.10 — THE ARROWS BESIDE THE DOOR REMADE (prompt C, 2 of 3).** The owner's
   son: *"Remake the arrows around the door, make them bigger and more
   noticeable."*
@@ -3611,6 +3651,11 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **29.9** The saved doors SHOW THE DOORS (*"show how they look and their
+  price, that's it"*): each row the door drawn (`copyOf`, 132 px) and its
+  price, the summary its accessible name, a small × in the corner; two across
+  (the dialog widened under 360, as the gallery's). Drawn only while the list
+  is open. The drawer sweep's flake was the seeding: an init script now. Long form: `HISTORY.md`.
 - **29.9** The quiet send says **"הזמינו את הדלת"** (*"Change the 'יש לי שאלה'
   text … to 'הזמינו את הדלת'"*) above 1100 in every state; the phone bar keeps
   "שלחו". The question state RETIRED on both sends and in the message — an

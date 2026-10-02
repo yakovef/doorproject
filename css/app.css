@@ -1852,15 +1852,19 @@ html:not([dir="rtl"]) .hud__slot--end { flex-direction: row-reverse; }
    The spans need no `display` change: a flex item is blockified, so these
    `display: inline` labels are already block boxes and `text-overflow` reaches
    them. `white-space: nowrap` is inherited from the pill. */
+/* ⚠ 48 px, .95 rem AT 700, A 20 px MARK SINCE 2.10.2026 — *"Make the WhatsApp
+   button bigger and more present"* (it was 44 px, .875 rem at 600, 17 px).
+   Still "שלחו" (his 27.9 word, for space). 48 is under the way on's 52, so
+   the bar keeps its 67 px and `--quote-h` does not move (asserted). */
 .quote__send {
   flex: 0 1 auto;
   min-inline-size: 0;
   display: inline-flex; align-items: center; gap: 7px;
-  min-block-size: 44px; padding: 0 16px;
+  min-block-size: 48px; padding: 0 16px;
   border: 1px solid transparent; border-radius: var(--r-pill, 999px);
   background: var(--wa);
   color: #fff; text-decoration: none;
-  font-size: .875rem; font-weight: 600; white-space: nowrap;
+  font-size: .95rem; font-weight: 700; white-space: nowrap;
   box-shadow: 0 1px 2px rgb(23 23 21 / .18);
 }
 .quote__send > span { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
@@ -1868,6 +1872,7 @@ html:not([dir="rtl"]) .hud__slot--end { flex-direction: row-reverse; }
 .quote__send .quote__ico { opacity: 1; }
 .quote__send:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
 .quote__ico { inline-size: 17px; block-size: 17px; flex: 0 0 auto; opacity: .85; }
+.quote__send .quote__ico { inline-size: 20px; block-size: 20px; }
 
 /* ── THE WAY BACK AND THE WAY ON, IN THE BAR, ON A PHONE ONLY ───────
    27.9.2026, the owner's son: back and next "moved to the bottom of the page
@@ -1921,6 +1926,10 @@ html[dir="rtl"] .quote__back .quote__chev { transform: none; }
 @media (max-width: 359px) {
   .quote { padding-inline: 10px; gap: 8px; }
   .quote__price .send__figure { font-size: 1.25rem; }
+  /* ⚠ KEPT AT .8 rem UNDER 360 ON 2.10, when the send became .95 rem at 700
+     everywhere else: at 320 in Russian the row has no spare at all (the
+     price, the send and the two arrows), and a bigger label would only
+     ellipsise sooner. It is still 48 px and 700 here. */
   .quote__send { padding: 0 11px; font-size: .8rem; }
 }
 
@@ -1997,19 +2006,36 @@ html[dir="rtl"] .quote__back .quote__chev { transform: none; }
     max-block-size: max(132px, min(46vh, calc(var(--bd-room, 100vh) - var(--bd-gap) - 12px)));
     text-align: start;
   }
-  /* ⚠ A LINE OF INK, NOT A PILL — and still 44 px tall: the floor is a floor,
-     and quiet is a matter of colour and weight, not of size (the first draft
-     of the card said 36 and the audit failed it within a minute). The mark is
-     ink too: the WhatsApp green on lamp-lit plaster is under 2:1, and the word
-     beside it says where it goes. The one green button is still the summary's. */
+  /* ⚠ A GREEN PILL SINCE 2.10.2026 — the owner's son: *"Make the WhatsApp
+     button bigger and more present."* Until then it was a line of ink with an
+     underline, 44 px tall (28.9: "quiet is a matter of colour and weight");
+     now the page's green with white words, 48 px, 700 at 1 rem, a 20 px mark,
+     its edge flush with the figure's, on a soft shadow so it stands off the
+     plaster (ours, CLAUDE.md §0a). The words are on the green, not on the
+     picture, so the contrast that matters is white on `--wa` — 3.05:1, the
+     exception recorded at the foot of the quote bar's note above and the
+     summary's own button's; the FIGURE above it keeps its ≥ 4.5:1 on the
+     picture. Where the wall left of the door cannot hold it on one line it
+     WRAPS (two lines, never under 1 rem) rather than shrinking or running
+     off the stage — `max-inline-size` is that wall.
+     ⚠ NO GAP ABOVE IT, MEASURED: in English and Russian the navigator column
+     stands under the price on the same wall and was already at its limit
+     (`placeSteps`), so every pixel the price grows comes off the column's
+     room. An 8 px margin put the column on the price at 1100–1152 (en) and
+     1280 (ru, `halfextra2`); with none, the pill adds 4 px over the old line
+     (48 against 44) and the readings left are named in the audit. */
   .quote__send {
-    min-block-size: 44px; padding: 0; gap: 6px;
-    background: none; color: var(--ink); box-shadow: none; border: 0;
-    border-radius: 0;
-    font-size: .95rem; font-weight: 600;
-    text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px;
+    min-block-size: 48px; padding: 6px 18px; gap: 8px;
+    background: var(--wa); color: #fff; border: 0;
+    border-radius: var(--r-pill, 999px);
+    box-shadow: 0 2px 8px rgb(0 0 0 / .22);
+    font-size: 1rem; font-weight: 700; line-height: 1.2;
+    white-space: normal; text-align: start;
+    max-inline-size: max(140px, calc(var(--frame-left, 38%) - 16px));
   }
-  .quote__send:hover { filter: none; text-decoration-thickness: 2px; }
+  .quote__send > span { overflow: visible; text-overflow: clip; }
+  .quote__send .quote__ico { inline-size: 20px; block-size: 20px; }
+  .quote__send:hover { filter: brightness(1.05); }
 }
 
 /* ⚠ `.grip-bar`, `.grip-live`, `.grip-bad` AND THE FOCUS RING STOOD HERE —
