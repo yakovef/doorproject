@@ -26,6 +26,143 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **2.10 — PROMPT D, 1 OF 2: A RESET.** The owner's son: *"A reset button that
+  looks just like 2 curved arrows that create a circle."* Answered in chat the
+  same day: on a phone undo, redo and reset are three icon discs, no words.
+  · **What was there.** No reset at all — `DEFAULTS` was read at boot and by
+    the gallery and nowhere else. Starting again meant clearing the address
+    by hand.
+  · **What it is.** `#reset-btn`, the undo group's third pill and its
+    OUTERMOST (the brief's word, this file's vocabulary: at the stage's edge —
+    so first in the markup, holding the corner, with undo and redo beside it
+    in their old order). Its glyph is `HUD_ICON.reset` in `js/icons.js`, the
+    save's family, written in by `app.js`: two 130° arcs of one circle (r 7.2)
+    chasing each other clockwise, each ending in an open head in the 50° gap
+    before the other — the two heads and gaps make it a cycle, not a ring; at
+    19 px each gap is 4.8 px. Its word `reset.short` (איפוס / Reset / Сброс)
+    above 1100, its name `reset` in `aria-label`/`title` everywhere. Greyed
+    (`disabled`, the undo's own rule) while `isUntouched(state)` — the door,
+    not the stack, decides: an undo can walk back to the default door, and a
+    link carrying another door can be reset from its first paint. A tap ASKS
+    (`askConfirm`, *"לאפס את הדלת? זה יסיר את כל הבחירות"*: his 27.9 rule at its
+    largest — it takes every choice away); yes runs `set({ ...DEFAULTS })`
+    (ONE entry on the undo stack, so the undo brings the whole door back),
+    empties `visited` (the checks) and `displaced` (the give-back memory: an
+    entry made before the reset would hand a panel back to a door somebody
+    has just started again), `goStep`s to step 01, writes a BARE address
+    (`scheduleUrl(true)` — the default door spelled out would make a reload
+    open the summary, as a shared link does) and toasts *"הדלת חזרה למצב
+    ההתחלתי"*. The tour's fourth sentence gained *"להתחיל מחדש"* in three
+    languages; `undo.group` names three.
+  · **The phone: discs.** Below 1100 `placeUndo` offers `icon` (the three
+    stacked, 3 × 44 + 2 × 6 = 144 px) and `iconrow` (side by side) only — the
+    labelled `stack` went with the words. Above 1100 the labelled row of
+    three first, as before. Measured with the pill block: 1280 he row (reset
+    88, undo 87, redo 86 px wide), 1440 ru row, 1100 ru stack (the row meets
+    the door there), 390 and 320 the stacked discs.
+  · **The wall readings (§9), re-measured.** The 144 px column's top reaches
+    the arrow beside the door at three places, on a step, he and ru alike:
+    390×844 `half` 12 px² (the redo's corner; clear with two pills),
+    320×568 `halfextra1` 76 (undo 39 + redo 37; clear with two since 29.9),
+    `halfextra2` 342 (undo 121 + redo 221; 115 with two). The row of three is
+    144 px wide and stands on the door wherever the column meets the arrow,
+    so there is no shape that clears both. `ARROW_KNOWN` restated — same
+    subject (pills on the arrow, at a named viewport and door, +10, asserted
+    still needed) — to the SUM over the pills, because the middle disc reaches
+    it too, and named with the three readings. Nothing else on the wall is
+    touched at any viewport, size or language. The other session is remaking
+    the arrows (60 px discs) today; whoever rebases re-reads these.
+  · **⚠ Re-read over the bigger arrows (`145b2d3`, rebased over the same
+    day): six readings, not three.** On a phone the arrow is 52 px where it
+    was 44, and the 144 px column met it at 16 readings — two named ones grown
+    past their +10 and new ones. Re-measured on a step after an undo, the
+    larger of he / ru: 390×844 `half` 100 (12 before) and `halfextra1` 15
+    (new); 320×568 `extra2` 92 (new: undo 39 + redo 53), `half` 322 (new; ru,
+    he 276), `halfextra1` 414 (76 before) and `halfextra2` 736 (342 before;
+    undo 311 + redo 425). WHY NO SHAPE CLEARS THEM, measured
+    (`tools/_wall3.mjs`, five phone widths × six sizes): the column is 44 px at
+    8 px in from the stage's edge and the arrow 52 px at 8 px off the casing,
+    so wherever the wall right of the door is under 112 px (320: 96–110 beside
+    the four wider doors) the arrow reaches into the column's width; below the
+    arrow the stage holds one row of discs (73–84 px at 320), two across only
+    where the wall is 102 px or more — the third disc has nowhere to stand off
+    the door and the arrow. At 390 the stack's top (299) meets the arrow's
+    foot (309 beside `half`). An L of discs (two at the foot, one over the
+    corner) was worked through on the numbers and not built: it halves the
+    320 readings and clears none of them, and at 390 it clears `half` only on
+    a fraction of a pixel. `ARROW_KNOWN` restated to the six (same subject,
+    +10, asserted still needed); the arrows and their size are the other
+    chat's and were not touched. What would close them is a product
+    question: the arrows on a phone, or a disc, somewhere other than beside
+    the door.
+  · **And the column it shares a corner with, in Hebrew.** The first full
+    audit of this commit found the navigator block red at 22 places: above
+    1100 in Hebrew the column stands above the pills, and where the labelled
+    row of three met the door the labelled STACK (144 px) took 100 px of its
+    room — the column up to 121 px over the door's middle, and at 1280×720
+    beside the three doubles ON the language picker, 1,904 px². So in Hebrew
+    above 1100 the glyphs' row comes before the labelled stack (`placeUndo`;
+    English and Russian keep the stack, their column on the other wall), and
+    the named lifts were re-read at every Hebrew door, five widths, before
+    (`9e780ad`) → after: 1100 `half` 27 → 0, `halfextra1` 9 → 0, 1152
+    `halfextra1` 11 → 0; 1280×720 standard 21 → 46, `extra1` 5 → 30, `extra2`
+    0 → 15 (the labelled row of three reaches the trust band's words and stands
+    over them, which the row of two did not); 1100 `halfextra2` 0 → 41 (only
+    the labelled stack clears the widest double); the rest unchanged — eight
+    named where there were nine. Keeping the words on the commonest laptop
+    was the choice over a centred column there; the glyphs' row first would
+    give the 21 back.
+  · **Audit.** RESTATED, the pill block (same subjects, three pills): on load
+    all three painted, undo and redo greyed, the reset greyed exactly on the
+    default door (the block's links carry only the size, so on `standard`);
+    after two changes reset and undo live, redo greyed; after an undo all
+    three live; the order reset, undo, redo; below 1100 discs only, and in
+    Hebrew above it the glyphs' row before the stack. LIFTED re-measured
+    (same subject: the column centred or pushed down but for named Hebrew
+    lifts, +2, asserted still needed). The tour's
+    fourth step holds the reset too. NEW, the reset's own walk at every
+    viewport, he and ru, from a bare load: greyed; live after a colour and a
+    window; a yes/no (yes `--danger`, no ink); no and Escape each leave the
+    code, the drawing's markup and the address byte for byte; yes — the bare
+    load's code, drawing and ₪3,195, step 01 live, no query, no checks, undo
+    live and redo greyed, the reset greyed, a toast above the pills; then the
+    undo brings back the door before it. UNITS: the four keys in three
+    languages above floors; the tour sentence names starting again; read out
+    of `app.js`'s source (it cannot be imported), the reset asks with
+    `dlg.reset`, goes through `set({ ...DEFAULTS })`, never assigns `state`,
+    and clears both memories; `HUD_ICON.reset` is two arcs and two heads.
+    FUZZ: the reset among the clicks on its own seeded coin (4 %, so the tile
+    walk draws what it drew), answered both ways and counted, a yes landing
+    on the door the page opened with.
+  · **Falsified,** each in a throwaway copy: `state = DEFAULTS` without `set`
+    → 16 faults, "the undo after a reset brought back … not the door before
+    it", at every viewport and language (and the units' "not through set" and
+    "assigns state directly"); the question skipped → 32, "opened no dialog"
+    (and the units' "does not ask first").
+  · **Sheets: 0 bare predicted** (no `render()` change); run once after commit
+    2.
+  · **Audit, on the commit rebased over the phone's first screen (`a590977`):**
+    every block clean. The run died in the wall-ink block on the container's
+    renderer crash (*"page, context or browser has been closed"* — the
+    signature `tools/browser.mjs` names; that block borrows no relaunching
+    page), and it and the price block after it, re-run alone, read no faults.
+    The wall readings re-measured after that rebase: the pill and navigator
+    blocks clean, `ARROW_KNOWN`'s three readings and the eight named lifts
+    still needed and unchanged. `npm test` re-read: 10,595,657 passed, the
+    same five staleness rows. Then the arrows landed (`145b2d3`) and the
+    readings were re-measured again — above. On the commit rebased over
+    the arrows: a complete audit, every block clean with the six named
+    readings — but for chromium dying in the price-card sweep (the same
+    container crash, the other chat's block, which says so itself), and that
+    block re-run alone reads no faults. `npm test` 10,595,657 passed, the
+    same five staleness rows. And over the send made a pill (`232e798`, the
+    other chat's, rebased over once more): the pill, navigator, reset and
+    price blocks re-run — no faults, the six readings and eight lifts as
+    named; `npm test` the same.
+  · **Not done, on purpose:** a reset that also forgets the language or the
+    tour flag (those are the visitor's, not the door's); a reset on the phone
+    bar (the discs stand at the stage's corner on every step).
+
 - **2.10 — THE SEND BIGGER AND MORE PRESENT (prompt C, 3 of 3).** The owner's
   son: *"Make the WhatsApp button bigger and more present."*
   · **What was wrong.** Above 1100 the quiet send was a line of ink, underlined,
@@ -3651,6 +3788,12 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **29.9** The stripes are two tiles on the face step; one cycle of six (B, 3
+  of 3) — *"2 panel, 3 panel, greek set, then horizontal stripes, then vertical
+  stripes, then nothing … square buttons like every other option"*: screen-only
+  `stripes-h`/`-v` (`STRIPE_TILE`, never in the link or code), `stripeTileGlyph`;
+  the pills gone, the count under the tiles while on; greyed by the window only;
+  a swap in the group asks nothing (`ownedBy`). Long form: `HISTORY.md`.
 - **29.9** The saved doors SHOW THE DOORS (*"show how they look and their
   price, that's it"*): each row the door drawn (`copyOf`, 132 px) and its
   price, the summary its accessible name, a small × in the corner; two across
@@ -3661,24 +3804,24 @@ oldest lines move to the top of the "moved" section.
   "שלחו". The question state RETIRED on both sends and in the message — an
   untouched door sends the standard door's ORDER; `is-untouched`, `send.waAsk*`
   and the `chosen` argument are gone. Long form: `HISTORY.md`.
-- **29.9** The designs unlock with a window (B, 2 of 3) — *"the window section
-  split in 2 … a sub-section unlocks right after it — the designs"*: the grille
-  group's `when: grilleHasSubject` (`isGlazed`), the finish group's hiding; the
-  arrows walk none → slot → square. A linked design still brings its window.
-  Units hold it to the rules; the audit to the page (links, taps, arrows); its
-  every-option walk now unlocks a `when` group first (§5.28). Long form: `HISTORY.md`.
-- **29.9** Undo and redo PAINTED FROM LOAD, greyed while disabled (*"available
-  but greyed out at the start"*): ink at .45, no shadow, still `disabled`; no
-  placeholder box. The toast clears them before the first change too.
-  `placeSteps` gives a centred column twice its shortfall (it kept its top:
-  1100 he −12 px); where the Hebrew stage is short the column still stands above
-  the door's middle — nine readings named (1280 standard 21 px). Long form: `HISTORY.md`.
 - **29.9** The tour: scrim .6 → **.8** (*"more black"*: the wall reads 5.6–6.7 %
   of bare through it), and the language picker LIVE in it (*"there should still
   be an option to change languages"*) — `#langs` itself moves into the dialog,
   in a cut-out of its own, and a language pressed re-shows the same step in
   it; home after, to the pixel. On a 320 phone the callout may share the
   picker's margin, never the picker. Long form: `HISTORY.md`.
+- **29.9** Undo and redo PAINTED FROM LOAD, greyed while disabled (*"available
+  but greyed out at the start"*): ink at .45, no shadow, still `disabled`; no
+  placeholder box. The toast clears them before the first change too.
+  `placeSteps` gives a centred column twice its shortfall (it kept its top:
+  1100 he −12 px); where the Hebrew stage is short the column still stands above
+  the door's middle — nine readings named (1280 standard 21 px). Long form: `HISTORY.md`.
+- **29.9** The designs unlock with a window (B, 2 of 3) — *"the window section
+  split in 2 … a sub-section unlocks right after it — the designs"*: the grille
+  group's `when: grilleHasSubject` (`isGlazed`), the finish group's hiding; the
+  arrows walk none → slot → square. A linked design still brings its window.
+  Units hold it to the rules; the audit to the page (links, taps, arrows); its
+  every-option walk now unlocks a `when` group first (§5.28). Long form: `HISTORY.md`.
 - **29.9** The window step before the face (B, 1 of 3) — *"The window section
   before the face section"*: `SECTIONS` · `glass` · `face` ·, adjacent still
   (§3); `WANT_ORDER` and the audit's arrows walk with it. No copy claimed the

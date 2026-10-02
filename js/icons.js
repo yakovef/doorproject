@@ -246,10 +246,20 @@ export const specIcon = key => (Object.prototype.hasOwnProperty.call(SPEC_ICON, 
  * marks keep: the shutter's window stands 2.4 from the shutter's edge, the
  * shutter 4.6 above the label.
  */
+/* ⚠ AND THE RESET, 2.10.2026 — the owner's son: *"A reset button that looks
+   just like 2 curved arrows that create a circle."* Two arcs of one circle
+   (r 7.2 about the grid's centre), each 130° long, chasing each other
+   clockwise; each ends in an open head that points along the arc, in the 50°
+   gap before the other begins — so the two heads and two gaps are what make it
+   a cycle and not a ring. Drawn at the pills' 19 px, where one unit is 0.79 px:
+   each gap's chord is 6.1 units (4.8 px), each head's arms 3.4. Nothing else on
+   the wall is round, and undo/redo are single hooked arrows. */
 export const HUD_ICON = {
   save: '<path d="M4.4 4.4h12.2l3 3v12.2H4.4Z"/>'
       + '<path d="M7.6 4.4v5.2h7.8V4.4"/><path d="M12.8 5.8v2.4"/>'
       + '<path d="M7.6 19.6v-5.4h8.8v5.4"/>',
+  reset: '<path d="M5.23 9.54A7.2 7.2 0 0 1 18.24 8.4"/><path d="M19.12 5.12 18.24 8.4l-3.28-.88"/>'
+       + '<path d="M18.77 14.46A7.2 7.2 0 0 1 5.76 15.6"/><path d="M4.88 18.88 5.76 15.6l3.28.88"/>',
 };
 
 export const hudIcon = key => {

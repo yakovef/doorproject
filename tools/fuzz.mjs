@@ -204,7 +204,16 @@ console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real brow
   const b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
   const CODE = new RegExp(`^DM-[0-9A-Z]{${encodeCode(DEFAULTS).length - 3}}$`);
   const r = rng(SEED ^ 0x5EED);
+  /* ⚠ THE RESET AMONG THE CLICKS, 2.10.2026: a wall button, not a tile, so the
+     tile list below never held it. Its own coin, from its own stream, so the
+     tile walk draws exactly what it drew before — a reset REPLACES the tile
+     that would have been pressed, it does not shift the sequence. It asks
+     (the confirm dialog), is answered by the same coin as every other
+     question, and both answers are counted (§5.28). */
+  const rr = rng(SEED ^ 0x7E5E7);
+  const RESET_RATE = 0.04;
   let clicks = 0, dialogs = 0, saidYes = 0, saidNo = 0;
+  let resets = 0, resetAsked = 0, resetYes = 0, resetNo = 0;
 
   for (let wk = 0; wk < WALKS; wk++) {
     const v = VIEWS[wk % VIEWS.length];
@@ -227,15 +236,20 @@ console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real brow
     if (!tiles.length) { fault('no option tiles on the page'); await p.close(); continue; }
 
     const trail = [];
+    /* the door this page opens with: what a reset's yes must land on */
+    const home = await p.evaluate(() => document.getElementById('code').textContent);
     for (let s = 0; s < STEPS; s++) {
       const t = tiles[Math.floor(r() * tiles.length)];
-      trail.push(`${t.group}=${t.id}`);
+      const resetNow = rr() < RESET_RATE;
+      trail.push(resetNow ? 'reset' : `${t.group}=${t.id}`);
       /* el.click(), not page.click(): a blocked tile carries aria-disabled and
          Playwright refuses those, but a person can still press Enter on one —
          they are deliberately buttons and not `disabled` buttons — and what it
          does then is exactly what this is here to fuzz. */
-      const hit = await p.$(`.field[data-group="${t.group}"] [data-id="${t.id}"]`);
+      const hit = resetNow ? await p.$('#reset-btn')
+        : await p.$(`.field[data-group="${t.group}"] [data-id="${t.id}"]`);
       if (!hit) continue;                       // a group can re-render its list
+      if (resetNow) resets++;
       const before = await p.evaluate(() => document.getElementById('code').textContent);
       await hit.evaluate(el => el.click());
       await p.waitForTimeout(12);
@@ -263,6 +277,15 @@ console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real brow
       }, answer);
       if (asked) dialogs++;
       if (asked === 'yes') saidYes++;
+      if (resetNow && asked) {
+        resetAsked++;
+        if (asked === 'yes') {
+          resetYes++;
+          await p.waitForTimeout(12);
+          const now = await p.evaluate(() => document.getElementById('code').textContent);
+          if (now !== home) fault('a reset answered yes did not land on the default door', `walk ${wk}: ${before} → ${now}, the page opened on ${home}`);
+        } else resetNo++;
+      }
       if (asked === 'no' || asked === 'ok') {
         saidNo++;
         await p.waitForTimeout(12);
@@ -363,6 +386,8 @@ console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real brow
   console.log(`  ${clicks} clicks, ${dialogs} of them met the confirm dialog — ${saidYes} answered yes, `
     + `${saidNo} no (the door unchanged after every no)`);
   if (!saidYes || !saidNo) fault('the confirm dialog was answered one way only', `yes ${saidYes}, no ${saidNo} — one half was never exercised`);
+  console.log(`  ${resets} of them the reset — ${resetAsked} asked (the rest on the default door, greyed), ${resetYes} yes and back to the default door, ${resetNo} no`);
+  if (!resetYes || !resetNo) fault('the reset was answered one way only', `pressed ${resets}, asked ${resetAsked}, yes ${resetYes}, no ${resetNo}`);
 }
 
 console.log(faults

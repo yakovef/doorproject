@@ -5572,13 +5572,22 @@ for (const v of VIEWS) {
    placed by the wall's WIDTH alone: the pills on the trust band's words at
    1100–1280 (Russian) and 1100–1152 (Hebrew), up to 1,646 px², and at 320 the
    stacked redo on the arrow beside the door, up to 943 px².
-   ⚠ ONE NAMED READING, asserted STILL NEEDED: at 320×568 beside the two widest
-   doors, with undo AND redo showing, the wall is 93 px — an arrow and one pill
-   wide — and the stage 239 px tall, so the stacked redo reaches the arrow by
-   66 (halfextra1) and 115 px² (halfextra2) in both languages. Since 29.9
-   only `halfextra2`'s: see ARROW_KNOWN. No shape clears
-   it without standing on the door. Named with its number (+10), never
-   widened; the day it clears, this fails and the name comes out. */
+   ⚠ AND SINCE 2.10 THREE (the owner's son: *"A reset button that looks just
+   like 2 curved arrows that create a circle"*; on a phone *"three icon discs,
+   no words"*). RESTATED, same subjects, each with three: on load all three
+   painted, undo and redo disabled, the RESET disabled exactly while the door
+   is the default (the link here carries only the size, so on `standard`);
+   after two changes the reset enabled with the undo; after an undo all three
+   enabled; the order reset (the corner), undo, redo; below 1100 the discs
+   only — `icon`, or `iconrow` where the stack touches something — never a
+   labelled shape. The reset's own walk is the next block.
+   ⚠ NAMED READINGS, asserted STILL NEEDED: at 320×568 beside the two widest
+   doors the wall is 93 px — an arrow and one pill wide — and the stage 239 px
+   tall, so the stacked redo reached the arrow by 66 (halfextra1) and 115 px²
+   (halfextra2) in both languages; since 29.9 only `halfextra2`'s; since 2.10
+   (three discs, 144 px, and the arrows 44 → 52 px on a phone the same day)
+   six: see ARROW_KNOWN. No shape clears them without standing on the door. Named with their numbers (+10), never widened; the
+   day one clears, this fails and the name comes out. */
 {
   console.log('\nundo stands at the stage\'s foot, labelled, and off the door');
   const before = faults;
@@ -5596,7 +5605,29 @@ for (const v of VIEWS) {
      clears it. Raised to the measured reading by the chat that grew the
      arrow, as the rule for two chats on one wall asks — the +10 still holds
      it, and the day it clears this fails. */
-  const ARROW_KNOWN = { '320x568 halfextra2': 311 };
+  /* ⚠ RESTATED 2.10, same subject (pills on the arrow beside the door, at a
+     named viewport and door, never grown, asserted still needed): THREE discs
+     stacked are 144 px (the reset, prompt D), so the column's top reaches the
+     arrow beside the narrower walls, and the reading is the SUM over the
+     pills, not the redo's alone — the middle disc reaches it too. Measured
+     first over the 44 px arrows: 390×844 `half` 12, 320×568 `halfextra1` 76,
+     `halfextra2` 342. RE-MEASURED over the 52 px arrows (`145b2d3`, the other
+     chat's, rebased over the same day), on a step after an undo, the larger
+     of he / ru: 390×844 `half` 100 (the redo's corner) and `halfextra1` 15;
+     320×568 `extra2` 92 (undo 39 + redo 53), `half` 322 (ru; he 276),
+     `halfextra1` 414 and `halfextra2` 736 (undo 311 + redo 425). WHY NO SHAPE
+     CLEARS THEM, measured (`tools/_wall3.mjs`): the pills' column is 44 px at
+     8 px in from the stage's edge, and the arrow stands 8 px off the casing
+     and is 52 wide, so wherever the wall right of the door is under ~112 px
+     (320: `extra2` 110, `half` 106, `halfextra1` 103, `halfextra2` 96) the
+     arrow reaches into the column's width; below the arrow the stage holds
+     ONE row of discs (73–84 px at 320), and that row holds two only where
+     the wall is 102 px or more (8 + 44 + 6 + 44) — the third disc has nowhere
+     to stand off the door and the arrow. At 390 the stack's top (299) meets the arrow's foot
+     (309 beside `half`). What would close them is a product question — the
+     arrows on a phone, or a disc, somewhere other than beside the door. */
+  const ARROW_KNOWN = { '390x844 half': 100, '390x844 halfextra1': 15, '320x568 extra2': 92,
+    '320x568 half': 322, '320x568 halfextra1': 414, '320x568 halfextra2': 736 };
   const arrowSeen = new Set();
   for (const v of VIEWS) for (const lang of ['he', 'ru']) for (const size of Object.keys(SIZES)) {
     const tag = `${lang} ${v.w}x${v.h} ${size}`;
@@ -5657,8 +5688,14 @@ for (const v of VIEWS) {
         .map(x => ({ id: x.id, off: x.disabled, bg: getComputedStyle(x).backgroundColor })));
       const said = l => l.map(x => `${x.id}${x.off ? ' (disabled)' : ''}`).join(', ') || 'nothing';
       const fresh = await shownAt();
-      if (fresh.map(x => x.id).join() !== 'undo-btn,redo-btn' || !fresh.every(x => x.off)) {
-        fault('undo-pill', `${tag}: on load the wall shows [${said(fresh)}] — both pills, both disabled (greyed), from the first paint`);
+      /* ⚠ RESTATED 2.10, same subject (what is painted on load, and greyed):
+         three now, and the reset's state is the door's — the link carries
+         only the size, so the door is the default exactly on `standard` */
+      const resetOff = size === 'standard';
+      if (fresh.map(x => x.id).join() !== 'reset-btn,undo-btn,redo-btn'
+        || !fresh.filter(x => x.id !== 'reset-btn').every(x => x.off)
+        || fresh.find(x => x.id === 'reset-btn')?.off !== resetOff) {
+        fault('undo-pill', `${tag}: on load the wall shows [${said(fresh)}] — all three painted from the first paint, undo and redo disabled (greyed), the reset ${resetOff ? 'disabled: this is the default door' : 'enabled: this link is not the default door'}`);
       }
       const atLoad = await measure();
       /* ⚠ A TOAST BEFORE THE FIRST CHANGE STACKS ABOVE THEM TOO (29.9): the
@@ -5684,8 +5721,8 @@ for (const v of VIEWS) {
       }
       const once = await shownAt();
       const beforeUndo = await measure();
-      if (once.map(x => `${x.id}${x.off ? '-' : '+'}`).join() !== 'undo-btn+,redo-btn-') {
-        fault('undo-pill', `${tag}: after two changes the wall shows [${said(once)}] — the undo enabled, the redo painted and disabled`);
+      if (once.map(x => `${x.id}${x.off ? '-' : '+'}`).join() !== 'reset-btn+,undo-btn+,redo-btn-') {
+        fault('undo-pill', `${tag}: after two changes the wall shows [${said(once)}] — the reset and the undo enabled, the redo painted and disabled`);
       }
       /* greyed, not bronze: a disabled pill's ground is not the enabled one's */
       const live = once.find(x => x.id === 'undo-btn' && !x.off), grey = fresh.find(x => x.off);
@@ -5693,8 +5730,8 @@ for (const v of VIEWS) {
       await pg.evaluate(() => document.querySelector('#undo-btn')?.click());
       await pg.waitForTimeout(450);
       const after = await shownAt();
-      if (after.map(x => `${x.id}${x.off ? '-' : '+'}`).join() !== 'undo-btn+,redo-btn+') {
-        fault('undo-pill', `${tag}: after an undo the wall shows [${said(after)}] — both enabled`);
+      if (after.map(x => `${x.id}${x.off ? '-' : '+'}`).join() !== 'reset-btn+,undo-btn+,redo-btn+') {
+        fault('undo-pill', `${tag}: after an undo the wall shows [${said(after)}] — all three enabled`);
       }
       const m = await measure();
       /* the same geometry clauses, at load and after the undo; the shape the
@@ -5705,17 +5742,25 @@ for (const v of VIEWS) {
         for (const x of r.pills) if (x.w < 44 || x.h < 44) fault('undo-pill', `${wtag}: ${x.id} is ${Math.round(x.w)}x${Math.round(x.h)} — the floor is 44`);
         if (Math.abs(r.dr) > 1.5 || Math.abs(r.db) > 1.5) fault('undo-pill', `${wtag}: the group stands ${r.dr} px off 8 px in from the stage's right and ${r.db} px off 8 px above ${r.lifted ? "the trust band's words" : "the stage's foot"}`);
         if (r.onDoor) fault('undo-pill', `${wtag}: the undo pills stand on the door — ${r.onDoor} px² of #frame (shape "${r.mode}")`);
+        const k = `${v.w}x${v.h} ${size}`;
+        const onArrow = r.hits.filter(h => / on stage__arrow /.test(h));
+        if (ARROW_KNOWN[k] !== undefined && onArrow.length) {
+          arrowSeen.add(`${lang} ${k}`);
+          const px = onArrow.reduce((n, h) => n + +h.split(' ').pop(), 0);
+          if (px > ARROW_KNOWN[k] + 10) fault('undo-pill', `${wtag}: the named pills-on-arrow reading grew to ${px} px² (named at ${ARROW_KNOWN[k]}: ${onArrow.join(', ')})`);
+        }
         for (const h of r.hits) {
-          const k = `${v.w}x${v.h} ${size}`, px = +h.split(' ').pop();
-          if (h.startsWith('redo-btn on stage__arrow') && ARROW_KNOWN[k] !== undefined) {
-            arrowSeen.add(`${lang} ${k}`);
-            if (px > ARROW_KNOWN[k] + 10) fault('undo-pill', `${wtag}: the named redo-on-arrow reading grew to ${px} px² (named at ${ARROW_KNOWN[k]})`);
-            continue;
-          }
+          if (ARROW_KNOWN[k] !== undefined && / on stage__arrow /.test(h)) continue;
           fault('undo-pill', `${wtag}: ${h} px²`);
         }
-        const order = v.w < 1100 ? ['stack', 'icon', 'iconrow'] : ['row', 'stack', 'iconrow', 'icon'];
-        if (!order.includes(r.mode)) fault('undo-pill', `${wtag}: the shape is "${r.mode}" — below 1100 the pair is stacked (stack, icon; iconrow only where neither fits)`);
+        /* ⚠ RESTATED 2.10, same subject (the shape, and on a phone a stacked
+           one first): below 1100 the discs only, no words — stacked, side by
+           side only where the stack touches something */
+        /* and in Hebrew above 1100 the glyphs' row before the labelled stack
+           (2.10): the column shares that corner (app.js `placeUndo`) */
+        const order = v.w < 1100 ? ['icon', 'iconrow']
+          : lang === 'he' ? ['row', 'iconrow', 'stack', 'icon'] : ['row', 'stack', 'iconrow', 'icon'];
+        if (!order.includes(r.mode)) fault('undo-pill', `${wtag}: the shape is "${r.mode}" — below 1100 the three are discs with no words (icon; iconrow only where the stack touches something)`);
         for (const k of order.slice(0, order.indexOf(r.mode))) {
           if (!r.touches[k]) fault('undo-pill', `${wtag}: the shape is "${r.mode}" but "${k}" touches nothing — the first shape that fits is "${k}"`);
         }
@@ -5732,7 +5777,7 @@ for (const v of VIEWS) {
       read++;
       modes[m.mode] = (modes[m.mode] || 0) + 1;
       const ids = m.pills.map(x => x.id).join();
-      if (ids !== 'undo-btn,redo-btn') fault('undo-pill', `${tag}: after an undo the pills shown are [${ids}] — both, undo first`);
+      if (ids !== 'reset-btn,undo-btn,redo-btn') fault('undo-pill', `${tag}: after an undo the pills shown are [${ids}] — all three, the reset first (outermost)`);
       if (m.lifted) lifted++;
       if (m.toastOn === null) fault('undo-pill', `${tag}: the undo raised no toast — the stacking clause has no subject`);
       else if (m.toastOn) fault('undo-pill', `${tag}: the undo's own toast covers ${m.toastOn} px² of the pills — it stacks above them`);
@@ -5748,9 +5793,126 @@ for (const v of VIEWS) {
   const want = VIEWS.length * 2 * Object.keys(SIZES).length;
   if (read < want) fault('undo-pill', `read ${read} of ${want} doors — this check is measuring less than it says`);
   for (const lang of ['he', 'ru']) for (const k of Object.keys(ARROW_KNOWN)) {
-    if (!arrowSeen.has(`${lang} ${k}`)) fault('undo-pill', `${lang} ${k}: the named redo-on-arrow reading is gone — the pills clear the arrow there now; take it out of ARROW_KNOWN and CLAUDE.md §9`);
+    if (!arrowSeen.has(`${lang} ${k}`)) fault('undo-pill', `${lang} ${k}: the named pills-on-arrow reading is gone — the pills clear the arrow there now; take it out of ARROW_KNOWN and CLAUDE.md §9`);
   }
-  if (faults === before) console.log(`    ${read} readings (${VIEWS.length} viewports x he/ru x ${Object.keys(SIZES).length} sizes): both painted and greyed from load, a save's toast above them before any change, the undo live after two changes and the redo still greyed, both live after an undo; one shape across the undo; at the corner (above the trust band's words on ${lifted}), ≥ 44, on no door and on nothing else on the wall, the toast above them; shapes row ${modes.row}, stack ${modes.stack}, iconrow ${modes.iconrow}, icon ${modes.icon}, each the first that touches nothing`);
+  if (faults === before) console.log(`    ${read} readings (${VIEWS.length} viewports x he/ru x ${Object.keys(SIZES).length} sizes): the three painted from load, undo and redo greyed and the reset greyed exactly on the default door, a save's toast above them before any change, the reset and the undo live after two changes and the redo still greyed, all three live after an undo, the reset outermost; discs only below 1100; one shape across the undo; at the corner (above the trust band's words on ${lifted}), ≥ 44, on no door and on nothing else on the wall, the toast above them; shapes row ${modes.row}, stack ${modes.stack}, iconrow ${modes.iconrow}, icon ${modes.icon}, each the first that touches nothing`);
+}
+
+/* ── THE RESET: IT ASKS, AND YES IS ONE UNDOABLE STEP BACK TO THE START ─────
+   2.10.2026, the owner's son: *"A reset button that looks just like 2 curved
+   arrows that create a circle."* What it does is ours (CLAUDE.md §0a). At
+   every `VIEWS` viewport, Hebrew and Russian, from a BARE load (the default
+   door, step 01, no query):
+     · greyed on load — there is nothing to reset;
+     · after a colour and a window, live;
+     · a tap asks (`#confirm`, two buttons, yes red `--danger`, no ink); NO and
+       ESCAPE each leave the door exactly as it was — the code, the drawing's
+       markup and the address byte for byte;
+     · YES: the door is the default again (the code and the drawing those of
+       the bare load), the figure the bare load's (₪3,195), step 01 live, the
+       address with no query, the navigator's checks gone, the undo live and
+       the redo greyed (one entry on the stack), the reset greyed again, and a
+       toast that says so — above the pills, never on them;
+     · then UNDO: the door before the reset back, and the reset live.
+   A walk that never reached the dialog, or a yes that changed nothing, fails
+   by name (§5.27: the transition asserted before what follows it). */
+{
+  console.log('\nthe reset asks, and yes is one undoable step back to the door the page opens with');
+  const before = faults;
+  let walked = 0;
+  const URL0 = `file://${process.cwd()}/index.html`;
+  for (const v of VIEWS) for (const lang of ['he', 'ru']) {
+    const tag = `${lang} ${v.w}x${v.h}`;
+    const pg = await b.newPage({ viewport: { width: v.w, height: v.h } });
+    const errs = []; pg.on('pageerror', e => errs.push(String(e)));
+    try {
+      await pg.goto(`${URL0}?lang=${lang}`);
+      await pg.waitForTimeout(500);
+      const door = () => pg.evaluate(() => {
+        const r = document.querySelector('#reset-btn'), u = document.querySelector('#undo-btn'), d = document.querySelector('#redo-btn');
+        return { code: document.querySelector('#code')?.textContent || '', svg: document.querySelector('#stage svg')?.outerHTML || '',
+          url: location.search, price: document.querySelector('#price')?.textContent?.trim() || '',
+          live: document.querySelector('.sect.is-live')?.dataset.section, first: document.querySelector('.steps__step')?.dataset.step,
+          checks: document.querySelectorAll('.steps__step.is-visited').length,
+          reset: r ? r.disabled : null, undo: u ? u.disabled : null, redo: d ? d.disabled : null,
+          dlg: !!document.querySelector('#confirm')?.open };
+      });
+      const fresh = await door();
+      if (fresh.reset !== true) fault('reset', `${tag}: on a bare load the reset is ${fresh.reset === null ? 'missing' : 'live'} — there is nothing to reset on the default door`);
+      if (!/3,195/.test(fresh.price)) fault('reset', `${tag}: the bare load's figure reads "${fresh.price}" — the clause below compares against it, and it should be ₪3,195`);
+      /* two changes, by gestures, so the rail carries checks */
+      await pg.evaluate(() => document.querySelector('.steps__step[data-step="colour"]')?.click());
+      await pg.waitForTimeout(250);
+      await pg.evaluate(() => [...document.querySelectorAll('.sect.is-live [role="radio"]')][4]?.click());
+      await pg.waitForTimeout(250);
+      await pg.evaluate(() => document.querySelector('.steps__step[data-step="glass"]')?.click());
+      await pg.waitForTimeout(250);
+      await pg.evaluate(() => document.querySelector('.sect.is-live [role="radio"][data-id="rect"]')?.click());
+      await pg.waitForTimeout(500);
+      const changed = await door();
+      if (changed.code === fresh.code) { fault('reset', `${tag}: the two taps did not change the door — the reset has nothing to undo and every clause below would pass with no subject`); continue; }
+      if (changed.reset !== false) fault('reset', `${tag}: after a colour and a window the reset is still greyed`);
+      if (!changed.checks) fault('reset', `${tag}: no step carries a check after the walk — the "checks gone" clause has no subject`);
+      /* no, and Escape: nothing moves */
+      for (const how of ['no', 'escape']) {
+        await pg.evaluate(() => document.querySelector('#reset-btn')?.click());
+        await pg.waitForTimeout(200);
+        const asked = await pg.evaluate(() => {
+          const d = document.querySelector('#confirm'), y = document.querySelector('#confirm-yes'), n = document.querySelector('#confirm-no');
+          const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+          const probe = c => { const e = document.createElement('i'); e.style.color = c; document.body.append(e); const out = getComputedStyle(e).color; e.remove(); return out; };
+          return d && d.open ? { text: document.querySelector('#confirm-p')?.textContent || '', two: !y.hidden && !n.hidden,
+            yesBg: getComputedStyle(y).backgroundColor, noBg: getComputedStyle(n).backgroundColor,
+            danger: probe(css('--danger')), ink: probe(css('--ink')) } : null;
+        });
+        if (!asked) { fault('reset', `${tag}: tapping the reset (${how}) opened no dialog — it takes every choice away and must ask`); continue; }
+        if (!asked.two || asked.text.length < 12) fault('reset', `${tag}: the reset's dialog is not a yes/no question ("${asked.text}")`);
+        if (asked.yesBg !== asked.danger || asked.noBg !== asked.ink) fault('reset', `${tag}: yes is ${asked.yesBg} and no ${asked.noBg} — red (--danger) and ink`);
+        if (how === 'no') await pg.evaluate(() => document.querySelector('#confirm-no')?.click());
+        else await pg.keyboard.press('Escape');
+        await pg.waitForTimeout(450);
+        const kept = await door();
+        if (kept.dlg) fault('reset', `${tag}: after ${how} the dialog is still open`);
+        if (kept.code !== changed.code || kept.svg !== changed.svg || kept.url !== changed.url) fault('reset', `${tag}: answering ${how} changed the door (code ${changed.code} → ${kept.code}${kept.url !== changed.url ? ', the address' : ''}${kept.svg !== changed.svg ? ', the drawing' : ''})`);
+      }
+      /* yes */
+      await pg.evaluate(() => document.querySelector('#reset-btn')?.click());
+      await pg.waitForTimeout(200);
+      await pg.evaluate(() => document.querySelector('#confirm-yes')?.click());
+      await pg.waitForTimeout(700);
+      const back = await door();
+      const toast = await pg.evaluate(() => {
+        const t = document.querySelector('#toast'); if (!t || t.hidden) return null;
+        const a = t.getBoundingClientRect();
+        const on = [...document.querySelectorAll('.stage__undo .undo-pill')].reduce((n, x) => { const r = x.getBoundingClientRect();
+          const w = Math.min(a.right, r.right) - Math.max(a.left, r.left), h = Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top);
+          return n + (w > 0 && h > 0 ? Math.round(w * h) : 0); }, 0);
+        return { text: t.textContent, on };
+      });
+      if (back.code !== fresh.code || back.svg !== fresh.svg) fault('reset', `${tag}: after yes the door is not the default (code ${back.code}, the bare load's ${fresh.code}${back.svg !== fresh.svg ? '; the drawing differs' : ''})`);
+      if (back.price !== fresh.price) fault('reset', `${tag}: after yes the figure reads "${back.price}" — the default door's is "${fresh.price}"`);
+      if (back.live !== back.first) fault('reset', `${tag}: after yes the live step is "${back.live}" — a fresh start is step 01 ("${back.first}")`);
+      if (back.url !== '') fault('reset', `${tag}: after yes the address carries "${back.url}" — a fresh start has no query (a reload would open the summary)`);
+      if (back.checks) fault('reset', `${tag}: after yes ${back.checks} navigator marks still carry a check — a fresh start has walked nothing`);
+      if (back.undo !== false || back.redo !== true) fault('reset', `${tag}: after yes the undo is ${back.undo ? 'greyed' : 'live'} and the redo ${back.redo ? 'greyed' : 'live'} — the reset is one entry on the stack (undo live, redo greyed)`);
+      if (back.reset !== true) fault('reset', `${tag}: after yes the reset is still live — the door is the default again`);
+      if (!toast) fault('reset', `${tag}: yes raised no toast — the reset says what it did`);
+      else if (toast.on) fault('reset', `${tag}: the reset's toast covers ${toast.on} px² of the pills — it stacks above them`);
+      /* undo brings the whole door back */
+      await pg.evaluate(() => document.querySelector('#undo-btn')?.click());
+      await pg.waitForTimeout(600);
+      const undone = await door();
+      if (undone.code !== changed.code) fault('reset', `${tag}: the undo after a reset brought back ${undone.code}, not the door before it (${changed.code})`);
+      if (undone.reset !== false) fault('reset', `${tag}: after undoing the reset, the reset is greyed — the door is not the default`);
+      if (errs.length) fault('reset', `${tag}: ${errs.join(' | ').slice(0, 140)}`);
+      walked++;
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('reset', `${tag}: chromium died during the reset's walk`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (walked < VIEWS.length * 2) fault('reset', `walked ${walked} of ${VIEWS.length * 2} — this check is measuring less than it says`);
+  if (faults === before) console.log(`    ${walked} walks (${VIEWS.length} viewports x he/ru): greyed on the default door and live after a change; a yes/no in red and ink, no and Escape leaving the door byte for byte; yes back to the default door and ₪3,195, step 01, no query, no checks, the undo live and the redo greyed, the reset greyed, a toast above the pills; the undo bringing the door back`);
 }
 
 /* ── THE SAVE ASKS, AND BOTH ITS DIALOGS CLOSE THE WAY A DIALOG DOES ───────
@@ -5833,7 +5995,7 @@ for (const v of VIEWS) {
    browser without that, so the page meets an empty store:
      · a bare load opens it as a MODAL, within two seconds, on step 1;
      · on each of its four steps the target — the door's frame, the navigator,
-       the options, the save and BOTH undo pills (each painted, 29.9) — is
+       the options, the save and EACH pill (painted, 29.9; three since 2.10) — is
        WHOLE inside a cut-out; the callout is inside the viewport and covers no cut-out; each
        arrow starts on the callout's edge and ends on a cut-out's edge; and the
        target is not clickable through the scrim (`elementFromPoint` at its
@@ -5898,7 +6060,8 @@ for (const v of VIEWS) {
       /* ⚠ RESTATED 29.9, same subject: the save and EACH pill, not the
          pills' group — whose 44 px placeholder box was inside the cut-out
          while nothing in it was painted, which is what he saw */
-      : [document.querySelector('#save-hud'), document.querySelector('#undo-btn'), document.querySelector('#redo-btn')];
+      /* …and since 2.10 the reset, the group's third pill */
+      : [document.querySelector('#save-hud'), document.querySelector('#reset-btn'), document.querySelector('#undo-btn'), document.querySelector('#redo-btn')];
     const holes = [...d.querySelectorAll('.tour__hole')].map(h => ({ left: +h.getAttribute('x'), top: +h.getAttribute('y'),
       right: +h.getAttribute('x') + +h.getAttribute('width'), bottom: +h.getAttribute('y') + +h.getAttribute('height') }));
     const card = R(d.querySelector('.tour__card'));
@@ -7770,8 +7933,21 @@ for (const v of VIEWS) {
      undo before 29.9 (1280×720 standard −20 on `02a9543`), where no clause
      looked — only painted from load. At 1280×720 the room below the door's
      middle down to the pills is 214 px and the column's shortest half 235. */
-  const LIFTED = { '1100x800 half': 27, '1100x800 halfextra1': 9, '1152x800 standard': 4, '1152x800 half': 4,
-    '1152x800 halfextra1': 11, '1280x720 standard': 21, '1280x720 half': 21, '1280x720 extra1': 5, '1280x720 halfextra1': 5 };
+  /* ⚠ RE-MEASURED 2.10.2026 with the reset, the group's third pill — same
+     subject (the column centred or pushed down, but for named Hebrew lifts,
+     each +2 and asserted still needed). Every Hebrew door at the five widths,
+     before (`9e780ad`) → after: the stack of THREE (144 px) took 100 px of the
+     column's room where the labelled row met the door — up to 121 px over the
+     door's middle and at 1280×720 beside the doubles on the language picker —
+     so in Hebrew the glyphs' row now comes before the stack (`placeUndo`). On
+     that: 1100 `half` 27 → 0 and `halfextra1` 9 → 0, 1152 `halfextra1` 11 → 0
+     (the glyphs' row where the two-pill stack stood); 1280×720 `standard` 21 →
+     46, `extra1` 5 → 30, `extra2` 0 → 15 (the labelled row of three reaches the
+     trust band's words and stands 8 px over them, as the two-pill row did not);
+     1100 `halfextra2` 0 → 41 (beside the widest double only the labelled stack
+     clears the door). The rest unchanged. */
+  const LIFTED = { '1100x800 halfextra2': 41, '1152x800 standard': 4, '1152x800 half': 4,
+    '1280x720 standard': 46, '1280x720 extra1': 30, '1280x720 extra2': 15, '1280x720 half': 21, '1280x720 halfextra1': 5 };
   const liftSeen = new Set();
   let wallRead = 0;
   for (const [w, h] of [[1100, 800], [1152, 800], [1280, 720], [1440, 900], [1920, 918]]) for (const lang of ['he', 'en']) for (const size of Object.keys(SIZES)) {

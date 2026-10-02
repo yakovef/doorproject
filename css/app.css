@@ -1263,8 +1263,11 @@ svg { direction: ltr; }
    above undo), `iconrow` or `icon` (the glyph alone, the word in
    `aria-label`/`title`), the first that touches neither the door, an arrow
    nor the price — standing above the trust band's words where they reach the
-   corner. The undo
-   is always the one in the corner. Absolute, for `.stage__hud`'s reason. */
+   corner. Since 2.10 the RESET is the group's third pill and its outermost:
+   first in the markup, so the row and the stack both start at the corner with
+   it and undo and redo keep their old order beside it (it was "the undo is
+   always the one in the corner"). Below 1100 the three are discs, no words
+   (the owner's son, 2.10). Absolute, for `.stage__hud`'s reason. */
 .stage__undo {
   position: absolute; z-index: 4;
   inset-block-end: var(--undo-b, 8px);

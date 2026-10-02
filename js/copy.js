@@ -270,7 +270,7 @@ export const UI = {
      Named here rather than deleted in silence, because a key that comes back
      under an old name is a string nobody can find the history of. */
   'undo':             ['ביטול השינוי האחרון', 'Undo the last change', 'Отменить последнее изменение'],
-  'undo.group':       ['ביטול וחזרה', 'Undo and redo', 'Отменить и вернуть'],
+  'undo.group':       ['ביטול, חזרה ואיפוס', 'Undo, redo and reset', 'Отменить, вернуть и сбросить'],
   'redo':             ['החזרת השינוי', 'Redo the change', 'Вернуть изменение'],
   'redo.done':        ['החזרנו את השינוי', 'Change restored', 'Изменение возвращено'],
   'undo.done':        ['הצעד האחרון בוטל', 'Last step undone', 'Последний шаг отменён'],
@@ -279,6 +279,18 @@ export const UI = {
      `aria-label` and `title`. */
   'undo.short':       ['ביטול', 'Undo', 'Отменить'],
   'redo.short':       ['חזרה', 'Redo', 'Вернуть'],
+  /* ⚠ THE RESET, 2.10.2026 — the owner's son: *"A reset button that looks just
+     like 2 curved arrows that create a circle."* The third pill: its word, its
+     longer name (`aria-label`/`title`, and on a phone — where the three are
+     discs with no words, his answer — the only name it has), the question it
+     asks first (it takes every choice away: his 27.9 rule), and what it says
+     after. No option and no price is named, so nothing goes stale. */
+  'reset.short':      ['איפוס', 'Reset', 'Сброс'],
+  'reset':            ['איפוס הדלת', 'Reset the door', 'Сбросить дверь'],
+  'dlg.reset':        ['לאפס את הדלת? זה יסיר את כל הבחירות', 'Reset the door? This removes every choice',
+                       'Сбросить дверь? Это удалит все выборы'],
+  'reset.done':       ['הדלת חזרה למצב ההתחלתי', 'The door is back to where it started',
+                       'Дверь вернулась к исходному виду'],
   /* ⚠ WHAT AN UNDO SAYS WHEN IT TOOK SOMETHING OFF THE DOOR. `specRows` omits
      a row whose option is "none", so a field the step removed has no row to
      print a value from — and `stripes.none` (gone 29.9) was not reusable, its
@@ -807,7 +819,8 @@ export const UI = {
 
   /* ── the first-visit tour, 28.9.2026 (js/tour.js) ─────────────────
      The Hebrew is the owner's son's own four sentences, word for word as the
-     order gave them; English and Russian are ours. */
+     order gave them; English and Russian are ours. (The fourth gained "להתחיל
+     מחדש" on 2.10, ours, when the reset joined its pills.) */
   'tour.label':       ['היכרות קצרה עם הדף', 'A quick tour', 'Краткое знакомство'],
   'tour.door':        ['זו הדלת שתעצבו — כל בחירה תופיע כאן. (הדלת האמיתית עשויה להיראות מעט אחרת: זה איור.)',
                        'This is the door you are designing — every choice appears here. (The real door may look a little different: this is an illustration.)',
@@ -818,9 +831,10 @@ export const UI = {
   'tour.options':     ['בכל שלב בוחרים כאן מה שאוהבים — או לוחצים על החצים שליד הדלת כדי לעבור מהר.',
                        'At each step, choose what you like here — or tap the arrows beside the door to flip through quickly.',
                        'На каждом шаге выбирайте здесь то, что нравится, — или нажимайте стрелки у двери, чтобы листать быстрее.'],
-  'tour.undo':        ['הכפתורים האלה עוזרים לחזור אחורה או לשמור.',
-                       'These buttons help you go back or save.',
-                       'Эти кнопки помогают вернуться назад или сохранить.'],
+  /* 2.10: and start again — the reset joined the pills under this cut-out */
+  'tour.undo':        ['הכפתורים האלה עוזרים לחזור אחורה, להתחיל מחדש או לשמור.',
+                       'These buttons help you go back, start again or save.',
+                       'Эти кнопки помогают вернуться назад, начать заново или сохранить.'],
   'tour.count':       ['{0} מתוך {1}', '{0} of {1}', '{0} из {1}'],
   'tour.next':        ['הבא', 'Next', 'Далее'],
   'tour.done':        ['סיום', 'Done', 'Готово'],

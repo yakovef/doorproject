@@ -230,6 +230,13 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   gallery pill also go under the answers; the phone band 1.2 / 1.0 rem (1.08
   for Russian and English titles); the save 44 px on a phone; a 120 ms press
   on tiles, swatches and pills.
+  **Taken for them in prompt D (2.10)**, each reversible in a line:
+  · the reset in the undo group, OUTERMOST (the corner; undo and redo keep
+    their order beside it), a labelled bronze pill "איפוס" above 1100 and a
+    disc below; greyed while the door is the default; it ASKS first (his 27.9
+    rule — it takes everything away); yes is ONE undoable step, back to step
+    01 with the checks and the give-back memory emptied and a bare address,
+    and says so in a toast; the tour's fourth sentence names it.
   Settled with them in chat, not ours: where the new "ask before removing"
   rule meets Peretz's refusal — a pull handle or bow with no room beside the
   window or the face — **Peretz's rule stands**, refused with its reason and
@@ -237,7 +244,8 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   the same way as an option with its price to follow, was withdrawn 28.9.)
   And on 29.9: the saved doors keep **a small × on the picture** to delete,
   and the option's name over the door is set in **the title's own face**
-  (Bona Nova).
+  (Bona Nova). On 2.10: on a phone undo, redo and reset are **three icon
+  discs, no words** (the words stay for screen readers).
 
 ---
 
@@ -247,6 +255,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **2.10** A RESET (*"…2 curved arrows that create a circle"*): the undo
+  group's third pill, outermost, greyed on the default door; it asks, and yes
+  is one undoable step back to the default door, step 01, no checks, a bare
+  address, a toast. On a phone three discs, no words (their answer); beside the
+  52 px arrows the 144 px stack meets them at six named readings, and in Hebrew
+  the glyphs' row precedes the labelled stack for the column (§9). Long form: `HISTORY.md`.
 - **2.10** The send bigger and more present (C, 3 of 3) — *"Make the WhatsApp
   button bigger"*: on the desktop wall a green 48 px pill, 1 rem at 700, flush
   with the price, wrapping before it shrinks (one three-line reading named);
@@ -275,12 +289,6 @@ lines here. Dates are the day of the change.
   A's five) a complete audit reads **no faults** — the drawer's flake and the
   `halfextra1` reading B's pre-rebase run met are gone there — `npm test`
   0 failed, latency 346 ms. Green rows merged with B's. Long form: `HISTORY.md`.
-- **29.9** The stripes are two tiles on the face step; one cycle of six (B, 3
-  of 3) — *"2 panel, 3 panel, greek set, then horizontal stripes, then vertical
-  stripes, then nothing … square buttons like every other option"*: screen-only
-  `stripes-h`/`-v` (`STRIPE_TILE`, never in the link or code), `stripeTileGlyph`;
-  the pills gone, the count under the tiles while on; greyed by the window only;
-  a swap in the group asks nothing (`ownedBy`). Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 30.9.2026
@@ -383,11 +391,21 @@ tour's fourth cut-out opens over it and never moves on a tap. `placeUndo` picks 
 hold — side by side, stacked, or the glyph alone (a phone beside a wide door)
 — and the column (Hebrew, same corner) and the toast stand above them.
 ⚠ **Since 29.9 they and the save are BRONZE** (`--accent-ink`, white, a paper
-halo — *"more noticeable … a different color … on both phone and pc"*), and
-**below 1100 the stacked shapes come first** (`stack`, then the glyphs
-stacked — *"on the phone … vertical"*; the glyphs side by side only where
-neither clears the door and the arrow, 320 beside `half`); the audit asserts both. The pills'
+halo — *"more noticeable … a different color … on both phone and pc"*). The pills'
 placement is the other session's, merged at the owner's son's choice.
+⚠ **Since 2.10 a RESET is the third** (*"A reset button that looks just like 2
+curved arrows that create a circle"*; `#reset-btn`, `HUD_ICON.reset` — two
+arcs of one circle, each with its head): outermost, so it holds the corner and
+undo and redo stand beside it in their old order; greyed while the door is the
+default (`isUntouched`); a tap ASKS (`#confirm`, *"לאפס את הדלת? זה יסיר את כל
+הבחירות"*), and yes is ONE entry on the undo stack (`set`) back to the default
+door, step 01, the checks and the give-back memory emptied, a bare address and
+a toast. **Below 1100 the three are discs with no words** (their answer, 2.10;
+the words stay in `aria-label`/`title`): stacked (`icon`, 144 px), side by side
+only where the stack touches something — the labelled `stack` of 29.9's *"on
+the phone … vertical"* is gone with the words; above 1100 the labelled row of
+three first, and in Hebrew the glyphs' row before the labelled stack (the
+column shares that corner, §9). The audit asserts all of it.
 
 - **`.quote` — the price and a quiet send — moves with the viewport:** on a
   desktop ON THE PHOTOGRAPH, LEFT of the door, high (28.9, the owner's son:
@@ -1603,7 +1621,7 @@ against nothing and landed on "slightly better".
 | `npm run audit` | the real page, driven — see below |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against 600 ms. It requires the design code to change on every tap, or a throwing handler would pass. ⚠ **Its milliseconds are a reading of the CONTAINER as much as of the page** (identical code: 183 ms on one, 262 on another, ~90 ms of spread across runs on the same one), so a jump is not a regression until the old commit has been run beside the new one — `git worktree add /tmp/lat <old>`, symlink `node_modules`, and interleave. The **element counts** it prints beside each figure are the part that belongs to the drawing |
 | `npm run collide` | real `getBBox()` over the buildable designs, no declared number in the loop; asserts the SIZES it sweeps exist. `-- boxes` measures every fitting's footprint and keeps `handleFootprint` and `SPECIAL_BOX` honest |
-| `npm run fuzz` | random combinations of every `DEFAULTS` field (it faults on one it does not draw — the bow was missed for a run, 26.9), then click-walks in a browser |
+| `npm run fuzz` | random combinations of every `DEFAULTS` field (it faults on one it does not draw — the bow was missed for a run, 26.9), then click-walks in a browser — option tiles, the confirm dialog answered both ways, and since 2.10 the reset (its own seeded coin, so the tile walk is unchanged; a yes must land on the door the page opened with) |
 | `npm run profile` | the leaf's VERTICAL fall against the medians `FALLOFF` was fitted to |
 | `npm run mottle` | slow horizontal unevenness of the PAINT; strips `[data-room="lamp-wash"]` first |
 | `npm run glass` | what is inside the pane, band by band, against the corpus — a description, not a target (§3). Ours on 27.9: tone 0.75 0.65 0.56 0.53 0.52, spread 0.16 0.14 0.15 0.11 0.08, deterministic |
@@ -1633,7 +1651,7 @@ are not in `VIEWS`:
   and a link on the summary; the whole question sequence off the navigator;
   the navigator a dark column on the door-facing edge above 1100 (a dark row
   below), centred on the door or pushed down at every size and desktop width
-  but nine named Hebrew lifts (29.9, §9), the live mark whole on both axes, and its checks on exactly the
+  but eight named Hebrew lifts (29.9; re-read 2.10 with three pills, §9), the live mark whole on both axes, and its checks on exactly the
   steps walked — none on arrival or after a reload, the address unmoved.
 - **the arrows' look** (2.10) — 60 / 56 / 52 px by width, 12 / 8 / 8 px off the
   casing, on the door's middle, no ring, a shadow, a 26 / 23 px chevron at 3,
@@ -1670,10 +1688,16 @@ are not in `VIEWS`:
   with no dialog, the square window skipping the stripes and the slot saying
   nothing else fits (29.9), a stripe tile on a panelled door landing without a
   question and on a glazed one asking; the undo pills painted from load and greyed while
-  disabled (29.9), at the stage's corner, ≥ 44, on no door and nothing else on
-  the wall, the first shape that fits and the same one across an undo, the
-  toast above them — a save's before any change included (every viewport,
-  he/ru, six sizes); the save's dialog modal, saving only when asked, counting, opening
+  disabled (29.9) — three since 2.10, the reset outermost and greyed exactly on
+  the default door, discs only below 1100 — at the stage's corner, ≥ 44, on no
+  door and nothing else on the wall but the named arrow readings (§9), the
+  first shape that fits and the same one across an undo, the toast above them
+  — a save's before any change included (every viewport, he/ru, six sizes);
+  the reset (2.10): greyed on a bare load, live after a change, a yes/no in
+  red and ink, no and Escape leaving the code, drawing and address byte for
+  byte, yes back to the default door and ₪3,195 on step 01 with no query and
+  no checks, one entry on the stack (undo live, redo greyed), its toast above
+  the pills, and an undo bringing the door back (every viewport, he/ru); the save's dialog modal, saving only when asked, counting, opening
   the list as a modal, closing on Escape and the backdrop, focus back on the
   save; the saved doors each its picture and price, told apart by their
   pictures' pixels or their prices, a white and a dark door each in its own
@@ -1693,7 +1717,7 @@ are not in `VIEWS`:
 - **the tour** — a modal on a first bare load; the scrim `.8` and the wall
   through it under 10 % of bare (5.6–6.7 % read; the old .6 reads 15–18), the callout's words ≥ 4.5:1 (29.9); on each
   of four steps the target whole in its cut-out and not pressable through the
-  scrim (the fourth: the save and each undo pill, painted — 29.9), the
+  scrim (the fourth: the save and each pill, painted — 29.9; three, 2.10), the
   language picker whole in its own cut-out and pressable, a language pressed
   on step 2 re-showing that step in it, the picker home after within 1 px; the
   save on every step where it stands with no tour in that language, within
@@ -2007,21 +2031,27 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   `extra1`, `half` and `halfextra1` everywhere and every door ≥ 1152 px with
   NO named reading since 28.9 (the widest double at 1152×800 read 17/18 px² on
   commit 1b and 0 once the crop moved).
-- **At 320×568 beside the two widest doors the undo pills cannot clear the
-  arrow** (28.9). With undo AND redo showing, the wall right of the door is
-  93 px — one arrow and one pill wide — and the stage 239 px tall; no shape
-  (side by side, stacked, the glyphs alone) clears both the door and the arrow,
-  so the stacked redo touches the arrow by 66 px² (`halfextra1`) and 115
-  (`halfextra2`), he and ru. A named reading in the audit, asserted still
-  needed — since 29.9 `halfextra2`'s only: the band's line box made every door
-  at 320 0.7 px smaller and on a step the glyphs side by side clear
-  `halfextra1`'s casing by 0.09 px (a knife edge; on the summary, 0.18 px on it,
-  so there the stacked glyphs stand beside the arrow's hidden, kept box).
-  ⚠ **311 px² since 2.10** (he; ru 295): the arrows went 44 → 52 px on a phone
-  (*"bigger and more noticeable"*), so the 93 px wall holds even less beside
-  them; `ARROW_KNOWN` raised to the measured reading by the chat that grew the
-  arrow. What would close it is a product question: the arrows on a phone,
-  or the redo, somewhere other than beside the door.
+- **Beside the narrowest walls on a phone the undo pills cannot clear the
+  arrow** (28.9; six readings since 2.10). The wall right of the door at
+  320×568 beside the two widest doors is 93 px — one arrow and one pill wide —
+  and the stage 239 px tall; no shape clears both the door and the arrow. With
+  two pills the stacked redo touched the arrow by 66 px² (`halfextra1`) and
+  115 (`halfextra2`), and since 29.9 only `halfextra2`'s (the band's line box
+  made every door at 320 0.7 px smaller; on a step the glyphs side by side
+  cleared `halfextra1`'s casing by 0.09 px). ⚠ **The reset made it three discs
+  stacked, 144 px** (2.10), **and the arrows went 44 → 52 px on a phone the
+  same day** (*"bigger and more noticeable"*, the other session's — with two
+  pills the redo's reading at `halfextra2` went 115 → 311). Together, measured
+  on a step after an undo, the larger of he / ru, the SUM over the pills:
+  **390×844 `half` 100 px²** and **`halfextra1` 15**; **320×568 `extra2` 92,
+  `half` 322, `halfextra1` 414, `halfextra2` 736**. Why no shape clears them:
+  the column is 44 px at 8 px from the stage's edge and the arrow 52 px at
+  8 px off the casing, so under 112 px of wall right of the door (320: 96–110
+  beside the four wider doors) the arrow reaches into the column's width, and
+  below the arrow the stage holds ONE row of discs, two across only where the
+  wall is 102 px or more. Named readings in the audit (`ARROW_KNOWN`, +10),
+  asserted still needed. What would close them is a product question: the
+  arrows on a phone, or a disc, somewhere other than beside the door.
 - **In Hebrew the navigator column shares the bottom-right corner with the undo
   pills, and where the stage is short it cannot be centred on the door** (29.9).
   Both pills stand there from load now (greyed), and the column stops 8 px
@@ -2031,8 +2061,19 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   in the audit with the other eight (1100: `half` 27, `halfextra1` 9; 1152:
   standard and `half` 4, `halfextra1` 11; 1280: `extra1`, `halfextra1` 5),
   asserted still needed. Not new: the same lift came after an undo before 29.9,
-  where no clause looked. What would close it is a product question — the
-  pills or the column somewhere other than one corner in Hebrew.
+  where no clause looked. ⚠ **The reset made the pills three (2.10)**: stacked
+  they are 144 px, and where the labelled row met the door the stack lifted
+  the column up to 121 px over the door's middle and, at 1280×720 beside the
+  doubles, onto the language picker (1,904 px²). So in Hebrew above 1100 the
+  glyphs' row comes before the labelled stack (`placeUndo`), and the lifts were
+  re-read, every Hebrew door at five widths: 1100 `half` and `halfextra1`, 1152
+  `halfextra1` now centred; 1280×720 standard **46** (was 21), `extra1` 30 (5),
+  `extra2` 15 (0) — the labelled row of three reaches the trust band's words
+  and stands over them — and 1100 `halfextra2` 41 (only the labelled stack
+  clears the widest double there); 1152 standard and `half` 4, 1280 `half` 21,
+  `halfextra1` 5 unchanged. Eight named. What would close it is a product
+  question — the pills or the column somewhere other than one corner in
+  Hebrew, or the pills unlabelled there.
 - **The bigger band cost the door about 2 % above 1100** (29.9, their
   *"bigger"*, the sizes ours). The crop gives the tallest doors exactly the
   band's wall, so the standard leaf went 437.0 → 426.6 / 564.0 → 551.4 /

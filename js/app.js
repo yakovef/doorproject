@@ -52,7 +52,7 @@ import { canSharePicture, copyMessage, drawingCaveat, fallbackWhatsappUrl,
          gripAddendum, PHONE_DISPLAY, PHONE_TEL, priceCaveat,
          priceIncludes, sendDoor, whatsappUrl } from './share.js';
 import { counted, L, LANGS, lang, pickLang, setLang, T, withLang } from './copy.js';
-import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
+import { DEFAULTS, encodeCode, fromQuery, isUntouched, toQuery } from './url-state.js';
 import { WORKS } from './works.js';
 import { refreshTour, startTour } from './tour.js';
 
@@ -651,6 +651,12 @@ function init() {
   $('#copy-btn').addEventListener('click', onCopy);
   $('#undo-btn').addEventListener('click', undo);
   $('#redo-btn').addEventListener('click', redo);
+  /* the reset (2.10): its glyph from js/icons.js, before its word, as the save's */
+  const resetBtn = $('#reset-btn');
+  if (resetBtn) {
+    resetBtn.insertAdjacentHTML('afterbegin', hudIcon('reset'));
+    resetBtn.addEventListener('click', resetDoor);
+  }
   $('#save-btn').addEventListener('click', saveCurrent);
   /* The wall's save (27.9.2026) ASKS since 28.9 (*"a window with two options,
      save or view a saved door"*): it opens `#savedlg`, whose first choice is
@@ -3166,13 +3172,47 @@ function redo() {
     rewrite the address would leave the link describing the door the customer
     just cancelled. */
 let urlTimer = null;
-function scheduleUrl() {
+/* `bare` (2.10, the reset): the address with no query at all — what a first
+   visit has — rather than the default door spelled out, which a reload would
+   read as a shared link and open on the summary. Same timer, so it replaces a
+   write `set` scheduled a moment earlier. */
+function scheduleUrl(bare = false) {
   clearTimeout(urlTimer);
   urlTimer = setTimeout(() => {
     try {
-      history.replaceState(null, '', toQuery(state));
+      history.replaceState(null, '', bare ? window.location.pathname : toQuery(state));
     } catch { /* history is a nicety, never a dependency */ }
   }, 300);
+}
+
+/**
+ * ⚠ THE RESET — 2.10.2026, the owner's son: *"A reset button that looks just
+ * like 2 curved arrows that create a circle."* What it does is ours (CLAUDE.md
+ * §0a), each reversible in a line:
+ *   · it ASKS FIRST, through the confirm dialog — it takes every choice away,
+ *     which is his 27.9 rule's case at its largest (red yes, ink no; no,
+ *     Escape and the backdrop change nothing);
+ *   · yes goes through `set`, so it is ONE entry on the undo stack and the
+ *     undo brings the whole door back — the price, the code, the drawing and
+ *     the address follow the way they do for any change;
+ *   · a fresh start: back to step 01, the navigator's checks emptied
+ *     (`visited`) and the give-back memory forgotten (`displaced` — an entry
+ *     made before the reset would otherwise hand a panel back to a door
+ *     somebody has just started again), the address bare;
+ *   · and it says so in a toast.
+ * Greyed while the door is the default (`paint`), so the guard here only
+ * covers a stray call.
+ */
+function resetDoor() {
+  if (isUntouched(state)) return;
+  askConfirm(T('dlg.reset'), () => {
+    set({ ...DEFAULTS });
+    visited.clear();
+    displaced.clear();
+    goStep(SECTIONS[0].key);
+    scheduleUrl(true);
+    toast(T('reset.done'));
+  });
 }
 
 /**
@@ -3503,9 +3543,15 @@ function paint() {
      that at 23,021 pixels. */
   $('#undo-btn').disabled = !canUndo();
   $('#redo-btn').disabled = !canRedo();
-  /* ⚠ SINCE 28.9 A DISABLED PILL IS NOT SHOWN AT ALL (the stylesheet), so the
-     two can appear and go on any paint — and where they stand depends on how
-     many are showing. */
+  /* ⚠ THE RESET'S RULE IS THE DOOR, NOT THE STACK (2.10): there is nothing to
+     reset while the door is the one the page opens with — whatever the
+     history holds (an undo can walk back to it) — and a LINK carrying any
+     other door can be reset from its first paint. `isUntouched` is derived
+     from `DEFAULTS`, the definition of that door. */
+  const rb = $('#reset-btn');
+  if (rb) rb.disabled = isUntouched(state);
+  /* All three are painted from load (greyed while disabled, 29.9); where they
+     stand depends on what else is on the wall, so place them on every paint. */
   placeUndo();
 }
 
@@ -3844,13 +3890,15 @@ function armRoom() {
 /**
  * ⚠ UNDO YOU CAN SEE, AT THE STAGE'S FOOT — 28.9.2026. The owner's son: *"The
  * undo option rethought: not noticeable on pc and in the way on the phone —
- * more noticeable, but not colliding with the door."* Two labelled ink pills
- * (a disabled one is not shown), 8 px inside the stage's bottom-right corner —
- * the picker's side, physically, in every language. The floor band under the
- * threshold is 13–47 px and a pill is 44, so a pill always reaches up beside
- * the door's foot. Four shapes, the first that touches nothing:
- *   row      the two labelled, side by side;
- *   stack    the two labelled, redo above undo;
+ * more noticeable, but not colliding with the door."* Labelled bronze pills —
+ * three since 2.10 (the reset, outermost, then undo and redo), all painted
+ * from load and greyed while disabled (29.9) — 8 px inside the stage's
+ * bottom-right corner, the picker's side, physically, in every language. The
+ * floor band under the threshold is 13–47 px and a pill is 44, so a pill
+ * always reaches up beside the door's foot. Four shapes, the first that
+ * touches nothing:
+ *   row      labelled, side by side;
+ *   stack    labelled, stacked from the corner up;
  *   iconrow  the glyphs alone, side by side (the word stays in `aria-label`
  *            and `title`);
  *   icon     the glyphs alone, stacked.
@@ -3921,8 +3969,23 @@ function placeUndo() {
      where neither stacked shape clears the door and the arrow (320 beside
      the `half` door: both stacked shapes touched the arrow, 21 px²), the
      labelled row never. */
-  const SHAPES = matchMedia('(max-width: 1099px)').matches
-    ? ['stack', 'icon', 'iconrow'] : ['row', 'stack', 'iconrow', 'icon'];
+  /* ⚠ AND ON A PHONE ONLY DISCS SINCE 2.10.2026 — the owner's son's answer
+     when the reset made it three: *"three icon discs, no words"* (the words
+     stay in `aria-label` and `title`). So below 1100 the labelled `stack` is
+     gone: the discs stacked (`icon`, 3 × 44 + 2 × 6 = 144 px), or side by side
+     (`iconrow`) where the stack touches the door or an arrow. */
+  /* ⚠ AND IN HEBREW ABOVE 1100 THE GLYPHS' ROW BEFORE THE LABELLED STACK
+     (2.10.2026), because there the navigator column shares this corner and
+     stands above the group. Three labelled pills stacked are 144 px; where the
+     labelled row meets the door the stack took 100 px of the column's room —
+     measured the day the reset came: the column up to 121 px above the door's
+     middle, and at 1280×720 beside the doubles ON the language picker (1,904
+     px²). One row of glyphs keeps the corner one pill tall (the words stay in
+     `aria-label` and `title`); English and Russian keep the labelled stack,
+     their column standing on the other wall. */
+  const SHAPES = matchMedia('(max-width: 1099px)').matches ? ['icon', 'iconrow']
+    : document.documentElement.dir === 'rtl' ? ['row', 'iconrow', 'stack', 'icon']
+    : ['row', 'stack', 'iconrow', 'icon'];
   if (!SHAPES.some(place)) place('icon');
   const now = box.getBoundingClientRect();
   if (now.top !== was.top || now.left !== was.left || now.height !== was.height) placeSteps();

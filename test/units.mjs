@@ -2519,6 +2519,34 @@ group('the משקוף section draws the frame\'s own lengths, and prints no numb
    file's own rule, "one idea, one mark, wherever it appears". Shared by
    copy-paste is shared until somebody edits one of them, so the identity is
    asserted rather than commented. */
+group('the reset goes through set, and its glyph is a cycle — 2.10.2026');
+{
+  /* ⚠ READ OUT OF THE SOURCE TEXT, because js/app.js touches the DOM at load
+     and no test can import it (BREAKDOWN_KEY's check reads it the same way).
+     What it guards is the one property the page's undo depends on: the reset
+     is ONE entry on the undo stack because it goes through `set`, the one
+     undoable path. A reset that assigned `state` directly would drop the door
+     with no way back. The audit drives the same thing on the page (the undo
+     after a reset brings the door back); this catches it without a browser. */
+  const src = readFileSync(new URL('../js/app.js', import.meta.url), 'utf8');
+  const body = (src.match(/function resetDoor\(\) \{([\s\S]*?)\n\}/) || [])[1];
+  ok(body, 'resetDoor could not be found in js/app.js — this check is dead');
+  if (body) {
+    ok(/askConfirm\(T\('dlg\.reset'\)/.test(body), 'the reset does not ask first (askConfirm with dlg.reset) — it takes every choice away');
+    ok(/\bset\(\{ \.\.\.DEFAULTS \}\)/.test(body), 'the reset does not go through set({ ...DEFAULTS }) — it would not be one entry on the undo stack');
+    ok(!/\bstate\s*=/.test(body), 'the reset assigns state directly — the undo stack never hears of it');
+    ok(/visited\.clear\(\)/.test(body) && /displaced\.clear\(\)/.test(body), 'the reset leaves the checks or the give-back memory behind — a fresh start forgets both');
+  }
+  const { HUD_ICON } = await import('../js/icons.js');
+  const r = HUD_ICON.reset || '';
+  /* two arcs of one circle and two heads: the "2 curved arrows that create a
+     circle", not a single hooked arrow like undo and redo */
+  const arcs = (r.match(/A7\.2 7\.2 0 0 1/g) || []).length;
+  ok(arcs === 2, `HUD_ICON.reset draws ${arcs} arcs — two curved arrows make the circle`);
+  ok((r.match(/<path/g) || []).length === 4, 'HUD_ICON.reset is not two arcs and two heads');
+  ok(r !== HUD_ICON.save, 'the reset and the save share a glyph');
+}
+
 group('the page\'s own marks');
 {
   /* ⚠ COUNTED AS SHAPES AND STROKES, NOT AS DISTINCT COORDINATES, and the
@@ -6384,6 +6412,24 @@ async function checkLanguages() {
       + `${floor}+ — a stub is not an explainer`));
     }
   }
+
+  /* ── the reset's words, 2.10.2026 ─────────────────────────────
+     The owner's son: *"A reset button that looks just like 2 curved arrows
+     that create a circle."* On a phone the three pills are discs with no
+     words (his answer), so `reset` — the `aria-label` and `title` — is the
+     only name the disc has there; the dialog's question and the toast say
+     what it does. Every key in all three languages above a floor: a word on
+     the pill (3), a name (8), a question and a report (16). The tour's fourth
+     sentence names starting again in all three. */
+  for (const [key, floor] of [['reset.short', 3], ['reset', 8], ['dlg.reset', 16], ['reset.done', 16]]) {
+    const row = UI[key];
+    ok(row, `UI has no '${key}' — the reset's ${key === 'reset' ? 'name' : 'words'} are missing`);
+    if (!row) continue;
+    IDS.forEach((id, i) => ok((row[i] || '').trim().length >= floor,
+      `UI['${key}'] in ${id} is ${(row[i] || '').trim().length} characters, want ${floor}+`));
+  }
+  ok(/להתחיל מחדש/.test(UI['tour.undo'][0]) && /start again/.test(UI['tour.undo'][1]) && /начать заново/.test(UI['tour.undo'][2]),
+     "tour.undo does not name starting again in all three — the fourth cut-out holds the reset now");
 
   /* ── which language a stranger arrives in ─────────────────────
      ⚠ ENGLISH IS NEVER CHOSEN FOR ANYBODY, and that is the decision this

@@ -13,7 +13,7 @@
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=309bc256">
+<link rel="stylesheet" href="css/app.css?v=7491af38">
 
 <!-- ⚠ THE PHOTOGRAPHED ROOM, IN TWO CROPS, AND ONLY ONE IS EVER FETCHED.
      The owner supplied the same entrance framed 3:4 and 16:9 and both ship:
@@ -469,8 +469,21 @@
          even that is too narrow — the word then in `aria-label` and `title`,
          as before. Absolute, for `.stage__hud`'s reason (nothing in the flow
          here), and never a child of `.stage`, whose markup `paint` rewrites. -->
-    <div class="stage__undo" role="group" aria-label="ביטול וחזרה"
+    <!-- ⚠ AND THE RESET, 2.10.2026 — the owner's son: "A reset button that
+         looks just like 2 curved arrows that create a circle." The group's
+         third member and its OUTERMOST, so first here: the row runs from the
+         corner (right-to-left in Hebrew, reversed in the others) and the
+         stack from the foot (`column-reverse`), so the reset holds the corner
+         and undo and redo stand beside it in their old order. Its glyph is
+         `HUD_ICON.reset` (js/icons.js), written in by app.js like the save's —
+         one source. Greyed (`disabled`) while the door is the one the page
+         opens with; a tap asks first (`#confirm`), and yes is ONE undoable
+         step back to the default door, step 01 and a bare address. -->
+    <div class="stage__undo" role="group" aria-label="ביטול, חזרה ואיפוס"
          data-ta="aria-label=undo.group">
+      <button type="button" class="undo-pill undo-pill--reset" id="reset-btn" disabled
+              aria-label="איפוס הדלת" title="איפוס הדלת"
+              data-ta="aria-label=reset,title=reset"><span class="undo-pill__w" data-t="reset.short">איפוס</span></button>
       <button type="button" class="undo-pill" id="undo-btn" disabled
               aria-label="ביטול השינוי האחרון" title="ביטול השינוי האחרון"
               data-ta="aria-label=undo,title=undo">
@@ -856,7 +869,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=5893b9d5"></script>
+<script src="assets/bundle.js?v=4f91f779"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

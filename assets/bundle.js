@@ -109,7 +109,7 @@
        Named here rather than deleted in silence, because a key that comes back
        under an old name is a string nobody can find the history of. */
     "undo": ["ביטול השינוי האחרון", "Undo the last change", "Отменить последнее изменение"],
-    "undo.group": ["ביטול וחזרה", "Undo and redo", "Отменить и вернуть"],
+    "undo.group": ["ביטול, חזרה ואיפוס", "Undo, redo and reset", "Отменить, вернуть и сбросить"],
     "redo": ["החזרת השינוי", "Redo the change", "Вернуть изменение"],
     "redo.done": ["החזרנו את השינוי", "Change restored", "Изменение возвращено"],
     "undo.done": ["הצעד האחרון בוטל", "Last step undone", "Последний шаг отменён"],
@@ -118,6 +118,24 @@
        `aria-label` and `title`. */
     "undo.short": ["ביטול", "Undo", "Отменить"],
     "redo.short": ["חזרה", "Redo", "Вернуть"],
+    /* ⚠ THE RESET, 2.10.2026 — the owner's son: *"A reset button that looks just
+       like 2 curved arrows that create a circle."* The third pill: its word, its
+       longer name (`aria-label`/`title`, and on a phone — where the three are
+       discs with no words, his answer — the only name it has), the question it
+       asks first (it takes every choice away: his 27.9 rule), and what it says
+       after. No option and no price is named, so nothing goes stale. */
+    "reset.short": ["איפוס", "Reset", "Сброс"],
+    "reset": ["איפוס הדלת", "Reset the door", "Сбросить дверь"],
+    "dlg.reset": [
+      "לאפס את הדלת? זה יסיר את כל הבחירות",
+      "Reset the door? This removes every choice",
+      "Сбросить дверь? Это удалит все выборы"
+    ],
+    "reset.done": [
+      "הדלת חזרה למצב ההתחלתי",
+      "The door is back to where it started",
+      "Дверь вернулась к исходному виду"
+    ],
     /* ⚠ WHAT AN UNDO SAYS WHEN IT TOOK SOMETHING OFF THE DOOR. `specRows` omits
        a row whose option is "none", so a field the step removed has no row to
        print a value from — and `stripes.none` (gone 29.9) was not reusable, its
@@ -729,7 +747,8 @@
     "dlg.ok": ["הבנתי", "OK", "Понятно"],
     /* ── the first-visit tour, 28.9.2026 (js/tour.js) ─────────────────
        The Hebrew is the owner's son's own four sentences, word for word as the
-       order gave them; English and Russian are ours. */
+       order gave them; English and Russian are ours. (The fourth gained "להתחיל
+       מחדש" on 2.10, ours, when the reset joined its pills.) */
     "tour.label": ["היכרות קצרה עם הדף", "A quick tour", "Краткое знакомство"],
     "tour.door": [
       "זו הדלת שתעצבו — כל בחירה תופיע כאן. (הדלת האמיתית עשויה להיראות מעט אחרת: זה איור.)",
@@ -746,10 +765,11 @@
       "At each step, choose what you like here — or tap the arrows beside the door to flip through quickly.",
       "На каждом шаге выбирайте здесь то, что нравится, — или нажимайте стрелки у двери, чтобы листать быстрее."
     ],
+    /* 2.10: and start again — the reset joined the pills under this cut-out */
     "tour.undo": [
-      "הכפתורים האלה עוזרים לחזור אחורה או לשמור.",
-      "These buttons help you go back or save.",
-      "Эти кнопки помогают вернуться назад или сохранить."
+      "הכפתורים האלה עוזרים לחזור אחורה, להתחיל מחדש או לשמור.",
+      "These buttons help you go back, start again or save.",
+      "Эти кнопки помогают вернуться назад, начать заново или сохранить."
     ],
     "tour.count": ["{0} מתוך {1}", "{0} of {1}", "{0} из {1}"],
     "tour.next": ["הבא", "Next", "Далее"],
@@ -9721,7 +9741,8 @@ ${plate.defs}${plate.body}
   };
   var specIcon = (key) => Object.prototype.hasOwnProperty.call(SPEC_ICON, key) ? `<svg class="spec__ico" viewBox="0 0 24 24" aria-hidden="true">${SPEC_ICON[key]}</svg>` : '<span class="spec__ico" aria-hidden="true"></span>';
   var HUD_ICON = {
-    save: '<path d="M4.4 4.4h12.2l3 3v12.2H4.4Z"/><path d="M7.6 4.4v5.2h7.8V4.4"/><path d="M12.8 5.8v2.4"/><path d="M7.6 19.6v-5.4h8.8v5.4"/>'
+    save: '<path d="M4.4 4.4h12.2l3 3v12.2H4.4Z"/><path d="M7.6 4.4v5.2h7.8V4.4"/><path d="M12.8 5.8v2.4"/><path d="M7.6 19.6v-5.4h8.8v5.4"/>',
+    reset: '<path d="M5.23 9.54A7.2 7.2 0 0 1 18.24 8.4"/><path d="M19.12 5.12 18.24 8.4l-3.28-.88"/><path d="M18.77 14.46A7.2 7.2 0 0 1 5.76 15.6"/><path d="M4.88 18.88 5.76 15.6l3.28.88"/>'
   };
   var hudIcon = (key) => {
     if (!Object.prototype.hasOwnProperty.call(HUD_ICON, key)) {
@@ -9793,6 +9814,7 @@ ${plate.defs}${plate.body}
     size: "standard",
     handing: "right-in"
   };
+  var isUntouched = (state2) => Object.keys(DEFAULTS).every((k) => state2[k] === DEFAULTS[k]);
   function toQuery(state2) {
     const p = new URLSearchParams();
     p.set("v", String(VERSION));
@@ -10996,6 +11018,11 @@ ${plate.defs}${plate.body}
     $("#copy-btn").addEventListener("click", onCopy);
     $("#undo-btn").addEventListener("click", undo);
     $("#redo-btn").addEventListener("click", redo);
+    const resetBtn = $("#reset-btn");
+    if (resetBtn) {
+      resetBtn.insertAdjacentHTML("afterbegin", hudIcon("reset"));
+      resetBtn.addEventListener("click", resetDoor);
+    }
     $("#save-btn").addEventListener("click", saveCurrent);
     const saveHud = $("#save-hud");
     if (saveHud) {
@@ -12064,14 +12091,25 @@ ${plate.defs}${plate.body}
     toast(said);
   }
   var urlTimer = null;
-  function scheduleUrl() {
+  function scheduleUrl(bare = false) {
     clearTimeout(urlTimer);
     urlTimer = setTimeout(() => {
       try {
-        history.replaceState(null, "", toQuery(state));
+        history.replaceState(null, "", bare ? window.location.pathname : toQuery(state));
       } catch {
       }
     }, 300);
+  }
+  function resetDoor() {
+    if (isUntouched(state)) return;
+    askConfirm(T("dlg.reset"), () => {
+      set({ ...DEFAULTS });
+      visited.clear();
+      displaced.clear();
+      goStep(SECTIONS[0].key);
+      scheduleUrl(true);
+      toast(T("reset.done"));
+    });
   }
   function stampChange(before, after) {
     const stage = $("#stage");
@@ -12192,6 +12230,8 @@ ${plate.defs}${plate.body}
     announce(describe(state));
     $("#undo-btn").disabled = !canUndo();
     $("#redo-btn").disabled = !canRedo();
+    const rb = $("#reset-btn");
+    if (rb) rb.disabled = isUntouched(state);
     placeUndo();
   }
   function markGroup(g, blocked) {
@@ -12378,7 +12418,7 @@ ${plate.defs}${plate.body}
       }
       return !obstacles.some((o) => hits(g, o));
     };
-    const SHAPES = matchMedia("(max-width: 1099px)").matches ? ["stack", "icon", "iconrow"] : ["row", "stack", "iconrow", "icon"];
+    const SHAPES = matchMedia("(max-width: 1099px)").matches ? ["icon", "iconrow"] : document.documentElement.dir === "rtl" ? ["row", "iconrow", "stack", "icon"] : ["row", "stack", "iconrow", "icon"];
     if (!SHAPES.some(place)) place("icon");
     const now = box.getBoundingClientRect();
     if (now.top !== was.top || now.left !== was.left || now.height !== was.height) placeSteps();
