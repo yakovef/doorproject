@@ -11306,6 +11306,8 @@ ${plate.defs}${plate.body}
     const tel = document.getElementById("send-tel");
     if (wa && tel && tel.previousElementSibling !== wa) wa.after(tel);
     if (send && wrap.contains(send)) $(".layout").appendChild(send);
+    const caveat = document.getElementById("draw-caveat");
+    if (caveat && wrap.contains(caveat)) $(".stage__bar")?.appendChild(caveat);
     document.querySelectorAll(".stage-wrap > .steps").forEach((n) => n.remove());
     wrap.replaceChildren();
     const opener = document.createElement("button");
@@ -11688,7 +11690,31 @@ ${plate.defs}${plate.body}
     else panel.insertBefore(nav, panel.querySelector(".sect") || null);
     if (had) had.focus({ preventScroll: true });
   }
+  function placePanelOrder() {
+    const narrow = typeof window.matchMedia === "function" && window.matchMedia("(max-width: 1099px)").matches;
+    const caveat = $("#draw-caveat"), bar = $(".stage__bar");
+    const works = $("#works-btn"), panel = $("#choices");
+    for (const sec of SECTIONS) {
+      const box = document.querySelector(`.sect[data-section="${sec.key}"]`);
+      const lede = box && box.querySelector(".sect__lede");
+      if (!lede) continue;
+      const body = box.querySelector(".sect__body");
+      if (narrow) body.insertBefore(lede, body.querySelector(":scope > .sect__exp"));
+      else box.querySelector(".sect__title").after(lede);
+    }
+    if (works && panel) {
+      const fit = document.querySelector(`.sect[data-section="${SECTIONS[0].key}"] .sect__body`);
+      if (narrow && fit) fit.insertBefore(works, fit.querySelector(":scope > .sect__lede, :scope > .sect__exp"));
+      else if (!narrow && works.parentElement !== panel) panel.prepend(works);
+    }
+    if (caveat && bar) {
+      const live = document.querySelector(".sect.is-live .sect__body");
+      if (narrow && live) live.insertBefore(caveat, live.querySelector(":scope > .sect__exp"));
+      else if (caveat.parentElement !== bar) bar.appendChild(caveat);
+    }
+  }
   function placeSend() {
+    placePanelOrder();
     const wa = $("#wa-btn");
     const card2 = document.querySelector(".panel--send .send");
     if (!wa || !card2) return;

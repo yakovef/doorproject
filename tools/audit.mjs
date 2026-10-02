@@ -4823,11 +4823,21 @@ for (const v of VIEWS) {
   console.log('\na step shows an answer, not just a question');
   const AN_URL = `file://${process.cwd()}/index.html`;
   /* must show an answer on every step but the named arrival */
+  /* ⚠ RESTATED 2.10.2026, STRONGER: every row here now holds on ARRIVAL too.
+     On a phone the step's answers come before its explanation, the note and
+     the gallery pill (`placePanelOrder`), and 320x568's step 01 — `arrival:
+     false` since 13.9, its first size tile wholly behind the quote bar — shows
+     its first row 16 px short of whole, an answer on screen. The flag is gone
+     with the exemption it carried; 360x780 and both landscape shapes joined
+     the list (below). */
   const MUST = [
     { name: '390x844', w: 390, h: 844, arrival: true },
+    { name: '360x780', w: 360, h: 780, arrival: true },
     { name: '834x1112', w: 834, h: 1112, arrival: true },
     { name: '1280x720', w: 1280, h: 720, arrival: true },
-    { name: '320x568', w: 320, h: 568, arrival: false },
+    { name: '320x568', w: 320, h: 568, arrival: true },
+    { name: '844x390 a phone on its side', w: 844, h: 390, arrival: true },
+    { name: '640x360 a 1280 laptop at 200% zoom', w: 640, h: 360, arrival: true },
   ];
   /* measured to show an answer on only the steps named here, and required to
      still be exactly that. ⚠ RESTATED 27.9.2026 FROM "NONE": the band above
@@ -4853,8 +4863,12 @@ for (const v of VIEWS) {
     /* ⚠ AND IN THE FLOW'S ORDER, glass BEFORE face since 29.9 — the clause
        compares the list as read off the page, in sequence; the six are the
        same six. */
-    { name: '844x390 a phone on its side', w: 844, h: 390, shows: ['pz', 'xlock', 'glass', 'face', 'grip', 'mk'] },
-    { name: '640x360 a 1280 laptop at 200% zoom', w: 640, h: 360, shows: ['glass', 'grip'] },
+    /* ⚠ AND EMPTY SINCE 2.10.2026, because both came true: with the lede, the
+       note and the gallery pill under the answers on a phone, a phone on its
+       side and a laptop at 200 % show an answer on all nine steps (they were 6
+       and 2 of nine). Measured, then moved into MUST above — the exemption
+       asked to shrink and it shrank to nothing; the clause below now fails on
+       any shape added here that shows every step. */
   ];
 
   /* How much of a tile the customer can actually see: its box, clipped to the
@@ -4888,9 +4902,19 @@ for (const v of VIEWS) {
     };
     const tiles = [...live.querySelectorAll('[role="radio"]')].filter(t => t.getBoundingClientRect().height >= 1);
     const shown = tiles.map(visible);
+    /* the first row — every tile level with the first — and how much of the
+       worst of them is hidden; the question, when it is painted (it is
+       visually hidden under 500 px tall, where the band carries it) */
+    const t0 = tiles[0] ? tiles[0].getBoundingClientRect().top : 0;
+    const row = tiles.map((t, i) => [t, shown[i]]).filter(([t]) => Math.abs(t.getBoundingClientRect().top - t0) < 3);
+    const rowShort = Math.round(Math.max(0, ...row.map(([t, v]) => t.getBoundingClientRect().height - v)));
+    const h2 = live.querySelector('.sect__title');
+    const hr = h2 ? h2.getBoundingClientRect() : null;
+    const qShort = !hr || hr.height < 2 ? 0 : Math.round(hr.height - visible(h2));
     return {
       step: live.dataset.section, tiles: tiles.length,
       any: shown.filter(v => v > 4).length, best: Math.round(Math.max(0, ...shown, 0)),
+      row: row.length, rowShort, qShort,
     };
   };
 
@@ -4957,11 +4981,146 @@ for (const v of VIEWS) {
         + 'CLAUDE.md §9; if it shows fewer, something took the answer back off the screen');
     }
   }
+  /* ⚠ AND ON A PHONE, THE QUESTION AND THE WHOLE FIRST ROW — 2.10.2026, the
+     owner's son: *"The app adapted to the phone in good form — looking really
+     good on the phone and intuitive."* "Any part of one tile" (above) is what
+     a step must never fall below; this is what a phone must look like: on
+     every step, on arrival at it, after it has finished arriving, the step's
+     question and every tile of its first row whole between the sticky door and
+     the quote bar, with no scroll — at the two commonest phone shapes, in
+     Hebrew and Russian. Measured before the change (390x844 he): step 01's
+     first row 64 px under the bar (ru 122; 360x780 ru 159, no tile at all).
+     ⚠ 320x568 CANNOT, BY A NAMED NUMBER OF PIXELS: 239 px of door, the rail
+     and the bar leave 200 px, and step 01's size tiles (with their band
+     lines) and the lock steps' tall lever tiles end 14–16 px under the bar.
+     Named per step, held to their reading + 4, asserted STILL NEEDED; every
+     other step at 320 must be whole too. Falsified by putting the lede back
+     above the tiles (`placePanelOrder` returning early): 390 he fails on fit,
+     64 px. */
+  const FIRST = [[390, 844], [360, 780], [320, 568]];
+  const ROW_KNOWN = { '320x568 he': { fit: 16, lock: 14, xlock: 14 }, '320x568 ru': { fit: 16, lock: 14 } };
+  let firstRead = 0;
+  for (const [w, h] of FIRST) for (const lang of ['he', 'ru']) {
+    const tag = `${w}x${h} ${lang}`, known = ROW_KNOWN[tag] || {};
+    const seenShort = new Set();
+    const p = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await p.goto(`${AN_URL}?lang=${lang}`, { waitUntil: 'load' });
+      await p.waitForTimeout(700);
+      const err = await walk(p, m => {
+        firstRead++;
+        if (!m.row) { fault('first-row', `${tag} ${m.step}: no first row of answers — this check has no subject`); return; }
+        if (m.qShort > 1) fault('first-row', `${tag} ${m.step}: the question is ${m.qShort} px out of view on arrival`);
+        const k = known[m.step];
+        if (k !== undefined) {
+          if (m.rowShort > 1) seenShort.add(m.step);
+          if (m.rowShort > k + 4) fault('first-row', `${tag} ${m.step}: the first row is ${m.rowShort} px short of whole — named at ${k}`);
+        } else if (m.rowShort > 1) {
+          fault('first-row', `${tag} ${m.step}: the first row of ${m.row} answers is ${m.rowShort} px short of whole on arrival — `
+            + 'the question with its answers is what a phone screen is for');
+        }
+      });
+      if (err) fault('first-row', `${tag}: ${err}`);
+    } catch (e) { fault('first-row', `${tag} could not be walked: ${e.message}`); }
+    await p.close().catch(() => {});
+    for (const s of Object.keys(known)) {
+      if (!seenShort.has(s)) fault('first-row', `${tag} ${s}: the named shortfall is gone — the first row is whole now; take it out of ROW_KNOWN and CLAUDE.md §9`);
+    }
+  }
+  if (firstRead < QUESTIONS * FIRST.length * 2) fault('first-row', `only ${firstRead} of ${QUESTIONS * FIRST.length * 2} steps read — the sweep is not walking the guide`);
   if (steps < QUESTIONS * MUST.length) fault('answer', `only ${steps} steps were measured of ${QUESTIONS * MUST.length} — the sweep is not walking the guide`);
   if (!faults) {
-    console.log(`    ${steps} steps across ${MUST.length} viewports show an answer; a phone on its `
-      + `side and a laptop at 200% zoom show ${EXEMPT.map(e => `${e.shows.length} (${e.shows.join(', ')})`).join(' and ')} of ${QUESTIONS}, and are the two named exemptions`);
+    console.log(`    ${steps} steps across ${MUST.length} viewports show an answer, arrival included (${EXEMPT.length} exemptions); `
+      + `${firstRead} phone steps at 390, 360 and 320 in he and ru show the question and the whole first row, but the ${Object.values(ROW_KNOWN).reduce((n, o) => n + Object.keys(o).length, 0)} named at 320`);
   }
+}
+
+/* ── ON A PHONE THE ANSWERS COME FIRST, AND THE NOTE IS ON EVERY STEP ──────
+   2.10.2026: below 1100 `placePanelOrder` moves each step's lede into its body
+   after the answers, step 01's gallery pill after its tiles, and the ONE
+   illustration note (`#draw-caveat`) into the live step before its explainer;
+   above 1100 all three go home. The note is an honesty commitment — the
+   drawing is an illustration — so it must be on every step's screen either
+   way: in the live step on a phone, under the picture on a desktop. Read on
+   every step at 390 he and 320 ru (phone) and 1280 he and 1100 ru (desktop),
+   then across a resize over 1100 both ways and a language switch on a phone
+   (the panel is rebuilt; the note is rescued before the clear). §5.15: each
+   reading asserts it found the note, the lede and the answers. Falsified by
+   `placePanelOrder` returning early (the phone readings fail on every step)
+   and by dropping the rescue in `buildPanel` (the note is gone after the
+   switch). */
+{
+  console.log('\non a phone the answers come first, and the note is on every step');
+  const before = faults;
+  let read = 0;
+  const where = () => {
+    const live = document.querySelector('.sect.is-live');
+    const note = document.getElementById('draw-caveat');
+    if (!live || !note) return { lost: !note };
+    const kids = [...live.querySelectorAll('.sect__body > *')];
+    const idx = el => kids.indexOf(el);
+    const fields = live.querySelectorAll('.sect__body > .field');
+    const lastField = fields[fields.length - 1];
+    const lede = live.querySelector('.sect__lede'), exp = live.querySelector('.sect__body > .sect__exp');
+    const works = document.getElementById('works-btn');
+    const shown = note.checkVisibility() && note.textContent.trim().length > 20;
+    return {
+      step: live.dataset.section, shown,
+      noteInLive: live.contains(note), noteInBar: !!note.closest('.stage__bar'),
+      noteAfterAnswers: !!lastField && idx(note) > idx(lastField) && (!exp || idx(note) < idx(exp)),
+      ledeAfterAnswers: !!lede && !!lastField && idx(lede) > idx(lastField) && (!exp || idx(lede) < idx(exp)),
+      ledeUnderTitle: !!lede && lede.previousElementSibling === live.querySelector('.sect__title'),
+      worksAfterAnswers: !!works && live.dataset.section === 'fit' && idx(works) > idx(lastField) && (!lede || idx(works) < idx(lede)),
+      worksHome: !!works && works.parentElement === document.getElementById('choices'),
+    };
+  };
+  const judge = (m, narrow, tag) => {
+    if (!m || m.lost) { fault('panel-order', `${tag}: the illustration note is not in the document`); return; }
+    if (!m.step) { fault('panel-order', `${tag}: no live step`); return; }
+    read++;
+    if (!m.shown) fault('panel-order', `${tag} ${m.step}: the illustration note is not painted`);
+    if (m.step === 'sum') return;
+    if (narrow) {
+      if (!m.noteInLive || !m.noteAfterAnswers) fault('panel-order', `${tag} ${m.step}: the note is not in the live step after its answers and before its explainer`);
+      if (!m.ledeAfterAnswers) fault('panel-order', `${tag} ${m.step}: the step's explanation is not under its answers`);
+      if (m.step === 'fit' && !m.worksAfterAnswers) fault('panel-order', `${tag} fit: the gallery pill is not after the size tiles and before the explanation`);
+    } else {
+      if (!m.noteInBar) fault('panel-order', `${tag} ${m.step}: the note is not under the picture`);
+      if (!m.ledeUnderTitle) fault('panel-order', `${tag} ${m.step}: the step's explanation is not under its question`);
+      if (!m.worksHome) fault('panel-order', `${tag} ${m.step}: the gallery offer is not at the head of the panel`);
+    }
+  };
+  const walkAll = async (pg, narrow, tag) => {
+    for (const k of await pg.evaluate(() => [...document.querySelectorAll('.steps__step[data-step]')].map(e => e.dataset.step))) {
+      await pg.evaluate(s => document.querySelector(`.steps__step[data-step="${s}"]`)?.click(), k);
+      await pg.waitForTimeout(160);
+      judge(await pg.evaluate(where), narrow, tag);
+    }
+  };
+  for (const [w, h, lang] of [[390, 844, 'he'], [320, 568, 'ru'], [1280, 720, 'he'], [1100, 800, 'ru']]) {
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
+      await pg.waitForTimeout(500);
+      await walkAll(pg, w < 1100, `${lang} ${w}x${h}`);
+      /* across 1100, both ways, on a step that is not the first */
+      if (w === 390) {
+        await pg.setViewportSize({ width: 1280, height: 720 }); await pg.waitForTimeout(300);
+        judge(await pg.evaluate(where), false, 'he 390 → 1280');
+        await pg.setViewportSize({ width: 390, height: 844 }); await pg.waitForTimeout(300);
+        judge(await pg.evaluate(where), true, 'he 1280 → 390');
+        /* and a language switch on a phone: the panel is rebuilt */
+        await pg.evaluate(() => document.querySelector('#langs .lang[lang="ru"]')?.click());
+        await pg.waitForTimeout(400);
+        judge(await pg.evaluate(where), true, 'he → ru at 390');
+      }
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('panel-order', `${lang} ${w}x${h}: chromium died`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (read < 4 * STEPS + 3) fault('panel-order', `only ${read} readings of ${4 * STEPS + 3} — this check is measuring less than it says`);
+  if (faults === before) console.log(`    ${read} readings: on a phone the note, the explanation and the gallery pill under the answers on every step; above 1100 each at home; the note kept across 1100 and a language switch`);
 }
 
 /* ── A STEP DOES NOT SAY ITS OWN NAME TWICE ──────────────────────────────

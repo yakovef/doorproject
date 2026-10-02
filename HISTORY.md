@@ -26,6 +26,58 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **2.10 — THE PHONE'S FIRST SCREEN (prompt C, 1 of 3).** The owner's son:
+  *"The app adapted to the phone in good form — looking really good on the
+  phone and intuitive."* Answered the same day in chat: on a phone the
+  illustration note goes **under the options**; the stage **stays a square**.
+  · **What was wrong, measured** (`research/phone/before.png`, the real page,
+    each step reached by its own "next"): on a phone the note (two lines), the
+    gallery pill and the step's lede stood between the door and the answers.
+    The first row of answers on ARRIVAL was 64 px under the quote bar at
+    390×844 he, 122 ru, 111 / 159 at 360×780 (no tile at all in Russian), and
+    at 320×568 step 01 showed no tile and seven other steps fell 9–110 px
+    short of a whole row. Landscape showed an answer on 6 of 9 steps (844×390)
+    and 2 of 9 (640×360).
+  · **What changed.** `placePanelOrder` (js/app.js, called from `placeSend` —
+    which `goStep` and the 1100 px listener already call, so `goStep` itself
+    was not touched): below 1100 each step's lede goes into its body after the
+    answers, step 01's gallery pill after its tiles and before the lede, and
+    the ONE note into the live step before its explainer; above 1100 all three
+    go home. `buildPanel` rescues the note before it empties the panel (a
+    language switch on a phone would otherwise delete markup `index.html`
+    owns). The emptied `.stage__bar` is not painted on a phone. The band 1.2 /
+    1.0 rem on a phone (was 1.02 / .86); Russian and English titles 1.08 rem —
+    at 1.2 the Russian extra lock's title was newly cut at 390 (+14 px);
+    at 1.08 the titles cut are exactly the ones 1.02 cut (ru pz and xlock at
+    320, xlock at 360, en pz at 320), Hebrew nowhere. The save disc 44 px on a
+    phone. The press state (`scale(.97)`) 90 → 120 ms, and it no longer drops
+    the tile's border and shadow transitions (it came after them and replaced
+    them); none under `prefers-reduced-motion` — the global block only
+    shortened a transition, the tile still shrank.
+  · **After** (`research/phone/after.png`): the question and the whole first
+    row on every step at 390×844 and 360×780 in Hebrew and Russian; at 320×568
+    an answer on every step, and three steps short of a whole row — fit 16,
+    lock 14, xlock 14 (he; ru fit 16, lock 14): 239 px of door, rail and bar
+    leave 200 px. Landscape: an answer on 9 of 9 at both shapes.
+  · **The audit, restated stronger.** `MUST` holds on arrival at every shape —
+    320×568's `arrival: false` is gone — and gained 360×780 and both landscape
+    shapes, whose exemption list is empty now. A new `first-row` clause asks
+    the question and the whole first row at 390 / 360 / 320 × he / ru on every
+    step, 320's three named in `ROW_KNOWN` (+ 4, asserted still needed). A new
+    block holds the note, the lede and the pill in their places on a phone and
+    at home above 1100, across a resize both ways and a language switch.
+  · **Found by the full audit, fixed here:** the note's first measure in the
+    panel was `42ch` — a `ch` is the face's "0", so the box changed WIDTH when
+    Rubik swapped in for its fallback and the English note rewrapped 2 → 3
+    lines on every step (15 of 684 type readings, over 2 in 100). It is 34rem;
+    the type block reads 5 of 684.
+  · **Falsified:** `placePanelOrder` returning early → 38 placement faults and
+    390 he fit 64 px short again; the rescue dropped → the note is gone after a
+    language switch.
+  · **Not done:** the stage's size on a phone (his answer: it stays a square);
+    the 320 rows (shorter tiles would close them); the picker's short forms at
+    320 (Hebrew is not cut there, so not needed). No `VERSION`; 0 bare sheets.
+
 - **1.10 — THE TOUR: THE SAVE STAYS IN ITS PLACE, AND THE OPTIONS STEP LIGHTS
   THE DOOR'S ARROWS.** The owner's son: *"in the tutorial for some reason the
   save button is in the same place as the languges, but when the tutorial
@@ -3521,6 +3573,24 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **29.9** The designs unlock with a window (B, 2 of 3) — *"the window section
+  split in 2 … a sub-section unlocks right after it — the designs"*: the grille
+  group's `when: grilleHasSubject` (`isGlazed`), the finish group's hiding; the
+  arrows walk none → slot → square. A linked design still brings its window.
+  Units hold it to the rules; the audit to the page (links, taps, arrows); its
+  every-option walk now unlocks a `when` group first (§5.28). Long form: `HISTORY.md`.
+- **29.9** Undo and redo PAINTED FROM LOAD, greyed while disabled (*"available
+  but greyed out at the start"*): ink at .45, no shadow, still `disabled`; no
+  placeholder box. The toast clears them before the first change too.
+  `placeSteps` gives a centred column twice its shortfall (it kept its top:
+  1100 he −12 px); where the Hebrew stage is short the column still stands above
+  the door's middle — nine readings named (1280 standard 21 px). Long form: `HISTORY.md`.
+- **29.9** The tour: scrim .6 → **.8** (*"more black"*: the wall reads 5.6–6.7 %
+  of bare through it), and the language picker LIVE in it (*"there should still
+  be an option to change languages"*) — `#langs` itself moves into the dialog,
+  in a cut-out of its own, and a language pressed re-shows the same step in
+  it; home after, to the pixel. On a 320 phone the callout may share the
+  picker's margin, never the picker. Long form: `HISTORY.md`.
 - **29.9** The window step before the face (B, 1 of 3) — *"The window section
   before the face section"*: `SECTIONS` · `glass` · `face` ·, adjacent still
   (§3); `WANT_ORDER` and the audit's arrows walk with it. No copy claimed the

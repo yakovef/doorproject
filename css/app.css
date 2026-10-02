@@ -439,6 +439,13 @@ svg { direction: ltr; }
 .stage__hud .iconbtn:hover:not(:disabled) { background: #6A5129; border-color: #6A5129; color: #fff; }
 .stage__hud .iconbtn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .stage__hud .iconbtn .btn__ico { stroke-width: 2.1; }
+/* ⚠ 44 px ON A PHONE SINCE 2.10.2026 (ours): the picker's row height, so the
+   top of the wall is one line and the band beside it has the room. 44 is the
+   tap floor (T14). */
+@media (max-width: 1099px) {
+  .stage__hud .iconbtn { inline-size: 44px; block-size: 44px; }
+  .stage__hud .iconbtn .btn__ico { inline-size: 20px; block-size: 20px; }
+}
 
 .langs { display: flex; gap: 2px; align-items: center; min-inline-size: 0; overflow-x: auto; }
 .lang {
@@ -1185,8 +1192,17 @@ svg { direction: ltr; }
   /* The phone's one line keeps its 28.9 size and height (29.9, ours): the
      sizes and line-heights are restated here because the desktop's changed
      under them; only the option's face and ink follow the desktop's. */
-  .band__title { font-size: 1.02rem; font-weight: 700; line-height: 1.15; flex: 0 0 auto; max-inline-size: 100%; }
-  .band__now { font-size: .86rem; line-height: 1.35; flex: 0 1 auto; min-inline-size: 0; min-block-size: 0; }
+  /* ⚠ BIGGER ON A PHONE SINCE 2.10.2026 (ours, CLAUDE.md §0a — *"looking really
+     good on the phone"*): the title 1.02 → 1.2 rem, the option .86 → 1 rem,
+     still one line; the option's name yields first. */
+  .band__title { font-size: 1.2rem; font-weight: 700; line-height: 1.15; flex: 0 0 auto; max-inline-size: 100%; }
+  .band__now { font-size: 1rem; line-height: 1.35; flex: 0 1 auto; min-inline-size: 0; min-block-size: 0; }
+  /* Russian and English step titles run a third longer than the Hebrew (the
+     extra lock's is 20 characters in Russian), and at 1.2 rem it was newly
+     cut at 390 — so those two scripts take 1.08 rem: measured (2.10), the
+     titles cut are then exactly the ones cut at 1.02 (ru pz and xlock at 320,
+     xlock at 360; en pz at 320), each by 1–3 px more; Hebrew is cut nowhere. */
+  html:not([lang="he"]) .band__title { font-size: 1.08rem; }
   .band__now:not(:empty)::before { content: '·'; margin-inline-end: 8px; color: var(--ink-3); }
 }
 
@@ -1527,6 +1543,25 @@ html:not([dir="rtl"]) .stage__undo[data-mode="icon"] { flex-direction: column-re
     font-size: .66rem; line-height: 1.4;
     max-inline-size: 34rem; padding-inline: 18px;
   }
+  /* ⚠ AND SINCE 2.10.2026 IT IS NOT HERE AT ALL ON A PHONE — the owner's son
+     answered that the note goes UNDER THE OPTIONS: `placePanelOrder` moves it
+     into the live step, after the answers and the step's own explanation and
+     before the explainer. The bar it leaves is empty and goes with it, so the
+     first thing under the door is the question again. */
+  .stage__bar:not(:has(.stage__note)) { display: none; }
+  /* ⚠ A MEASURE IN rem, NEVER ch: a `ch` is the face's own "0", so a 42ch box
+     changes WIDTH when Rubik swaps in for its fallback, and the note rewrapped
+     2 → 3 lines in English at 390 on every step — 15 of 684 readings in the
+     audit's type block (2.10, its first run). 34rem moves no line in any of
+     the three languages at 320–390. */
+  .sect__body > .stage__note {
+    margin: 12px 0 0; padding: 0; text-align: start; max-inline-size: 34rem;
+    font-size: .7rem; line-height: 1.45;
+  }
+  /* the step's explanation under its answers (2.10, ours — `placePanelOrder`) */
+  .sect__body > .sect__lede { margin: 14px 0 0; }
+  /* and step 01's gallery pill after its tiles, before the explanation */
+  .sect__body > .works-open { margin-block: 14px 0; }
 }
 .pills--compact .pill {
   min-block-size: 36px; padding: 6px 18px; font-size: .82rem;
@@ -4631,9 +4666,18 @@ html.is-live .wa__off { display: none; }
 .toast { animation: toastUp .2s var(--ease) both; pointer-events: none; }
 @keyframes toastUp { from { opacity: 0; transform: translateY(8px); } }
 
-/* The cheapest thing that makes a page feel like a product on a phone. */
-.tile, .swatch, .pill { transition: transform .09s var(--ease); }
+/* The cheapest thing that makes a page feel like a product on a phone.
+   ⚠ 120 ms SINCE 2.10.2026, and it keeps the tile's own border and shadow
+   transitions: this rule came after `.tile`'s (M-section above) and REPLACED
+   them, so a selected tile's ring snapped on. And NO PRESS UNDER
+   `prefers-reduced-motion` — the global block there only shortens a
+   transition, it would still have shrunk the tile (T9). */
+.swatch, .pill { transition: transform .12s var(--ease); }
+.tile { transition: border-color .14s var(--ease), box-shadow .14s var(--ease), transform .12s var(--ease); }
 .tile:active, .swatch:active, .pill:active { transform: scale(.97); }
+@media (prefers-reduced-motion: reduce) {
+  .tile:active, .swatch:active, .pill:active { transform: none; }
+}
 
 /* ── ≥1280 · THE DOOR TAKES THE EMPTY COLUMN ─────────────────────────
    `REALISM2.md` stage F. The mockup runs the drawing full bleed with the

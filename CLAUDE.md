@@ -220,6 +220,16 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   · the stripe tiles draw the leaf with its lines (seven across, five
     upright — a representative count), as the face tiles draw the leaf with
     its panels.
+  **Prompt C (2.10)** — his words: *"The app adapted to the phone in good form —
+  looking really good on the phone and intuitive"*, *"Remake the arrows around
+  the door, make them bigger and more noticeable"*, *"Make the WhatsApp button
+  bigger and more present"*; and two answers in chat: on a phone the
+  illustration note goes **under the options**, and the stage **stays a
+  square** (the door's size on a phone is the crop's, not this round's). Taken
+  for them, each reversible in a line: on a phone the step's lede and the
+  gallery pill also go under the answers; the phone band 1.2 / 1.0 rem (1.08
+  for Russian and English titles); the save 44 px on a phone; a 120 ms press
+  on tiles, swatches and pills.
   Settled with them in chat, not ours: where the new "ask before removing"
   rule meets Peretz's refusal — a pull handle or bow with no room beside the
   window or the face — **Peretz's rule stands**, refused with its reason and
@@ -237,6 +247,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **2.10** The phone's first screen (C, 1 of 3) — *"adapted to the phone in good
+  form"*: below 1100 each step is question · answers · lede · the note (*"under
+  the options"*, his answer) · explainer (`placePanelOrder`); band 1.2/1.0 rem,
+  save 44 px, a 120 ms press. First row whole on every step at 390 and 360 (it
+  was 64–159 px short on arrival); 320's three named; landscape 9 of 9 answers.
+  Sheets `research/phone/`. Long form: `HISTORY.md`.
 - **1.10** The tour: the SAVE STAYS IN ITS PLACE (*"the save button is in the
   same place as the languges, but when the tutorial ends it jumps back"* —
   with `#langs` lifted into the dialog the save's slot was the row's only
@@ -265,24 +281,6 @@ lines here. Dates are the day of the change.
   "שלחו". The question state RETIRED on both sends and in the message — an
   untouched door sends the standard door's ORDER; `is-untouched`, `send.waAsk*`
   and the `chosen` argument are gone. Long form: `HISTORY.md`.
-- **29.9** The tour: scrim .6 → **.8** (*"more black"*: the wall reads 5.6–6.7 %
-  of bare through it), and the language picker LIVE in it (*"there should still
-  be an option to change languages"*) — `#langs` itself moves into the dialog,
-  in a cut-out of its own, and a language pressed re-shows the same step in
-  it; home after, to the pixel. On a 320 phone the callout may share the
-  picker's margin, never the picker. Long form: `HISTORY.md`.
-- **29.9** Undo and redo PAINTED FROM LOAD, greyed while disabled (*"available
-  but greyed out at the start"*): ink at .45, no shadow, still `disabled`; no
-  placeholder box. The toast clears them before the first change too.
-  `placeSteps` gives a centred column twice its shortfall (it kept its top:
-  1100 he −12 px); where the Hebrew stage is short the column still stands above
-  the door's middle — nine readings named (1280 standard 21 px). Long form: `HISTORY.md`.
-- **29.9** The designs unlock with a window (B, 2 of 3) — *"the window section
-  split in 2 … a sub-section unlocks right after it — the designs"*: the grille
-  group's `when: grilleHasSubject` (`isGlazed`), the finish group's hiding; the
-  arrows walk none → slot → square. A linked design still brings its window.
-  Units hold it to the rules; the audit to the page (links, taps, arrows); its
-  every-option walk now unlocks a `when` group first (§5.28). Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 30.9.2026
@@ -347,6 +345,15 @@ by Hebrew readers.
   re-written in `translateStatic`, or it stays in the first language for ever.
 
 ### The chrome stands on the wall
+
+⚠ **On a phone the answers come first (2.10)**: below 1100 `placePanelOrder`
+(js/app.js, called from `placeSend`, which `goStep` and the 1100 px listener
+call) moves each step's lede into its body after the answers, step 01's
+gallery pill after its tiles, and the ONE illustration note (`#draw-caveat`)
+into the live step before its explainer — the owner's son: the note goes
+*"under the options"*. Above 1100 all three go home (the note under the
+picture). `buildPanel` rescues the note before it empties the panel. The save
+disc is 44 px on a phone (52 above).
 
 The page has no header. The language picker stands in the wall's top-right
 corner in every language (placed by the owner with circles on a screenshot,
@@ -444,7 +451,9 @@ placement is the other session's, merged at the owner's son's choice.
   ≥ 0.7 of the title, in its face). Each line is one line in every language (ellipsis), so it never
   climbs. On a phone it is one line at the same anchor (`--band-h` is gone, the
   stage has its 30 px back); the option's name yields to an ellipsis before
-  the step's. At 320×568 the crop extends past `FIT_TRIM` so the band clears
+  the step's — and since 2.10 it is 1.2 / 1.0 rem there (1.02 / .86 before;
+  Russian and English titles 1.08, which cuts exactly the titles 1.02 cut, and
+  Hebrew is cut nowhere). At 320×568 the crop extends past `FIT_TRIM` so the band clears
   the two tallest casings by 8 px too (it was ~2.5 until 29.9).
 - **A first visit gets a tour** (28.9, the owner's son: *"a grey overlay on
   everything but the thing described, an arrow from the text to the thing …
@@ -1080,6 +1089,9 @@ for the same half of the leaf and `repair` trades between them.
   no dialog; the square window skips the stripes; beside the slot every other
   tile is greyed (the pair too, `why.noRoomBelow`) and the arrow says nothing
   else fits.
+- **On a phone a step reads question · answers · lede · note · explainer**
+  (2.10, `placePanelOrder`); above 1100 question · lede · answers · explainer,
+  the note under the picture.
 - A bare load opens step 01; a shared link or a code opens the summary (T11).
 - ⚠ **A first bare visit gets a TOUR** (28.9, the owner's son: *"A little
   tutorial when a person first joins … Only on the first visit"*; `js/tour.js`):
@@ -1606,6 +1618,13 @@ are not in `VIEWS`:
   below), centred on the door or pushed down at every size and desktop width
   but nine named Hebrew lifts (29.9, §9), the live mark whole on both axes, and its checks on exactly the
   steps walked — none on arrival or after a reload, the address unmoved.
+- **the phone's first screen** (2.10) — at 390×844 and 360×780, he and ru, on
+  every step on arrival, the question and the whole first row of its answers
+  between the door and the bar (320's three short steps named, `ROW_KNOWN`);
+  an answer on screen on every step at seven shapes, arrival and both
+  landscape shapes included, no exemption; the note, the lede and the gallery
+  pill under the answers on a phone and at home above 1100, across a resize
+  and a language switch.
 - **every step** — reachable from the rail; a visible send and a readable price;
   every `[data-wa]` the same href, none asking a question, the quiet send
   saying the order above 1100 and "שלחו" below (29.9); at least one answer on screen with the
@@ -2039,7 +2058,11 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   at 844×390 the פרזול, face and משקוף steps as well (the band left the stage's
   flow and the phone bar lost its caption line, 71.3 → 67.0 px), and the extra
   lock's own step (three tiles): six of nine there, two of nine at 640×360.
-  **The layout is
+  ⚠ **Since 2.10 BOTH SHOW AN ANSWER ON ALL NINE** — the lede, the note and the
+  gallery pill went under the answers on a phone (§0c), and both shapes moved
+  from the audit's exemption list into `MUST`, which is empty of exemptions
+  now. What is left is the item's first half: a whole first row there is not
+  asked (844×390 is 20–122 px short of it, 640×360 1–140). **The layout is
   chosen by WIDTH and the problem is HEIGHT** — but `max-width: 1099px` is
   read 19 times in the stylesheet alone (the fixed rail, body padding, quote
   bar, sticky stage, `placeSend`, the toast's anchor among them; the
@@ -2067,10 +2090,17 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   showed 3 of 8 rows); 1100×800 6 (5), 1440×900 8 (7), 1680 8, 1920×918 8 (7).
   The foot is 151 px — the full-width send and the telephone under it. A
   third column would need a wider panel or 70 px tiles.
-- **At 320×568 step 01 arrives with its answers 78 px below the fold.** What
-  would close it: the illustration note (45 px) not standing between door and
-  question on a phone — an honesty commitment, ask before moving it — or shorter
-  size tiles.
+- **At 320×568 three steps cannot show a WHOLE first row** (2.10; this item
+  read "step 01 arrives with its answers 78 px below the fold" until then, and
+  it was 131 px with no tile showing at all, measured that morning). The owner's
+  son answered the honesty question in a line — the note goes under the
+  options — and with the lede and the gallery pill there too, an answer is on
+  screen on every step at 320 and the audit's `arrival: false` is gone. What
+  remains is arithmetic: 239 px of door, the 62 px rail and the 67 px bar leave
+  200 px, and step 01's size tiles and the lock steps' lever tiles are taller
+  than what is left — fit 16 px, lock 14, xlock 14 (he; ru fit 16, lock 14),
+  named in `ROW_KNOWN`, held to + 4, asserted still needed. The stage stays a
+  square (his 2.10 answer), so what would close it is shorter tiles.
 
 ### Blocked on a human — `ASK-PERETZ.md`
 

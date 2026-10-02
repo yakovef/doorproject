@@ -1332,6 +1332,11 @@ function buildPanel() {
   const tel = document.getElementById('send-tel');
   if (wa && tel && tel.previousElementSibling !== wa) wa.after(tel);
   if (send && wrap.contains(send)) $('.layout').appendChild(send);
+  /* ⚠ AND THE ILLUSTRATION NOTE (2.10): on a phone `placePanelOrder` moves it
+     into the live step, a child of THIS element — home first, under the
+     picture, or the clear below deletes markup `index.html` owns. */
+  const caveat = document.getElementById('draw-caveat');
+  if (caveat && wrap.contains(caveat)) $('.stage__bar')?.appendChild(caveat);
   /* ⚠ AND A NAVIGATOR LEFT ON THE PHOTOGRAPH (28.9). Above 1100 the column
      lives in `.stage-wrap`, outside this element, so `replaceChildren` below
      would not reach it — and a language switch would build a second column
@@ -2168,7 +2173,51 @@ function placeNav() {
   if (had) had.focus({ preventScroll: true });
 }
 
+/**
+ * ⚠ ON A PHONE THE ANSWERS COME FIRST — 2.10.2026, the owner's son: *"The app
+ * adapted to the phone in good form — looking really good on the phone and
+ * intuitive"*, and his answer that the illustration note goes UNDER THE
+ * OPTIONS. Measured before (390×844 he, arrival): the note (two lines), the
+ * gallery pill and the step's lede stood between the door and the tiles, and
+ * the first row of size tiles was 64 px under the quote bar (122 in Russian,
+ * 131 at 320). So below 1100 every step reads eyebrow · question · its groups
+ * and hints · the LEDE · the NOTE · the explainer, and step 01's gallery pill
+ * stands after its tiles, before the lede (the lede and the pill are ours,
+ * CLAUDE.md §0a). Above 1100 all three go home: the lede under the question,
+ * the note under the picture, the pill at the head of the panel.
+ * ⚠ ONE ELEMENT EACH, MOVED, never copied — the note is one sentence from
+ * `js/share.js` (the page and the message cannot promise two things), and the
+ * audit asserts it is in the live step on every phone step and under the
+ * picture above 1100. Called from `placeSend`, which `goStep` and the 1100 px
+ * listener already call, so a step change and a width change both re-place.
+ */
+function placePanelOrder() {
+  const narrow = typeof window.matchMedia === 'function'
+    && window.matchMedia('(max-width: 1099px)').matches;
+  const caveat = $('#draw-caveat'), bar = $('.stage__bar');
+  const works = $('#works-btn'), panel = $('#choices');
+  for (const sec of SECTIONS) {
+    const box = document.querySelector(`.sect[data-section="${sec.key}"]`);
+    const lede = box && box.querySelector('.sect__lede');
+    if (!lede) continue;
+    const body = box.querySelector('.sect__body');
+    if (narrow) body.insertBefore(lede, body.querySelector(':scope > .sect__exp'));
+    else box.querySelector('.sect__title').after(lede);
+  }
+  if (works && panel) {
+    const fit = document.querySelector(`.sect[data-section="${SECTIONS[0].key}"] .sect__body`);
+    if (narrow && fit) fit.insertBefore(works, fit.querySelector(':scope > .sect__lede, :scope > .sect__exp'));
+    else if (!narrow && works.parentElement !== panel) panel.prepend(works);
+  }
+  if (caveat && bar) {
+    const live = document.querySelector('.sect.is-live .sect__body');
+    if (narrow && live) live.insertBefore(caveat, live.querySelector(':scope > .sect__exp'));
+    else if (caveat.parentElement !== bar) bar.appendChild(caveat);
+  }
+}
+
 function placeSend() {
+  placePanelOrder();
   const wa = $('#wa-btn');
   const card = document.querySelector('.panel--send .send');
   if (!wa || !card) return;
