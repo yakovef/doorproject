@@ -144,6 +144,21 @@ export const SECTION_ICON = {
         + '<circle cx="12" cy="16.6" r="1.6"/>',
   sum:    '<path d="M5.4 3h8.8l4.4 4.4V21H5.4Z"/><path d="M14.2 3v4.4h4.4"/>'
         + '<path d="m8.4 14 2.4 2.6 4.8-5.4"/>',
+  /* ⚠ THE WINDOW'S DESIGNS, 2.10.2026 — their own step (`grd`), present only
+     with a window, drawn right after `glass` and tied to it in the navigator.
+     DESCRIBED FIRST, as the 27.9 brief asks: what goes inside the window — the
+     iron bars over the glass, or a pattern in it. — A window with bars: a
+     WIDE, LOW ARCH (no other mark has an arch, and `glass` is the slanted
+     pane) with three bars up it and one across, each bar touching the arch;
+     3.6 units apart, 3.2 px at 21 px — past the 2.7 under which a gap closes.
+     ⚠ The first draft was a TALL arched pane with two bars each way, and the
+     audit's pairwise raster read it 51 % against `sum` (floor 50): a tall
+     outline with lines in it is the summary's sheet at 21 px. Wide and low it
+     reads 64 % against its closest (`colour`), 68 against `face`. It is not
+     `SPEC_ICON.grille`, the frameless diamond lattice: that names the
+     ironwork in the summary, this names the question on the rail. */
+  grd:    '<path d="M2.8 18.4V12a9.2 7.2 0 0 1 18.4 0v6.4Z"/>'
+        + '<path d="M8.4 5.4v13M12 4.8v13.6M15.6 5.4v13M2.8 13.6h18.4"/>',
 };
 
 export function sectionIcon(key) {

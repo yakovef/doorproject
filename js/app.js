@@ -196,18 +196,22 @@ const GROUPS = [
   /* ⚠ `tinted`: a `-light` design's tile is the design in the DOOR'S colour
      (27.9.2026, *"black or the color of the door"*), so the art is drawn for
      the paint on screen and re-drawn when it changes — `retintOptions`. */
-  /* ⚠ `when`: THE DESIGNS UNLOCK WITH A WINDOW — 29.9.2026, the owner's son:
-     *"The window section split in 2 … if they choose a window, a sub-section
-     unlocks right after it — the designs. So the arrow feature near the door
-     works well."* Hidden through the finish group's mechanism (`markGroup`
-     sets the field `hidden` on every paint) off `grilleHasSubject`, which is
-     `isGlazed` — the question that greys every design on a solid door. So the
-     step's arrows walk the window list alone (none → slot → square → none),
-     and the "none" window tile stays (ours, CLAUDE.md §0a): it is the only
-     way back to a solid door on this step. */
-  { key: 'grille', title: 'g.grille', in: 'glass', kind: 'sq', list: () => GRILLES,
+  /* ⚠ THE DESIGNS UNLOCK WITH A WINDOW — 29.9.2026, the owner's son: *"The
+     window section split in 2 … if they choose a window, a sub-section unlocks
+     right after it — the designs. So the arrow feature near the door works
+     well."* It was this group's `when`, hiding the field on the glass step.
+     ⚠ SINCE 2.10.2026 THE DESIGNS ARE A STEP OF THEIR OWN (`grd`, SECTIONS
+     below) — *"Make the window design a separate section like our 10 existing
+     ones, but only appearing if you choose one of the windows — an icon next
+     to the window one, basically a subsection."* So the group moved `in:
+     'grd'` and its `when` moved to the STEP: one statement of when the designs
+     exist (`grilleHasSubject` = `isGlazed`), read by the navigator, the
+     forward and back buttons and the counter. The glass step is the window
+     alone, and its arrows walk none → slot → square → none; the "none" tile
+     stays (ours, CLAUDE.md §0a) — the only way back to a solid door there. */
+  { key: 'grille', title: 'g.grille', in: 'grd', kind: 'sq', list: () => GRILLES,
     glyph: o => grilleGlyph(o, byId(COLOURS, state.colour).hex), tinted: true,
-    hint: 'g.grille.h', when: grilleHasSubject,
+    hint: 'g.grille.h',
     /* ⚠ TWO HEADED GROUPS, AND EACH DESIGN'S TWO COLOURS SIDE BY SIDE — 28.9,
        the owner's son: *"Put the expensive window designs apart from the
        regular ones, and keep the same designs in different colours near each
@@ -489,6 +493,23 @@ const SECTIONS = [
      moved with it. */
   { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass',
     expArgs: () => [L(SIZES.half)] },
+  /* ⚠ THE WINDOW'S DESIGNS, A STEP OF THEIR OWN THAT IS PRESENT ONLY WITH A
+     WINDOW — 2.10.2026, the owner's son: *"Make the window design a separate
+     section like our 10 existing ones, but only appearing if you choose one of
+     the windows — an icon next to the window one, basically a subsection."*
+     Keyed `grd` and titled "עיצוב החלון" (ours, CLAUDE.md §0a); right after
+     `glass`, its navigator mark tied to the glass mark by a thin line (the
+     "subsection", css/app.css). `when` is the step's PRESENCE (`present()`
+     below): on a solid door the step is not in the walk — its mark and its
+     card are hidden, the forward button skips it, a jump to it is refused, and
+     "step N of M" counts the steps that ARE there (9 or 10). The key is
+     `data-step` only, never the link or the code, so no `VERSION`; the field
+     `g=` stays where it is. The explainer's two figures come through
+     arguments (§5.25): the etched designs' surcharge per window, and the
+     double door that has two panes. */
+  { key: 'grd',    title: 'step.grd.t',    sub: 'step.grd.s',    lede: 'step.grd.l', exp: 'exp.grd',
+    expArgs: () => [formatAgorot(byId(GRILLES, 'vine').delta), L(SIZES.half)],
+    when: grilleHasSubject },
   { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face',
     expArgs: () => [formatAgorot(STRIPE_A.h), formatAgorot(STRIPE_A.v),
                     L(byId(DETAILS, 'panel2')), L(byId(DETAILS, 'panel3'))] },
@@ -2316,12 +2337,29 @@ let revealed = false;
  */
 const displaced = new Map();
 
-const STEP_KEYS = () => [...SECTIONS.map(x => x.key), SUMMARY.key];
+/* ⚠ THE STEPS THAT ARE THERE — 2.10.2026. A section with a `when` (the
+   window's designs, `grd`) is in the walk only while its question has a
+   subject on THIS door; every reader of "which steps" asks here: the
+   navigator (`markSteps` hides an absent mark and card), the forward and back
+   buttons (`stepBy` skips it), a jump (`goStep`/`leaveTo` refuse it) and the
+   counter ("step N of M" counts these). `ALL_KEYS` is every card that was
+   built, present or not — what `goStep` hides. */
+const present = (st = state) => SECTIONS.filter(sec => !sec.when || sec.when(st));
+const STEP_KEYS = () => [...present().map(x => x.key), SUMMARY.key];
+const ALL_KEYS = () => [...SECTIONS.map(x => x.key), SUMMARY.key];
+/* Where the live step goes when it stops being there (an undo or a link took
+   the window away while the designs were up): the nearest present step BEFORE
+   it in the flow — the glass step, for the designs. */
+const stepBefore = key => {
+  const keys = ALL_KEYS(), here = STEP_KEYS();
+  for (let i = keys.indexOf(key) - 1; i >= 0; i--) if (here.includes(keys[i])) return keys[i];
+  return here[0];
+};
 
 function goStep(key, focus = true) {
   if (!STEP_KEYS().includes(key)) return;
   liveStep = key;
-  for (const k of STEP_KEYS()) {
+  for (const k of ALL_KEYS()) {
     const box = document.querySelector(`.sect[data-section="${k}"]`);
     if (box) { box.hidden = k !== key; box.classList.toggle('is-live', k === key); }
   }
@@ -2676,9 +2714,17 @@ function paintSaved() {
 
 /** Which sections are open, on the navigator. */
 function markSteps() {
-  const keys = STEP_KEYS();
-  for (const [i, k] of keys.entries()) {
+  const here = STEP_KEYS();
+  const asked = here.length - 1;                // the summary is not a question
+  let came = false;
+  for (const k of ALL_KEYS()) {
+    const i = here.indexOf(k);
     const b = document.querySelector(`.steps__step[data-step="${k}"]`);
+    /* ⚠ A STEP THAT IS NOT THERE HAS NO MARK (2.10.2026): the designs' circle
+       comes and goes with the window, on every paint, so a link, an undo and a
+       tap all agree with the door. Its card is hidden by `goStep`, which never
+       shows an absent key. */
+    if (b && b.hidden !== (i < 0)) { b.hidden = i < 0; came = true; }
     if (b) {
       const on = k === liveStep;
       b.classList.toggle('is-on', on);
@@ -2704,10 +2750,14 @@ function markSteps() {
        like step eight of three. Nothing about the digits says which is which.
        The words carry it instead — the same information, in the one order
        every reader of this language already has. */
+    /* ⚠ AND COUNTED AMONG THE STEPS THAT ARE THERE (2.10.2026): ten with a
+       window, nine without — the eyebrow on the face step reads "7 of 10" or
+       "6 of 9" as the window comes and goes. `SECTIONS.length` would count a
+       step the customer cannot reach. */
     const where = document.querySelector(`.sect[data-section="${k}"] [data-step-n]`);
-    if (where) {
+    if (where && i >= 0) {
       where.textContent = k === SUMMARY.key ? T(SUMMARY.sub)
-        : T('nav.stepOf', i + 1, SECTIONS.length);
+        : T('nav.stepOf', i + 1, asked);
     }
   }
   /* The hairline that filled behind you (`--fill` on `.steps::after`) went on
@@ -2785,6 +2835,9 @@ function markSteps() {
      `aria-label` and `title` instead of their text, without the ‹ › glyph the
      worded buttons carry — the arrow IS the glyph. One statement of what the
      button is called, whichever form shows it. */
+  /* among the steps that are THERE (2.10): the forward button on the glass
+     step leads to the designs only while the door has a window */
+  const keys = here;
   const i = keys.indexOf(liveStep);
   const word = k => T(k).replace(/[‹›]/g, '').trim();
   const name = (b, k) => {
@@ -2804,6 +2857,10 @@ function markSteps() {
      the step before it already offers לסיכום on `.sect__next`. `hidden` rather
      than `disabled` — a dead control asks to be pressed and then refuses. */
   for (const b of document.querySelectorAll('.sect__skip')) b.hidden = i >= keys.length - 2;
+  /* ⚠ AND A MARK THAT CAME OR WENT RE-PLACES THE COLUMN (2.10.2026): `paint`
+     fits the stage BEFORE it marks the steps, so a tap that brings the window
+     would leave the column placed for ten marks with eleven in it. */
+  if (came) placeSteps();
 }
 
 /* ⚠ SIX FUNCTIONS DIED HERE AND THE COMMENT IS THE POINT.
@@ -3357,6 +3414,15 @@ function sectionLabel(sec) {
 }
 
 function paint() {
+  /* ⚠ THE LIVE STEP WENT AWAY (2.10.2026): an undo, a redo or a link took the
+     window off the door while the designs were up. Go back to the step before
+     it — the glass, where the window is chosen — without moving focus, and
+     say nothing more: the undo's own toast already names what came back.
+     `goStep` paints, so this paint ends here. */
+  if (liveStep && !STEP_KEYS().includes(liveStep) && document.querySelector('.sect')) {
+    goStep(stepBefore(liveStep), false);
+    return;
+  }
   const colour = byId(COLOURS, state.colour);
   const handing = byId(HANDINGS, state.handing);
   const size = SIZES[state.size] || SIZES.standard;
@@ -4106,6 +4172,26 @@ function placeSteps() {
   if (!Number.isFinite(mid0)) return;
   const wrap = wrapEl.getBoundingClientRect();
   const mid = wrap.y + mid0;
+  /* ⚠ THE DESIGNS' MARK STANDS BESIDE THE WINDOW'S, WHERE THE WALL HOLDS IT —
+     2.10.2026, the owner's son: *"… an icon next to the window one, basically
+     a subsection."* Stacked, a window made the column eleven marks — 516 px at
+     its tightest against the ten's 470 — and the wall had no 46 px to give:
+     measured on every glazed door at seven desktop widths in three languages,
+     the column was pulled up onto the price on 22 (up to 2,709 px², "fit" and
+     "colour" under it), onto the language picker at 1280×720 in Hebrew
+     (280 px²), and above the door's middle on twenty more. So in the column
+     the designs' mark leaves the flow and stands BESIDE the glass mark, on
+     the column's inline-end side (the door's side in both directions), in a
+     56 px tab of the column's ink — the phone's row already shows them side by
+     side — and the column stays ten tall. Where that tab would touch the
+     door, an arrow, the price, a wall control or the undo pills (measured:
+     Hebrew at 1100–1200 beside the wider doors, where the arrow stands level
+     with the glass row) the mark goes back into the column, stacked, and the
+     audit names what that costs. Decided off the same measurements the audit
+     makes, never a width typed here. */
+  const grd = col.querySelector('.steps__step[data-step="grd"]');
+  const glass = col.querySelector('.steps__step[data-step="glass"]');
+  const fit = () => {
   col.style.removeProperty('--steps-gap');
   col.style.removeProperty('--steps-pad');
   let H = col.offsetHeight;
@@ -4154,7 +4240,11 @@ function placeSteps() {
      12 px ABOVE the door's middle with gap left to give. So it shrinks to the
      height that fits under the floor however it stands — centred (its foot at
      mid + h/2) and pushed (at push + h) — and takes its top again after. */
-  const gaps = Math.max(1, col.querySelectorAll('.steps__step').length - 1);
+  /* ⚠ AND THE GAPS ARE THE ONES ON SCREEN (2.10.2026): an absent step's mark
+     is `hidden` and a mark beside the glass is out of the flow — neither
+     stands between two others. */
+  const rows = [...col.querySelectorAll('.steps__step')].filter(e => !e.hidden && !(e === grd && col.dataset.grd));
+  const gaps = Math.max(1, rows.length - 1);
   if (top + H > floor) {
     const fits = Math.min(2 * (floor - mid), floor - push);
     let give = H - fits;
@@ -4168,6 +4258,34 @@ function placeSteps() {
   }
   if (top + H > floor) top = floor - H;
   wrapEl.style.setProperty('--steps-top', `${Math.round(top - wrap.y)}px`);
+  };
+  /* the tab beside the glass row touches nothing on the wall, and stays on
+     the stage: the door's SETTLED box (as `placeUndo` reads it — an entrance
+     transform must not decide this), the arrows (their box is kept on the
+     summary, so the mark does not move between steps), the price, the wall's
+     controls and the undo pills */
+  const besideClear = () => {
+    const r = grd.getBoundingClientRect(), st = $('#stage')?.getBoundingClientRect();
+    if (!r.width || !st || r.left < st.left || r.right > st.right || r.top < st.top || r.bottom > st.bottom) return false;
+    const fEl = document.querySelector('.door-svg #frame'), sEl = fEl && fEl.ownerSVGElement;
+    const m = sEl && typeof fEl.getBBox === 'function' ? sEl.getScreenCTM() : null;
+    const bb = m ? fEl.getBBox() : null;
+    const frame = bb && bb.width > 0
+      ? { left: m.e + m.a * bb.x, right: m.e + m.a * (bb.x + bb.width), top: m.f + m.d * bb.y, bottom: m.f + m.d * (bb.y + bb.height) }
+      : fEl && fEl.getBoundingClientRect();
+    const others = [frame, ...[...document.querySelectorAll('.stage__arrow, #quote, .stage__hud .hud__slot, .stage__undo .undo-pill')]
+      .map(e => e.getBoundingClientRect())].filter(o => o && o.right > o.left);
+    return !others.some(o => r.left < o.right && r.right > o.left && r.top < o.bottom && r.bottom > o.top);
+  };
+  if (grd && glass && !grd.hidden) {
+    col.dataset.grd = 'beside';
+    fit();
+    col.style.setProperty('--grd-top', `${glass.offsetTop}px`);
+    if (besideClear()) return;
+  }
+  delete col.dataset.grd;
+  col.style.removeProperty('--grd-top');
+  fit();
 }
 
 function fitStage() {

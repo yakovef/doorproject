@@ -52,10 +52,20 @@ const CODE = new RegExp(`^DM-[0-9A-Z]{${encodeCode(DEFAULTS).length - 3}}$`);
 /* ⚠ THE WALK'S LENGTH, STATED ONCE — 28.9.2026. Nine question steps and the
    summary since the extra lock got its own step (`xlock`, after the פרזול).
    Sixteen places in this file had typed 8 or 9 by hand, and a tenth step would
-   have left every walk one step short, green. `WANT_ORDER` (the arrival block)
-   asserts the page's navigator is exactly this long. */
-const QUESTIONS = 9;
-const STEPS = QUESTIONS + 1;
+   have left every walk one step short, green.
+   ⚠ AND READ OFF THE PAGE SINCE 2.10.2026: the window's designs are a step
+   that is PRESENT only with a window (`grd`), so the length of the walk is a
+   property of the door, not of the file. `QUESTIONS` and `STEPS` are now the
+   page's own count on the door it opens with (no window: nine and ten),
+   read from the navigator's present marks once the browser is up (below),
+   and `presentSteps(page)` answers it for any door a walk is standing on. The
+   navigator block asserts the two counts by number — ten marks without a
+   window, eleven with — so a derivation that drifted cannot pass by
+   agreeing with itself. Three more hand-typed counts were found doing this
+   (`8 * KB.length`, `LAND.length * 9`, `walked < 8`) and derive now. */
+const presentSteps = pg => pg.evaluate(() =>
+  [...document.querySelectorAll('.steps__step')].filter(x => !x.hidden).map(x => x.dataset.step));
+let QUESTIONS = 0, STEPS = 0;
 
 const VIEWS = [
   { name: 'phone',    w: 390,  h: 844 },
@@ -98,6 +108,15 @@ let b = tourless(await chromium.launch({ executablePath: '/opt/pw-browsers/chrom
 let faults = 0;
 let crashes = 0;
 const fault = (view, msg) => { faults++; console.log(`  ✗ [${view}] ${msg}`); };
+{
+  const pg = await b.newPage({ viewport: { width: 1280, height: 720 } });
+  await pg.goto(`file://${process.cwd()}/index.html`);
+  await pg.waitForSelector('.steps__step');
+  STEPS = (await presentSteps(pg)).length;
+  QUESTIONS = STEPS - 1;
+  await pg.close();
+  if (STEPS < 2) fault('steps', `the page opens with ${STEPS} navigator marks — every walk below would measure nothing`);
+}
 
 /* ── A VIEWPORT THAT KILLED THE BROWSER IS SKIPPED, LOUDLY ────────────
    Chromium in some containers stops being able to rasterise this page, and the
@@ -420,17 +439,27 @@ for (const v of VIEWS) {
      And every group carries its one line of plain Hebrew. Both halves are
      asserted because both shipped missing once: four of eleven groups had no
      `hint` and there was no `<details>` anywhere in the project. */
-  const explains = await p.evaluate(() => ({
-    steps: document.querySelectorAll('.sect[data-section]').length,
-    exps: document.querySelectorAll('.sect .sect__exp').length,
+  /* ⚠ RESTATED 2.10.2026, same subject (a step and its explainer, one for
+     one): counted over the steps that are THERE — the present marks — since
+     the designs' step is present only with a window; every built card is
+     still asked to carry one (`built` below), so a step that is absent here
+     cannot ship without its explainer either. */
+  const explains = await p.evaluate(() => {
+    const here = [...document.querySelectorAll('.steps__step')].filter(x => !x.hidden).map(x => x.dataset.step);
+    const at = k => document.querySelector(`.sect[data-section="${k}"]`);
+    return {
+    steps: here.filter(at).length,
+    exps: here.filter(k => at(k)?.querySelector('.sect__exp')).length,
+    built: document.querySelectorAll('.sect[data-section]').length,
+    builtExps: document.querySelectorAll('.sect[data-section] .sect__exp').length,
     open: document.querySelectorAll('.sect .sect__exp[open]').length,
     empty: [...document.querySelectorAll('.sect .sect__a')]
       .filter(e => (e.textContent || '').trim().length < 40).length,
     fields: document.querySelectorAll('.field[data-group]').length,
     hinted: document.querySelectorAll('.field[data-group] .field__hint').length,
-  }));
-  if (explains.exps !== explains.steps) {
-    fault(v.name, `${explains.steps} steps and ${explains.exps} explainers — a step that `
+  }; });
+  if (!explains.steps || explains.exps !== explains.steps || explains.builtExps !== explains.built) {
+    fault(v.name, `${explains.steps} present steps and ${explains.exps} explainers (${explains.built} built, ${explains.builtExps} explained) — a step that `
                 + 'cannot answer "what is this?" is the cabinet again with wider margins');
   }
   if (explains.open) fault(v.name, `${explains.open} explainer(s) start open`);
@@ -726,6 +755,21 @@ for (const v of VIEWS) {
         fault(v.name, `the summary picture "${r.key}" is named "${r.name.trim()}" and its row `
           + `says "${val}" — the name under the picture is not the thing chosen`);
       }
+    }
+    /* ⚠ AND THE DESIGNS' ROW GOES TO THE DESIGNS' STEP (2.10.2026): the
+       designs are their own step now (`grd`), and this door carries a grid, so
+       `stepFor('grille')` — `sectionOf`, no hand map — must name it, and a tap
+       must land there. */
+    const gRow = rows.find(r => r.key === 'grille');
+    if (!gRow) fault(v.name, 'the summary of a door with a grid has no grille row — the designs\' row clause has no subject');
+    else {
+      if (gRow.step !== 'grd') fault(v.name, `the summary's grille row goes to step "${gRow.step}" — the designs are their own step, "grd"`);
+      await p.evaluate(() => document.querySelector('.spec__row[data-key="grille"]').click());
+      await p.waitForTimeout(400);
+      const live = await p.evaluate(() => (document.querySelector('.sect.is-live') || {}).dataset?.section);
+      if (live !== 'grd') fault(v.name, `tapping the grille row opened step "${live}" — the designs' step is "grd"`);
+      await p.evaluate(() => document.querySelector('.steps__step[data-step="sum"]')?.click());
+      await p.waitForTimeout(400);
     }
     /* And the tap actually lands there. One row is enough to prove the wiring;
        `stepFor` is asserted per row above. */
@@ -1660,8 +1704,11 @@ for (const v of VIEWS) {
     if (!fresh || !after) {
       fault(v.name, 'no [data-wa] on the page at all — the walked-door opener '
         + 'check cannot see its subject and is dead');
-    } else if (walked < 8) {
-      fault(v.name, `the guide could only be walked ${walked} of 8 steps forward `
+    /* ⚠ DERIVED 2.10.2026 (it was a typed 8, stale since the tenth mark on
+       28.9: every press of the way on must move, QUESTIONS of them reach the
+       summary) */
+    } else if (walked < QUESTIONS) {
+      fault(v.name, `the guide could only be walked ${walked} of ${QUESTIONS} steps forward `
         + 'with the button — this check cannot reach the summary');
     } else {
       if (fresh.asks || !fresh.claims) {
@@ -1692,7 +1739,12 @@ for (const v of VIEWS) {
      it. Walked rather than asserted at one point, because a navigator that
      works for the first circle and not the seventh is the fault this is for. */
   {
-    const keys = await p.evaluate(() =>
+    /* ⚠ THE MARKS THAT ARE THERE (2.10.2026): the designs' mark is built and
+       hidden on a door with no window, and a hidden circle is not one a
+       customer can press — so the walk is the PRESENT marks, and every mark
+       in the DOM (present or not) is read beside it for the order below. */
+    const keys = await presentSteps(p);
+    const built = await p.evaluate(() =>
       [...document.querySelectorAll('.steps__step')].map(b => b.dataset.step));
 
     /* ⚠ THE ORDER OF THE QUESTIONS, WHICH NOTHING IN THIS REPOSITORY WAS
@@ -1733,13 +1785,27 @@ for (const v of VIEWS) {
        window section before the face section."* The pair stays adjacent (§3).
        Falsified by swapping them back in SECTIONS: this fires at every
        viewport. */
+    /* ⚠ RESTATED 2.10.2026, same subject (the WHOLE sequence, off the
+       rendered navigator), as TWO expectations, because the designs are a step
+       of their own present only with a window (the owner's son: *"a separate
+       section … only appearing if you choose one of the windows — an icon next
+       to the window one"*): this door (no window) is asked as WANT_ORDER, and
+       the navigator holds, in order, WANT_GLAZED — the designs directly after
+       the glass — with that one mark hidden. The glazed door's own sequence is
+       walked by the navigator block. Falsified by moving `grd` in SECTIONS. */
     const WANT_ORDER = ['fit', 'colour', 'lock', 'pz', 'xlock', 'glass', 'face', 'grip', 'mk', 'sum'];
+    const WANT_GLAZED = ['fit', 'colour', 'lock', 'pz', 'xlock', 'glass', 'grd', 'face', 'grip', 'mk', 'sum'];
     if (keys.join(',') !== WANT_ORDER.join(',')) {
       fault(v.name, `the flow asks its questions as ${keys.join(' → ')}, `
         + `and it should be ${WANT_ORDER.join(' → ')} `
         + '(the owner\'s son, 26.9.2026: the finish right after the lever, the pull '
         + 'handle after the panels and the glass — overruling Peretz\'s 30.8 "handles '
-        + 'before the panels"; משקוף last, 30.8; the window before the face, 29.9)');
+        + 'before the panels"; משקוף last, 30.8; the window before the face, 29.9; '
+        + 'the designs only with a window, 2.10)');
+    }
+    if (built.join(',') !== WANT_GLAZED.join(',')) {
+      fault(v.name, `the navigator holds ${built.join(' → ')} — with a window it asks ${WANT_GLAZED.join(' → ')}, `
+        + 'the designs directly after the glass (2.10)');
     }
 
     for (const k of keys) {
@@ -2365,6 +2431,23 @@ for (const v of VIEWS) {
        ⚠ ONE LEVEL NOW, NOT TWO. It used to open the section and then the
        category inside it, because the cabinet was two deep. A step holds one
        or two groups and shows them both. */
+    /* ⚠ AND A STEP THAT IS NOT THERE IS REACHED THE WAY A PERSON REACHES IT —
+       2.10.2026. The window's designs are their own step (`grd`), present
+       only with a window: its mark is hidden on this door, and a hidden
+       circle cannot be pressed (Playwright waits on it for ever). So the walk
+       gives the step its subject first — the square window on the glass step,
+       answering yes — and then goes to it; a mark still hidden is a fault. */
+    const STEP_UNLOCK = { grd: ['glass', 'window', 'rect'] };
+    if (STEP_UNLOCK[section] && await p.$eval(`.steps__step[data-step="${section}"]`, el => el.hidden)) {
+      const [st, ug, uid] = STEP_UNLOCK[section];
+      await p.click(`.steps__step[data-step="${st}"]`);
+      await p.waitForTimeout(70);
+      await p.$eval(`.field[data-group="${ug}"] [data-id="${uid}"]`, el => el.click());
+      await p.waitForTimeout(30);
+      await p.evaluate(() => { const d = document.querySelector('#confirm'); if (d && d.open) document.querySelector('#confirm-yes')?.click(); });
+      await p.waitForTimeout(30);
+      if (await p.$eval(`.steps__step[data-step="${section}"]`, el => el.hidden)) { fault(v.name, `the ${section} step is still not there after choosing ${uid} on ${st}`); continue; }
+    }
     await p.click(`.steps__step[data-step="${section}"]`);
     await p.waitForTimeout(70);
     const onStep = await p.$eval(`.sect[data-section="${section}"]`, el => !el.hidden);
@@ -3833,7 +3916,8 @@ for (const v of VIEWS) {
     for (const id of ['he', 'en', 'ru']) {
       await pg.goto(root + `index.html?lang=${id}`);
       await pg.evaluate(() => document.fonts.ready);
-      const steps = await pg.evaluate(() => [...document.querySelectorAll('.steps__step')].map(s => s.dataset.step));
+      /* the steps that are there (2.10): the designs' mark is hidden without a window */
+      const steps = await presentSteps(pg);
       const heights = () => pg.evaluate(() => [...document.querySelectorAll(
         '#choices p, #choices .field__hint, #choices .sect__where, #choices summary, #choices .tile__name, #choices .spec__name')]
         .filter(e => e.offsetParent && e.textContent.trim()).map(e => { const cs = getComputedStyle(e);
@@ -4389,8 +4473,9 @@ for (const v of VIEWS) {
   if (!steps) {
     fault('landscape', 'not one step was measured — the sweep walked nothing');
   }
-  if (steps < LAND.length * 9) {
-    fault('landscape', `only ${steps} of ${LAND.length * 9} steps were measured — the walk stopped short`);
+  /* derived 2.10.2026 (a typed 9): every step of the walk, the summary too */
+  if (steps < LAND.length * STEPS) {
+    fault('landscape', `only ${steps} of ${LAND.length * STEPS} steps were measured — the walk stopped short`);
   }
   void exemptSeen; void exemptWide;
   if (!faults) {
@@ -4793,7 +4878,8 @@ for (const v of VIEWS) {
   /* §5.15, twice: a sweep that walked nothing, and one that walked fewer steps
      than the flow has, both read green without these. */
   if (measured < 200) fault('keyboard', `only ${measured} focus moves were measured across ${KB.length} widths — the sweep is not walking the guide`);
-  if (stepsSeen < 8 * KB.length) fault('keyboard', `${stepsSeen} question steps were reached of ${8 * KB.length} — the walk stopped short`);
+  /* derived 2.10.2026 (a typed 8, a step short since 28.9) */
+  if (stepsSeen < QUESTIONS * KB.length) fault('keyboard', `${stepsSeen} question steps were reached of ${QUESTIONS * KB.length} — the walk stopped short`);
   if (!faults) console.log(`    ${measured} focused options across ${stepsSeen} steps and ${KB.length} widths: every one whole on screen`);
 }
 
@@ -4965,7 +5051,7 @@ for (const v of VIEWS) {
         }
       });
       if (err) fault(where, err);
-      if (n < 8) fault(where, `only ${n} of 8 question steps were walked`);
+      if (n < QUESTIONS) fault(where, `only ${n} of ${QUESTIONS} question steps were walked`);   // derived 2.10 (a typed 8)
     } catch (e) {
       fault(where, `could not be walked: ${e.message}`);
     }
@@ -4983,8 +5069,8 @@ for (const v of VIEWS) {
       await walk(p, m => { n++; if (m.tiles && m.any) shows.push(m.step); });
     } catch { /* counted as none below, and `n` will say so */ }
     await p.close().catch(() => {});
-    if (n < 8) {
-      fault('answer', `${v.name}: only ${n} of 8 steps were walked, so this exemption is not being checked`);
+    if (n < QUESTIONS) {   // derived 2.10 (a typed 8)
+      fault('answer', `${v.name}: only ${n} of ${QUESTIONS} steps were walked, so this exemption is not being checked`);
     } else if (shows.join(',') !== v.shows.join(',')) {
       fault('answer', `${v.name} now shows an answer on ${shows.length ? shows.join(', ') : 'no step'} — `
         + `the exemption names ${v.shows.join(', ')}. If it shows more, narrow the exemption here and in `
@@ -5101,7 +5187,10 @@ for (const v of VIEWS) {
     }
   };
   const walkAll = async (pg, narrow, tag) => {
-    for (const k of await pg.evaluate(() => [...document.querySelectorAll('.steps__step[data-step]')].map(e => e.dataset.step))) {
+    /* the PRESENT marks (2.10, prompt D's designs step: its mark is built and
+       hidden without a window, and a press on it is refused — the walk read
+       the glass step twice and never the designs) */
+    for (const k of await presentSteps(pg)) {
       await pg.evaluate(s => document.querySelector(`.steps__step[data-step="${s}"]`)?.click(), k);
       await pg.waitForTimeout(160);
       judge(await pg.evaluate(where), narrow, tag);
@@ -6705,8 +6794,22 @@ for (const v of VIEWS) {
       };
       const rail = [...document.querySelectorAll('.steps__g')]
         .map(s => [...s.querySelectorAll('path')].map(q => q.getAttribute('d')).join('|'));
-      return { nav: read('steps__g'), spec: read('spec__ico', 'spec__art'), rail };
+      /* the marks a customer SEES against the steps that are there (2.10): a
+         step absent from the walk (the designs, on this solid door) is built
+         and must not render; every present one must */
+      const marks = [...document.querySelectorAll('.steps__step')]
+        .map(x => ({ k: x.dataset.step, hidden: x.hidden, seen: x.checkVisibility() }));
+      return { nav: read('steps__g'), spec: read('spec__ico', 'spec__art'), rail, marks };
     });
+    /* ⚠ RESTATED 2.10.2026, same subject (the rail is the table the page
+       uses, every mark accounted for): every built mark is a SECTION_ICON
+       (below), and the marks SEEN are exactly the steps present — the
+       designs' mark (`grd`) built and hidden on a door with no window, every
+       present one drawn. Falsified by dropping the line in `markSteps` that
+       hides an absent mark: the designs' circle is drawn on the solid door. */
+    const shownWrong = style.marks.filter(m => m.seen === m.hidden).map(m => `${m.k} (${m.hidden ? 'absent, drawn' : 'present, not drawn'})`);
+    if (!style.marks.some(m => m.hidden)) fault('marks', 'no mark is absent on a door with no window — the designs\' mark should be built and hidden; the seen-vs-present clause has no subject');
+    if (shownWrong.length) fault('marks', `the rail's seen marks are not the steps present: ${shownWrong.join(', ')}`);
 
     const ds = art => [...art.matchAll(/ d="([^"]*)"/g)].map(m => m[1]).join('|');
     const navArt = Object.fromEntries(Object.entries(SECTION_ICON).map(([k, d]) => [k, ds(d)]));
@@ -6846,9 +6949,14 @@ for (const v of VIEWS) {
     try {
       await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
       await p.waitForTimeout(900);
-      for (let s = 0; s < QUESTIONS; s++) {
+      /* ⚠ TO THE SUMMARY, NOT A COUNT (2.10.2026): the taps below can leave a
+         window on the door, and then the designs are one more step — a walk of
+         QUESTIONS presses would stop one short. One spare press; the summary
+         ends it. */
+      for (let s = 0; s <= QUESTIONS + 1; s++) {
         const live = await p.evaluate(() => document.querySelector('.sect.is-live')?.dataset.section || null);
         if (!live) { fault(where, 'no live step — this check has no subject'); break; }
+        if (live === 'sum') break;
         /* ⚠ RESTATED 27.9.2026 ON BOTH AXES, SAME SUBJECT (the live mark is
            whole in its navigator). Above 1100 the navigator is a COLUMN now,
            and a circle cut by the row's inline edges is no longer the only way
@@ -7103,10 +7211,16 @@ for (const v of VIEWS) {
     try {
       await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
       await p.waitForTimeout(700);
+      /* ⚠ 2.10.2026: every mark in the navigator, the designs' among them —
+         which is present only with a window, so the walk chooses the square
+         window on the glass step and reads the designs' explainer (its
+         surcharge is an argument, §5.25) on the next. A mark still absent when
+         the walk reaches it is a fault, not a skip. */
       const keys = await p.evaluate(() => [...document.querySelectorAll('.steps__step[data-step]')].map(e => e.dataset.step));
-      if (keys.length < 9) fault(where, `the navigator has ${keys.length} circles — this walk has no steps to read`);
+      if (keys.length < STEPS) fault(where, `the navigator has ${keys.length} circles — this walk has no steps to read`);
       let sawColour = false, sawSum = false;
       for (const k of keys) {
+        if (!(await presentSteps(p)).includes(k)) { fault(where, `the "${k}" mark is not there when the walk reaches it (the window was chosen on the glass step)`); continue; }
         await p.evaluate(k => document.querySelector(`.steps__step[data-step="${k}"]`)?.click(), k);
         await p.waitForTimeout(300);
         const r = await p.evaluate(() => {
@@ -7147,6 +7261,12 @@ for (const v of VIEWS) {
         if (r.key === 'colour') {
           sawColour = true;
           if (!r.a.includes(measured)) fault(where, `the colour step's explainer does not say "${measured}"`);
+        }
+        if (r.key === 'glass') {
+          await p.evaluate(() => document.querySelector('.sect.is-live [role="radio"][data-id="rect"]')?.click());
+          await p.waitForTimeout(250);
+          await p.evaluate(() => { const d = document.querySelector('#confirm'); if (d && d.open) document.querySelector('#confirm-yes')?.click(); });
+          await p.waitForTimeout(200);
         }
         if (r.key === 'sum') {
           sawSum = true;
@@ -7405,7 +7525,11 @@ for (const v of VIEWS) {
     try {
       await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
       await pg.waitForTimeout(500);
-      for (const step of ['fit', 'colour', 'lock', 'pz', 'glass', 'face', 'grip']) {
+      /* ⚠ 2.10.2026: and the designs (`grd`), their own step, present after
+         the glass walk leaves a window on the door — two headed groups, each
+         black design with its door-colour twin beside it, walked in drawn
+         order (the walk asserts the step is there before walking it) */
+      for (const step of ['fit', 'colour', 'lock', 'pz', 'glass', 'grd', 'face', 'grip']) {
         /* ⚠ 29.9.2026: the glass step comes BEFORE the face now and its walk
            leaves a window on the door — beside the slot every face tile is
            greyed and the face walk would press nothing. The window goes first,
@@ -7418,6 +7542,10 @@ for (const v of VIEWS) {
         }
         await pg.evaluate(k => document.querySelector(`.steps__step[data-step="${k}"]`)?.click(), step);
         await pg.waitForTimeout(350);
+        if ((await pg.evaluate(() => document.querySelector('.sect.is-live')?.dataset.section)) !== step) {
+          fault('arrow-order', `${lang} ${w}x${h}: the "${step}" mark did not open its step${step === 'grd' ? ' — the glass walk left a window, so the designs should be there' : ''}`);
+          continue;
+        }
         const read = () => pg.evaluate(() => {
           const f = document.querySelector('.sect.is-live .field');
           if (!f) return null;
@@ -7469,7 +7597,7 @@ for (const v of VIEWS) {
       fault('arrow-order', `${lang} ${w}x${h}: chromium died during the walk`);
     } finally { await pg.close().catch(() => {}); }
   }
-  if (walkedSteps < 14) fault('arrow-order', `only ${walkedSteps} of 14 steps walked — this check is measuring less than it says`);
+  if (walkedSteps < 16) fault('arrow-order', `only ${walkedSteps} of 16 steps walked — this check is measuring less than it says`);
   if (faults === before) console.log(`    ${presses} presses over ${walkedSteps} steps in two languages: every "next" the next free tile drawn, wrapping, every "prev" the one before (${asked} presses asked first and were answered yes)`);
 }
 
@@ -7557,7 +7685,7 @@ for (const v of VIEWS) {
 /* ── THE WINDOW DESIGNS: REGULAR, THEN SPECIAL, EACH ONE'S TWO COLOURS TOGETHER
    28.9.2026, the owner's son: *"Put the expensive window designs apart from the
    regular ones, and keep the same designs in different colours near each
-   other."* On the glass step, in Hebrew and Russian: exactly two headings; the
+   other."* On the designs' step (`grd`, its own since 2.10), in Hebrew and Russian: exactly two headings; the
    first group every design the list prices at nothing, the second every one it
    prices at something, its heading carrying that surcharge; every `-light`
    twin drawn directly after its black design; every design drawn once. */
@@ -7571,11 +7699,13 @@ for (const v of VIEWS) {
     try {
       await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&w=rect`);
       await pg.waitForTimeout(400);
-      await pg.evaluate(() => document.querySelector('.steps__step[data-step="glass"]')?.click());
+      /* ⚠ 2.10.2026: the designs are their own step (`grd`), so its mark */
+      await pg.evaluate(() => document.querySelector('.steps__step[data-step="grd"]')?.click());
       await pg.waitForTimeout(300);
+      if ((await pg.evaluate(() => document.querySelector('.sect.is-live')?.dataset.section)) !== 'grd') { fault('grille-groups', `${lang}: the designs' mark did not open the designs' step`); continue; }
       const seq = await pg.evaluate(() => [...(document.querySelector('.field[data-group="grille"] .field__opts')?.children || [])]
         .map(e => e.classList.contains('opts__sub') ? `#${e.textContent.trim()}` : e.dataset.id).filter(Boolean));
-      if (!seq.length) { fault('grille-groups', `${lang}: no grille field on the glass step — nothing to check`); continue; }
+      if (!seq.length) { fault('grille-groups', `${lang}: no grille field on the designs' step — nothing to check`); continue; }
       read++;
       const heads = seq.map((x, i) => [x, i]).filter(([x]) => x.startsWith('#'));
       if (heads.length !== 2 || heads[0][1] !== 0) { fault('grille-groups', `${lang}: ${heads.length} headings (${heads.map(h => h[0]).join(' | ')}) — two, the first on top`); continue; }
@@ -7605,38 +7735,52 @@ for (const v of VIEWS) {
    to it, the two ways a door arrives — a link (the paint at boot) and a tap
    (the paint after a change), both directions — as the finish group's block
    does, because a listing rule read when the tiles were built froze once
-   (8.9). While hidden no design tile is visible, so none can be tapped from
-   the page; a LINK carrying a design and no window still brings its window
-   (`repair`), and the field is shown on that door. And the step's arrows walk
-   the window list alone: none → slot → square → none, with no dialog.
-   §5.15: every reading asserts it found the field. Falsified by dropping
-   `when` from the grille group: the solid door's clauses fire. */
+   (8.9). A LINK carrying a design and no window still brings its window
+   (`repair`), and the designs are on that door. And the glass step's arrows
+   walk the window list alone: none → slot → square → none, with no dialog.
+   ⚠ RESTATED 2.10.2026, same subject (the designs on the page exactly with a
+   window), from the FIELD's hiding to the STEP's presence — the owner's son:
+   *"Make the window design a separate section like our 10 existing ones, but
+   only appearing if you choose one of the windows."* The designs are their
+   own step (`grd`): with a window its mark is in the navigator right after the
+   glass and its card holds the designs; without one the mark is hidden, the
+   glass step's way on leads to the face, and no design tile is visible
+   anywhere. A tap on "none" while the designs are LIVE takes the step away and
+   lands on the glass (the undo half of that is the navigator block's walk).
+   §5.15: every reading asserts it found its subject. Falsified by dropping
+   the step's `when`: the solid door's clauses fire. */
 {
-  console.log('\nthe window designs are on the page only with a window');
+  console.log('\nthe window designs are a step of their own, there only with a window');
   const before = faults;
   const pg = await b.newPage({ viewport: { width: 1280, height: 800 } });
   const read = () => pg.evaluate(() => {
     const f = document.querySelector('.field[data-group="grille"]');
-    if (!f) return null;
+    const mark = document.querySelector('.steps__step[data-step="grd"]');
+    if (!f || !mark) return null;
+    const here = [...document.querySelectorAll('.steps__step')].filter(x => !x.hidden).map(x => x.dataset.step);
     const tiles = [...f.querySelectorAll('[role="radio"]')];
-    return { hidden: f.hidden, seen: f.checkVisibility(), tileSeen: tiles.some(t => t.checkVisibility()),
+    const next = [...document.querySelectorAll('.sect[data-section="glass"] .sect__next')][0];
+    return { present: !mark.hidden && here.includes('grd'), after: here[here.indexOf('glass') + 1],
+             inStep: f.closest('.sect')?.dataset.section, tileSeen: tiles.some(t => t.checkVisibility()),
+             live: document.querySelector('.sect.is-live')?.dataset.section,
              win: document.querySelector('.field[data-group="window"] [aria-checked="true"]')?.dataset.id };
   });
   const toGlass = () => pg.evaluate(() => document.querySelector('.steps__step[data-step="glass"]')?.click());
   let asked = 0;
   const judge = (m, want, what) => {
-    if (!m) { fault('grille-when', `${what}: no designs field on the page — nothing to check`); return; }
+    if (!m) { fault('grille-when', `${what}: no designs field or no designs mark on the page — nothing to check`); return; }
     asked++;
-    if (m.seen !== want || m.hidden === want || m.tileSeen !== want) {
-      fault('grille-when', `${what}: the window designs are ${m.seen ? 'shown' : 'hidden'} `
-        + `(${m.tileSeen ? 'a tile visible' : 'no tile visible'}) on a door with window "${m.win}" — `
-        + `they should be ${want ? 'shown' : 'hidden'}`);
+    if (m.inStep !== 'grd') fault('grille-when', `${what}: the designs are on the "${m.inStep}" step — they are a step of their own`);
+    if (m.present !== want || (want && m.after !== 'grd') || (!want && m.tileSeen)) {
+      fault('grille-when', `${what}: the designs' step is ${m.present ? 'there' : 'not there'} `
+        + `(after the glass: "${m.after}"; ${m.tileSeen ? 'a design tile visible' : 'no design tile visible'}) on a door with window "${m.win}" — `
+        + `it should be ${want ? 'there, right after the glass' : 'gone'}`);
     }
   };
   for (const [q, want, what, win] of [['', false, 'a solid door', 'none'], ['&w=strip', true, 'the tall slot', 'strip'],
        ['&w=rect', true, 'the square window', 'rect'],
        /* a design with no window in a LINK: repair brings the window, so the
-          designs are on the page with it (SAID.windowAdded) */
+          designs are there with it (SAID.windowAdded) */
        ['&w=none&g=scroll', true, 'a design linked without a window', null]]) {
     await pg.goto(`file://${process.cwd()}/index.html?lang=he${q}`);
     await pg.waitForTimeout(300);
@@ -7660,6 +7804,40 @@ for (const v of VIEWS) {
     if (m && m.win !== id) fault('grille-when', `tapping "${id}": the window is "${m.win}" — the tap did not land`);
     judge(m, want, `tapping "${id}"`);
   }
+  /* the glass step's way on: to the designs with a window, past them without */
+  for (const [id, to] of [['rect', 'grd'], ['none', 'face']]) {
+    await toGlass();
+    await pg.waitForTimeout(150);
+    await pg.evaluate(i => document.querySelector(`.field[data-group="window"] [data-id="${i}"]`)?.click(), id);
+    await pg.waitForTimeout(150);
+    await pg.evaluate(() => [...document.querySelectorAll('.sect.is-live .sect__next')].find(x => x.offsetParent && !x.disabled)?.click());
+    await pg.waitForTimeout(300);
+    const m = await read();
+    asked++;
+    if (!m || m.live !== to) fault('grille-when', `the way on from the glass with window "${id}" lands on "${m && m.live}" — it should be "${to}"`);
+  }
+  /* "none" tapped while the designs are LIVE: the step goes and the glass is live */
+  await toGlass();
+  await pg.waitForTimeout(150);
+  await pg.evaluate(() => document.querySelector('.field[data-group="window"] [data-id="rect"]')?.click());
+  await pg.waitForTimeout(150);
+  await pg.evaluate(() => document.querySelector('.steps__step[data-step="grd"]')?.click());
+  await pg.waitForTimeout(250);
+  const onGrd = await read();
+  if (!onGrd || onGrd.live !== 'grd') fault('grille-when', `the designs' mark opened "${onGrd && onGrd.live}" — the "none while live" clause has no subject`);
+  else {
+    /* the undo takes the window back off (the tap before it was "none"),
+       while the designs are the live step */
+    await pg.evaluate(() => document.querySelector('#undo-btn')?.click());
+    await pg.waitForTimeout(400);
+    const m = await read();
+    asked++;
+    if (!m || m.present || m.live !== 'glass') fault('grille-when', `the window taken away while the designs were live (an undo): the step is ${m && m.present ? 'still there' : 'gone'} and "${m && m.live}" is live — it should be gone, with the glass live`);
+  }
+  await toGlass();
+  await pg.waitForTimeout(150);
+  await pg.evaluate(() => document.querySelector('.field[data-group="window"] [data-id="none"]')?.click());
+  await pg.waitForTimeout(200);
   const walk = [];
   for (let k = 0; k < 3; k++) {
     await pg.evaluate(() => document.querySelector('.stage__arrow--next').click());
@@ -7674,8 +7852,49 @@ for (const v of VIEWS) {
   }
   if (walk.join(',') !== 'strip,rect,none') fault('grille-when', `the arrows walk the window step as none → ${walk.join(' → ')} — it should be none → strip → rect → none`);
   await pg.close().catch(() => {});
-  if (asked < 11) fault('grille-when', `only ${asked} of 11 readings taken — this check is measuring less than it says`);
-  if (faults === before) console.log(`    ${asked} readings: hidden on a solid door and after "none", shown with either window, by link and by tap; a design linked without a window brings it; the arrows walk none → slot → square → none, asking nothing`);
+  if (asked < 14) fault('grille-when', `only ${asked} of 14 readings taken — this check is measuring less than it says`);
+  if (faults === before) console.log(`    ${asked} readings: the designs a step of their own, right after the glass with either window and gone without one, by link and by tap; the glass step's way on to them or past them; a design linked without a window brings it; the window taken away while they were live leaves the glass live; the arrows walk none → slot → square → none, asking nothing`);
+}
+
+/* ── "STEP N OF M" COUNTS THE STEPS THAT ARE THERE — 2.10.2026 ──────────────
+   The designs are a step present only with a window (`grd`), so the eyebrow
+   over each step's question counts the PRESENT steps: nine questions on a
+   solid door, ten with a window — the face step reads "7 of 9" or "8 of 10" as
+   the window comes and goes. Nothing asserted the eyebrow before. In Hebrew,
+   English and Russian, on a solid door and a glazed one, every present step is
+   opened by its mark and its `[data-step-n]` must read exactly
+   `nav.stepOf(i + 1, M)` — M typed here, 9 and 10, and the summary its own
+   line. Falsified by putting `SECTIONS.length` back in `markSteps`: the solid
+   door reads "of 10". */
+{
+  console.log('\n"step N of M" counts the steps that are there');
+  const before = faults;
+  let read = 0;
+  for (const lang of ['he', 'en', 'ru']) for (const [q, M] of [['', 9], ['&w=rect', 10]]) {
+    const tag = `${lang} ${q ? 'glazed' : 'solid'}`;
+    const pg = await b.newPage({ viewport: { width: 1280, height: 720 } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}${q}`);
+      await pg.waitForTimeout(500);
+      const keys = await presentSteps(pg);
+      if (keys.length !== M + 1) { fault('step-n', `${tag}: ${keys.length} present steps — ${M} questions and the summary`); continue; }
+      for (const [i, k] of keys.entries()) {
+        await pg.evaluate(k => document.querySelector(`.steps__step[data-step="${k}"]`)?.click(), k);
+        await pg.waitForTimeout(160);
+        const got = await pg.evaluate(() => ({ live: document.querySelector('.sect.is-live')?.dataset.section,
+          n: document.querySelector('.sect.is-live [data-step-n]')?.textContent?.trim() }));
+        const want = withLang(lang, () => k === 'sum' ? T('step.sum.s') : T('nav.stepOf', i + 1, M));
+        read++;
+        if (got.live !== k) fault('step-n', `${tag}: the "${k}" mark opened "${got.live}"`);
+        else if (got.n !== want) fault('step-n', `${tag} step "${k}": the eyebrow reads "${got.n}" — "${want}"`);
+      }
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('step-n', `${tag}: chromium died`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (read < 3 * (10 + 11)) fault('step-n', `only ${read} of ${3 * 21} eyebrows read — this check is measuring less than it says`);
+  if (faults === before) console.log(`    ${read} eyebrows in three languages: every present step "N of 9" on a solid door and "N of 10" with a window, the summary its own line`);
 }
 
 /* ── THE BAND STANDS ON THE PHOTOGRAPH, OVER THE DOOR AND ON NOTHING ELSE ──
@@ -7830,7 +8049,8 @@ for (const v of VIEWS) {
         const W = document.querySelector('.stage-wrap').getBoundingClientRect();
         const S = document.querySelector('#stage').getBoundingClientRect();
         const rtl = document.documentElement.dir === 'rtl';
-        const steps = [...nav.querySelectorAll('.steps__step')];
+        /* the marks that are THERE (2.10): the designs' is hidden without a window */
+        const steps = [...nav.querySelectorAll('.steps__step')].filter(s => !s.hidden);
         const vis = innerWidth >= 1100 ? W : { top: 0, bottom: innerHeight, left: 0, right: innerWidth };
         const circ = s => getComputedStyle(s.querySelector('.steps__c')).backgroundColor;
         const f = document.querySelector('.door-svg #frame')?.getBoundingClientRect();
@@ -7867,7 +8087,13 @@ for (const v of VIEWS) {
         };
       }, [INK]);
       const a = await look();
-      if (!a || a.n !== STEPS) { fault('nav-column', `${tag}: ${a ? a.n : 'no'} navigator marks — this check has no subject`); continue; }
+      /* ⚠ RESTATED 2.10.2026, same subject (the navigator's marks, counted):
+         the PRESENT marks, and by number — ten on this door, which has no
+         window (nine questions and the summary); the glazed door's eleven are
+         asserted below. `STEPS` is read off the page now, so the number is
+         typed here and only here, where a derivation that drifted would be
+         caught by it. */
+      if (!a || a.n !== 10 || a.n !== STEPS) { fault('nav-column', `${tag}: ${a ? a.n : 'no'} navigator marks on a door with no window — ten (nine questions and the summary)`); continue; }
       readings++;
       const wide = w >= 1100;
       if (wide) {
@@ -7918,6 +8144,102 @@ for (const v of VIEWS) {
     } finally { await pg.close().catch(() => {}); }
   }
   if (readings < 6) fault('nav-column', `only ${readings} of 6 viewports were read — this check is measuring almost nothing`);
+  /* ⚠ AND WITH A WINDOW, ELEVEN — 2.10.2026, the owner's son: *"Make the window
+     design a separate section … only appearing if you choose one of the
+     windows — an icon next to the window one, basically a subsection."* On a
+     glazed door (a link with the square window), at a column and a row in both
+     directions: eleven present marks; the designs' (`grd`) directly after the
+     glass; its TIE drawn — a paper line whose box lies between the glass
+     square and the designs square, touching the boundary (the column: across
+     its gap; the row: across the shared edge); the column still never
+     scrolling and inside the stage; the designs walked to by their mark, the
+     live square on it, the band naming it, and the counter "7 of 10". §5.15:
+     each clause first proves its subject is on the page. Falsified by dropping
+     the section's `when` (eleven on the solid door above) and by deleting the
+     tie's rule (the tie clause). */
+  let glazedRead = 0;
+  for (const [w, h, lang] of [[1100, 800, 'he'], [1280, 720, 'en'], [390, 844, 'he'], [320, 568, 'ru']]) {
+    const tag = `${lang} ${w}x${h} glazed`;
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&w=rect`);
+      await pg.waitForTimeout(600);
+      const g = await pg.evaluate(() => {
+        const nav = document.querySelector('.steps');
+        const all = [...document.querySelectorAll('.steps__step')];
+        const here = all.filter(s => !s.hidden);
+        const at = k => here.find(s => s.dataset.step === k);
+        const gl = at('glass'), gd = at('grd');
+        if (!nav || !gl || !gd) return { keys: here.map(s => s.dataset.step) };
+        const sq = e => e.querySelector('.steps__c').getBoundingClientRect();
+        const a = sq(gl), c = sq(gd), tie = getComputedStyle(gd, '::before');
+        const gr = gd.getBoundingClientRect();
+        /* the tie's box, from its computed offsets against the designs' button */
+        const num = v => parseFloat(v) || 0;
+        const col = getComputedStyle(nav).flexDirection === 'column';
+        const rtl = document.documentElement.dir === 'rtl';
+        const tw = num(tie.width), th = num(tie.height);
+        let box;
+        if (col) { const top = gr.top + num(tie.top); box = { left: gr.left + num(tie.left), right: gr.left + num(tie.left) + tw, top, bottom: top + th }; }
+        else {
+          const start = num(rtl ? tie.right : tie.left);
+          const l = rtl ? gr.right - start - tw : gr.left + start;
+          const top = gr.top + num(tie.top);
+          box = { left: l, right: l + tw, top, bottom: top + th };
+        }
+        return { keys: here.map(s => s.dataset.step), col, rtl, mode: nav.dataset.grd || (col ? 'stacked' : 'row'),
+          tie: tie.content !== 'none' && tie.display !== 'none' ? { w: tw, h: th, bg: tie.backgroundColor, box } : null,
+          a: { left: a.left, right: a.right, top: a.top, bottom: a.bottom }, c: { left: c.left, right: c.right, top: c.top, bottom: c.bottom },
+          scrolls: col && nav.scrollHeight > nav.clientHeight + 1,
+          inStage: !col || (() => { const r = nav.getBoundingClientRect(), S = document.querySelector('#stage').getBoundingClientRect(); return r.top >= S.top - 1 && r.bottom <= S.bottom + 1; })() };
+      });
+      const want = ['fit', 'colour', 'lock', 'pz', 'xlock', 'glass', 'grd', 'face', 'grip', 'mk', 'sum'];
+      if (!g.a) { fault('nav-column', `${tag}: no glass or designs mark among the ${g.keys.length} present (${g.keys.join(' ')}) — with a window there are eleven`); continue; }
+      glazedRead++;
+      if (g.keys.join(',') !== want.join(',')) fault('nav-column', `${tag}: the marks are ${g.keys.join(' → ')} — the designs directly after the glass, eleven in all`);
+      if (!g.tie) fault('nav-column', `${tag}: the designs' mark carries no tie to the glass mark — "an icon next to the window one, basically a subsection"`);
+      else {
+        const t = g.tie.box;
+        /* thin: 2 px across; and spanning the boundary between the two squares */
+        /* ⚠ RESTATED 2.10, same subject (a 2 px line across the boundary
+           between the two squares): in the column the designs' mark stands
+           BESIDE the glass mark where the wall holds it (`placeSteps`), so
+           the line there runs across, as on the phone's row — the squares'
+           own positions say which way it must run, and the line must stay out
+           of both glyphs (11.5 px of margin each side of a 21 px mark). */
+        const stacked = g.c.top >= g.a.bottom - 1;
+        const thin = stacked ? Math.abs(g.tie.w - 2) < 0.6 : Math.abs(g.tie.h - 2) < 0.6;
+        const L = g.a.left < g.c.left ? g.a : g.c, Rr = L === g.a ? g.c : g.a;
+        const spans = stacked
+          ? t.top <= g.a.bottom + 0.5 && t.bottom >= g.c.top - 0.5 && t.left >= Math.max(g.a.left, g.c.left) - 1 && t.right <= Math.min(g.a.right, g.c.right) + 1
+          : t.left <= L.right + 0.5 && t.right >= Rr.left - 0.5 && t.left >= L.right - 11.5 && t.right <= Rr.left + 11.5
+            && t.top >= Math.max(g.a.top, g.c.top) - 1 && t.bottom <= Math.min(g.a.bottom, g.c.bottom) + 1;
+        /* and where it stands: beside in the column at these two (the
+           standard door at 1100 in Hebrew and 1280 in English holds it), the
+           next square in the phone's row */
+        if (g.mode !== (g.col ? 'beside' : 'row')) fault('nav-column', `${tag}: the designs' mark is "${g.mode}" — ${g.col ? 'beside the glass mark (the wall holds it here)' : 'the next square in the row'}`);
+        if (!thin || !spans) fault('nav-column', `${tag}: the tie is ${g.tie.w.toFixed(1)}×${g.tie.h.toFixed(1)} at ${Math.round(t.left)},${Math.round(t.top)}–${Math.round(t.right)},${Math.round(t.bottom)} — a 2 px line across the boundary between the glass square and the designs square`);
+      }
+      if (g.scrolls) fault('nav-column', `${tag}: the column of eleven scrolls — its targets fit`);
+      if (!g.inStage) fault('nav-column', `${tag}: the column of eleven leaves the stage`);
+      /* walk to the designs by their mark */
+      await pg.evaluate(() => document.querySelector('.steps__step[data-step="grd"]')?.click());
+      await pg.waitForTimeout(400);
+      const on = await pg.evaluate(() => ({ live: document.querySelector('.sect.is-live')?.dataset.section,
+        square: document.querySelector('.steps__step.is-on')?.dataset.step,
+        band: document.querySelector('[data-band-title]')?.textContent?.trim(),
+        title: document.querySelector('.sect.is-live .sect__title')?.textContent?.trim(),
+        where: document.querySelector('.sect.is-live [data-step-n]')?.textContent?.trim() }));
+      const nOf = { he: 'שלב 7 מתוך 10', en: 'Step 7 of 10', ru: 'Шаг 7 из 10' }[lang];
+      if (on.live !== 'grd' || on.square !== 'grd') fault('nav-column', `${tag}: the designs' mark opened "${on.live}" with the live square on "${on.square}"`);
+      if (!on.band || on.band !== on.title) fault('nav-column', `${tag}: on the designs the band says "${on.band}", the step "${on.title}"`);
+      if (on.where !== nOf) fault('nav-column', `${tag}: on the designs the counter reads "${on.where}" — "${nOf}"`);
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('nav-column', `${tag}: chromium died`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (glazedRead < 4) fault('nav-column', `only ${glazedRead} of 4 glazed doors read — the eleven-mark clauses are measuring less than they say`);
   /* THE WALL GATE, every size at every desktop width, both directions (28.9):
      the column on no door, no arrow, no wall control, inside the stage.
      ⚠ AND CENTRED OR PUSHED DOWN, AT EVERY SIZE AND WIDTH (29.9) — the clause
@@ -7980,7 +8302,111 @@ for (const v of VIEWS) {
   }
   for (const k of Object.keys(LIFTED)) if (!liftSeen.has(k)) fault('nav-column', `he ${k}: the named lift is gone — the column is centred there now; take it out of LIFTED and CLAUDE.md §9`);
   if (wallRead < 5 * 2 * Object.keys(SIZES).length) fault('nav-column', `the wall gate read ${wallRead} of ${5 * 2 * Object.keys(SIZES).length} doors`);
-  if (faults === before) console.log(`    ${readings} viewports: a dark column on the photograph above 1100 (a dark row below), ${STEPS} whole ≥44 px targets, the live one a light square; checks on exactly the steps walked, none on arrival or after a reload, the address unmoved; ${wallRead} doors × widths × directions with the column on no door, arrow or wall control, centred or pushed down but for the ${Object.keys(LIFTED).length} named Hebrew lifts`);
+  /* ⚠ AND WITH A WINDOW THE COLUMN STANDS WHERE IT STANDS WITHOUT ONE — 2.10.2026.
+     The window brings the designs' mark, and stacked in the column it made it
+     46 px taller than the wall had: measured on every glazed door at seven
+     desktop widths in three languages, the column was pulled onto the price on
+     22 (up to 2,709 px² — "fit" and "colour" under it), onto the language
+     picker at 1280×720 in Hebrew, and above the door's middle on twenty more.
+     The wall gate above loads a solid door, so none of it was asked. Now
+     `placeSteps` stands the designs' mark BESIDE the glass mark where that
+     touches nothing, and this asks, at the gate's five widths in all three
+     languages and every size, a glazed door against the same solid one:
+       · beside — but on the doors named here, where the tab beside the glass
+         row meets the arrow (Hebrew, 1100–1152, the wider doors), stacked;
+         each named one asserted still stacked;
+       · beside: the column's box the solid door's to the pixel (the window
+         adds nothing to it — whatever it touches there, the solid door's
+         clauses own); the tab level with the glass mark (6 px of ink round
+         the square), joined to the column's inline-end edge, on the stage,
+         on no door, arrow, price, wall control or undo pill;
+       · stacked: on none of those either, and centred or pushed down but for
+         the lifts named here, each +2 and asserted still needed (1100
+         `halfextra2` 64 against the solid door's 41).
+     §5.15: a door that reads no designs' mark at all is a fault, not a pass.
+     Falsified by `placeSteps` never standing the mark beside (stacked
+     everywhere: the price clause on English and Russian, the lifts) and by
+     dropping the tab's check (`besideClear` always clear: the arrow at the
+     named doors). */
+  const STACKED = ['1100x800 extra2', '1100x800 half', '1100x800 halfextra1', '1100x800 halfextra2',
+    '1152x800 halfextra1', '1152x800 halfextra2'];
+  const GLAZED_LIFT = { '1100x800 half': 25, '1100x800 halfextra1': 7, '1100x800 halfextra2': 64, '1152x800 halfextra1': 9 };
+  const stackSeen = new Set(), glzLiftSeen = new Set();
+  let glzRead = 0, besideN = 0;
+  const colRead = pg => pg.evaluate(() => {
+      const n = document.querySelector('.stage-wrap > .steps'); if (!n) return null;
+      const R = e => e.getBoundingClientRect();
+      const r = R(n), S = R(document.querySelector('#stage'));
+      const ov = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
+      const fEl = document.querySelector('.door-svg #frame'), m = fEl && fEl.ownerSVGElement.getScreenCTM(), bb = fEl && fEl.getBBox();
+      const fr = m ? { left: m.e + m.a * bb.x, right: m.e + m.a * (bb.x + bb.width), top: m.f + m.d * bb.y, bottom: m.f + m.d * (bb.y + bb.height) } : null;
+      const wall = [['the door', fr], ...[...document.querySelectorAll('.stage__arrow')].map(e => ['an arrow', R(e)]),
+        ['the price', document.querySelector('#quote') && R(document.querySelector('#quote'))],
+        ...[...document.querySelectorAll('.stage__hud .hud__slot')].map(e => ['a wall control', R(e)]),
+        ...[...document.querySelectorAll('.stage__undo .undo-pill')].map(e => ['an undo pill', R(e)])].filter(([, b]) => b && b.width);
+      const on = b => wall.map(([k, o]) => [k, ov(b, o)]).filter(([, o]) => o);
+      const gd = document.querySelector('.steps__step[data-step="grd"]'), gl = document.querySelector('.steps__step[data-step="glass"]');
+      const gb = gd && !gd.hidden ? R(gd) : null, lb = gl ? R(gl) : null;
+      const rtl = document.documentElement.dir === 'rtl';
+      return { mode: n.dataset.grd || 'stacked', top: r.top, h: r.height, on: on(r), grd: !!gb,
+        tab: gb && n.dataset.grd ? { on: on(gb), inStage: gb.left >= S.left - 1 && gb.right <= S.right + 1 && gb.top >= S.top - 1 && gb.bottom <= S.bottom + 1,
+          level: lb ? gb.top - (lb.top - 6) : NaN, joined: rtl ? r.left - gb.right : gb.left - r.right, w: gb.width } : null,
+        midOff: fr ? Math.round((r.top + r.bottom) / 2 - (fr.top + fr.bottom) / 2) : null };
+    });
+  const colAt = async (pg, url) => { await pg.goto(url); await pg.waitForTimeout(450); return colRead(pg); };
+  let tapped = 0;
+  for (const [w, h] of [[1100, 800], [1152, 800], [1280, 720], [1440, 900], [1920, 918]]) for (const lang of ['he', 'en', 'ru']) for (const size of Object.keys(SIZES)) {
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      const base = `file://${process.cwd()}/index.html?lang=${lang}&s=${size}`;
+      const solid = await colAt(pg, base);
+      const g = await colAt(pg, `${base}&w=rect`);
+      const k = `${w}x${h} ${size}`, tag = `${lang} ${k} glazed`;
+      if (!solid || !g) { fault('nav-column', `${tag}: no column on the photograph — this clause has no subject`); continue; }
+      /* and by a TAP, on the standard door: the window chosen on the glass
+         step places the column as the link did (`paint` fits the stage before
+         it marks the steps, so `markSteps` re-places it when a mark comes) */
+      if (size === 'standard') {
+        await pg.goto(base); await pg.waitForTimeout(450);
+        await pg.evaluate(() => document.querySelector('.steps__step[data-step="glass"]')?.click());
+        await pg.waitForTimeout(250);
+        await pg.evaluate(() => document.querySelector('.sect.is-live [role="radio"][data-id="rect"]')?.click());
+        await pg.waitForTimeout(500);
+        const t = await colRead(pg);
+        tapped++;
+        if (!t || !t.grd) fault('nav-column', `${lang} ${k} tapped: the square window tapped on the glass step brought no designs' mark`);
+        else if (t.mode !== g.mode || Math.abs(t.top - g.top) > 1 || Math.abs(t.h - g.h) > 1) {
+          fault('nav-column', `${lang} ${k} tapped: after the window is tapped the column is "${t.mode}", ${Math.round(t.h)} px at ${Math.round(t.top)} — by the link it is "${g.mode}", ${Math.round(g.h)} px at ${Math.round(g.top)}`);
+        }
+      }
+      if (!g.grd) { fault('nav-column', `${tag}: no designs' mark on a glazed door — the beside/stacked clause has no subject`); continue; }
+      glzRead++;
+      const named = lang === 'he' && STACKED.includes(k);
+      if (named) { if (g.mode === 'stacked') stackSeen.add(k); }
+      else if (g.mode !== 'beside') fault('nav-column', `${tag}: the designs' mark is stacked in the column — it stands beside the glass mark wherever the wall holds it, and the wall held it here on 2.10`);
+      if (g.mode === 'beside') {
+        besideN++;
+        if (Math.abs(g.top - solid.top) > 1 || Math.abs(g.h - solid.h) > 1) fault('nav-column', `${tag}: the column is ${Math.round(g.h)} px at ${Math.round(g.top)} — the solid door's is ${Math.round(solid.h)} px at ${Math.round(solid.top)}; the window must add nothing to it`);
+        const t = g.tab;
+        if (t.on.length) fault('nav-column', `${tag}: the designs' mark beside the glass stands on ${t.on.map(([q, o]) => `${q} (${o} px²)`).join(', ')}`);
+        if (!t.inStage) fault('nav-column', `${tag}: the designs' mark beside the glass leaves the stage`);
+        if (Math.abs(t.level) > 1 || Math.abs(t.joined) > 1 || Math.abs(t.w - 56) > 1) fault('nav-column', `${tag}: the designs' tab is ${t.w.toFixed(1)} px, ${t.level.toFixed(1)} px off level with the glass mark and ${t.joined.toFixed(1)} px off the column's edge — a 56 px tab of the column's ink, joined to it, level`);
+      } else {
+        if (g.on.length) fault('nav-column', `${tag}: the stacked column stands on ${g.on.map(([q, o]) => `${q} (${o} px²)`).join(', ')}`);
+        const lift = GLAZED_LIFT[k];
+        if (g.midOff === null) fault('nav-column', `${tag}: no #frame — the centring clause has no subject`);
+        else if (lift !== undefined && lang === 'he') {
+          if (g.midOff < -2) glzLiftSeen.add(k);
+          if (-g.midOff > lift + 2) fault('nav-column', `${tag}: the stacked column stands ${-g.midOff} px above the door's middle — named at ${lift}`);
+        } else if (g.midOff < -2) fault('nav-column', `${tag}: the stacked column's middle is ${g.midOff} px from the door's — centred on it, or pushed down, never up`);
+      }
+    } finally { await pg.close().catch(() => {}); }
+  }
+  for (const k of STACKED) if (!stackSeen.has(k)) fault('nav-column', `he ${k} glazed: the designs' mark stands beside the glass now — take it out of STACKED and CLAUDE.md §9`);
+  for (const k of Object.keys(GLAZED_LIFT)) if (!glzLiftSeen.has(k)) fault('nav-column', `he ${k} glazed: the named lift is gone — take it out of GLAZED_LIFT and CLAUDE.md §9`);
+  if (glzRead < 5 * 3 * Object.keys(SIZES).length) fault('nav-column', `the glazed wall clause read ${glzRead} of ${5 * 3 * Object.keys(SIZES).length} doors`);
+  if (tapped < 15) fault('nav-column', `the window was tapped on ${tapped} of 15 standard doors — the tap clause is measuring less than it says`);
+  if (faults === before) console.log(`    ${readings} viewports: a dark column on the photograph above 1100 (a dark row below), ${STEPS} whole ≥44 px targets, the live one a light square; checks on exactly the steps walked, none on arrival or after a reload, the address unmoved; ${wallRead} doors × widths × directions with the column on no door, arrow or wall control, centred or pushed down but for the ${Object.keys(LIFTED).length} named Hebrew lifts; ${glzRead} glazed doors against the same solid ones, the designs' mark beside the glass on ${besideN} (the column the solid door's, the tab on nothing) and stacked on the ${STACKED.length} named, ${Object.keys(GLAZED_LIFT).length} of them lifted as named; the window tapped on ${tapped} standard doors placing the column as its link does`);
 }
 
 /* ── THE HANDLE FINISH IS ON THE PAGE ONLY WHERE IT PAINTS SOMETHING ──────

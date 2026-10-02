@@ -26,6 +26,173 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **2.10 — PROMPT D, 2 OF 2: THE WINDOW'S DESIGNS, A STEP OF THEIR OWN.** The
+  owner's son: *"Make the window design a separate section like our 10 existing
+  ones, but only appearing if you choose one of the windows — an icon next to
+  the window one, basically a subsection."*
+  · **What was there.** Since 29.9 the designs were the glass step's second
+    group, hidden by the group's `when` while the door had no window. The step
+    count was `SECTIONS.length` everywhere — "step N of 9" on every door.
+  · **What it is.** `SECTIONS` gained `grd` ("עיצוב החלון" / "Window design" /
+    "Дизайн окна", ours) directly after `glass`, carrying `when:
+    grilleHasSubject`; the `grille` group moved `in: 'grd'` and dropped its own
+    `when` — one statement of when the designs exist. PRESENCE: `present()` is
+    the sections whose `when` holds for the door; `STEP_KEYS()` reads it, so
+    `stepBy` skips an absent step, `goStep`/`leaveTo` refuse it, and the way on
+    and back (`markSteps`) count it; `ALL_KEYS()` is every built card, what
+    `goStep` hides. `markSteps` sets `hidden` on an absent step's mark (the
+    page-wide `[hidden] { display: none !important }` takes it off) and counts "step N of M" among the present steps — 9 or 10; the face step
+    reads 7 of 9 or 8 of 10 as the window comes and goes. `paint`: when the
+    live step stops being there (an undo or a link took the window while the
+    designs were up) it goes to the step before it — the glass — without
+    focus, and says nothing more (the undo's toast already names what came
+    back). The band on the designs: their title and the chosen design.
+    `stepFor('grille')` lands on `grd` by `sectionOf` (no hand map).
+  · **The mark.** `SECTION_ICON.grd`: a wide, low arch with three bars up it
+    and one across. ⚠ The first draft, a TALL arched pane with two bars each
+    way, read 51 % against `sum` in the audit's pairwise raster (floor 50) — a
+    tall outline with lines in it is the summary's sheet at 21 px; six
+    candidates were scored with the audit's own metric (`tools/_markgrd.mjs`),
+    and wide-and-low reads 64 % against its closest (`colour`). The closest pair
+    on the rail is still lock ~ grip, 60 %. The TIE (the "subsection"): a 2 px
+    paper line across the boundary between the glass square and the designs
+    square — 12 px centred on it in the phone's row, where the squares touch;
+    in the desktop column (below) across the 12 px between the squares side by
+    side, or across the column's gap where stacked, 6 px into each margin —
+    clear of both glyphs.
+  · **⚠ In the column, BESIDE the glass mark — found before this commit
+    left the container.** The first build stacked the designs' mark in the
+    column, and the glazed navigator pass asked four viewports for "no
+    scroll, inside the stage" and nothing else; the wall gate loads solid
+    doors. Re-reading the column on every glazed door at seven desktop widths
+    in three languages (`tools/_navglz.mjs`) against the solid baseline (which
+    matched the audit's named readings exactly: eight Hebrew lifts and the
+    other chat's four column-on-price): eleven marks are 516 px at their
+    tightest against the ten's 470, the wall under 1440 had no 46 px to give,
+    and the column was pulled UP — onto the price on 22 doors in English and
+    Russian (up to 2,709 px²; "fit" and "colour" under it, the 28.9 fault),
+    onto the language picker at 1280×720 in Hebrew (280 px²), above the door's
+    middle on twenty more. The fix reads his words literally — *"an icon next
+    to the window one"*: `placeSteps` takes the designs' mark out of the flow
+    and stands it beside the glass mark, on the column's inline-end side (the
+    door's side in both directions), in a 56 px tab of the column's ink whose
+    inline-start corners are square, so tab and column read as one piece
+    (`data-grd="beside"`, `--grd-top` the glass mark's offset). The tab is
+    measured against the door's settled box, the arrows (their summary box
+    kept, so it does not move between steps), the price, the wall controls and
+    the undo pills; where it touches any of them the mark goes back into the
+    column, stacked. Simulated first on 144 doors (8 widths × 3 languages × 6
+    sizes, `tools/_sat.mjs`): clear on 137, every English and Russian one; the
+    seven that meet the arrow are Hebrew at 1100–1200 beside the wider doors,
+    where the arrow stands level with the glass row. Built and re-read: the
+    column the solid door's to the pixel on 84 of the gate's 90 glazed doors;
+    stacked on six, four of them lifted (1100 `halfextra2` 64 — the solid
+    door's 41 — `half` 25, `halfextra1` 7; 1152 `halfextra1` 9), named
+    (`STACKED`, `GLAZED_LIFT`, §9). And a second fault the re-read found:
+    `paint` fits the stage BEFORE `markSteps` shows the designs' mark, so a
+    TAP that brought the window left the column placed for ten with eleven in
+    it (516 px at the old top) — `markSteps` now re-places the column when a
+    mark comes or goes. `placeSteps` also counted the hidden mark among its
+    gaps (ten where nine stood); it counts the marks on screen now. The tour's
+    navigator cut-out takes the tab as a cut-out of its own.
+  · **Copy.** `step.grd.t/s/l`, `exp.grd.q/a` (bars over the glass or a
+    pattern etched in it; black or the door's colour; the bars included, the
+    etched designs the special ones at `{0}` per window — `formatAgorot` of
+    the catalogue's delta — and the double door's two panes through `{1}`);
+    `step.glass.s/l` and `exp.glass.q/a` said the designs were on the glass
+    step, in three languages — they say the window, and that its filling is
+    the next step, now. `exp.glass.q` became "which window?"; "what goes inside
+    the window?" is the designs' question.
+  · **Counts derived (the audit).** `QUESTIONS`/`STEPS` were typed (9, 10);
+    they are read off the page's present marks once the browser is up, and
+    `presentSteps(page)` answers it for any door; the navigator block asserts
+    them BY NUMBER — ten marks on a solid door, eleven with a window — so a
+    derivation that drifted cannot agree with itself. Three more hand-typed
+    counts were found doing the same thing: `8 * KB.length` (the keyboard walk,
+    a step short since 28.9), `LAND.length * 9`, `walked < 8`, and two `n < 8`
+    in the answer block — all derived now.
+  · **Units: the `xlock` gap.** T15's step list was TYPED and had left out
+    `xlock` since that step was made on 28.9 — four days green with a step's
+    explainer unasked. It is derived from the steps' own title keys in `UI`
+    now (with a floor of eleven), which asks `grd` and `xlock` by their having
+    a title. And read out of `app.js`'s source: the designs' step carries
+    exactly `grilleHasSubject`, sits right after `glass`, owns the designs
+    group, and the group keeps no `when` of its own; over every window, present
+    exactly when glazed.
+  · **Audit, restated (same subjects) and new.** WANT_ORDER as two
+    expectations (the solid door's walk, and the navigator's built order with
+    `grd` after `glass`); T15's page half counted over the present steps (and
+    every built card still explained); the navigator block — ten present marks
+    by number, and a glazed pass at 1100 he, 1280 en, 390 he, 320 ru: eleven
+    marks, `grd` after `glass`, the tie a 2 px line across the boundary, no
+    scroll, the designs walked to by their mark with the live square, the band
+    and "7 of 10"; the designs block from the FIELD's hiding to the STEP's
+    presence (by link and tap both ways, the glass step's way on to the designs
+    or past them, the window undone while the designs were live leaving the
+    glass live, the arrows on the glass still none → slot → square); the
+    arrows-order walk takes `grd` (16 steps); the designs grouping taps the
+    `grd` mark; the summary's grille row goes to `grd`; the explainers walk
+    reads `grd`'s; the navigator block's glazed pass reads the mark beside
+    the glass at its two desktop doors and the tie across the squares the way
+    they stand; NEW in it: at the gate's five widths, three languages and six
+    sizes, a glazed door against the same solid one — beside but on the six
+    named, the column the solid door's to the pixel, the tab level, joined, on
+    the stage and on nothing; stacked: on nothing, lifted only as named — and
+    the window TAPPED on the standard door placing the column as its link
+    does (15); the marks block holds the SEEN marks to the present steps
+    (an absent mark drawn is the `[hidden]` override); the every-option walk
+    unlocks the STEP (the square window, yes) before pressing its mark; the
+    font-swap walk goes over present marks, and so does the phone's
+    panel-order walk (the other chat's block, a590977 — it pressed every BUILT
+    mark, so on a solid door its press on the hidden designs was refused and
+    the glass judged twice; adapted to the presence this commit brings, its
+    judgement untouched). NEW: "step N of M" read on every
+    present step in three languages, solid (9) and glazed (10) — nothing
+    asserted the eyebrow before.
+  · **Falsified,** each in a throwaway copy: the step's `when` dropped → 11
+    faults (eleven present steps on a solid door in three languages; the
+    designs there on a solid door, after "none" and on the glass step's way
+    on); `SECTIONS.length` back in "N of M" → 28 (every solid-door eyebrow "of
+    10"); the tie's rule deleted → the tie clause at all four glazed doors;
+    `placeSteps` never standing the mark beside → 118 (stacked where the wall
+    held it, the column on the price, the lifts); the tab's check skipped
+    (always clear) → 16 (on the arrow at the six named, each named one beside
+    now); `markSteps`' re-place dropped → 15 (every tapped window: the column
+    stacked, 46 px taller at the old top);
+    the line in `markSteps` that hides an absent mark dropped → the marks
+    block ("no mark is absent on a door with no window"). Units: the step's
+    `when` gone → "does not take its presence from grilleHasSubject"; the
+    designs' explainer removed → T15 names `exp.grd.a` (a typed list would
+    not have asked).
+  · **A falsification that could not fail, caught.** The first draft carried
+    `.steps__step[hidden] { display: none }` under a comment saying the
+    button's `inline-flex` outranks the user agent's `[hidden]` — and a marks
+    clause written to see that rule go missing. Deleting the rule faulted
+    nothing: `app.css` has had a page-wide `[hidden] { display: none
+    !important }` all along. The rule and its false comment went; the clause
+    was re-aimed at the line that really hides the mark, and fails there
+    (§5.14's shape: an assertion written to catch a bug that could not
+    happen).
+  · **The slow gates, once, after this commit** (the brief's): `npm run
+    sheets` — **0 bare and 0 lockset moved**, as predicted for both commits;
+    `.stamps.json` and the 12 `shot` sheets only. `collide -- boxes` clean
+    (every fitting inside what it declares; the deepest mount 109 under
+    `MOUNT_REACH` 121). `fuzz`: 30,000 designs and 1,800 clicks, 238 met the
+    confirm dialog (125 yes, 113 no, the door unchanged after every no), and
+    the reset among them — pressed 85 times, 75 asked (the rest on the default
+    door, greyed), 33 yes and back to the default door, 42 no — nothing broke.
+    `latency`: 641 ms on sidelight + ironwork against the 600 ms gate; run
+    twice more interleaved with `232e798` on the same container, base 498 /
+    691, this 589 / 575 — no difference between the code (the column's code
+    does not run at 390), the container is the slow thing, as the other chat
+    measured the same day; the element counts unchanged, 268 · 1,017 · 656.
+    `npm test` after the sheets: 10,595,731, 0 failed.
+  · **Not done, on purpose:** a step for any other `when` group (the handle
+    finish stays a field on the grip step — it is one row, not a question);
+    numbering the designs as "6a" (the counter is words, and a sub-number is
+    the puzzle 30.8 took out of it); a `VERSION` (a step key is `data-step`,
+    and `g=` did not move).
+
 - **2.10 — PROMPT D, 1 OF 2: A RESET.** The owner's son: *"A reset button that
   looks just like 2 curved arrows that create a circle."* Answered in chat the
   same day: on a phone undo, redo and reset are three icon discs, no words.
@@ -140,7 +307,7 @@ oldest lines move to the top of the "moved" section.
     "assigns state directly"); the question skipped → 32, "opened no dialog"
     (and the units' "does not ask first").
   · **Sheets: 0 bare predicted** (no `render()` change); run once after commit
-    2.
+    2: **0 bare and 0 lockset moved**, as predicted (D 2 of 2's entry).
   · **Audit, on the commit rebased over the phone's first screen (`a590977`):**
     every block clean. The run died in the wall-ink block on the container's
     renderer crash (*"page, context or browser has been closed"* — the
@@ -3788,6 +3955,11 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **30.9** PROMPT A's closing pass: after its 5 of 5 the sheets moved 0 bare
+  (predicted), `boxes` and fuzz clean; on the merged branch (B's 3 of 3 on
+  A's five) a complete audit reads **no faults** — the drawer's flake and the
+  `halfextra1` reading B's pre-rebase run met are gone there — `npm test`
+  0 failed, latency 346 ms. Green rows merged with B's. Long form: `HISTORY.md`.
 - **29.9** The stripes are two tiles on the face step; one cycle of six (B, 3
   of 3) — *"2 panel, 3 panel, greek set, then horizontal stripes, then vertical
   stripes, then nothing … square buttons like every other option"*: screen-only

@@ -328,11 +328,22 @@ export const UI = {
   'step.face.l':      ['מה יש על פני הדלת — פאנלים מוגבהים, או פסי מתכת. אפשר גם חלק לגמרי.',
                        'What sits on the front of the door — raised panels, or metal strips. Perfectly plain is a choice too.',
                        'Что находится на лицевой стороне — накладные панели или металлические полосы. Можно оставить гладкой.'],
+  /* ⚠ 2.10.2026: what fills the window left this step for its own (`grd`,
+     below — the owner's son: *"Make the window design a separate section …
+     only appearing if you choose one of the windows"*), and these two said it
+     was here. The window alone now, and where its filling went. */
   'step.glass.t':     ['חלון', 'Glazing', 'Окно'],
-  'step.glass.s':     ['חלון ועיצוב הזכוכית', 'A window, and what goes in it', 'Окно и его оформление'],
-  'step.glass.l':     ['חלון בכנף, ומה נמצא בתוכו — סורג או זכוכית מעוצבת.',
-                       'A window in the leaf, and what fills it — a grille, or worked glass.',
-                       'Окно в полотне и его наполнение — решётка или художественное стекло.'],
+  'step.glass.s':     ['האם יהיה חלון, ואיזה', 'Whether there is a window, and which', 'Будет ли окно и какое'],
+  'step.glass.l':     ['חלון בכנף — צוהר אנכי או חלון מלבני, או בלי. מה שבתוכו נבחר בשלב הבא.',
+                       'A window in the leaf — an upright slot or a rectangle, or none. What fills it is chosen in the next step.',
+                       'Окно в полотне — узкое вертикальное или прямоугольное, или без окна. Наполнение выбирается на следующем шаге.'],
+  /* the window's designs, their own step since 2.10.2026 — present only while
+     the door has a window */
+  'step.grd.t':       ['עיצוב החלון', 'Window design', 'Дизайн окна'],
+  'step.grd.s':       ['מה נכנס לתוך החלון', 'What goes inside the window', 'Что ставится в окно'],
+  'step.grd.l':       ['סורג מעל הזכוכית או דוגמה בתוכה — בשחור או בגוון הדלת. אפשר גם בלי.',
+                       'Bars over the glass or a pattern in it — in black or in the door’s colour. None is a choice too.',
+                       'Решётка поверх стекла или узор в нём — чёрные или в цвет двери. Можно и без них.'],
   'step.grip.t':      ['ידית משיכה', 'The pull handle', 'Ручка-скоба'],
   'step.grip.s':      ['הידית האנכית ואורכה', 'The upright bar and its length', 'Вертикальная скоба и её длина'],
   'step.grip.l':      ['הידית שמושכים בה. אפשר גם בלעדיה, והאורך נתון לבחירתכם.',
@@ -570,7 +581,9 @@ export const UI = {
   'exp.face.a':           ['פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — {0} לפס אופקי ו‑{1} לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, ולא פסים עם חלון. עם חלון מרובע, ב„{2}” החלון תופס את מקום הפאנל העליון והתחתון נשאר; דלת חלקה מקבלת את הפאנל שהחלון מביא איתו; ו„{3}” לא משתלבים עם חלון — מסגרת החלון נכנסת ללוחית הידית שבאמצע. המאחז האופקי נבחר כאן, עם החזית; ידית המשיכה מגיעה בהמשך, ואפשר את שניהם יחד.',
                        'Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — {0} a horizontal strip and {1} a vertical one. Panels and strips do not go on the same door, and strips do not go with a window. With the square window, on “{2}” the window takes the upper panel’s place and the lower one stays; a plain door gets the panel the window brings below it; and “{3}” does not go with a window — its frame would run into the handle plate in the middle. The horizontal bow is chosen here, with the face; the pull handle comes later, and the two can go together.',
                        'Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: {0} за горизонтальную и {1} за вертикальную. Панели и полосы не совмещаются на одной двери, а полосы — с окном. С квадратным окном у варианта «{2}» окно занимает место верхней панели, а нижняя остаётся; гладкая дверь получает нижнюю панель, которую приносит окно; а «{3}» с окном не сочетаются — рама окна заходит на среднюю накладку под ручку. Горизонтальная скоба выбирается здесь, вместе с полотном; ручка-скоба — дальше, и их можно сочетать.'],
-  'exp.glass.q':          ['מה נכנס לתוך החלון?', 'What goes inside the window?', 'Что ставится в окно?'],
+  /* ⚠ 2.10.2026: "what goes inside the window?" is the designs' own question
+     now (`exp.grd`); this step asks which window. */
+  'exp.glass.q':          ['איזה חלון לבחור?', 'Which window should I choose?', 'Какое окно выбрать?'],
   /* ⚠ THE SIDELIGHT IS NOT A PRODUCT AND THIS SENTENCE WAS STILL SELLING IT —
      25.9.2026. "a door with a sidelight" / "דלת עם חלון צד" / "дверь с боковым
      окном" was withdrawn on 27.8 and `SIZES` has held six entries with no such
@@ -578,9 +591,16 @@ export const UI = {
      its own. A customer who read this and went looking for it found nothing
      to click. Gone, and the double door is named by its own tile through
      `{0}` — see the note over `exp.fit.a`. */
-  'exp.glass.a':          ['יש שני חלונות: צוהר אנכי צר לאורך הדלת, וחלון מלבני. חלון מלבני מגיע תמיד עם פאנל בתחתית. מה שנמצא בתוך הזכוכית — סורג מברזל או זכוכית מעוצבת — נבחר בנפרד. בדלת {0} יש שני פתחים מזוגגים, והסורג מותקן בשניהם ומתומחר לפי מספרם.',
-                       'There are two windows: a narrow upright slot, and a rectangle. A rectangle always comes with a panel below it. What fills the glass — wrought iron, or worked glass — is chosen separately. A {0} door has TWO glazed openings; the ironwork goes in both and is priced per opening.',
-                       'Окон два: узкое вертикальное и прямоугольное. Прямоугольное всегда идёт с нижней панелью. Наполнение стекла — кованая решётка или художественное стекло — выбирается отдельно. У двери «{0}» ДВА остеклённых проёма: решётка ставится в оба и считается по их числу.'],
+  'exp.glass.a':          ['יש שני חלונות: צוהר אנכי צר לאורך הדלת, וחלון מלבני. חלון מלבני מגיע תמיד עם פאנל בתחתית. אפשר גם בלי חלון. כשבוחרים חלון נפתח אחריו שלב עיצוב החלון — מה שנמצא בתוך הזכוכית; בלי חלון השלב הזה לא מופיע. בדלת {0} יש שני פתחים מזוגגים.',
+                       'There are two windows: a narrow upright slot, and a rectangle. A rectangle always comes with a panel below it. Going without a window is a choice too. Choose a window and the window design step opens after this one — what fills the glass; without a window that step is not there. A {0} door has TWO glazed openings.',
+                       'Окон два: узкое вертикальное и прямоугольное. Прямоугольное всегда идёт с нижней панелью. Можно и без окна. Если выбрать окно, после этого шага откроется шаг «Дизайн окна» — наполнение стекла; без окна этого шага нет. У двери «{0}» ДВА остеклённых проёма.'],
+  /* the designs' explainer (2.10.2026). `{0}` is the etched designs'
+     surcharge per window and `{1}` the double door, both out of the catalogue
+     (§5.25: no figure or name typed). */
+  'exp.grd.q':            ['מה נכנס לתוך החלון?', 'What goes inside the window?', 'Что ставится в окно?'],
+  'exp.grd.a':            ['עיצוב החלון הוא מה שנמצא בתוך הזכוכית: סורג ברזל שמותקן מעל הזכוכית, או דוגמה שחרוטה בזכוכית עצמה. כל עיצוב מגיע בשני צבעים — שחור, או בגוון הדלת. הסורגים כלולים במחיר; הדוגמאות החרוטות הן העיצובים המיוחדים, בתוספת {0} לכל חלון. בדלת {1} יש שני פתחים מזוגגים, והעיצוב נכנס לשניהם ומתומחר לפי מספרם. אפשר גם בלי עיצוב — זכוכית שקופה בלבד.',
+                           'The window design is what fills the glass: iron bars fitted over the glass, or a pattern etched into the glass itself. Every design comes in two colours — black, or the door’s colour. The bars are included in the price; the etched patterns are the special designs, at {0} extra per window. A {1} door has TWO glazed openings, and the design goes in both and is priced per opening. Going without a design is a choice too — clear glass only.',
+                           'Дизайн окна — это наполнение стекла: железная решётка поверх стекла или узор, вытравленный в самом стекле. Каждый дизайн есть в двух цветах — чёрный или в цвет двери. Решётки входят в цену; вытравленные узоры — это особые дизайны, доплата {0} за каждое окно. У двери «{1}» ДВА остеклённых проёма: дизайн ставится в оба и считается по их числу. Можно и без дизайна — только прозрачное стекло.'],
   'exp.grip.q':           ['איזה אורך לבחור?', 'What length should I choose?', 'Какую длину выбрать?'],
   /* ⚠ TWO PRICES PER BAR SINCE 20.9.2026, NOT A RATE. Peretz: *"cylinder
      (idan) 500, from 70-100 cm · cylinder but bigger 800, from 120-200 cm"* —

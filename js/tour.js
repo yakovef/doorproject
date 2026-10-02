@@ -96,7 +96,11 @@ const doorArrows = () => [...document.querySelectorAll('.stage__arrow')]
 
 export const TOUR_STEPS = [
   { text: 'tour.door', targets: () => [R(document.querySelector('#stage .door-svg #frame'))] },
-  { text: 'tour.steps', targets: () => [R(document.querySelector('.steps'))] },
+  /* and the designs' mark where it stands beside the column, out of its box
+     (2.10, a glazed door above 1100) — its own cut-out, or the scrim would
+     cover one of the steps the sentence is about */
+  { text: 'tour.steps', targets: () => [R(document.querySelector('.steps')),
+    ...[...document.querySelectorAll('.steps[data-grd="beside"] .steps__step[data-step="grd"]')].map(R)] },
   { text: 'tour.options', targets: () => [optionsRect(), ...doorArrows()], yields: true,
     /* a phone's options can start below the fold: bring the first ones up
        under the door before the cut-out is measured */

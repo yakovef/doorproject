@@ -2571,6 +2571,62 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
   display: none; pointer-events: none;
 }
 .steps__step.is-visited .steps__v { display: block; }
+/* A step that is not there has no mark (2.10.2026 — the window's designs,
+   `grd`, present only with a window): `markSteps` sets `hidden`, and the
+   page-wide `[hidden] { display: none !important }` above outranks the
+   button's `inline-flex`. */
+/* ⚠ AND THE DESIGNS' MARK IS TIED TO THE WINDOW'S — the owner's son: *"an icon
+   next to the window one, basically a subsection."* A 2 px paper line across
+   the boundary between the glass square and the designs square, clear of both
+   glyphs (each 21 px in a 44 px square, so 11.5 px of margin): on the phone's
+   row, where the squares touch, 12 px centred on the boundary; in the desktop
+   column, across its gap (`--steps-gap`, 6 px or tightened) and 6 px into each
+   margin. The designs always follow the glass, so the line hangs off the
+   designs' INLINE-START (the row) or TOP (the column) edge — right in Hebrew,
+   left in English, by the logical property alone. */
+.steps__step[data-step="grd"]::before {
+  content: ''; position: absolute; z-index: 0; pointer-events: none;
+  background: var(--paper); border-radius: 1px;
+  inset-block-start: calc(50% - 1px); block-size: 2px;
+  inset-inline-start: -6px; inline-size: 12px;
+}
+@media (min-width: 1100px) {
+  .stage-wrap > .steps .steps__step[data-step="grd"]::before {
+    inset-inline-start: calc(50% - 1px); inline-size: 2px;
+    inset-block-start: calc(-1 * var(--steps-gap, 6px) - 6px);
+    block-size: calc(var(--steps-gap, 6px) + 12px);
+  }
+  /* ⚠ AND IN THE COLUMN THE DESIGNS' MARK STANDS BESIDE THE WINDOW'S, where
+     the wall holds it (`placeSteps` decides, 2.10.2026 — a stacked eleventh
+     mark had no room on most glazed doors under 1440). Out of the flow, level
+     with the glass mark (`--grd-top` is its offset), past the column's
+     inline-end edge — the door's side in both directions — in a 56 px tab of
+     the column's ink whose two inline-start corners are square, so the tab
+     and the column read as one piece. The squares stand 12 px apart (6 of the
+     column's padding, 6 of the tab's), and the tie crosses that gap and 6 px
+     into each margin: 24 px, level with their middles. The visited check sits
+     on the square's corner, as it does in the column. */
+  .stage-wrap > .steps[data-grd="beside"] .steps__step[data-step="grd"] {
+    position: absolute; z-index: 1;
+    inset-block-start: calc(var(--grd-top, 0px) - 6px);
+    inset-inline-start: 100%;
+    flex: none; box-sizing: border-box;
+    inline-size: calc(var(--tap) + 12px); block-size: calc(var(--tap) + 12px);
+    min-inline-size: 0; min-block-size: 0;
+    padding: 6px;
+    background: var(--ink);
+    border-start-start-radius: 0; border-end-start-radius: 0;
+    border-start-end-radius: var(--r-card); border-end-end-radius: var(--r-card);
+    box-shadow: 0 6px 18px rgb(0 0 0 / .18);
+  }
+  .stage-wrap > .steps[data-grd="beside"] .steps__step[data-step="grd"]::before {
+    inset-block-start: calc(50% - 1px); block-size: 2px;
+    inset-inline-start: -12px; inline-size: 24px;
+  }
+  .stage-wrap > .steps[data-grd="beside"] .steps__step[data-step="grd"] .steps__v {
+    inset-block-start: 2px; inset-inline-end: 2px;
+  }
+}
 .steps__vg { inline-size: 18px; block-size: 18px; display: block; }
 .steps__vg circle { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
 .steps__vg path {

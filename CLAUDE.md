@@ -236,7 +236,14 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
     disc below; greyed while the door is the default; it ASKS first (his 27.9
     rule — it takes everything away); yes is ONE undoable step, back to step
     01 with the checks and the give-back memory emptied and a bare address,
-    and says so in a toast; the tour's fourth sentence names it.
+    and says so in a toast; the tour's fourth sentence names it;
+  · the designs' step keyed `grd`, titled "עיצוב החלון", right after the glass,
+    its mark tied to the glass mark by a thin line (the "subsection"); "step N
+    of M" counts the steps present (9 or 10); when the window goes while the
+    designs are up, the glass step is live again, with nothing more said;
+    and in the desktop column the designs' mark stands BESIDE the glass mark
+    (his *"an icon next to the window one"*, read literally), because stacked
+    it made the column taller than most glazed walls under 1440 hold.
   Settled with them in chat, not ours: where the new "ask before removing"
   rule meets Peretz's refusal — a pull handle or bow with no room beside the
   window or the face — **Peretz's rule stands**, refused with its reason and
@@ -255,6 +262,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **2.10** The window's designs a STEP OF THEIR OWN, present only with a window
+  (*"a separate section … only appearing if you choose one of the windows — an
+  icon next to the window one"*): `grd` after the glass, tied to its mark —
+  in the column BESIDE it (stacked, eleven marks were pulled onto the price
+  on 22 glazed doors), stacked on six named; `present()` feeds the way on/back and "N of
+  M" (9 or 10). T15's typed list had left out `xlock`. Long form: `HISTORY.md`.
 - **2.10** A RESET (*"…2 curved arrows that create a circle"*): the undo
   group's third pill, outermost, greyed on the default door; it asks, and yes
   is one undoable step back to the default door, step 01, no checks, a bare
@@ -284,21 +297,23 @@ lines here. Dates are the day of the change.
   options step LIGHTS THE DOOR'S TWO ARROWS (*"the arrows … in the third
   step"*), each with a pointer; on a phone the callout stands between them and
   the options. Long form: `HISTORY.md`.
-- **30.9** PROMPT A's closing pass: after its 5 of 5 the sheets moved 0 bare
-  (predicted), `boxes` and fuzz clean; on the merged branch (B's 3 of 3 on
-  A's five) a complete audit reads **no faults** — the drawer's flake and the
-  `halfextra1` reading B's pre-rebase run met are gone there — `npm test`
-  0 failed, latency 346 ms. Green rows merged with B's. Long form: `HISTORY.md`.
 ---
 
-## 0c. Where it stands today — 30.9.2026
+## 0c. Where it stands today — 2.10.2026
 
 **The prices are real and the site is not deployed — deliberately.** Peretz
 gave the numbers on 26.8; `PLACEHOLDER` is `false`. Not deployed on the
 instruction *"dont deploy it, i want to see that its finished."*
 
-**The page is a flow of nine steps and a summary**, one live at every width:
-fit · colour · lock · **pz** · **xlock** · **glass** · **face** · **grip** · mk · sum.
+**The page is a flow of nine steps and a summary — ten with a window**, one
+live at every width: fit · colour · lock · **pz** · **xlock** · **glass** ·
+(**grd**) · **face** · **grip** · mk · sum. ⚠ **Since 2.10 the window's designs
+are a step of their own, PRESENT ONLY WITH A WINDOW** (the owner's son: *"Make
+the window design a separate section like our 10 existing ones, but only
+appearing if you choose one of the windows — an icon next to the window one,
+basically a subsection"*): `grd`, "עיצוב החלון", right after the glass, its mark
+tied to the glass mark by a thin line; on a solid door it is not in the walk
+and "step N of M" counts nine (§3).
 The window comes BEFORE the face since 29.9 (the owner's son: *"The window
 section before the face section. If a user chooses a window, in the face
 section the stripes are greyed out"*) — face → glass since the two were split,
@@ -559,14 +574,14 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | **10,595,593 assertions, 0 failed** on prompt C's 3 of 3 (2.10; the same total on each of its commits — the round is page and instrument, not catalogue) and with the stripes as tiles, prompt B's 3 of 3 on the A round's five (29.9; 10,595,605 before that rebase, 10,595,466 on B's 2 of 3, 10,595,363 on its 1); re-read on the merged tree in A's closing pass, 30.9: the same 10,595,593, 0 failed (10,595,454 on A's 5 of 5 before B's 3 landed). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 29.9 |
-| `npm run audit` | **No faults on prompt C's 3 of 3** (2.10), the phone's first-row, the arrows' look and the send-as-pill clauses among them; its 1 of 3 read 1 (the note's `42ch`, fixed), its 2 of 3 read 2 (the `ARROW_KNOWN` reading its bigger arrows raised, raised). **On `87af342` — B's 3 of 3 on A's five, the branch both rounds share — a COMPLETE run: no faults** (A's closing pass, 30.9). The two B's pre-rebase run below left to A's regions do not reproduce on the merged tree: `halfextra1` had left `ARROW_KNOWN` in A's 2 of 5 (`893f851`, §9 — B's tree had the band commit and not that one), and the drawer's toggle was the block's seeding, an init script since A's 5 of 5 (30 rows, 5 shapes, he and ru). A's 3 of 3 (`cc19850`), a complete run: no faults. ⚠ **On prompt B's 3 of 3 (29.9), before its rebase: 5 faults, none in its rows** — the 320×568 `halfextra1` redo-on-arrow reading GONE in he and ru (the band commit `08a59ed` made the side-by-side glyphs fit there: 37 → 0 px², measured on `d3b54e6` against `08a59ed`; its region, and the exemption asks to come out) and 3 of the saved-designs drawer's (its toggle off the page in one case — the unexplained fault below, again). Its own blocks — the six-tile cycle, the designs unlocking, the stripe tiles' pictures (closest 58%) and fit — clean. the full run at the end of the 28.9 round read **4 faults, all fixed in commit 10** (§0b). ⚠ **The re-run after the fix did not finish** — the container restarted under it — and was clean through every block up to the navigator's (the undo and landscape blocks among them); the blocks after that were clean on the first run, before the fix, and are not re-run ⚠ **On `629f7d0` (the כדור merged onto 10 of 10): 6 faults, every one the saved-designs drawer's** — its toggle not on the page in ru at 390×844 and 834×1112, the stale design not reaching the drawer (he, ru), 8 of 10 cases opened, 24 of 30 rows. The drawer is the 5-of-10 save dialog's; the כדור touched no page code. Not fixed here ⚠ **And a COMPLETE run on `629f7d0` + the ironwork port (29.9, every block to the end) read no faults at all, the drawer's 30 rows at 5 shapes in two languages included** — so those 6 did not reproduce once. ⚠ **Explained 29.9 (A's 5 of 5):** the block wrote the saved doors on one load and read them on the next, and a navigation can land in a new renderer before the write reaches it — seeded by an init script now | 30.9 |
-| `npm run collide` | `-- boxes` clean on prompt C's 3 of 3 (2.10); re-read clean on prompt B's 3 of 3 (29.9), the same 1,638 — `all` (1,638 designs — 1,468 base, 602 with the bow, plus 170 face-detail) and `boxes` clean with the כדור redrawn (28.9: drawn 33/33/33, declared 35/35/35; the bow 0/300/21 in 4/305/26; the knob-plate 46/46/155 in 48/48/157; the deepest mount 109, the עילי's) | 28.9 |
-| `npm run fuzz` | 30,000 designs, 1,800 clicks, 195 met the confirm dialog — 107 yes, 88 no, the door unchanged after every no — nothing broke (prompt C's 3 of 3, 2.10; the same counts as B's) | 2.10 |
-| `npm run latency` | ⚠ **Over the gate on 2.10, and so is the commit before the round**: prompt C's 3 of 3 read 653 ms beside a running audit, then interleaved three each with `9e780ad` on a quiet container — old 705 / 738 / 793 ms, new 755 / 708 / 683 ms. No difference between the code; the container is the slow thing (§7). The ELEMENT COUNTS are unchanged: **268** · **1,017** · 656 for default · sidelight+ironwork · the heaviest. On 29.9 the same page read 413 ms on another container. ⚠ The middle count was 531 until the ironwork port (`d797065`) drew `iron` as its own bars (532 → 1,018 tags in `render()`, `4fbb96c` against `d797065`) | 2.10 |
+| `npm test` | **10,595,731, 0 failed** on prompt D's 2 of 2 (2.10, after its sheets; 10,595,657 on its 1 of 2 — the reset's copy and source checks — before the sheets, the five staleness rows the only red) · **10,595,593 assertions, 0 failed** on prompt C's 3 of 3 (2.10; the same total on each of its commits — the round is page and instrument, not catalogue) and with the stripes as tiles, prompt B's 3 of 3 on the A round's five (29.9; 10,595,605 before that rebase, 10,595,466 on B's 2 of 3, 10,595,363 on its 1); re-read on the merged tree in A's closing pass, 30.9: the same 10,595,593, 0 failed (10,595,454 on A's 5 of 5 before B's 3 landed). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 2.10 |
+| `npm run audit` | **A COMPLETE run on prompt D's 2 of 2 (2.10, over `69723b0`): no faults** — the designs' step, "N of M", the glazed column beside the glass on 84 of 90 doors and the tapped window among them. Its 1 of 2 (the reset), complete over the arrows: every block clean but for chromium dying in the price-card sweep, which re-run alone read none; over the send, the wall blocks re-run clean · **No faults on prompt C's 3 of 3** (2.10), the phone's first-row, the arrows' look and the send-as-pill clauses among them; its 1 of 3 read 1 (the note's `42ch`, fixed), its 2 of 3 read 2 (the `ARROW_KNOWN` reading its bigger arrows raised, raised). **On `87af342` — B's 3 of 3 on A's five, the branch both rounds share — a COMPLETE run: no faults** (A's closing pass, 30.9). The two B's pre-rebase run below left to A's regions do not reproduce on the merged tree: `halfextra1` had left `ARROW_KNOWN` in A's 2 of 5 (`893f851`, §9 — B's tree had the band commit and not that one), and the drawer's toggle was the block's seeding, an init script since A's 5 of 5 (30 rows, 5 shapes, he and ru). A's 3 of 3 (`cc19850`), a complete run: no faults. ⚠ **On prompt B's 3 of 3 (29.9), before its rebase: 5 faults, none in its rows** — the 320×568 `halfextra1` redo-on-arrow reading GONE in he and ru (the band commit `08a59ed` made the side-by-side glyphs fit there: 37 → 0 px², measured on `d3b54e6` against `08a59ed`; its region, and the exemption asks to come out) and 3 of the saved-designs drawer's (its toggle off the page in one case — the unexplained fault below, again). Its own blocks — the six-tile cycle, the designs unlocking, the stripe tiles' pictures (closest 58%) and fit — clean. the full run at the end of the 28.9 round read **4 faults, all fixed in commit 10** (§0b). ⚠ **The re-run after the fix did not finish** — the container restarted under it — and was clean through every block up to the navigator's (the undo and landscape blocks among them); the blocks after that were clean on the first run, before the fix, and are not re-run ⚠ **On `629f7d0` (the כדור merged onto 10 of 10): 6 faults, every one the saved-designs drawer's** — its toggle not on the page in ru at 390×844 and 834×1112, the stale design not reaching the drawer (he, ru), 8 of 10 cases opened, 24 of 30 rows. The drawer is the 5-of-10 save dialog's; the כדור touched no page code. Not fixed here ⚠ **And a COMPLETE run on `629f7d0` + the ironwork port (29.9, every block to the end) read no faults at all, the drawer's 30 rows at 5 shapes in two languages included** — so those 6 did not reproduce once. ⚠ **Explained 29.9 (A's 5 of 5):** the block wrote the saved doors on one load and read them on the next, and a navigation can land in a new renderer before the write reaches it — seeded by an init script now | 2.10 |
+| `npm run collide` | `-- boxes` clean on prompt D's 2 of 2 (2.10: every fitting inside what it declares, the deepest mount 109 under `MOUNT_REACH` 121) and on prompt C's 3 of 3 (2.10); re-read clean on prompt B's 3 of 3 (29.9), the same 1,638 — `all` (1,638 designs — 1,468 base, 602 with the bow, plus 170 face-detail) and `boxes` clean with the כדור redrawn (28.9: drawn 33/33/33, declared 35/35/35; the bow 0/300/21 in 4/305/26; the knob-plate 46/46/155 in 48/48/157; the deepest mount 109, the עילי's) | 2.10 |
+| `npm run fuzz` | 30,000 designs, 1,800 clicks, **238** met the confirm dialog — 125 yes, 113 no, the door unchanged after every no — and **the reset among the clicks** (its own seeded coin): pressed 85 times, 75 asked (the rest on the default door, greyed), 33 yes and back to the default door, 42 no — nothing broke (prompt D's 2 of 2, 2.10). Prompt C's 3 of 3: 195 met the dialog, 107 yes / 88 no, nothing broke | 2.10 |
+| `npm run latency` | ⚠ **Over the gate again on prompt D's 2 of 2 (2.10), and so is its base**: 641 ms on sidelight + ironwork, then interleaved twice with `232e798` on the same container — base 498 / 691 ms, D 589 / 575; no difference between the code (D's page code does not run at 390 — the column is not on the photograph there). Counts unchanged, 268 · 1,017 · 656. Before it, ⚠ **over the gate on 2.10, and so is the commit before the round**: prompt C's 3 of 3 read 653 ms beside a running audit, then interleaved three each with `9e780ad` on a quiet container — old 705 / 738 / 793 ms, new 755 / 708 / 683 ms. No difference between the code; the container is the slow thing (§7). The ELEMENT COUNTS are unchanged: **268** · **1,017** · 656 for default · sidelight+ironwork · the heaviest. On 29.9 the same page read 413 ms on another container. ⚠ The middle count was 531 until the ironwork port (`d797065`) drew `iron` as its own bars (532 → 1,018 tags in `render()`, `4fbb96c` against `d797065`) | 2.10 |
 | `npm run profile` | all rows green; dark reed 0.999 | 26.9 |
 | `npm run mottle` | plain leaf 0.0190, panels 0.1070 | 23.9 |
-| `npm run sheets` | the bare sheet files and 6 `lockset` sheets byte-stable across commits that do not touch the drawing. ⚠ The Rotem (27.9) moved 33, every one ONLY in a lever-sized patch at lock height: 10 `against-` by 231 px at their edge (they set no lockset, so they carry the default Rotem), 8 `corpus-`, 6 `recreate-`, `lockset-coral`, `lockset-plate` and 7 `shot`. The big round (27.9), run once after its commit 7 with the prediction written first: **0 bare and 0 lockset moved**, as predicted — the 12 `shot` sheets, `.stamps.json` and `corpus-links.md` (v=26, `lt=`) only. The knob-plate (28.9): exactly the two that show it, `corpus-06` (d092) and `lockset-knobplate`. The bow (28.9): `against-grab` only — no gallery door carries it. The 28.9 round, predicted first: exactly `recreate-d122` (the half door's fixed leaf). Prompt B (29.9), 0 predicted on each of its three commits: 0 bare moved each time — the stripe tiles are tile art. PROMPT A (29.9), 0 predicted, run once after its 5 of 5: **0 bare and 0 lockset moved** — the 12 `shot` sheets and `.stamps.json` only (that refresh superseded by B's 3 of 3, run on the merged tree). Prompt C (2.10), 0 predicted and 0 moved on each of its three commits (chrome and CSS only) | 2.10 |
+| `npm run sheets` | the bare sheet files and 6 `lockset` sheets byte-stable across commits that do not touch the drawing. **Prompt D (2.10), 0 bare predicted for both commits, run once after its 2 of 2: 0 bare and 0 lockset moved** — `.stamps.json` and the 12 `shot` sheets only. ⚠ The Rotem (27.9) moved 33, every one ONLY in a lever-sized patch at lock height: 10 `against-` by 231 px at their edge (they set no lockset, so they carry the default Rotem), 8 `corpus-`, 6 `recreate-`, `lockset-coral`, `lockset-plate` and 7 `shot`. The big round (27.9), run once after its commit 7 with the prediction written first: **0 bare and 0 lockset moved**, as predicted — the 12 `shot` sheets, `.stamps.json` and `corpus-links.md` (v=26, `lt=`) only. The knob-plate (28.9): exactly the two that show it, `corpus-06` (d092) and `lockset-knobplate`. The bow (28.9): `against-grab` only — no gallery door carries it. The 28.9 round, predicted first: exactly `recreate-d122` (the half door's fixed leaf). Prompt B (29.9), 0 predicted on each of its three commits: 0 bare moved each time — the stripe tiles are tile art. PROMPT A (29.9), 0 predicted, run once after its 5 of 5: **0 bare and 0 lockset moved** — the 12 `shot` sheets and `.stamps.json` only (that refresh superseded by B's 3 of 3, run on the merged tree). Prompt C (2.10), 0 predicted and 0 moved on each of its three commits (chrome and CSS only) | 2.10 |
 
 ⚠ **When a bare sheet moves on a commit that could not have moved it, find out
 what did** — that is how chrome painted across every sheet was found once. And
@@ -626,7 +641,7 @@ screen. Two different questions, and for a long time only one had been put.
   retire an option, alias its id onto the nearest real one, for ever.
 - **The short code stores INDICES**, which no alias can rescue. Any change to
   an option list's ORDER or to the bit layout needs a `VERSION` bump in
-  `js/url-state.js` (**27** on 28.9 — read the file, do not trust this figure),
+  `js/url-state.js` (**28** since 29.9 — read the file, do not trust this figure),
   so an old code is refused with a notice rather than decoded into a different
   door. **Appending to the end of a list, or changing a property, costs no
   bump.**
@@ -1059,15 +1074,24 @@ bands sit inside the pane.
 
 ### The flow — `SECTIONS` and `GROUPS` in `js/app.js`
 
-Nine steps and a summary, in the order in §0c. Each step holds one or two
-groups; each group is a list of options drawn as tiles (or swatches, pills,
-rows). `face` and `glass` stay adjacent because a panel and a window compete
+Nine steps and a summary — ten with a window (the designs, `grd`, 2.10) — in
+the order in §0c. Each step holds one or two groups; each group is a list of
+options drawn as tiles (or swatches, pills, rows). `face` and `glass` stay adjacent because a panel and a window compete
 for the same half of the leaf and `repair` trades between them.
 
 - **Section keys are not in the wire format** (they appear as `data-step` and
-  nowhere in `url-state.js`), so reordering costs no `VERSION`; the `01`–`09`
-  are a CSS counter over position. What must move with a reorder is
-  `WANT_ORDER` in `tools/audit.mjs`.
+  nowhere in `url-state.js`), so reordering costs no `VERSION`; the eyebrow's
+  "step N of M" is written by `markSteps` over the PRESENT steps (2.10: 9 or
+  10). What must move with a reorder is `WANT_ORDER` in `tools/audit.mjs`.
+- ⚠ **A step can be ABSENT (2.10.2026)**: a section with a `when` is in the
+  walk only while its question has a subject on the door — today the designs
+  (`grd`, `when: grilleHasSubject` = `isGlazed`). `present()` is the one
+  statement; `STEP_KEYS()` reads it, so the way on and back skip an absent
+  step, `goStep`/`leaveTo` refuse it, its mark and card are `hidden`, and "N of
+  M" counts the rest; `ALL_KEYS()` is every built card. When the live step
+  stops being there (an undo or a link took the window while the designs were
+  up) `paint` goes to the step before it — the glass — without focus and
+  without a second sentence.
 - **The navigator is a table of contents, never a progress bar**: every step
   carries a value on first paint, so a state-derived indicator would read
   complete before anything was touched. Since 27.9 (the owner's son: *"…a
@@ -1082,7 +1106,12 @@ for the same half of the leaf and `repair` trades between them.
   panel — a fixed row inside the sticky wrap's stacking context would paint
   under its own ink strip). Absolute, 12 px off the stage's panel-facing edge,
   its own ink and `--r-card`, 514 px tall with ten marks (28.9 — the extra
-  lock's step); centred on the door's mid-height
+  lock's step) — and still ten tall with a window (2.10): the designs' mark
+  stands BESIDE the glass mark in a 56 px tab of the column's ink on its
+  door-facing side, wherever that tab touches nothing (`placeSteps` measures;
+  stacked, eleven marks were 516 px at their tightest and the wall under 1440
+  had not got them — onto the price on 22 glazed doors, the language picker
+  on 3); stacked only where the tab meets the arrow (§9); centred on the door's mid-height
   unless the wall chrome on its side reaches below that, then 8 px under it,
   never onto the trust band's WORDS (the band's box is the floor strip, but
   its centred words never reach the column's corner — the ten marks needed
@@ -1106,14 +1135,22 @@ for the same half of the leaf and `repair` trades between them.
   else away asks first (`#confirm`, `planChoice`/`displacedBy`, §3 Rules).
   The summary shows the PICTURES of what was chosen, one button per spec row
   back to its step, at every width (§0c; `#summary` stays, visually hidden).
-- **The glass step is two groups, the second unlocked by the first** (29.9,
-  the owner's son: *"… if they choose a window, a sub-section unlocks right
-  after it — the designs. So the arrow feature near the door works well"*):
-  the window (`none · strip · rect`, "none" kept — ours, §0a) and the designs,
-  whose `when` is `grilleHasSubject` = `isGlazed`, the question that greys
-  every design on a solid door — hidden through the finish group's mechanism.
-  The arrows walk the window list alone. A LINK with a design and no window
-  still brings the window (`SAID.windowAdded`).
+- **The glass step is the window, and the designs are the next step — only
+  with a window** (29.9 the designs unlocked as the glass step's second group;
+  2.10 a step of their own, the owner's son: *"… only appearing if you choose
+  one of the windows — an icon next to the window one, basically a
+  subsection"*): the glass step is `none · strip · rect` ("none" kept — ours,
+  §0a) and its arrows walk that list; `grd` holds the designs (two headed
+  groups, each black design with its door-colour twin) and its arrows walk
+  them in drawn order. Its mark (`SECTION_ICON.grd`, a wide low arch with bars
+  — the first, tall, draft read 51 % against `sum` in the audit's raster) is
+  tied to the glass mark by a 2 px paper line across the boundary of the two
+  squares: on the phone's row the next square, the line across their shared
+  edge; in the desktop column BESIDE the glass mark (a 56 px tab of ink on the
+  door's side, the line across the 12 px between the squares), or stacked
+  under it where the tab would meet the arrow, the line across the column's
+  gap. A LINK with a design and no window still brings the window
+  (`SAID.windowAdded`), and the step with it.
 - **The face step is ONE radio group of six** (29.9, the owner's son: *"…the
   arrows go through the stripes as well — 2 panel, 3 panel, greek set, then
   horizontal stripes, then vertical stripes, then nothing, and the cycle
@@ -1648,11 +1685,24 @@ two pixels), plus sweeps with their own viewport lists where the worst widths
 are not in `VIEWS`:
 
 - **arrival and order** — one step live at every width; a bare load on step 01
-  and a link on the summary; the whole question sequence off the navigator;
+  and a link on the summary; the whole question sequence off the navigator
+  (two expectations since 2.10: the solid door's ten, and the built order with
+  the designs after the glass); every present step's "N of M" in three
+  languages, 9 and 10 (2.10); the designs a step only with a window, by link
+  and tap, the glass step's way on to them or past them, the live step falling
+  back to the glass when the window goes (2.10); the walks' lengths read off
+  the page (`presentSteps`), asserted by number — ten marks solid, eleven
+  glazed;
   the navigator a dark column on the door-facing edge above 1100 (a dark row
   below), centred on the door or pushed down at every size and desktop width
   but eight named Hebrew lifts (29.9; re-read 2.10 with three pills, §9), the live mark whole on both axes, and its checks on exactly the
-  steps walked — none on arrival or after a reload, the address unmoved.
+  steps walked — none on arrival or after a reload, the address unmoved;
+  with a window (2.10) the designs' mark BESIDE the glass mark in the column,
+  the column the same solid door's to the pixel and the tab level, joined, on
+  the stage and on nothing, at five widths × three languages × six sizes —
+  stacked only on six named Hebrew doors, four of them lifted as named (§9) —
+  and a tapped window placing the column as its link does; the tie across
+  the two squares the way they stand.
 - **the arrows' look** (2.10) — 60 / 56 / 52 px by width, 12 / 8 / 8 px off the
   casing, on the door's middle, no ring, a shadow, a 26 / 23 px chevron at 3,
   ≥ 4.5:1 on the disc, inverting to ink on hover.
@@ -1738,7 +1788,8 @@ are not in `VIEWS`:
   block of text on every step, 390 and 1280 × three languages (~720 readings),
   measured in Rubik and in its fallback: none moves by more than a line, at
   most 2 in 100 move at all (28.9 1c).
-- **pictures** — the navigator's ten marks (21 px) and the spec's fourteen
+- **pictures** — the navigator's eleven marks (21 px; the SEEN ones exactly the
+  steps present, 2.10) and the spec's fourteen
   (28 px since 27.9 — the summary's fallback for a row whose step has no tile
   glyph, the משקוף and the handing), rasterised at the size the stylesheet
   gives them inside their container and compared pairwise (floor 0.50); the stripe tiles (29.9 —
@@ -1782,7 +1833,7 @@ grepping for each one, not remembering it** — two were found missing that way.
 | T12 | Two renders of one state stay byte-identical | purity |
 | T13 | Under `.is-bare`, `animation-name: none` on every animated element | the bare sheets go non-deterministic otherwise |
 | T14 | Every interactive control measures ≥ 44 px on both axes at every `VIEWS` viewport | the grip controls were 22 px for two rounds |
-| T15 | Every group has a `hint`, every step a `<details>` explainer, in all three languages above a length floor | built late, after being marked done |
+| T15 | Every group has a `hint`, every step a `<details>` explainer, in all three languages above a length floor — the step list DERIVED from the `step.<k>.t` keys since 2.10 (it was typed and had left out `xlock` for four days) | built late, after being marked done |
 
 ### ⚠ Chromium dies in some containers, and it is not your code
 
@@ -2074,6 +2125,19 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   `halfextra1` 5 unchanged. Eight named. What would close it is a product
   question — the pills or the column somewhere other than one corner in
   Hebrew, or the pills unlabelled there.
+- **With a window, six Hebrew doors at 1100–1152 stack the designs' mark in
+  the column, and four of them lift it** (2.10). In the column the designs'
+  mark stands beside the glass mark in a 56 px tab on the door's side; at
+  1100 beside `extra2`, `half`, `halfextra1`, `halfextra2` and 1152 beside
+  `halfextra1`, `halfextra2` the arrow stands level with the glass row and the
+  tab would meet it (248–2,014 px², measured), so the mark goes back into the
+  column and the column is eleven marks — 516 px at its tightest. Above the
+  door's middle by **64 px** at 1100 `halfextra2` (the solid door's 41), 25
+  `half`, 7 `halfextra1`, and 9 at 1152 `halfextra1`; the other two stand
+  centred. Named in the audit (`STACKED`, `GLAZED_LIFT`, +2), asserted still
+  needed. Everywhere else — 84 of the gate's 90 glazed doors — the column is
+  the solid door's to the pixel. What would close them is the arrow or the
+  column somewhere else on the narrowest Hebrew walls.
 - **The bigger band cost the door about 2 % above 1100** (29.9, their
   *"bigger"*, the sizes ours). The crop gives the tallest doors exactly the
   band's wall, so the standard leaf went 437.0 → 426.6 / 564.0 → 551.4 /

@@ -6400,7 +6400,20 @@ async function checkLanguages() {
      paragraph that rescues somebody who does not know what a משקוף is, and
      the cheapest way to fake that is a sentence fragment in the language
      nobody here proof-reads by eye. */
-  for (const step of ['fit', 'mk', 'colour', 'face', 'glass', 'grip', 'lock', 'pz', 'sum']) {
+  /* ⚠ RESTATED 2.10.2026, SAME SUBJECT (every step's explainer, three
+     languages, above the floors): the list was TYPED here and had left out
+     `xlock` since that step was made on 28.9 — a hand-kept list beside the
+     one that defines the steps, the shape CLAUDE.md §5.10 is about, and it
+     passed green for four days with a step unasked. Derived now from the
+     steps' own title keys in `UI` (`step.<k>.t`), so the designs' step
+     (`grd`, 2.10) and the extra lock are asked by having a title — the same
+     key `SECTIONS` reads — and a step can no longer be added without its
+     explainer being asked for. A floor on the count keeps the derivation
+     honest: eleven steps with the summary since 2.10. */
+  const STEP_IDS = Object.keys(UI).filter(k => /^step\.[^.]+\.t$/.test(k)).map(k => k.split('.')[1]);
+  ok(STEP_IDS.length >= 11 && STEP_IDS.includes('xlock') && STEP_IDS.includes('grd') && STEP_IDS.includes('sum'),
+     `T15 derived ${STEP_IDS.length} steps from UI (${STEP_IDS.join(' ')}) — fewer than the eleven there are, or one missing`);
+  for (const step of STEP_IDS) {
     for (const part of ['q', 'a']) {
       const row = UI[`exp.${step}.${part}`];
       ok(row, `step '${step}' has no exp.${step}.${part} — TRANSFORM.md §10.4 asks every `
@@ -6945,6 +6958,29 @@ group('the window designs are offered exactly where there is glass');
      + 'the design no longer brings its window');
     ok(r.said.includes(T('fix.windowAdded')), `a link with the design ${g.id} and no window: the window came without its sentence`);
     ok(grilleHasSubject(r.state), `a link with the design ${g.id}: the window came and the designs group would still be hidden`);
+  }
+  /* ⚠ AND SINCE 2.10.2026 THE PREDICATE IS A STEP'S PRESENCE (`grd`, the
+     owner's son: *"a separate section … only appearing if you choose one of the
+     windows"*). The sweep above keeps its subject on `grilleHasSubject`, which
+     is now what puts the designs' STEP in the walk; read out of `js/app.js`'s
+     source (it cannot be imported, as BREAKDOWN_KEY's check reads it), that
+     step must carry exactly this predicate, sit directly after `glass`, and
+     own the designs group — and the group must not keep a `when` of its own,
+     or two statements of one rule could come apart (§5.10). Then, over every
+     window: present exactly when glazed. */
+  const src = readFileSync(new URL('../js/app.js', import.meta.url), 'utf8');
+  const secs = src.slice(src.indexOf('const SECTIONS = ['), src.indexOf('\n];', src.indexOf('const SECTIONS = [')));
+  const order = [...secs.matchAll(/\{ key: '([a-z]+)'/g)].map(m => m[1]);
+  ok(order.length >= 10, `SECTIONS could not be read out of js/app.js (${order.length} keys) — this check is dead`);
+  ok(order[order.indexOf('glass') + 1] === 'grd', `the designs' step is not directly after the glass: ${order.join(' ')}`);
+  const grdSec = (secs.match(/\{ key: 'grd',[\s\S]*?(?=\{ key: ')/) || [''])[0];
+  ok(/when: grilleHasSubject/.test(grdSec), "the designs' step does not take its presence from grilleHasSubject");
+  const grp = (src.match(/\{ key: 'grille',[\s\S]*?split:/) || [''])[0];
+  ok(grp, 'the designs group could not be read out of js/app.js — this check is dead');
+  ok(/in: 'grd'/.test(grp) && !/when:/.test(grp), "the designs group is not in the designs' step, or keeps a when of its own beside the step's");
+  for (const w of WINDOWS) {
+    const st = repair({ ...DEFAULTS, window: w.id }).state;
+    ok(grilleHasSubject(st) === (w.id !== 'none'), `window ${w.id}: the designs' step would be ${grilleHasSubject(st) ? 'present' : 'absent'} — present exactly with glass`);
   }
 }
 

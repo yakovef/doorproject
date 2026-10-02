@@ -180,12 +180,25 @@
       "What sits on the front of the door — raised panels, or metal strips. Perfectly plain is a choice too.",
       "Что находится на лицевой стороне — накладные панели или металлические полосы. Можно оставить гладкой."
     ],
+    /* ⚠ 2.10.2026: what fills the window left this step for its own (`grd`,
+       below — the owner's son: *"Make the window design a separate section …
+       only appearing if you choose one of the windows"*), and these two said it
+       was here. The window alone now, and where its filling went. */
     "step.glass.t": ["חלון", "Glazing", "Окно"],
-    "step.glass.s": ["חלון ועיצוב הזכוכית", "A window, and what goes in it", "Окно и его оформление"],
+    "step.glass.s": ["האם יהיה חלון, ואיזה", "Whether there is a window, and which", "Будет ли окно и какое"],
     "step.glass.l": [
-      "חלון בכנף, ומה נמצא בתוכו — סורג או זכוכית מעוצבת.",
-      "A window in the leaf, and what fills it — a grille, or worked glass.",
-      "Окно в полотне и его наполнение — решётка или художественное стекло."
+      "חלון בכנף — צוהר אנכי או חלון מלבני, או בלי. מה שבתוכו נבחר בשלב הבא.",
+      "A window in the leaf — an upright slot or a rectangle, or none. What fills it is chosen in the next step.",
+      "Окно в полотне — узкое вертикальное или прямоугольное, или без окна. Наполнение выбирается на следующем шаге."
+    ],
+    /* the window's designs, their own step since 2.10.2026 — present only while
+       the door has a window */
+    "step.grd.t": ["עיצוב החלון", "Window design", "Дизайн окна"],
+    "step.grd.s": ["מה נכנס לתוך החלון", "What goes inside the window", "Что ставится в окно"],
+    "step.grd.l": [
+      "סורג מעל הזכוכית או דוגמה בתוכה — בשחור או בגוון הדלת. אפשר גם בלי.",
+      "Bars over the glass or a pattern in it — in black or in the door’s colour. None is a choice too.",
+      "Решётка поверх стекла или узор в нём — чёрные или в цвет двери. Можно и без них."
     ],
     "step.grip.t": ["ידית משיכה", "The pull handle", "Ручка-скоба"],
     "step.grip.s": ["הידית האנכית ואורכה", "The upright bar and its length", "Вертикальная скоба и её длина"],
@@ -472,7 +485,9 @@
       "Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — {0} a horizontal strip and {1} a vertical one. Panels and strips do not go on the same door, and strips do not go with a window. With the square window, on “{2}” the window takes the upper panel’s place and the lower one stays; a plain door gets the panel the window brings below it; and “{3}” does not go with a window — its frame would run into the handle plate in the middle. The horizontal bow is chosen here, with the face; the pull handle comes later, and the two can go together.",
       "Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: {0} за горизонтальную и {1} за вертикальную. Панели и полосы не совмещаются на одной двери, а полосы — с окном. С квадратным окном у варианта «{2}» окно занимает место верхней панели, а нижняя остаётся; гладкая дверь получает нижнюю панель, которую приносит окно; а «{3}» с окном не сочетаются — рама окна заходит на среднюю накладку под ручку. Горизонтальная скоба выбирается здесь, вместе с полотном; ручка-скоба — дальше, и их можно сочетать."
     ],
-    "exp.glass.q": ["מה נכנס לתוך החלון?", "What goes inside the window?", "Что ставится в окно?"],
+    /* ⚠ 2.10.2026: "what goes inside the window?" is the designs' own question
+       now (`exp.grd`); this step asks which window. */
+    "exp.glass.q": ["איזה חלון לבחור?", "Which window should I choose?", "Какое окно выбрать?"],
     /* ⚠ THE SIDELIGHT IS NOT A PRODUCT AND THIS SENTENCE WAS STILL SELLING IT —
        25.9.2026. "a door with a sidelight" / "דלת עם חלון צד" / "дверь с боковым
        окном" was withdrawn on 27.8 and `SIZES` has held six entries with no such
@@ -481,9 +496,18 @@
        to click. Gone, and the double door is named by its own tile through
        `{0}` — see the note over `exp.fit.a`. */
     "exp.glass.a": [
-      "יש שני חלונות: צוהר אנכי צר לאורך הדלת, וחלון מלבני. חלון מלבני מגיע תמיד עם פאנל בתחתית. מה שנמצא בתוך הזכוכית — סורג מברזל או זכוכית מעוצבת — נבחר בנפרד. בדלת {0} יש שני פתחים מזוגגים, והסורג מותקן בשניהם ומתומחר לפי מספרם.",
-      "There are two windows: a narrow upright slot, and a rectangle. A rectangle always comes with a panel below it. What fills the glass — wrought iron, or worked glass — is chosen separately. A {0} door has TWO glazed openings; the ironwork goes in both and is priced per opening.",
-      "Окон два: узкое вертикальное и прямоугольное. Прямоугольное всегда идёт с нижней панелью. Наполнение стекла — кованая решётка или художественное стекло — выбирается отдельно. У двери «{0}» ДВА остеклённых проёма: решётка ставится в оба и считается по их числу."
+      "יש שני חלונות: צוהר אנכי צר לאורך הדלת, וחלון מלבני. חלון מלבני מגיע תמיד עם פאנל בתחתית. אפשר גם בלי חלון. כשבוחרים חלון נפתח אחריו שלב עיצוב החלון — מה שנמצא בתוך הזכוכית; בלי חלון השלב הזה לא מופיע. בדלת {0} יש שני פתחים מזוגגים.",
+      "There are two windows: a narrow upright slot, and a rectangle. A rectangle always comes with a panel below it. Going without a window is a choice too. Choose a window and the window design step opens after this one — what fills the glass; without a window that step is not there. A {0} door has TWO glazed openings.",
+      "Окон два: узкое вертикальное и прямоугольное. Прямоугольное всегда идёт с нижней панелью. Можно и без окна. Если выбрать окно, после этого шага откроется шаг «Дизайн окна» — наполнение стекла; без окна этого шага нет. У двери «{0}» ДВА остеклённых проёма."
+    ],
+    /* the designs' explainer (2.10.2026). `{0}` is the etched designs'
+       surcharge per window and `{1}` the double door, both out of the catalogue
+       (§5.25: no figure or name typed). */
+    "exp.grd.q": ["מה נכנס לתוך החלון?", "What goes inside the window?", "Что ставится в окно?"],
+    "exp.grd.a": [
+      "עיצוב החלון הוא מה שנמצא בתוך הזכוכית: סורג ברזל שמותקן מעל הזכוכית, או דוגמה שחרוטה בזכוכית עצמה. כל עיצוב מגיע בשני צבעים — שחור, או בגוון הדלת. הסורגים כלולים במחיר; הדוגמאות החרוטות הן העיצובים המיוחדים, בתוספת {0} לכל חלון. בדלת {1} יש שני פתחים מזוגגים, והעיצוב נכנס לשניהם ומתומחר לפי מספרם. אפשר גם בלי עיצוב — זכוכית שקופה בלבד.",
+      "The window design is what fills the glass: iron bars fitted over the glass, or a pattern etched into the glass itself. Every design comes in two colours — black, or the door’s colour. The bars are included in the price; the etched patterns are the special designs, at {0} extra per window. A {1} door has TWO glazed openings, and the design goes in both and is priced per opening. Going without a design is a choice too — clear glass only.",
+      "Дизайн окна — это наполнение стекла: железная решётка поверх стекла или узор, вытравленный в самом стекле. Каждый дизайн есть в двух цветах — чёрный или в цвет двери. Решётки входят в цену; вытравленные узоры — это особые дизайны, доплата {0} за каждое окно. У двери «{1}» ДВА остеклённых проёма: дизайн ставится в оба и считается по их числу. Можно и без дизайна — только прозрачное стекло."
     ],
     "exp.grip.q": ["איזה אורך לבחור?", "What length should I choose?", "Какую длину выбрать?"],
     /* ⚠ TWO PRICES PER BAR SINCE 20.9.2026, NOT A RATE. Peretz: *"cylinder
@@ -9696,7 +9720,21 @@ ${plate.defs}${plate.body}
     /* the extra lock's step, 28.9.2026: the קודן's own case — the summary's row
        drew it first (`SPEC_ICON.speciallock`, which now refers here) */
     xlock: '<rect x="7.4" y="3.6" width="9.2" height="16.8" rx="4.6"/><path d="M10.6 8.6h.01M13.4 8.6h.01M10.6 12.2h.01M13.4 12.2h.01"/><circle cx="12" cy="16.6" r="1.6"/>',
-    sum: '<path d="M5.4 3h8.8l4.4 4.4V21H5.4Z"/><path d="M14.2 3v4.4h4.4"/><path d="m8.4 14 2.4 2.6 4.8-5.4"/>'
+    sum: '<path d="M5.4 3h8.8l4.4 4.4V21H5.4Z"/><path d="M14.2 3v4.4h4.4"/><path d="m8.4 14 2.4 2.6 4.8-5.4"/>',
+    /* ⚠ THE WINDOW'S DESIGNS, 2.10.2026 — their own step (`grd`), present only
+       with a window, drawn right after `glass` and tied to it in the navigator.
+       DESCRIBED FIRST, as the 27.9 brief asks: what goes inside the window — the
+       iron bars over the glass, or a pattern in it. — A window with bars: a
+       WIDE, LOW ARCH (no other mark has an arch, and `glass` is the slanted
+       pane) with three bars up it and one across, each bar touching the arch;
+       3.6 units apart, 3.2 px at 21 px — past the 2.7 under which a gap closes.
+       ⚠ The first draft was a TALL arched pane with two bars each way, and the
+       audit's pairwise raster read it 51 % against `sum` (floor 50): a tall
+       outline with lines in it is the summary's sheet at 21 px. Wide and low it
+       reads 64 % against its closest (`colour`), 68 against `face`. It is not
+       `SPEC_ICON.grille`, the frameless diamond lattice: that names the
+       ironwork in the summary, this names the question on the rail. */
+    grd: '<path d="M2.8 18.4V12a9.2 7.2 0 0 1 18.4 0v6.4Z"/><path d="M8.4 5.4v13M12 4.8v13.6M15.6 5.4v13M2.8 13.6h18.4"/>'
   };
   function sectionIcon(key) {
     if (!Object.prototype.hasOwnProperty.call(SECTION_ICON, key)) {
@@ -10294,7 +10332,13 @@ ${plate.defs}${plate.body}
   var doorArrows = () => [...document.querySelectorAll(".stage__arrow")].filter((a) => getComputedStyle(a).visibility !== "hidden").map(R);
   var TOUR_STEPS = [
     { text: "tour.door", targets: () => [R(document.querySelector("#stage .door-svg #frame"))] },
-    { text: "tour.steps", targets: () => [R(document.querySelector(".steps"))] },
+    /* and the designs' mark where it stands beside the column, out of its box
+       (2.10, a glazed door above 1100) — its own cut-out, or the scrim would
+       cover one of the steps the sentence is about */
+    { text: "tour.steps", targets: () => [
+      R(document.querySelector(".steps")),
+      ...[...document.querySelectorAll('.steps[data-grd="beside"] .steps__step[data-step="grd"]')].map(R)
+    ] },
     {
       text: "tour.options",
       targets: () => [optionsRect(), ...doorArrows()],
@@ -10629,25 +10673,28 @@ ${plate.defs}${plate.body}
     /* ⚠ `tinted`: a `-light` design's tile is the design in the DOOR'S colour
        (27.9.2026, *"black or the color of the door"*), so the art is drawn for
        the paint on screen and re-drawn when it changes — `retintOptions`. */
-    /* ⚠ `when`: THE DESIGNS UNLOCK WITH A WINDOW — 29.9.2026, the owner's son:
-       *"The window section split in 2 … if they choose a window, a sub-section
-       unlocks right after it — the designs. So the arrow feature near the door
-       works well."* Hidden through the finish group's mechanism (`markGroup`
-       sets the field `hidden` on every paint) off `grilleHasSubject`, which is
-       `isGlazed` — the question that greys every design on a solid door. So the
-       step's arrows walk the window list alone (none → slot → square → none),
-       and the "none" window tile stays (ours, CLAUDE.md §0a): it is the only
-       way back to a solid door on this step. */
+    /* ⚠ THE DESIGNS UNLOCK WITH A WINDOW — 29.9.2026, the owner's son: *"The
+       window section split in 2 … if they choose a window, a sub-section unlocks
+       right after it — the designs. So the arrow feature near the door works
+       well."* It was this group's `when`, hiding the field on the glass step.
+       ⚠ SINCE 2.10.2026 THE DESIGNS ARE A STEP OF THEIR OWN (`grd`, SECTIONS
+       below) — *"Make the window design a separate section like our 10 existing
+       ones, but only appearing if you choose one of the windows — an icon next
+       to the window one, basically a subsection."* So the group moved `in:
+       'grd'` and its `when` moved to the STEP: one statement of when the designs
+       exist (`grilleHasSubject` = `isGlazed`), read by the navigator, the
+       forward and back buttons and the counter. The glass step is the window
+       alone, and its arrows walk none → slot → square → none; the "none" tile
+       stays (ours, CLAUDE.md §0a) — the only way back to a solid door there. */
     {
       key: "grille",
       title: "g.grille",
-      in: "glass",
+      in: "grd",
       kind: "sq",
       list: () => GRILLES,
       glyph: (o) => grilleGlyph(o, byId(COLOURS, state.colour).hex),
       tinted: true,
       hint: "g.grille.h",
-      when: grilleHasSubject,
       /* ⚠ TWO HEADED GROUPS, AND EACH DESIGN'S TWO COLOURS SIDE BY SIDE — 28.9,
          the owner's son: *"Put the expensive window designs apart from the
          regular ones, and keep the same designs in different colours near each
@@ -10915,6 +10962,29 @@ ${plate.defs}${plate.body}
       lede: "step.glass.l",
       exp: "exp.glass",
       expArgs: () => [L(SIZES.half)]
+    },
+    /* ⚠ THE WINDOW'S DESIGNS, A STEP OF THEIR OWN THAT IS PRESENT ONLY WITH A
+       WINDOW — 2.10.2026, the owner's son: *"Make the window design a separate
+       section like our 10 existing ones, but only appearing if you choose one of
+       the windows — an icon next to the window one, basically a subsection."*
+       Keyed `grd` and titled "עיצוב החלון" (ours, CLAUDE.md §0a); right after
+       `glass`, its navigator mark tied to the glass mark by a thin line (the
+       "subsection", css/app.css). `when` is the step's PRESENCE (`present()`
+       below): on a solid door the step is not in the walk — its mark and its
+       card are hidden, the forward button skips it, a jump to it is refused, and
+       "step N of M" counts the steps that ARE there (9 or 10). The key is
+       `data-step` only, never the link or the code, so no `VERSION`; the field
+       `g=` stays where it is. The explainer's two figures come through
+       arguments (§5.25): the etched designs' surcharge per window, and the
+       double door that has two panes. */
+    {
+      key: "grd",
+      title: "step.grd.t",
+      sub: "step.grd.s",
+      lede: "step.grd.l",
+      exp: "exp.grd",
+      expArgs: () => [formatAgorot(byId(GRILLES, "vine").delta), L(SIZES.half)],
+      when: grilleHasSubject
     },
     {
       key: "face",
@@ -11759,11 +11829,18 @@ ${plate.defs}${plate.body}
   var visited = /* @__PURE__ */ new Set();
   var revealed = false;
   var displaced = /* @__PURE__ */ new Map();
-  var STEP_KEYS = () => [...SECTIONS.map((x) => x.key), SUMMARY.key];
+  var present = (st = state) => SECTIONS.filter((sec) => !sec.when || sec.when(st));
+  var STEP_KEYS = () => [...present().map((x) => x.key), SUMMARY.key];
+  var ALL_KEYS = () => [...SECTIONS.map((x) => x.key), SUMMARY.key];
+  var stepBefore = (key) => {
+    const keys = ALL_KEYS(), here = STEP_KEYS();
+    for (let i = keys.indexOf(key) - 1; i >= 0; i--) if (here.includes(keys[i])) return keys[i];
+    return here[0];
+  };
   function goStep(key, focus = true) {
     if (!STEP_KEYS().includes(key)) return;
     liveStep = key;
-    for (const k of STEP_KEYS()) {
+    for (const k of ALL_KEYS()) {
       const box = document.querySelector(`.sect[data-section="${k}"]`);
       if (box) {
         box.hidden = k !== key;
@@ -11931,9 +12008,16 @@ ${plate.defs}${plate.body}
     }));
   }
   function markSteps() {
-    const keys = STEP_KEYS();
-    for (const [i2, k] of keys.entries()) {
+    const here = STEP_KEYS();
+    const asked = here.length - 1;
+    let came = false;
+    for (const k of ALL_KEYS()) {
+      const i2 = here.indexOf(k);
       const b = document.querySelector(`.steps__step[data-step="${k}"]`);
+      if (b && b.hidden !== i2 < 0) {
+        b.hidden = i2 < 0;
+        came = true;
+      }
       if (b) {
         const on = k === liveStep;
         b.classList.toggle("is-on", on);
@@ -11942,8 +12026,8 @@ ${plate.defs}${plate.body}
         else b.removeAttribute("aria-current");
       }
       const where = document.querySelector(`.sect[data-section="${k}"] [data-step-n]`);
-      if (where) {
-        where.textContent = k === SUMMARY.key ? T(SUMMARY.sub) : T("nav.stepOf", i2 + 1, SECTIONS.length);
+      if (where && i2 >= 0) {
+        where.textContent = k === SUMMARY.key ? T(SUMMARY.sub) : T("nav.stepOf", i2 + 1, asked);
       }
     }
     const panel = document.querySelector(".panel--choose");
@@ -11966,6 +12050,7 @@ ${plate.defs}${plate.body}
       const dx = c.left < r.left + pad ? c.left - (r.left + pad) : c.right > r.right - pad ? c.right - (r.right - pad) : 0;
       if (Math.abs(dx) > 0.5) row.scrollBy({ left: dx, behavior: "instant" });
     }
+    const keys = here;
     const i = keys.indexOf(liveStep);
     const word = (k) => T(k).replace(/[‹›]/g, "").trim();
     const name = (b, k) => {
@@ -11983,6 +12068,7 @@ ${plate.defs}${plate.body}
       name(b, i === keys.length - 2 ? "nav.toSummary" : "nav.next");
     }
     for (const b of document.querySelectorAll(".sect__skip")) b.hidden = i >= keys.length - 2;
+    if (came) placeSteps();
   }
   function choose(g, id) {
     noteEngaged();
@@ -12163,6 +12249,10 @@ ${plate.defs}${plate.body}
     return hit ? L(hit) : "";
   }
   function paint() {
+    if (liveStep && !STEP_KEYS().includes(liveStep) && document.querySelector(".sect")) {
+      goStep(stepBefore(liveStep), false);
+      return;
+    }
     const colour = byId(COLOURS, state.colour);
     const handing = byId(HANDINGS, state.handing);
     const size = SIZES[state.size] || SIZES.standard;
@@ -12478,41 +12568,65 @@ ${plate.defs}${plate.body}
     if (!Number.isFinite(mid0)) return;
     const wrap = wrapEl.getBoundingClientRect();
     const mid = wrap.y + mid0;
-    col.style.removeProperty("--steps-gap");
-    col.style.removeProperty("--steps-pad");
-    let H = col.offsetHeight;
-    const cx = col.getBoundingClientRect();
-    const inX = (r) => r.width && r.right > cx.left && r.left < cx.right;
-    let push = -Infinity;
-    for (const el of document.querySelectorAll("#quote, .stage__hud .hud__slot")) {
-      const r = el.getBoundingClientRect();
-      if (inX(r) && r.top < mid && r.bottom + 8 > mid - H / 2) push = Math.max(push, r.bottom + 8);
+    const grd = col.querySelector('.steps__step[data-step="grd"]');
+    const glass = col.querySelector('.steps__step[data-step="glass"]');
+    const fit = () => {
+      col.style.removeProperty("--steps-gap");
+      col.style.removeProperty("--steps-pad");
+      let H = col.offsetHeight;
+      const cx = col.getBoundingClientRect();
+      const inX = (r) => r.width && r.right > cx.left && r.left < cx.right;
+      let push = -Infinity;
+      for (const el of document.querySelectorAll("#quote, .stage__hud .hud__slot")) {
+        const r = el.getBoundingClientRect();
+        if (inX(r) && r.top < mid && r.bottom + 8 > mid - H / 2) push = Math.max(push, r.bottom + 8);
+      }
+      const topFor = (h) => Math.max(mid - h / 2, push);
+      let top = topFor(H);
+      const st = document.querySelector("#stage")?.getBoundingClientRect();
+      let floor = (st ? st.bottom : wrap.bottom) - 8;
+      for (const w of document.querySelectorAll(".trust__i")) {
+        const r = w.getBoundingClientRect();
+        if (r.width && inX(r) && r.top > mid) floor = Math.min(floor, r.top - 8);
+      }
+      const un = document.querySelector(".stage__undo");
+      const ur = un && un.getBoundingClientRect();
+      if (ur && ur.width && inX(ur) && ur.top > mid) floor = Math.min(floor, ur.top - 8);
+      const rows = [...col.querySelectorAll(".steps__step")].filter((e) => !e.hidden && !(e === grd && col.dataset.grd));
+      const gaps = Math.max(1, rows.length - 1);
+      if (top + H > floor) {
+        const fits = Math.min(2 * (floor - mid), floor - push);
+        let give = H - fits;
+        const g = Math.max(2, 6 - give / gaps);
+        give -= (6 - g) * gaps;
+        const pad = Math.max(6, 10 - Math.max(0, give) / 2);
+        col.style.setProperty("--steps-gap", `${g.toFixed(2)}px`);
+        col.style.setProperty("--steps-pad", `${pad.toFixed(2)}px`);
+        H = col.offsetHeight;
+        top = topFor(H);
+      }
+      if (top + H > floor) top = floor - H;
+      wrapEl.style.setProperty("--steps-top", `${Math.round(top - wrap.y)}px`);
+    };
+    const besideClear = () => {
+      const r = grd.getBoundingClientRect(), st = $("#stage")?.getBoundingClientRect();
+      if (!r.width || !st || r.left < st.left || r.right > st.right || r.top < st.top || r.bottom > st.bottom) return false;
+      const fEl = document.querySelector(".door-svg #frame"), sEl = fEl && fEl.ownerSVGElement;
+      const m = sEl && typeof fEl.getBBox === "function" ? sEl.getScreenCTM() : null;
+      const bb = m ? fEl.getBBox() : null;
+      const frame = bb && bb.width > 0 ? { left: m.e + m.a * bb.x, right: m.e + m.a * (bb.x + bb.width), top: m.f + m.d * bb.y, bottom: m.f + m.d * (bb.y + bb.height) } : fEl && fEl.getBoundingClientRect();
+      const others = [frame, ...[...document.querySelectorAll(".stage__arrow, #quote, .stage__hud .hud__slot, .stage__undo .undo-pill")].map((e) => e.getBoundingClientRect())].filter((o) => o && o.right > o.left);
+      return !others.some((o) => r.left < o.right && r.right > o.left && r.top < o.bottom && r.bottom > o.top);
+    };
+    if (grd && glass && !grd.hidden) {
+      col.dataset.grd = "beside";
+      fit();
+      col.style.setProperty("--grd-top", `${glass.offsetTop}px`);
+      if (besideClear()) return;
     }
-    const topFor = (h) => Math.max(mid - h / 2, push);
-    let top = topFor(H);
-    const st = document.querySelector("#stage")?.getBoundingClientRect();
-    let floor = (st ? st.bottom : wrap.bottom) - 8;
-    for (const w of document.querySelectorAll(".trust__i")) {
-      const r = w.getBoundingClientRect();
-      if (r.width && inX(r) && r.top > mid) floor = Math.min(floor, r.top - 8);
-    }
-    const un = document.querySelector(".stage__undo");
-    const ur = un && un.getBoundingClientRect();
-    if (ur && ur.width && inX(ur) && ur.top > mid) floor = Math.min(floor, ur.top - 8);
-    const gaps = Math.max(1, col.querySelectorAll(".steps__step").length - 1);
-    if (top + H > floor) {
-      const fits = Math.min(2 * (floor - mid), floor - push);
-      let give = H - fits;
-      const g = Math.max(2, 6 - give / gaps);
-      give -= (6 - g) * gaps;
-      const pad = Math.max(6, 10 - Math.max(0, give) / 2);
-      col.style.setProperty("--steps-gap", `${g.toFixed(2)}px`);
-      col.style.setProperty("--steps-pad", `${pad.toFixed(2)}px`);
-      H = col.offsetHeight;
-      top = topFor(H);
-    }
-    if (top + H > floor) top = floor - H;
-    wrapEl.style.setProperty("--steps-top", `${Math.round(top - wrap.y)}px`);
+    delete col.dataset.grd;
+    col.style.removeProperty("--grd-top");
+    fit();
   }
   function fitStage() {
     if (document.documentElement.classList.contains("is-bare")) return;
