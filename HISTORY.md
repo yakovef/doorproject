@@ -26,6 +26,44 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **2.10 — THE ARROWS BESIDE THE DOOR REMADE (prompt C, 2 of 3).** The owner's
+  son: *"Remake the arrows around the door, make them bigger and more
+  noticeable."*
+  · **What was wrong.** 44 px (the tap floor), a 1 px `--rule` ring, paper at
+    86 %, no shadow, a 20 px chevron at 2.2, 8 px off the casing, the same at
+    every width — on the photograph's plaster they read as two faint circles.
+  · **What changed** (CSS only, off `fitStage`'s variables as before): a paper
+    disc at 92 % on `0 2px 10px rgb(0 0 0 / .28)`, no ring, a 26 px chevron at
+    a stroke of 3 in ink; hovered or pressed it inverts (ink disc, paper
+    chevron); focus wears the page's ring. Size and gap are two properties on
+    `.stage-wrap` read by the four positions: **60 px, 12 px** at ≥ 1200;
+    **56 px, 8 px** at 1100–1199; **52 px, 8 px** on a phone (chevron 23).
+  · **The wall, measured** (`tools/_arr.mjs`, every width 320–1920 × he/ru/en
+    × six sizes, 216 readings, the arrows' boxes against `#frame`, the
+    navigator column, the price, the band, the wall's controls and the undo
+    pills): at 60 px everywhere above 1100 the arrow touched the column at
+    1100 in Hebrew beside `halfextra2` — 56 px at 12 still did, by one pixel
+    (56 px²), so 1100–1199 keeps the old 8 px gap and reads clear. The one
+    reading that moved is the redo pill against the arrow at 320 beside
+    `halfextra2`: 115 → 311 px² (he; ru 295). The 93 px wall there holds an
+    arrow and one pill, and the arrow grew by 8. `ARROW_KNOWN` (the undo
+    block's, the other chat's region) raised to the measured reading with the
+    reason beside it, as the rule for two chats on one wall asks; §9's item
+    updated. The wall-ink ceilings (`KNOWN_MAX`), the column, price and band
+    clauses and the tour's arrow pointers read clean in the full audit.
+  · **Asserted:** a new audit block — per viewport (1920 to 320, he and ru) the
+    disc's size for its width, its gap to the casing (unless held at the
+    stage's edge), centred on the door's mid-height, no ring, a shadow, the
+    chevron's size and stroke, ≥ 4.5:1 on the disc, and inverting to ink on
+    hover. Its colour parser was first wrong: `color-mix()` computes to
+    `color(srgb 0.98 …)`, channels 0–1, read as 0–255 (1.20:1 everywhere) —
+    the instrument, fixed before trusting it.
+  · **Falsified:** the 44 px back → 16 size faults.
+  · **Not done:** `fitStage` publishing an `--arrow-size` off the measured wall
+    (a media band was enough and is one number to read); the redo at 320
+    beside the widest double (a product question, §9). No `VERSION`; 0 bare
+    sheets.
+
 - **2.10 — THE PHONE'S FIRST SCREEN (prompt C, 1 of 3).** The owner's son:
   *"The app adapted to the phone in good form — looking really good on the
   phone and intuitive."* Answered the same day in chat: on a phone the
@@ -3573,6 +3611,11 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **29.9** The quiet send says **"הזמינו את הדלת"** (*"Change the 'יש לי שאלה'
+  text … to 'הזמינו את הדלת'"*) above 1100 in every state; the phone bar keeps
+  "שלחו". The question state RETIRED on both sends and in the message — an
+  untouched door sends the standard door's ORDER; `is-untouched`, `send.waAsk*`
+  and the `chosen` argument are gone. Long form: `HISTORY.md`.
 - **29.9** The designs unlock with a window (B, 2 of 3) — *"the window section
   split in 2 … a sub-section unlocks right after it — the designs"*: the grille
   group's `when: grilleHasSubject` (`isGlazed`), the finish group's hiding; the

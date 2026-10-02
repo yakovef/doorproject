@@ -5578,7 +5578,15 @@ for (const v of VIEWS) {
      side now clear the casing by 0.09 px — so its pills stand beside the door
      without reaching the arrow. A knife edge, measured, named here so the day
      it comes back is not a surprise. */
-  const ARROW_KNOWN = { '320x568 halfextra2': 115 };
+  /* ⚠ RAISED 115 → 311 ON 2.10.2026, BY THE ARROWS, NOT THE PILLS — the owner's
+     son: *"Remake the arrows around the door, make them bigger"*. The arrow
+     on a phone is 52 px where it was 44, in a wall at 320 beside the widest
+     double that is 93 px: an arrow and one pill. Measured, he 311 and ru 295
+     px² with the stacked redo (it was 115 / 116); no shape the pills have
+     clears it. Raised to the measured reading by the chat that grew the
+     arrow, as the rule for two chats on one wall asks — the +10 still holds
+     it, and the day it clears this fails. */
+  const ARROW_KNOWN = { '320x568 halfextra2': 311 };
   const arrowSeen = new Set();
   for (const v of VIEWS) for (const lang of ['he', 'ru']) for (const size of Object.keys(SIZES)) {
     const tag = `${lang} ${v.w}x${v.h} ${size}`;
@@ -7132,6 +7140,75 @@ for (const v of VIEWS) {
   }
   if (asked < 10) fault('band', `only ${asked} of 10 readings were made — this check is measuring almost nothing`);
   if (faults === before) console.log(`    ${asked} readings: the band's title ≥ 26 px and the chosen option ≥ 19 px and ≥ 0.7 of it, one face and ink; the leaf no smaller than with that band at 1280, 1440 and 1920, the band one height on all ${STEPS} steps in he and ru; the arrows step the face and wrap, the band follows, the tall slot's refusal opens the dialog and changes nothing, hidden on the summary`);
+}
+
+/* ── THE ARROWS ARE BIG AND SEEN — 2.10.2026 ─────────────────────────────
+   The owner's son: *"Remake the arrows around the door, make them bigger and
+   more noticeable."* They were the 44 px floor with a hairline ring and no
+   shadow. Asserted per viewport (both directions, he and ru): the disc 60 px
+   at ≥ 1200, 56 at 1100–1199 (the wall there beside the widest double holds
+   no more next to the navigator column), 52 on a phone; its gap to the casing
+   12 / 8 / 8 px unless it is held inside the stage at its edge; centred on the
+   door's mid-height; no ring, a shadow; the chevron 26 px (23 on a phone) at a
+   stroke of 3, its ink ≥ 4.5:1 on the disc; and hovered, the disc inverts to
+   ink. Where the arrows stand against the door, the column, the price, the
+   band and the wall controls is the other blocks' (§9's wall table).
+   Falsified by putting the 44 px back: the size clause fires at every width. */
+{
+  console.log('\nthe arrows are big, round and seen');
+  const before = faults;
+  let read = 0;
+  /* `color-mix()` computes to `color(srgb 0.98 …)`, channels 0–1; `rgb()` to 0–255 */
+  const lum = c => { const m = c.match(/[\d.]+/g).map(Number).map(v => /^color\(srgb/.test(c) ? v * 255 : v); const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; };
+    return .2126 * f(m[0]) + .7152 * f(m[1]) + .0722 * f(m[2]); };
+  const ratio = (a, c) => { const x = lum(a), y = lum(c); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+  for (const [w, h, lang] of [[1920, 918, 'he'], [1440, 900, 'ru'], [1280, 720, 'he'], [1152, 800, 'ru'], [1100, 800, 'he'],
+                               [834, 1112, 'ru'], [390, 844, 'he'], [320, 568, 'ru']]) {
+    const tag = `${lang} ${w}x${h}`;
+    const want = w >= 1200 ? 60 : w >= 1100 ? 56 : 52, gap = w >= 1200 ? 12 : 8, chev = w >= 1100 ? 26 : 23;
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}`);
+      await pg.waitForTimeout(600);
+      const m = await pg.evaluate(() => {
+        const fr = document.querySelector('.door-svg #frame')?.getBoundingClientRect();
+        const st = document.querySelector('#stage').getBoundingClientRect();
+        return [...document.querySelectorAll('.stage__arrow')].map(a => {
+          const r = a.getBoundingClientRect(), cs = getComputedStyle(a), ch = a.querySelector('.stage__chev');
+          const left = r.right <= fr.left + 1;
+          return { dir: a.dataset.dir, w: r.width, h: r.height, gap: left ? fr.left - r.right : r.left - fr.right,
+            held: r.left <= st.left + 5 || r.right >= st.right - 5,
+            mid: Math.abs((r.top + r.bottom) / 2 - (fr.top + fr.bottom) / 2),
+            ring: parseFloat(cs.borderTopWidth), shadow: cs.boxShadow, bg: cs.backgroundColor, ink: cs.color,
+            chev: ch ? ch.getBoundingClientRect().width : 0, stroke: ch ? parseFloat(getComputedStyle(ch).strokeWidth) : 0 };
+        });
+      });
+      if (m.length !== 2) { fault('arrow-look', `${tag}: ${m.length} arrows — this check has no subject`); continue; }
+      for (const a of m) {
+        read++;
+        if (Math.abs(a.w - want) > 0.5 || Math.abs(a.h - want) > 0.5) fault('arrow-look', `${tag} ${a.dir}: the arrow is ${a.w.toFixed(1)}x${a.h.toFixed(1)} px — it should be ${want}`);
+        if (!a.held && Math.abs(a.gap - gap) > 1) fault('arrow-look', `${tag} ${a.dir}: ${a.gap.toFixed(1)} px off the casing — it should be ${gap}`);
+        if (a.mid > 1.5) fault('arrow-look', `${tag} ${a.dir}: ${a.mid.toFixed(1)} px off the door's mid-height`);
+        if (a.ring > 0) fault('arrow-look', `${tag} ${a.dir}: a ${a.ring} px ring — the disc stands on its shadow`);
+        if (!a.shadow || a.shadow === 'none') fault('arrow-look', `${tag} ${a.dir}: no shadow — it does not stand off the picture`);
+        if (Math.abs(a.chev - chev) > 0.5 || a.stroke < 3) fault('arrow-look', `${tag} ${a.dir}: the chevron is ${a.chev.toFixed(1)} px at ${a.stroke} — ${chev} px at 3`);
+        if (ratio(a.ink, a.bg) < 4.5) fault('arrow-look', `${tag} ${a.dir}: the chevron is ${ratio(a.ink, a.bg).toFixed(2)}:1 on its disc`);
+      }
+      if (w >= 1100) {
+        await pg.hover('.stage__arrow--next');
+        await pg.waitForTimeout(250);
+        const hv = await pg.evaluate(() => { const a = document.querySelector('.stage__arrow--next'), cs = getComputedStyle(a);
+          return { bg: cs.backgroundColor, ink: cs.color, page: getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() }; });
+        read++;
+        if (lum(hv.bg) > 0.1 || ratio(hv.ink, hv.bg) < 4.5) fault('arrow-look', `${tag}: hovered, the arrow is ${hv.bg} with ${hv.ink} — it should invert to ink`);
+      }
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault('arrow-look', `${tag}: chromium died`);
+    } finally { await pg.close().catch(() => {}); }
+  }
+  if (read < 20) fault('arrow-look', `only ${read} of 20 readings — this check is measuring less than it says`);
+  if (faults === before) console.log(`    ${read} readings: 60 / 56 / 52 px discs, 12 / 8 / 8 px off the casing, on the door's middle, no ring, a shadow, a 26 / 23 px chevron at 3 and ≥ 4.5:1, inverting to ink on hover`);
 }
 
 /* ── THE ARROWS WALK THE TILES IN THE ORDER THEY ARE DRAWN ────────────────

@@ -247,6 +247,11 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **2.10** The arrows remade (C, 2 of 3) — *"bigger and more noticeable"*:
+  60 px paper discs on a shadow, no ring, a 26 px chevron at 3, inverting on
+  hover; 56 px at 1100–1199, 52 on a phone. On no door, column, price, band or
+  wall control at any width; at 320 beside `halfextra2` the redo's named
+  overlap with the arrow 115 → 311 px² (`ARROW_KNOWN`). Long form: `HISTORY.md`.
 - **2.10** The phone's first screen (C, 1 of 3) — *"adapted to the phone in good
   form"*: below 1100 each step is question · answers · lede · the note (*"under
   the options"*, his answer) · explainer (`placePanelOrder`); band 1.2/1.0 rem,
@@ -276,11 +281,6 @@ lines here. Dates are the day of the change.
   price, the summary its accessible name, a small × in the corner; two across
   (the dialog widened under 360, as the gallery's). Drawn only while the list
   is open. The drawer sweep's flake was the seeding: an init script now. Long form: `HISTORY.md`.
-- **29.9** The quiet send says **"הזמינו את הדלת"** (*"Change the 'יש לי שאלה'
-  text … to 'הזמינו את הדלת'"*) above 1100 in every state; the phone bar keeps
-  "שלחו". The question state RETIRED on both sends and in the message — an
-  untouched door sends the standard door's ORDER; `is-untouched`, `send.waAsk*`
-  and the `chosen` argument are gone. Long form: `HISTORY.md`.
 ---
 
 ## 0c. Where it stands today — 30.9.2026
@@ -493,7 +493,14 @@ placement is the other session's, merged at the owner's son's choice.
   order, and the colours are drawn grouped by price), wrapping, through
   `choose`; refused options are skipped (ours, §0a); with none free, a
   one-button dialog and no change. Hidden (box kept) on the summary. The way
-  on is on the interface's inline end.
+  on is on the interface's inline end. ⚠ **Remade 2.10** (*"Remake the arrows
+  around the door, make them bigger and more noticeable"*): paper discs at
+  92 % on a soft shadow, no ring, a 26 px chevron at a stroke of 3 in ink,
+  inverting to ink on hover and press — **60 px, 12 px off the casing** at ≥
+  1200; **56 px, 8 px off** at 1100–1199 (the wall beside the widest double
+  there is 137 px and the column takes 68 of it; 56 at 12 still touched the
+  column by a pixel); **52 px, 8 px off** on a phone (chevron 23). Two
+  custom properties on `.stage-wrap`, `--arrow` and `--arrow-gap`.
 - ⚠ **`.stage__hud` IS ABSOLUTE AND MUST STAY ABSOLUTE.** Above 1100 px the
   stage is a flex item, so anything in the flow up there takes its height out
   of the drawing — a control that merely appeared in `.stage__bar` once cost
@@ -1618,6 +1625,9 @@ are not in `VIEWS`:
   below), centred on the door or pushed down at every size and desktop width
   but nine named Hebrew lifts (29.9, §9), the live mark whole on both axes, and its checks on exactly the
   steps walked — none on arrival or after a reload, the address unmoved.
+- **the arrows' look** (2.10) — 60 / 56 / 52 px by width, 12 / 8 / 8 px off the
+  casing, on the door's middle, no ring, a shadow, a 26 / 23 px chevron at 3,
+  ≥ 4.5:1 on the disc, inverting to ink on hover.
 - **the phone's first screen** (2.10) — at 390×844 and 360×780, he and ru, on
   every step on arrival, the question and the whole first row of its answers
   between the door and the bar (320's three short steps named, `ROW_KNOWN`);
@@ -1993,7 +2003,11 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   needed — since 29.9 `halfextra2`'s only: the band's line box made every door
   at 320 0.7 px smaller and on a step the glyphs side by side clear
   `halfextra1`'s casing by 0.09 px (a knife edge; on the summary, 0.18 px on it,
-  so there the stacked glyphs stand beside the arrow's hidden, kept box). What would close it is a product question: the arrows on a phone,
+  so there the stacked glyphs stand beside the arrow's hidden, kept box).
+  ⚠ **311 px² since 2.10** (he; ru 295): the arrows went 44 → 52 px on a phone
+  (*"bigger and more noticeable"*), so the 93 px wall holds even less beside
+  them; `ARROW_KNOWN` raised to the measured reading by the chat that grew the
+  arrow. What would close it is a product question: the arrows on a phone,
   or the redo, somewhere other than beside the door.
 - **In Hebrew the navigator column shares the bottom-right corner with the undo
   pills, and where the stage is short it cannot be centred on the door** (29.9).

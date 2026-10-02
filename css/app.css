@@ -1213,17 +1213,33 @@ svg { direction: ltr; }
    wall is narrower than the arrow. Absolute for `.stage__hud`'s reason:
    nothing in the flow here. The way on is on the interface's inline end —
    the left in Hebrew — and the chevrons mirror with it; the door does not.
-   44 px, the floor. Hidden (box kept) on the summary, where there is no group
-   to step through. */
+   Hidden (box kept) on the summary, where there is no group to step through.
+   ⚠ REMADE 2.10.2026 — the owner's son: *"Remake the arrows around the door,
+   make them bigger and more noticeable."* They were 44 px (the floor), a 1 px
+   `--rule` ring, paper at 86 %, no shadow, a 20 px chevron at 2.2, 8 px off
+   the casing. Now (ours, CLAUDE.md §0a): a 60 px paper disc at 92 % on a soft
+   shadow, no ring, a 26 px chevron at 3 in ink, 12 px off the casing;
+   hovered or pressed it inverts (ink disc, paper chevron); focus wears the
+   page's ring. 52 px and 8 px on a phone. ⚠ AND 56 px FROM 1100 TO 1199:
+   the wall there beside the widest double is 137 px and the navigator column
+   takes 56 + 12 of it — 60 + 12 more does not fit, and 56 at 12 still
+   touched the column by one pixel (56 px², Hebrew, `halfextra2`, measured
+   2.10), so that band keeps the old 8 px gap too. Two numbers, `--arrow` and `--arrow-gap`, read by
+   the four positions below. */
+.stage-wrap { --arrow: 60px; --arrow-gap: 12px; }
+@media (min-width: 1100px) and (max-width: 1199px) { .stage-wrap { --arrow: 56px; --arrow-gap: 8px; } }
+@media (max-width: 1099px) { .stage-wrap { --arrow: 52px; --arrow-gap: 8px; } }
 .stage__arrow {
   position: absolute; z-index: 4;
   inset-block-start: var(--frame-mid, 45%);
   transform: translateY(-50%);
-  inline-size: 44px; block-size: 44px; padding: 0;
+  inline-size: var(--arrow); block-size: var(--arrow); padding: 0;
   display: grid; place-items: center;
-  border: 1px solid var(--rule); border-radius: 50%;
-  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  border: 0; border-radius: 50%;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  box-shadow: 0 2px 10px rgb(0 0 0 / .28);
   color: var(--ink); cursor: pointer;
+  transition: background-color .12s var(--ease), color .12s var(--ease);
 }
 @supports not (background: color-mix(in srgb, red 50%, transparent)) {
   .stage__arrow { background: var(--paper); }
@@ -1302,16 +1318,17 @@ html:not([dir="rtl"]) .stage__undo[data-mode="icon"] { flex-direction: column-re
 .stage__undo[data-mode="iconrow"] .undo-pill { padding: 0; inline-size: 44px; }
 .stage__undo[data-mode="icon"] .undo-pill__w,
 .stage__undo[data-mode="iconrow"] .undo-pill__w { display: none; }
-.stage__arrow:hover { border-color: var(--ink-3); background: var(--paper); }
+.stage__arrow:hover, .stage__arrow:active { background: var(--ink); color: var(--paper); }
 .stage__chev {
-  inline-size: 20px; block-size: 20px;
-  fill: none; stroke: currentColor; stroke-width: 2.2;
+  inline-size: 26px; block-size: 26px;
+  fill: none; stroke: currentColor; stroke-width: 3;
   stroke-linecap: round; stroke-linejoin: round;
 }
-.stage__arrow--prev { left: max(4px, calc(var(--frame-left, 30%) - 52px)); }
-.stage__arrow--next { left: min(calc(100% - 48px), calc(var(--frame-right, 70%) + 8px)); }
-[dir="rtl"] .stage__arrow--prev { left: min(calc(100% - 48px), calc(var(--frame-right, 70%) + 8px)); }
-[dir="rtl"] .stage__arrow--next { left: max(4px, calc(var(--frame-left, 30%) - 52px)); }
+@media (max-width: 1099px) { .stage__chev { inline-size: 23px; block-size: 23px; } }
+.stage__arrow--prev { left: max(4px, calc(var(--frame-left, 30%) - var(--arrow-gap) - var(--arrow))); }
+.stage__arrow--next { left: min(calc(100% - var(--arrow) - 4px), calc(var(--frame-right, 70%) + var(--arrow-gap))); }
+[dir="rtl"] .stage__arrow--prev { left: min(calc(100% - var(--arrow) - 4px), calc(var(--frame-right, 70%) + var(--arrow-gap))); }
+[dir="rtl"] .stage__arrow--next { left: max(4px, calc(var(--frame-left, 30%) - var(--arrow-gap) - var(--arrow))); }
 [dir="rtl"] .stage__chev { transform: scaleX(-1); }
 .stage-wrap[data-step="sum"] .stage__arrow { visibility: hidden; }
 
