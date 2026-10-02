@@ -286,6 +286,24 @@ export const UI = {
   'undo.gone':        ['ללא', 'None', 'Нет'],
 
   /* ── the flow: the eight steps ────────────────────────────────── */
+  /* ⚠ THE NAVIGATOR'S WORD UNDER EACH MARK — 2.10.2026, the redesign round
+     (the owner's son: *"make the app more pleasant to the eye and more
+     intuitive"*). Ten icons with no words asked a customer to tell a padlock
+     from a key with sparkles; every reference configurator labels its steps.
+     One short noun each, set INSIDE the 44 px mark under the icon, so the row
+     keeps its 62 px and the column its 44 px targets. The step's full title
+     stays the button's accessible name; these are `aria-hidden`. Also the
+     destination on the desktop's "Next" (`nav.nextTo`). */
+  'step.fit.n':       ['מידה', 'Size', 'Размер'],
+  'step.colour.n':    ['צבע', 'Colour', 'Цвет'],
+  'step.lock.n':      ['מנעול', 'Lock', 'Замок'],
+  'step.pz.n':        ['פרזול', 'Finish', 'Отделка'],
+  'step.xlock.n':     ['מנעול נוסף', 'Extra lock', 'Доп. замок'],
+  'step.glass.n':     ['חלון', 'Window', 'Окно'],
+  'step.face.n':      ['חזית', 'Face', 'Полотно'],
+  'step.grip.n':      ['ידית', 'Handle', 'Ручка'],
+  'step.mk.n':        ['משקוף', 'Frame', 'Коробка'],
+  'step.sum.n':       ['סיכום', 'Summary', 'Итог'],
   'step.fit.t':       ['מבנה הדלת', 'The door itself', 'Сама дверь'],
   'step.fit.s':       ['גודל הדלת וכיוון הפתיחה', 'Size and opening direction', 'Размер и сторона открывания'],
   'step.fit.l':       ['הגודל והצד שאליו הדלת נפתחת. נמדוד אצלכם במדויק, בחינם.',
@@ -359,6 +377,11 @@ export const UI = {
   'nav.back':         ['‹ הקודם', '‹ Back', '‹ Назад'],
   'nav.next':         ['הבא ›', 'Next ›', 'Далее ›'],
   'nav.toSummary':    ['לסיכום ›', 'To the summary ›', 'К итогу ›'],
+  /* The desktop's way on says WHERE it goes (2.10.2026) — "Next" alone is the
+     most important button on the page and the only one that does not say what
+     it does. `{0}` is the next step's `step.<key>.n`. The bar's arrows on a
+     phone keep `nav.next` in their name; there is no room for the word. */
+  'nav.nextTo':       ['הבא: {0} ›', 'Next: {0} ›', 'Далее: {0} ›'],
   /* The skip in `.sect__foot`, desktop only — see the note where it is built.
      No chevron: it is a jump rather than a step, and the arrow on `nav.next`
      and `nav.toSummary` is what says "one more". */

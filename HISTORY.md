@@ -26,6 +26,52 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **2.10 — THE REDESIGN ROUND, PROMPT 1: WORDS, DESTINATIONS, NAMES, AND
+  QUIETER CHROME.** The owner's son: *"look at the app i made inspect it, more
+  specificaly the ui and ux, your missions is to make the app more pleasent to
+  the eye and more intuative … take insparion from those sites … but before you
+  push that to the main branch i would like to see how it looks like."* So it
+  lives on the session branch `claude/eloquent-cori-i0kfjb` and is NOT merged
+  into `claude/door-builder-website-plan-rgg7gu` until they say so; the
+  before/after is on a design canvas sent to them.
+  **Read off the page first, with real taps** (a scripted `el.click()` leaves
+  `:focus-visible` on and drew a ring round every step title that no customer
+  ever sees — checked, not shipped as a finding). Measured: tile names 12.48
+  px, prices 9.92 px grey; the save 52 px; the undo pills 87×44 each; ~140 px
+  of eyebrow, title and lede before the first answer on a phone; and on the
+  phone summary the whole layout 2 px off with a white sliver down the left —
+  the visually hidden `<h1>` and `#live` stand 1 px past the inline-start edge
+  in RTL and the document could slide.
+  **What changed:** (1) the navigator's marks carry a word (`step.<key>.n`,
+  three languages) inside the 44 px mark — the row stays 62 px, the column
+  56 → 68 px (at 1100 beside the widest double the column ends 10 px short of
+  the door's arrow); (2) the desktop's "Next" names its destination
+  (`nav.nextTo`), the skip is a link, back keeps its outline — one primary;
+  (3) `.swatch__name` is shown under each chip, the code kept on it; (4) the
+  summary's tiles carry the row's label above the picture (`.spec__label`),
+  and inside the summary the send block is no longer a card in the card (and
+  its 46 px of padding went); (5) the gallery opener: three of the gallery's
+  own doors drawn small (chosen by what they show — a panelled face, a window
+  with ironwork, a tall window — not by index), paper ground, the accent only
+  on its hover border; (6) tiles a faint white card, names .86rem/500 (Russian
+  kept at .78rem — "Стандартная" broke inside the word at 1100), meta
+  .72rem/500; (7) Hebrew headings no longer tracked (`html[lang="he"]`); (8)
+  the step's counter on its title's row (`.sect:not([hidden])` a grid); (9)
+  `html { overflow-x: clip }`.
+  **Kept, because they are the owner's son's:** the floppy disk (27.9, *"an
+  old hard drive"*), the bronze undo pills and their corner (28–29.9), the
+  black column and its white square (27.9), every placement on the photograph.
+  The tan opener ground (27.9, *"more apparent, still in the palette"*) is the
+  one of his answered differently: apparent by its pictures instead — named so
+  he can reverse it in a line.
+  **The test that could not read `--ink-2`:** the opener's contrast check
+  parsed `var(--([a-z-]+))`, so a token with a digit read as `ink-` and
+  resolved to nothing; `[a-z0-9-]` now, ink-2 on paper-up 5.01:1.
+  **Gates:** `npm test` 6 failed before the sheets (5 stale-sheet, 1 the regex
+  above); the sheets moved the 12 `shot` sheets and `.stamps.json` only
+  (predicted: no bare sheet — the drawing is untouched). `npm run audit` not
+  yet run on this round.
+
 - **1.10 — THE TOUR: THE SAVE STAYS IN ITS PLACE, AND THE OPTIONS STEP LIGHTS
   THE DOOR'S ARROWS.** The owner's son: *"in the tutorial for some reason the
   save button is in the same place as the languges, but when the tutorial

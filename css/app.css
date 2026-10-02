@@ -281,7 +281,14 @@
    once, here, rather than being re-defended by every rule that sets display. */
 [hidden] { display: none !important; }
 
-html { -webkit-text-size-adjust: 100%; }
+/* ⚠ AND THE PAGE NEVER SCROLLS SIDEWAYS — 2.10.2026. The visually hidden
+   `<h1>` and `#live` stand 1 px past the inline-start edge in a right-to-left
+   page, which was enough for a phone to let the whole document slide: on the
+   summary at 390 the layout sat 2 px off and a white sliver showed down the
+   left edge. `clip` on the root is the viewport's `hidden`: nothing becomes a
+   scroll container that was not, so the sticky door and the fixed rows are
+   untouched. */
+html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
 
 body {
   margin: 0;
@@ -2119,7 +2126,7 @@ html[dir="rtl"] .quote__back .quote__chev { transform: none; }
   display: grid; justify-items: center; align-content: start; gap: 4px;
   min-block-size: 44px; padding: 8px 4px 8px;
   border: 1px solid var(--rule); border-radius: var(--r-tile);
-  background: none; appearance: none; -webkit-appearance: none;
+  background: rgb(255 255 255 / .62); appearance: none; -webkit-appearance: none;
   font: inherit; color: var(--ink); text-align: center;
 }
 button.spec__row { cursor: pointer; }
@@ -2132,6 +2139,13 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
 .spec__swatch {
   inline-size: 48px; block-size: 36px; border-radius: 8px;
   background: var(--chip); border: 1px solid rgb(0 0 0 / .22);
+}
+/* The question, above its answer (2.10.2026, js/app.js). */
+.spec__label {
+  max-inline-size: 100%;
+  font-size: .64rem; font-weight: 600; letter-spacing: .03em; line-height: 1.2;
+  color: var(--ink-2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .spec__name {
   font-size: .74rem; line-height: 1.25; color: var(--ink);
@@ -2377,6 +2391,22 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
   transition: background .12s var(--ease), color .12s var(--ease);
 }
 .steps__g { inline-size: 21px; block-size: 21px; }
+/* ⚠ A WORD UNDER EACH MARK — 2.10.2026, the redesign round. Ten icons with
+   no words asked the customer to tell a padlock from a key with sparkles;
+   every reference configurator names its steps. The word is set INSIDE the
+   44 px mark, under a 19 px icon, so the phone's row stays 62 px and the
+   column's targets stay 44 tall — the two costs that took the old title and
+   number out (see the notes above) do not come back. The mark grows sideways
+   only, to fit its word. */
+.steps__c {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  inline-size: auto; min-inline-size: var(--tap); padding-inline: 6px;
+}
+.steps__c .steps__g { inline-size: 19px; block-size: 19px; }
+.steps__w {
+  font: 500 .6rem/1 var(--sans); letter-spacing: .01em;
+  white-space: nowrap;
+}
 
 /* ── ⚠ NINE CIRCLES HAVE TO FIT, AND THEY DID NOT ────────────────────
    Reported from outside, 30.8.2026: *"when i scroll down the options, the
@@ -2644,7 +2674,7 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
 /* What the question means, for the customer who does not already know. Capped
    at a readable measure rather than run to the full width of a 380 px card. */
 .sect__lede {
-  margin: 0 0 22px;
+  margin: 0 0 16px;
   font: 400 .94rem/1.55 var(--sans);
   color: var(--ink-2);
   max-inline-size: 42ch;
@@ -2864,18 +2894,33 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
    names this selector and why. `--accent-ink` as text on this ground would
    be 1.86:1; the count takes `--ink` too. Still not the send: no green, no
    verb about the order. */
+/* ⚠ AND SINCE 2.10.2026 IT IS APPARENT BY ITS PICTURES. The tan ground made
+   it the loudest block in the panel — louder than the question the customer
+   is answering, and on a phone a tan sliver of it showed under the photograph
+   on every step. Three of the gallery's own doors, drawn small, say "ready
+   doors" before a word is read; the card is the panel's paper with a hairline,
+   the accent only on its hover border (still the allowlist's `.works-open`).
+   The text is `--ink` and the count `--ink-2` on `--paper-up`, asserted ≥
+   4.5:1 by the same test, reading this rule. */
 .works-open {
   appearance: none; -webkit-appearance: none;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  inline-size: 100%; min-block-size: 56px;
-  margin-block-end: 12px; padding: 10px 14px;
-  background: var(--accent);
-  border: 1px solid var(--accent); border-radius: var(--r-tile);
+  display: flex; align-items: center; gap: 14px;
+  inline-size: 100%; min-block-size: 64px;
+  margin-block-end: 14px; padding: 8px 16px 8px 14px;
+  background: var(--paper-up);
+  border: 1px solid var(--rule); border-radius: var(--r-tile);
   font: inherit; color: var(--ink); text-align: start; cursor: pointer;
+  transition: border-color .14s var(--ease), box-shadow .14s var(--ease);
 }
-.works-open:hover { border-color: var(--ink); }
-.works-open__t { font-weight: 600; font-size: .92rem; }
-.works-open__n { font-size: .78rem; font-weight: 500; color: var(--ink); white-space: nowrap; }
+.works-open:hover { border-color: var(--accent); box-shadow: 0 6px 18px rgb(23 23 21 / .08); }
+.works-open__doors { display: flex; flex: 0 0 auto; align-items: flex-end; block-size: 48px; direction: ltr; }
+.works-open__door { inline-size: 24px; block-size: 48px; }
+.works-open__door + .works-open__door { margin-inline-start: 4px; }
+.works-open__door svg { inline-size: 100%; block-size: 100%; display: block; }
+.works-open__txt { display: grid; gap: 2px; flex: 1 1 auto; min-inline-size: 0; }
+.works-open__t { font-weight: 600; font-size: .95rem; }
+.works-open__n { font-size: .8rem; font-weight: 400; color: var(--ink-2); white-space: nowrap; }
+.works-open__go { flex: 0 0 auto; font-size: 1.3rem; line-height: 1; color: var(--ink-2); }
 /* ⚠ AND ON A PHONE IT SHOWS ON THE FIRST STEP ONLY. See the note in
    `markSteps` for why: it is an offer about where to START, and on a phone it
    was standing between the door and the question on all nine steps. The
@@ -2900,8 +2945,12 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
      open list for the arrival measurement and what closing it would cost. */
   .works-open {
     min-block-size: var(--tap); margin-block-end: 8px;
-    padding: 4px 14px; border-radius: var(--r-pill);
+    padding: 4px 14px 4px 10px; gap: 10px;
   }
+  /* The doors at the pill's own height: still pictures, still 44 px. */
+  .works-open__doors { block-size: 36px; }
+  .works-open__door { inline-size: 18px; block-size: 36px; }
+  .works-open__txt { display: flex; align-items: baseline; gap: 8px; }
   .works-open__t { font-weight: 600; font-size: .86rem; }
 }
 
@@ -3234,14 +3283,24 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
   text-align: center;
   border-block-start: 1px solid rgb(0 0 0 / .14);
 }
-.swatch__name, .swatch__meta { display: none; }
+.swatch__meta { display: none; }
 /* The gap-ring construction is already the mockup's. What changes is only its
    colour — the same move as the tile border, for the same measured reason. */
 .swatch.is-selected .swatch__chip { --ring: var(--accent-ink); }
 .swatch:hover .swatch__chip { --ring: var(--rule); }
 .swatch.is-selected:hover .swatch__chip { --ring: var(--accent-ink); }
 
-.swatch__name { font-size: .82rem; line-height: 1.25; }
+/* ⚠ THE NAME IS SHOWN SINCE 2.10.2026. A customer chose between "7126D" and
+   "9005D" — the paint supplier's codes, which is what Peretz orders by and
+   nothing a customer reads. The code stays on the chip; the name goes under
+   it, two lines at most, the full name in the button's own label. */
+.swatch { gap: 6px; align-content: start; }
+.swatch__name {
+  max-inline-size: 72px;
+  font-size: .7rem; line-height: 1.2; color: var(--ink-2); text-align: center;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+}
+.swatch.is-selected .swatch__name { color: var(--ink); font-weight: 600; }
 /* `--sans` since 28.9: it held Hebrew in `--mono`, which has none (§9, closed). */
 .swatch__meta {
   font-family: var(--sans); font-size: .66rem; color: var(--ink-2);
@@ -3270,7 +3329,11 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
 
 .tile {
   appearance: none; -webkit-appearance: none;
-  background: none; padding: 10px 8px 12px;
+  /* ⚠ A CARD, NOT AN OUTLINE — 2.10.2026. On the phone's paper an outline
+     tile was a hairline drawn on the ground, and the options read as a form.
+     A faint white lift makes each one an object you pick up; on the desktop's
+     #FDFBF7 card it is nearly the card, and the hairline carries it there. */
+  background: rgb(255 255 255 / .62); padding: 12px 8px 12px;
   font: inherit; color: inherit; text-align: center;
   cursor: pointer;
   border: 1px solid var(--rule);
@@ -3281,7 +3344,7 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
   position: relative;
   transition: border-color .12s var(--ease), box-shadow .12s var(--ease);
 }
-.tile:hover { border-color: var(--ink-2); }
+.tile:hover { border-color: var(--ink-2); box-shadow: 0 4px 14px rgb(23 23 21 / .07); }
 .tile.is-selected { border-color: var(--accent-ink); box-shadow: inset 0 0 0 1px var(--accent-ink); }
 
 /* ── THE CHECK BADGE ────────────────────────────────────────────────
@@ -3330,7 +3393,9 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
    they are words, and `--mono` has no Hebrew in it (§9). */
 
 .tile__name {
-  font-size: .78rem; line-height: 1.2;
+  /* 13.8 px, up from 12.5, and 500 — 2.10.2026. The option's name is the
+     thing being chosen and it was the quietest text on the screen. */
+  font-size: .86rem; font-weight: 500; line-height: 1.22;
   /* ⚠ A WORD NEVER LEAVES ITS TILE (28.9). Rubik's Cyrillic is wider than the
      system sans the Russian page was always painted in, and three names are one
      word wider than an 80 px grille tile — "Геометрические", "Переплетённые",
@@ -3344,7 +3409,7 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
   hyphens: auto; overflow-wrap: anywhere;
 }
 /* `--sans` since 28.9: it held Hebrew in `--mono`, which has none (§9, closed). */
-.tile__meta { font-family: var(--sans); font-size: .62rem; color: var(--ink-2); }
+.tile__meta { font-family: var(--sans); font-size: .72rem; font-weight: 500; color: var(--ink-2); }
 /* ⚠ ONE LINE, AND NOT RED. `דורש חלון` was `--warn` at three wrapped lines,
    which did two things to a grid of tiles: it made the reason the LOUDEST
    colour on a page whose accent is tan, and it doubled the height of the tiles
@@ -3759,6 +3824,17 @@ html.is-live .wa__off { display: none; }
    `display: none` and not `visibility`, so it takes no room in the flex row
    and the two buttons that were there keep the layout they were measured in. */
 .sect__skip { flex: 0 0 auto; display: none; }
+/* ⚠ ONE BUTTON THAT LOOKS LIKE THE WAY ON — 2.10.2026. Back, skip and next
+   were three pills of near-equal weight. Next is the ink pill and says where
+   it goes (`nav.nextTo`); back keeps its outline; the skip is a link, which
+   is what a jump is. Its 44 px target is the box, not the ink. */
+.sect__foot .sect__skip {
+  border-color: transparent; background: none;
+  padding-inline: 6px; font-size: .84rem; color: var(--ink-2);
+  text-decoration: underline; text-underline-offset: .25em; text-decoration-color: var(--rule);
+}
+.sect__foot .sect__skip:hover { color: var(--ink); text-decoration-color: currentColor; border-color: transparent; }
+.sect__foot { flex-wrap: wrap; }
 @media (min-width: 1100px) { .sect__skip:not([hidden]) { display: inline-flex; } }
 /* The summary's way on is the send, so it takes the room the same way.
    ⚠ AND SINCE 27.9 THE WHOLE ROW: the send is full width (the owner's son,
@@ -3766,6 +3842,16 @@ html.is-live .wa__off { display: none; }
    the way back and the telephone sharing the second. */
 .sect__foot .btn--wa { flex: 1 0 100%; order: -1; margin-block: 0; }
 .sect--sum .sect__foot { flex-wrap: wrap; row-gap: 6px; }
+/* ⚠ NO CARD INSIDE THE CARD — 2.10.2026. On the summary the send block sat as
+   a white bordered, shadowed card inside the choices card: two frames round
+   one list. Inside the summary it is the step's own content; `--surface`
+   stays declared on `.send` for the halos. */
+.sect--sum .send { border: 0; box-shadow: none; background: none; padding: 0; }
+/* …and none of the card's padding either: the panel round it was 20 px, then
+   the card's own margins, a 46 px gap between "check it over" and the first
+   picture on a phone. */
+.sect--sum .panel--send { padding: 0; }
+.sect--sum .send__incl { margin-block: 0; }
 .sect__foot .send__tel { flex: 1 1 auto; justify-content: flex-end; }
 .sect__next:not(:disabled) {
   background: var(--ink); color: var(--paper);
@@ -3969,8 +4055,9 @@ html.is-live .wa__off { display: none; }
        less than 2, 10 → no less than 6) by exactly the shortfall. Nine 44 px
        targets stay nine 44 px targets. */
     flex-direction: column; align-items: center; gap: var(--steps-gap, 6px);
-    margin: 0; padding: var(--steps-pad, 10px) 6px;
-    inline-size: 56px;
+    margin: 0; padding: var(--steps-pad, 10px) 4px;
+    /* 68, up from 56, for the word under each mark (2.10.2026). */
+    inline-size: 68px;
     background: var(--ink);
     border: 0; border-radius: var(--r-card);
     box-shadow: 0 6px 18px rgb(0 0 0 / .18);
@@ -4675,3 +4762,47 @@ html.is-live .wa__off { display: none; }
   .panel--send { display: none; }
   .sect--sum .panel--send { display: block; border: 0; }
 }
+
+/* The column's marks share one width, so the live square is one shape on
+   every step whatever its word (2.10.2026). */
+@media (min-width: 1100px) {
+  .stage-wrap > .steps .steps__c { inline-size: 60px; padding-inline: 2px; }
+}
+
+/* ⚠ HEBREW IS NEVER TRACKED — 2.10.2026. The small headings were set as
+   Latin small caps: uppercase and .12–.14em of letter-spacing. Hebrew has no
+   case, and tracking pulls its letters apart into "מ י ד ה" — read off the
+   page's own screenshots in the redesign round. English and Russian keep the
+   tracking their capitals want; Hebrew gets its letters back together, a
+   touch larger and heavier to keep the voice the tracking was giving. */
+html[lang="he"] :is(.field__title, .opts__sub, .sect__where, .send__label,
+                    .blen__label, .stripes__label, .tour__n, .spec__label) {
+  letter-spacing: 0;
+}
+html[lang="he"] .field__title { font-size: .8rem; font-weight: 600; }
+
+/* ⚠ THE STEP'S COUNTER ON ITS TITLE'S LINE — 2.10.2026. "שלב 2 מתוך 9" sat
+   on a line of its own above the title, so a phone spent an eyebrow, a
+   title and a lede before the first answer. The title holds the start of the
+   row and the counter its end; every other child takes the full row, in its
+   own order. `:not([hidden])` because a display on `.sect` would otherwise
+   beat the `hidden` attribute and show every step at once. Grid does not
+   collapse margins, so the lede's is the gap it was meant to be. */
+.sect:not([hidden]) {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px; align-items: baseline;
+}
+.sect:not([hidden]) > * { grid-column: 1 / -1; }
+.sect:not([hidden]) > .sect__title { grid-column: 1; grid-row: 1; margin-block-end: 6px; }
+.sect:not([hidden]) > .sect__where { grid-column: 2; grid-row: 1; margin: 0; white-space: nowrap; }
+
+/* The column's words a little larger than the phone's — it has the room. */
+@media (min-width: 1100px) {
+  .stage-wrap > .steps .steps__w { font-size: .64rem; }
+}
+
+/* ⚠ RUSSIAN KEEPS THE OLD 12.5 px NAME — 2.10.2026. At the redesign's 13.8 px
+   "Стандартная" and "Увеличенная" no longer fit a 100 px tile at 1100 and
+   broke inside the word; a Cyrillic word is half again a Hebrew one. The
+   weight stays, which is most of what the larger size was for. */
+html[lang="ru"] .tile__name { font-size: .78rem; }

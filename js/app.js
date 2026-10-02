@@ -1345,8 +1345,25 @@ function buildPanel() {
   opener.type = 'button';
   opener.className = 'works-open';
   opener.id = 'works-btn';
-  opener.innerHTML = `<span class="works-open__t">${T('works.open')}</span>`
-    + `<span class="works-open__n">${T('works.count', counted(WORKS.length, 'works.noun'))}</span>`;
+  /* ⚠ APPARENT BY ITS PICTURES, NOT BY A SLAB OF TAN — 2.10.2026. The 27.9
+     ask was *"more apparent, still in the palette"*, answered with the accent
+     as a ground — which made it the loudest block in the panel, louder than
+     the question being asked. Three of the gallery's own doors, drawn small,
+     say "ready designs" before a word is read, and the card around them is
+     the panel's paper. Chosen by what they show, not by index (works.js is
+     generated): a panelled face, a window with ironwork, a tall window —
+     three doors that look unlike each other. */
+  const sample = [
+    WORKS.findIndex(w => w.state.detail && w.state.detail !== 'plain'),
+    WORKS.findIndex(w => w.state.window === 'rect' && w.state.grille && w.state.grille !== 'none'),
+    WORKS.findIndex(w => w.state.window === 'strip'),
+  ].filter(i => i >= 0);
+  opener.innerHTML = `<span class="works-open__doors" aria-hidden="true">${sample.map(i =>
+      `<span class="works-open__door">${copyOf(render({ ...DEFAULTS, ...WORKS[i].state }), `wo${i}`)}</span>`).join('')}</span>`
+    + '<span class="works-open__txt">'
+    + `<span class="works-open__t">${T('works.open')}</span>`
+    + `<span class="works-open__n">${T('works.count', counted(WORKS.length, 'works.noun'))}</span>`
+    + '</span><span class="works-open__go" aria-hidden="true">›</span>';
   opener.addEventListener('click', openWorks);
   wrap.appendChild(opener);
 
@@ -1398,7 +1415,12 @@ function buildPanel() {
 
        What is left is nine 44 px icon circles that mean "which question", and
        the row is legible at every width for the first time. */
-    b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span>`
+    /* ⚠ AND A WORD UNDER THE ICON AGAIN SINCE 2.10.2026 — inside the 44 px
+       mark, not under it, so neither cost above comes back: the row stays
+       62 px and the column's marks stay 44 tall. The word is short
+       (`step.<key>.n`) and `aria-hidden`; the full title is still the name. */
+    b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}`
+      + `<span class="steps__w">${T(`step.${sec.key}.n`)}</span></span>`
       /* the check on a step the customer has left (27.9) — shown by
          `markSteps` from `visited`, never from the door's values */
       + `<span class="steps__v" aria-hidden="true">${checkBadge()}</span>`;
@@ -2743,7 +2765,11 @@ function markSteps() {
   }
   for (const b of document.querySelectorAll('.sect__next')) {
     b.disabled = i >= keys.length - 1;
-    name(b, i === keys.length - 2 ? 'nav.toSummary' : 'nav.next');
+    /* The worded button says where it goes (2.10.2026, `nav.nextTo`); the
+       bar's arrow keeps the bare word in its name. */
+    if (i < keys.length - 2 && !b.classList.contains('quote__arrow')) {
+      b.textContent = T('nav.nextTo', T(`step.${keys[i + 1]}.n`));
+    } else name(b, i === keys.length - 2 ? 'nav.toSummary' : 'nav.next');
   }
   /* The skip is pointless on the last two: the summary IS the destination, and
      the step before it already offers לסיכום on `.sect__next`. `hidden` rather
@@ -3402,7 +3428,14 @@ function paint() {
         row.dataset.step = step;
         row.addEventListener('click', () => leaveTo(step));
       }
-      row.innerHTML = `<span class="spec__art" aria-hidden="true">${pictureOf(r)}</span>`
+      /* ⚠ THE QUESTION ABOVE THE PICTURE SINCE 2.10.2026. Under each picture
+         was only the answer, so the default door read "סטנדרטית",
+         "סטנדרטי", "ניקל" — the size and the frame one letter apart, and
+         nothing saying which was which (the old table's own complaint, two
+         screens up). The row's label is already in the accessible name; this
+         puts it on screen too, small, above the picture. */
+      row.innerHTML = `<span class="spec__label" aria-hidden="true">${r.label}</span>`
+        + `<span class="spec__art" aria-hidden="true">${pictureOf(r)}</span>`
         + `<span class="spec__name" aria-hidden="true">${nameOf(r)}</span>`;
       return row;
     }));

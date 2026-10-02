@@ -237,6 +237,15 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **2.10** THE REDESIGN ROUND, prompt 1 (*"make the app more pleasant to the
+  eye and more intuitive … before you push that to the main branch i would
+  like to see how it looks"*) — ON `claude/eloquent-cori-i0kfjb` ONLY, not
+  merged: words under the navigator's marks; "הבא: {next step}"; colour names
+  under swatches; the summary's question above each picture, no card in a
+  card; the gallery opener drawn with three of its doors on paper (tan → its
+  hover border); tiles a card ground, 13.8 px names (ru 12.5); Hebrew never
+  tracked; the counter on the title's row; the 2 px sideways slide fixed.
+  Long form: `HISTORY.md`.
 - **1.10** The tour: the SAVE STAYS IN ITS PLACE (*"the save button is in the
   same place as the languges, but when the tutorial ends it jumps back"* —
   with `#langs` lifted into the dialog the save's slot was the row's only
@@ -1028,9 +1037,12 @@ for the same half of the leaf and `repair` trades between them.
   carries a value on first paint, so a state-derived indicator would read
   complete before anything was touched. Since 27.9 (the owner's son: *"…a
   black rectangle, and then the section that i am in will turn white and be
-  square"*) it is a 56 px ink COLUMN above 1100 and the same look on the
-  phone's fixed 62 px row (the ink a fixed strip under it, so the row's fade
-  cue still works). The live step is a light square.
+  square"*) it is an ink COLUMN above 1100 (68 px since 2.10, 56 before) and
+  the same look on the phone's fixed 62 px row (the ink a fixed strip under
+  it, so the row's fade cue still works). The live step is a light square.
+  ⚠ **Since 2.10 each mark carries a WORD under its icon** (`step.<key>.n`,
+  `.steps__w`, `aria-hidden`; the title stays the name), set INSIDE the 44 px
+  mark so neither the row's height nor the targets moved.
   ⚠ **Since 28.9 the column stands ON THE PHOTOGRAPH** (*"…not endless, but just
   the size it needs … a little separated from the options choosing thing, the
   image needs to be behind it"*): `placeNav` moves `.steps` into `.stage-wrap`

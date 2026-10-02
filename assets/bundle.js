@@ -124,6 +124,24 @@
        Russian being "Без полос", about stripes. This one is the general word. */
     "undo.gone": ["ללא", "None", "Нет"],
     /* ── the flow: the eight steps ────────────────────────────────── */
+    /* ⚠ THE NAVIGATOR'S WORD UNDER EACH MARK — 2.10.2026, the redesign round
+       (the owner's son: *"make the app more pleasant to the eye and more
+       intuitive"*). Ten icons with no words asked a customer to tell a padlock
+       from a key with sparkles; every reference configurator labels its steps.
+       One short noun each, set INSIDE the 44 px mark under the icon, so the row
+       keeps its 62 px and the column its 44 px targets. The step's full title
+       stays the button's accessible name; these are `aria-hidden`. Also the
+       destination on the desktop's "Next" (`nav.nextTo`). */
+    "step.fit.n": ["מידה", "Size", "Размер"],
+    "step.colour.n": ["צבע", "Colour", "Цвет"],
+    "step.lock.n": ["מנעול", "Lock", "Замок"],
+    "step.pz.n": ["פרזול", "Finish", "Отделка"],
+    "step.xlock.n": ["מנעול נוסף", "Extra lock", "Доп. замок"],
+    "step.glass.n": ["חלון", "Window", "Окно"],
+    "step.face.n": ["חזית", "Face", "Полотно"],
+    "step.grip.n": ["ידית", "Handle", "Ручка"],
+    "step.mk.n": ["משקוף", "Frame", "Коробка"],
+    "step.sum.n": ["סיכום", "Summary", "Итог"],
     "step.fit.t": ["מבנה הדלת", "The door itself", "Сама дверь"],
     "step.fit.s": ["גודל הדלת וכיוון הפתיחה", "Size and opening direction", "Размер и сторона открывания"],
     "step.fit.l": [
@@ -216,6 +234,11 @@
     "nav.back": ["‹ הקודם", "‹ Back", "‹ Назад"],
     "nav.next": ["הבא ›", "Next ›", "Далее ›"],
     "nav.toSummary": ["לסיכום ›", "To the summary ›", "К итогу ›"],
+    /* The desktop's way on says WHERE it goes (2.10.2026) — "Next" alone is the
+       most important button on the page and the only one that does not say what
+       it does. `{0}` is the next step's `step.<key>.n`. The bar's arrows on a
+       phone keep `nav.next` in their name; there is no room for the word. */
+    "nav.nextTo": ["הבא: {0} ›", "Next: {0} ›", "Далее: {0} ›"],
     /* The skip in `.sect__foot`, desktop only — see the note where it is built.
        No chevron: it is a jump rather than a step, and the arrow on `nav.next`
        and `nav.toSummary` is what says "one more". */
@@ -11312,7 +11335,12 @@ ${plate.defs}${plate.body}
     opener.type = "button";
     opener.className = "works-open";
     opener.id = "works-btn";
-    opener.innerHTML = `<span class="works-open__t">${T("works.open")}</span><span class="works-open__n">${T("works.count", counted(WORKS.length, "works.noun"))}</span>`;
+    const sample = [
+      WORKS.findIndex((w) => w.state.detail && w.state.detail !== "plain"),
+      WORKS.findIndex((w) => w.state.window === "rect" && w.state.grille && w.state.grille !== "none"),
+      WORKS.findIndex((w) => w.state.window === "strip")
+    ].filter((i) => i >= 0);
+    opener.innerHTML = `<span class="works-open__doors" aria-hidden="true">${sample.map((i) => `<span class="works-open__door">${copyOf(render({ ...DEFAULTS, ...WORKS[i].state }), `wo${i}`)}</span>`).join("")}</span><span class="works-open__txt"><span class="works-open__t">${T("works.open")}</span><span class="works-open__n">${T("works.count", counted(WORKS.length, "works.noun"))}</span></span><span class="works-open__go" aria-hidden="true">›</span>`;
     opener.addEventListener("click", openWorks);
     wrap.appendChild(opener);
     const nav = document.createElement("nav");
@@ -11323,7 +11351,7 @@ ${plate.defs}${plate.body}
       b.type = "button";
       b.className = "steps__step";
       b.dataset.step = sec.key;
-      b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span><span class="steps__v" aria-hidden="true">${checkBadge()}</span>`;
+      b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}<span class="steps__w">${T(`step.${sec.key}.n`)}</span></span><span class="steps__v" aria-hidden="true">${checkBadge()}</span>`;
       b.setAttribute("aria-label", T(sec.title));
       b.title = T(sec.title);
       b.addEventListener("click", () => {
@@ -11927,7 +11955,9 @@ ${plate.defs}${plate.body}
     }
     for (const b of document.querySelectorAll(".sect__next")) {
       b.disabled = i >= keys.length - 1;
-      name(b, i === keys.length - 2 ? "nav.toSummary" : "nav.next");
+      if (i < keys.length - 2 && !b.classList.contains("quote__arrow")) {
+        b.textContent = T("nav.nextTo", T(`step.${keys[i + 1]}.n`));
+      } else name(b, i === keys.length - 2 ? "nav.toSummary" : "nav.next");
     }
     for (const b of document.querySelectorAll(".sect__skip")) b.hidden = i >= keys.length - 2;
   }
@@ -12148,7 +12178,7 @@ ${plate.defs}${plate.body}
           row.dataset.step = step2;
           row.addEventListener("click", () => leaveTo(step2));
         }
-        row.innerHTML = `<span class="spec__art" aria-hidden="true">${pictureOf(r)}</span><span class="spec__name" aria-hidden="true">${nameOf(r)}</span>`;
+        row.innerHTML = `<span class="spec__label" aria-hidden="true">${r.label}</span><span class="spec__art" aria-hidden="true">${pictureOf(r)}</span><span class="spec__name" aria-hidden="true">${nameOf(r)}</span>`;
         return row;
       }));
     }

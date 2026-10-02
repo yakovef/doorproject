@@ -5709,7 +5709,10 @@ group('the accent is spent only where it means "this one is chosen"');
        palette's one colour is this tan — so it is the opener's GROUND now,
        with ink on it (asserted ≥ 4.5:1 below). It still means one thing: the
        one offer on the page to start from a door he built. */
-    ['.works-open',          'the gallery opener\'s ground — the one offer to start from a door he built'],
+    /* ⚠ RESTATED AGAIN 2.10.2026: the tan ground went (the loudest block in
+       the panel, louder than the question); the opener is apparent by three
+       of the gallery's doors drawn in it, and the accent is its hover border. */
+    ['.works-open',          'the gallery opener\'s hover border — the one offer to start from a door he built'],
     ['.work',                'one gallery door, on hover only'],
     ['.proof a',             'the underline on the proof link'],
   ];
@@ -5769,7 +5772,10 @@ group('the accent is spent only where it means "this one is chosen"');
   const root = /:root\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] || '';
   const token = name => (new RegExp(`--${name}:\\s*(#[0-9A-Fa-f]{6})`).exec(root) || [])[1];
   const rule = sel => (new RegExp(`\\n${sel.replace(/[.]/g, '\\.')}\\s*\\{([^}]*)\\}`).exec(css) || [])[1];
-  const prop = (body, name) => (new RegExp(`(?:^|[;\\s])${name}:\\s*var\\(--([a-z-]+)\\)`).exec(body || '') || [])[1];
+  /* `[a-z0-9-]`, not `[a-z-]` (2.10.2026): a token with a digit in it —
+     `--ink-2`, the opener's count since the redesign — read as `ink-` and
+     resolved to nothing, so the check went red on a colour it could not see. */
+  const prop = (body, name) => (new RegExp(`(?:^|[;\\s])${name}:\\s*var\\(--([a-z0-9-]+)\\)`).exec(body || '') || [])[1];
   const opener = rule('.works-open'), count = rule('.works-open__n');
   const ground = token(prop(opener, 'background'));
   ok(opener && ground, 'the gallery opener\'s ground could not be read out of css/app.css — '
@@ -5780,7 +5786,7 @@ group('the accent is spent only where it means "this one is chosen"');
     if (ground && ink) {
       ok(contrast(ink, ground) >= 4.5,
          `the gallery opener's ${what} is ${ink} on ${ground}: ${contrast(ink, ground).toFixed(2)}:1, `
-       + 'under the 4.5:1 text needs — on the accent ground the text is --ink');
+       + 'under the 4.5:1 text needs — the opener\'s text is --ink, its count --ink-2');
     }
   }
 }
