@@ -526,10 +526,15 @@
     /* ⚠ THE LOCK STEP'S OWN QUESTION SINCE 28.9 — the extra lock went to its own
        step, and took the question below (`exp.xlock`) with it. */
     "exp.lock.q": ["מה כלול במנעול?", "What comes with the lock?", "Что входит в замок?"],
+    /* ⚠ AND THE CYLINDER ALONE IS NOT INCLUDED, SINCE 10.10.2026 — ₪100, the
+       owner's son. "A lever and a cylinder, included" stays true of the Rotem
+       the page opens on; the sentence after it says what the option without a
+       lever costs, `{0}` its label and `{1}` its price out of `LOCKSETS[].delta`
+       — typed, it would be the next ₪700 (see `exp.xlock.a`). */
     "exp.lock.a": [
-      "בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כאן בוחרים את צורת הידית; את הגוון שלה בוחרים בשלב הבא, בפרזול. מנעול נוסף — כספת או קודן — נבחר אחרי הפרזול, בשלב משלו. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.",
-      "Every door has a lever and a cylinder, included in the price — that is the ordinary lock. Here you choose the lever's shape; its tone is chosen in the next step, the hardware finish. An extra lock — a safe lock or a keypad — is chosen after the hardware finish, on its own step. A smart lock is a different product and is in the lever list.",
-      "В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Здесь выбирают форму ручки; её оттенок — на следующем шаге, в отделке фурнитуры. Дополнительный замок — сейфовый или кодовый — выбирают после отделки фурнитуры, на отдельном шаге. Умный замок — отдельный продукт, он в списке ручек."
+      "בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. {0}, בלי ידית, עולה {1}. כאן בוחרים את צורת הידית; את הגוון שלה בוחרים בשלב הבא, בפרזול. מנעול נוסף — כספת או קודן — נבחר אחרי הפרזול, בשלב משלו. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.",
+      "Every door has a lever and a cylinder, included in the price — that is the ordinary lock. {0}, with no lever, is {1}. Here you choose the lever's shape; its tone is chosen in the next step, the hardware finish. An extra lock — a safe lock or a keypad — is chosen after the hardware finish, on its own step. A smart lock is a different product and is in the lever list.",
+      "В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. «{0}», без ручки, стоит {1}. Здесь выбирают форму ручки; её оттенок — на следующем шаге, в отделке фурнитуры. Дополнительный замок — сейфовый или кодовый — выбирают после отделки фурнитуры, на отдельном шаге. Умный замок — отдельный продукт, он в списке ручек."
     ],
     "exp.xlock.q": ["כספת וקודן — במקום המנעול או בנוסף?", "Safe lock and keypad — instead of the lock, or as well?", "Сейфовый и кодовый замок — вместо основного или вдобавок?"],
     /* ⚠ THE TWO FIGURES WERE TYPED HERE AND THEY WENT STALE — 25.9.2026. This
@@ -929,7 +934,10 @@
     "fix.finishHome": ["גוון הידית חזר לניקל — אין ידית משיכה על הדלת", "The handle finish is back to nickel — there is no pull handle on the door", "Отделка ручки снова никель — на двери нет ручки-скобы"],
     "fix.gripGone": ["הסרנו את ידית המשיכה — אין לה מקום כאן", "We removed the pull handle — there is no room for it here", "Мы убрали ручку-скобу — для неё здесь нет места"],
     "fix.bowGone": ["הסרנו את המאחז האופקי — אין לו מקום כאן", "We removed the horizontal pull — there is no room for it here", "Мы убрали горизонтальную скобу — для неё здесь нет места"],
-    "fix.locksetSwapped": ["החלפנו את המנעול — אין לו מקום ליד המאחז", "We swapped the lockset — there is no room for it beside the grip", "Мы заменили замок — рядом со скобой ему нет места"],
+    /* ⚠ WITH THE PRICE IT LANDS ON SINCE 10.10.2026: the cylinder, the swap's
+       usual landing, stopped being included (₪100), so a swap moves the total —
+       {0} the lockset swapped in, {1} its price as its tile prints it. */
+    "fix.locksetSwapped": ["החלפנו את המנעול ל{0} ({1}) — אין לו מקום ליד המאחז", "We swapped the lockset for {0} ({1}) — there is no room for it beside the grip", "Мы заменили замок на «{0}» ({1}) — рядом со скобой ему нет места"],
     "fix.setWindow": ["התאמנו את החלון — הסט היווני מגיע עם חלון מלבני משלו", "We adjusted the window — the Greek set comes with a rectangular one of its own", "Мы изменили окно — у греческого комплекта своё прямоугольное"],
     /* ⚠ `fix.setGone` USED TO ANSWER FOR THIS TOO AND IT IS THE WRONG SENTENCE.
        Stripes and a panel want the same face, so asking for stripes clears the
@@ -1316,8 +1324,15 @@
        still opens on it, so the opening figure does not move. */
     coral: 100,
     // קורל          — Peretz, 20.9.2026
-    cylinder: 0,
-    // צילינדר בלבד
+    /* ⚠ ₪100 SINCE 10.10.2026 — the owner's son: *"The option with cylinder only
+       needs to be 100 shekels."* It was ~~included~~ (₪0) from the first price
+       list. It is still the lever's FALLBACK — the lockset `repair` swaps in
+       when a pull handle or the bow has no room beside the lever (Peretz,
+       20.9: the lever goes, not the window or the panels) — so a swap from the
+       Rotem now costs ₪100, and `fix.locksetSwapped` names the price it lands
+       on. The Rotem is still what the page opens on: ₪3,195 does not move. */
+    cylinder: 100,
+    // צילינדר בלבד  — the owner's son, 10.10.2026
     plate: 0,
     // רותם          — included, and what the page opens on
     /* ⚠ ₪390, AND SO IS THE ריבועי — Peretz, 20.9.2026: *"all the square
@@ -9376,6 +9391,10 @@ ${plate.defs}${plate.body}
   var faceWorked = (state2) => !!byId(DETAILS, state2.detail).panel || isLineWork(state2);
   var detailWorked = (d) => !!d.panel;
   var locksetFits = (state2, id) => state2.grab !== "grab" || bowFits({ ...state2, lockset: id });
+  var locksetSwapWords = (k) => {
+    const o = byId(LOCKSETS, k);
+    return [L(o), priceLabel(o.delta)];
+  };
   function fallbackLockset(state2) {
     if (locksetFits(state2, "cylinder")) return "cylinder";
     const k = LOCKSETS.find((x) => locksetFits(state2, x.id));
@@ -9594,9 +9613,9 @@ ${plate.defs}${plate.body}
     let s = { ...state2 };
     const changed = [];
     const said = [];
-    const change = (group, key) => {
+    const change = (group, key, ...args) => {
       changed.push(group);
-      said.push(T(key));
+      said.push(T(key, ...args));
     };
     if (intent !== "window" && !isGlazed(s) && s.grille !== "none") {
       s.window = "rect";
@@ -9668,7 +9687,7 @@ ${plate.defs}${plate.body}
       const k = fallbackLockset(s);
       if (k && k !== s.lockset && bowFits({ ...s, lockset: k })) {
         s.lockset = k;
-        change("lockset", SAID.locksetSwapped);
+        change("lockset", SAID.locksetSwapped, ...locksetSwapWords(k));
       }
       if (!bowFits(s)) {
         s.grab = "nograb";
@@ -9680,7 +9699,7 @@ ${plate.defs}${plate.body}
         const k = fallbackLockset(s);
         if (k && k !== s.lockset && gripFits({ ...s, lockset: k })) {
           s.lockset = k;
-          change("lockset", SAID.locksetSwapped);
+          change("lockset", SAID.locksetSwapped, ...locksetSwapWords(k));
         }
       }
       if (!gripFits(s)) {
@@ -10915,7 +10934,7 @@ ${plate.defs}${plate.body}
       sub: "step.lock.s",
       lede: "step.lock.l",
       exp: "exp.lock",
-      expArgs: () => []
+      expArgs: () => [L(byId(LOCKSETS, "cylinder")), formatAgorot(byId(LOCKSETS, "cylinder").delta)]
     },
     {
       key: "pz",

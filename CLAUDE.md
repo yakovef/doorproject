@@ -262,6 +262,11 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **10.10** The CYLINDER ONLY is **₪100** (*"The option with cylinder only
+  needs to be 100 shekels"*; it was included): its tile prints the figure, the
+  lock step's explainer says it through `expArgs`, and the lever's fallback
+  swap now names where it lands and its price (`locksetSwapWords`) — a swap
+  from the Rotem costs ₪100. ₪3,195 unmoved (the Rotem). Long form: `HISTORY.md`.
 - **2.10** The window's designs a STEP OF THEIR OWN, present only with a window
   (*"a separate section … only appearing if you choose one of the windows — an
   icon next to the window one"*): `grd` after the glass, tied to its mark —
@@ -290,13 +295,7 @@ lines here. Dates are the day of the change.
   save 44 px, a 120 ms press. First row whole on every step at 390 and 360 (it
   was 64–159 px short on arrival); 320's three named; landscape 9 of 9 answers.
   Sheets `research/phone/`. Long form: `HISTORY.md`.
-- **1.10** The tour: the SAVE STAYS IN ITS PLACE (*"the save button is in the
-  same place as the languges, but when the tutorial ends it jumps back"* —
-  with `#langs` lifted into the dialog the save's slot was the row's only
-  child and stood under the picker; a stand-in holds the slot now), and the
-  options step LIGHTS THE DOOR'S TWO ARROWS (*"the arrows … in the third
-  step"*), each with a pointer; on a phone the callout stands between them and
-  the options. Long form: `HISTORY.md`.
+
 ---
 
 ## 0c. Where it stands today — 2.10.2026
@@ -1198,7 +1197,11 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
 - ⚠ **A pull handle never costs the window or the face** (20.9): *"the normal
   handle goes away, not the window or the panels."* `gripFits` is answered in
   one `repair` branch — the lever yields first (`fallbackLockset`,
-  `SAID.locksetSwapped`), the handle second, glass and face never.
+  `SAID.locksetSwapped`), the handle second, glass and face never. ⚠ **The
+  fallback is the cylinder, and since 10.10 it costs ₪100** (the owner's son):
+  a swap from the Rotem moves the total by +₪100 (from the Coral, by nothing),
+  so the swap's sentence names the lockset it lands on and that lockset's
+  price as its tile prints it (`locksetSwapWords`).
   `gripObstacle(state, id)` is the one statement of what stands in a bar's way
   (`null` · `lock` · `window` · `face` · `door` · `bow`); `bowObstacle(state)`
   is the bow's (`null` · `lock` · `window` · `face` · `door`). A greyed handle
@@ -1253,6 +1256,8 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
   as an obstacle (`why.gripOnBow`); `repair` swaps the lever first, drops the
   bar second, never the bow.
 - **`LOCKSETS` — the lock furniture**, always: what you turn and the keyway.
+  The Rotem (`plate`, the default) and the עילי are included; the cylinder
+  only is ₪100 since 10.10 (it was included — the owner's son).
   ⚠ **`lever-taper` (the curved lever) has a placeholder id that can never be
   renamed** — its name went into the LABEL: ידית מתעקלת / Curved lever /
   Изогнутая ручка, permanent since 27.9 on the owner's son's word.

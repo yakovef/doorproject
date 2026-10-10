@@ -26,6 +26,49 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **10.10 — PROMPT F, 1 OF 3: THE CYLINDER AT ₪100.** The owner's son: *"The
+  option with cylinder only needs to be 100 shekels."*
+  · **What was there.** `LOCKSET.cylinder` was 0 — the cylinder only
+    ("צילינדר בלבד") was included from the first price list, its tile printed
+    "כלול", and it was the free landing of the lever's FALLBACK: when a pull
+    handle or the bow has no room beside the lever, `repair` swaps the lever
+    for the cylinder (Peretz, 20.9: *"the normal handle goes away, not the
+    window or the panels"*), and that swap changed nothing on the bill.
+  · **What it is.** `LOCKSET.cylinder` **100** (`js/prices.js`, the old figure
+    kept in its comment, dated). Grepped: the lockset prices are read through
+    `priceInto('lockset', …)` and nowhere else — the build's ₪200 `cylinder`
+    line in `BUILD` is the fitted door's cylinder part, a different object.
+    The tile prints ₪100. The fallback stays the cylinder (ours, named in the
+    brief so he can reverse it): a swap from the Rotem now costs **+₪100**,
+    from the Coral nothing, from a ₪390 square −₪290 — so `fix.locksetSwapped`
+    says where it landed and what that costs, *"החלפנו את המנעול לצילינדר בלבד
+    (₪100) — …"*, built by `locksetSwapWords(k)` in `rules.js` (the lockset's
+    label and `priceLabel` of its delta — "כלול" where it is free), which the
+    tests call too. `exp.lock.a` kept "a lever and a cylinder, included — the
+    ordinary lock" (true of the Rotem the page opens on) and gained one
+    sentence, in three languages, with the label and figure through
+    `expArgs` (§5.25: a typed figure is the next ₪700). `exp.pz.a` names no
+    price — unchanged. **₪3,195 does not move**: the default is the Rotem.
+  · **Measured.** `npm test`: the cylinder door ₪3,295, the Rotem's + ₪100,
+    its breakdown row 10,000 agorot, its tile "₪100".
+  · **Restated (same subjects, reasons beside them).** The three swap
+    clauses (the bar sweep, the bow sweep, the reported link) compare against
+    the sentence with its lockset and price. "What the drawing shows is what
+    the price charges" drew each lockset against the cylinder as its FREE
+    baseline — priced now, it read the ₪100 Coral as "drawn free" on all 18
+    size/window doors — so the free baseline is the Rotem.
+  · **New units.** The cylinder door ₪3,295; the page opens on the Rotem at
+    ₪3,195 (asserted off `DEFAULTS`, not only the group's stem); the
+    breakdown's lockset row ₪100 and the total the Rotem's + ₪100; the tile's
+    label "₪100", not "כלול"; the swap sentence carries the label and figure.
+  · **Falsified.** The cylinder back at 0 → the four new clauses (the price,
+    the breakdown, the tile — "כלול" — and the sentence, which read "(כלול)").
+  · **Sheets: 0 bare predicted** (no `render()` change); run after 2 and 3.
+  · **Not done, on purpose:** another fallback (the Rotem would keep the swap
+    free, but it is the lever the bar had no room beside; the cylinder clears
+    a grab bar on the narrowest leaf with 539 mm to spare); a `VERSION` (a
+    price is a property, no list moved).
+
 - **2.10 — PROMPT D, 2 OF 2: THE WINDOW'S DESIGNS, A STEP OF THEIR OWN.** The
   owner's son: *"Make the window design a separate section like our 10 existing
   ones, but only appearing if you choose one of the windows — an icon next to
@@ -3955,6 +3998,13 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **1.10** The tour: the SAVE STAYS IN ITS PLACE (*"the save button is in the
+  same place as the languges, but when the tutorial ends it jumps back"* —
+  with `#langs` lifted into the dialog the save's slot was the row's only
+  child and stood under the picker; a stand-in holds the slot now), and the
+  options step LIGHTS THE DOOR'S TWO ARROWS (*"the arrows … in the third
+  step"*), each with a pointer; on a phone the callout stands between them and
+  the options. Long form: `HISTORY.md`.
 - **30.9** PROMPT A's closing pass: after its 5 of 5 the sheets moved 0 bare
   (predicted), `boxes` and fuzz clean; on the merged branch (B's 3 of 3 on
   A's five) a complete audit reads **no faults** — the drawer's flake and the

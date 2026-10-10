@@ -6,7 +6,7 @@ import { BELLS, BOWS, glassRows, PEEPHOLES, STRIPE_SLOTS, REBATE, STRIPE_LEGACY,
 import { contrast, lighten, scaleTone, silhouette } from '../js/colour.js';
 import { SECTION_ICON, sectionIcon, SPEC_ICON, specIcon } from '../js/icons.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
-import { breakdownRows, formatAgorot, priceAgorot, priceParts, shekels, tileAgorot } from '../js/price.js';
+import { breakdownRows, formatAgorot, priceAgorot, priceLabel, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
   bellGlyph, bowGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
@@ -16,7 +16,9 @@ import {
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
-import { bowObstacle, conflicts, detailWorked, displacedBy, fallbackLockset, faceTile, gripObstacle, repair, STRIPE_TILE } from '../js/rules.js';
+import { bowObstacle, conflicts, detailWorked, displacedBy, fallbackLockset, faceTile, gripObstacle, locksetSwapWords, repair, STRIPE_TILE } from '../js/rules.js';
+/* the swap's sentence as the page builds it — the lockset it lands on and its price (10.10.2026) */
+const swapSaid = k => T('fix.locksetSwapped', ...locksetSwapWords(k));
 import { describeSentence, handingWords, specLines, specRows, summaryLine } from '../js/spec.js';
 import { WORKS } from '../js/works.js';
 import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery, VERSION } from '../js/url-state.js';
@@ -816,6 +818,25 @@ group('price');
   ok(P({ handle: 'none', lockset: 'coral' }) === 3295, 'the Coral is ₪100 — Peretz, 20.9.2026');
   ok(P({ handle: 'none', lockset: 'lever-taper' }) === 3395,
      'the curved lever — "the weird one" — is ₪200, and A19 is closed');
+  /* ⚠ THE CYLINDER ALONE IS ₪100 SINCE 10.10.2026 — the owner's son: *"The
+     option with cylinder only needs to be 100 shekels."* It was included. The
+     page still opens on the Rotem, so the opening figure is asserted from
+     DEFAULTS as well as from this group's stem — two ways of reaching ₪3,195,
+     and the cylinder on neither. */
+  ok(P({ handle: 'none', lockset: 'cylinder' }) === 3295,
+     `the cylinder only is ₪100 — the owner's son, 10.10.2026 — got ₪${P({ handle: 'none', lockset: 'cylinder' }) - 3195} over the door`);
+  ok(DEFAULTS.lockset === 'plate' && shekels(priceAgorot(DEFAULTS)) === 3195,
+     `the page opens on ${DEFAULTS.lockset} at ₪${shekels(priceAgorot(DEFAULTS))} — the Rotem at ₪3,195, the cylinder only the lever's fallback`);
+  {
+    const cyl = { ...base, handle: 'none', lockset: 'cylinder' }, rot = { ...cyl, lockset: 'plate' };
+    const row = breakdownRows(cyl).find(r => r.key === 'lockset');
+    ok(row && row.agorot === 10000 && priceAgorot(cyl) - priceAgorot(rot) === 10000,
+       `the breakdown carries the cylinder as a ₪100 row and the total is the Rotem's + ₪100 (row ${row && row.agorot})`);
+    ok(priceLabel(byId(LOCKSETS, 'cylinder').delta) === formatAgorot(10000),
+       `the cylinder's tile prints "${priceLabel(byId(LOCKSETS, 'cylinder').delta)}" — ₪100, not "${T('price.included')}"`);
+    ok(swapSaid('cylinder').includes(formatAgorot(10000)) && swapSaid('cylinder').includes(L(byId(LOCKSETS, 'cylinder'))),
+       `the swap's sentence does not say where it landed and what it costs: "${swapSaid('cylinder')}"`);
+  }
   /* The four withdrawn bars land on the two that survive, at their money. */
   ok(P({ handle: 'ron' }) === P({ handle: 'idan' }), 'withdrawn ron should price as idan');
   ok(P({ handle: 'ella' }) === P({ handle: 'idan' }), 'withdrawn ella should price as idan (the finish rides in the link)');
@@ -3158,7 +3179,11 @@ group('what the drawing shows is what the price charges');
     ['window',  WINDOWS,  'none'],
     ['detail',  DETAILS,  'plain'],
     ['handle',  HANDLES,  'none'],
-    ['lockset', LOCKSETS, 'cylinder'],
+    /* ⚠ RESTATED 10.10.2026, same subject (drawn implies charged): the FREE
+       lockset each option is drawn against is the Rotem now. It was the
+       cylinder, which was included until the owner's son priced it at ₪100;
+       against a priced baseline the Coral (₪100) read as "drawn free". */
+    ['lockset', LOCKSETS, 'plate'],
   ]) {
     for (const size of sizeKeys) for (const w of WINDOWS) for (const o of list) {
       if (o.id === off) continue;
@@ -3531,8 +3556,11 @@ group('a pull handle never costs the window — 20.9.2026');
           const fb = fallbackLockset({ ...st, handle: h.id });
           ok(r.lockset === fb && fb !== st.lockset,
              `${label}: the lever was the obstacle and the tap left the lockset at ${r.lockset}`);
-          ok(said.includes(T('fix.locksetSwapped')),
-             `${label}: the lever was swapped and the tap did not say so (${said.join(' · ')})`);
+          /* RESTATED 10.10.2026, same subject (the swap is announced): the
+             sentence now carries the lockset it lands on and its price, since
+             the cylinder stopped being included */
+          ok(said.includes(swapSaid(r.lockset)),
+             `${label}: the lever was swapped and the tap did not say so, with its price (${said.join(' · ')})`);
         } else {
           fit++;
           ok(what === null, `${label}: offered with the ${what} in its way`);
@@ -3594,7 +3622,8 @@ group('a pull handle never costs the window — 20.9.2026');
       ok(r.grab === 'grab', `${label}: offered, and the tap did not add it (${said.join(' · ')})`);
       if (what === 'lock') {
         bowSwapped++;
-        ok(r.lockset !== st.lockset && said.includes(T('fix.locksetSwapped')),
+        /* RESTATED 10.10.2026, same subject: the sentence names where it landed and what that costs */
+        ok(r.lockset !== st.lockset && said.includes(swapSaid(r.lockset)),
            `${label}: the lever was in the bow's way and the tap left it (${said.join(' · ')})`);
       } else {
         bowFit++;
@@ -3701,7 +3730,8 @@ group('a pull bar never stands across a window or a panel — 24.9.2026');
   ok(s0.detail === 'panel3', `the reported link lost its panels (${s0.detail}) — the panels outrank the bar`);
   ok(s0.handle === 'idan', `the reported link lost its bar (${s0.handle}) — the bar outranks the lever`);
   ok(s0.lockset !== 'coral', 'the reported link kept the Coral beside a bar with no room — the lever must yield');
-  ok(shot.said.includes(T('fix.locksetSwapped')),
+  /* RESTATED 10.10.2026, same subject: the sentence carries the lockset and its price */
+  ok(shot.said.includes(swapSaid(s0.lockset)),
      `the reported link swapped the lever without saying so: ${JSON.stringify(shot.said)}`);
 
   /* The grip's body, from the CATALOGUE's width and length and the feet the

@@ -466,7 +466,7 @@ const SECTIONS = [
      navigator rather than a pair-wise rule — so a half-finished reorder fails
      there rather than shipping. */
   { key: 'lock',   title: 'step.lock.t',   sub: 'step.lock.s',   lede: 'step.lock.l', exp: 'exp.lock',
-    expArgs: () => [] },
+    expArgs: () => [L(byId(LOCKSETS, 'cylinder')), formatAgorot(byId(LOCKSETS, 'cylinder').delta)] },
   { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz',
     expArgs: () => [L(byId(LOCKSETS, 'cadoor')), L(byId(LOCKSETS, 'sapir'))] },
   /* ⚠ THE EXTRA LOCK HAS ITS OWN STEP, 28.9.2026 — the owner's son: *"The extra

@@ -474,7 +474,14 @@ export const LOCKSET = {
      included as standard; the Rotem is the included one now, and the page
      still opens on it, so the opening figure does not move. */
   coral:     100,    // קורל          — Peretz, 20.9.2026
-  cylinder:  0,      // צילינדר בלבד
+  /* ⚠ ₪100 SINCE 10.10.2026 — the owner's son: *"The option with cylinder only
+     needs to be 100 shekels."* It was ~~included~~ (₪0) from the first price
+     list. It is still the lever's FALLBACK — the lockset `repair` swaps in
+     when a pull handle or the bow has no room beside the lever (Peretz,
+     20.9: the lever goes, not the window or the panels) — so a swap from the
+     Rotem now costs ₪100, and `fix.locksetSwapped` names the price it lands
+     on. The Rotem is still what the page opens on: ₪3,195 does not move. */
+  cylinder:  100,    // צילינדר בלבד  — the owner's son, 10.10.2026
   plate:     0,      // רותם          — included, and what the page opens on
   /* ⚠ ₪390, AND SO IS THE ריבועי — Peretz, 20.9.2026: *"all the square
      handles 390."* The Sapir was ₪350 on its own figure from 30.8; it is a

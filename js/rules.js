@@ -51,7 +51,8 @@
  * state the interface would not let you build.
  */
 
-import { T } from './copy.js';
+import { L, T } from './copy.js';
+import { priceLabel } from './price.js';
 import { byId, DETAILS, finishHasSubject, glassRows, GRILLES, HANDLE_FINISHES, HANDLES, isGlazed, leafGlazed, LOCKSETS,
          PEEPHOLES, STRIPE_MAX, WINDOWS }
   from './catalog.js';
@@ -167,6 +168,16 @@ const locksetFits = (state, id) => state.grab !== 'grab' || bowFits({ ...state, 
  * spare. The null branch stays anyway, because it costs one line and the whole
  * point of the loop above is that the fitting range is allowed to change.
  */
+/* ⚠ WHAT THE SWAP SAYS, SINCE 10.10.2026: the lockset it lands on and that
+   lockset's price as its tile prints it ("כלול" or a figure). The cylinder
+   stopped being included (₪100, the owner's son), so a swap from the Rotem
+   moves the total and the sentence that announces it says what it costs.
+   Exported so the tests build the sentence the page builds. */
+export const locksetSwapWords = k => {
+  const o = byId(LOCKSETS, k);
+  return [L(o), priceLabel(o.delta)];
+};
+
 export function fallbackLockset(state) {
   if (locksetFits(state, 'cylinder')) return 'cylinder';
   const k = LOCKSETS.find(x => locksetFits(state, x.id));
@@ -836,7 +847,7 @@ export function repair(state, intent = null) {
      already says that a toast naming the wrong culprit is worse than no toast
      at all; this is the shape that keeps producing them. */
   const said = [];
-  const change = (group, key) => { changed.push(group); said.push(T(key)); };
+  const change = (group, key, ...args) => { changed.push(group); said.push(T(key, ...args)); };
 
   /* Asking for a grille or worked glass on a solid door means asking for a
      window. Fix that first, and only if it was not the window itself that was
@@ -1072,7 +1083,7 @@ export function repair(state, intent = null) {
   if (s.grab === 'grab' && !bowFits(s)) {
     const k = fallbackLockset(s);
     if (k && k !== s.lockset && bowFits({ ...s, lockset: k })) {
-      s.lockset = k; change('lockset', SAID.locksetSwapped);
+      s.lockset = k; change('lockset', SAID.locksetSwapped, ...locksetSwapWords(k));
     }
     if (!bowFits(s)) { s.grab = 'nograb'; change('grab', SAID.bowGone); }
   }
@@ -1081,7 +1092,7 @@ export function repair(state, intent = null) {
     if (intent !== 'lockset') {
       const k = fallbackLockset(s);
       if (k && k !== s.lockset && gripFits({ ...s, lockset: k })) {
-        s.lockset = k; change('lockset', SAID.locksetSwapped);
+        s.lockset = k; change('lockset', SAID.locksetSwapped, ...locksetSwapWords(k));
       }
     }
     /* Still no room: the grip is the last thing left to give — never the
