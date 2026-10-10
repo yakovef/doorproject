@@ -6121,7 +6121,7 @@ for (const v of VIEWS) {
   console.log('\nthe first-visit tour: four cut-outs, once, and never on a link');
   const before = faults;
   const raw = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
-  let steps = 0;
+  let steps = 0, curveRead = 0, curvedFlat = 0;
   let scrimPatch = null; const scrimReadings = [];
   /* per process: two audits in one container must not read each other's */
   const SCRIM_ON = `/tmp/audit-scrim-${process.pid}-on.png`, SCRIM_OFF = `/tmp/audit-scrim-${process.pid}-off.png`;
@@ -6159,7 +6159,16 @@ for (const v of VIEWS) {
     const onEdge = (x, y, r) => { const dx = Math.max(r.left - x, 0, x - r.right), dy = Math.max(r.top - y, 0, y - r.bottom);
       const inX = x >= r.left - 1 && x <= r.right + 1, inY = y >= r.top - 1 && y <= r.bottom + 1;
       return Math.hypot(dx, dy) <= 1.5 && (Math.abs(x - r.left) <= 1.5 || Math.abs(x - r.right) <= 1.5 || Math.abs(y - r.top) <= 1.5 || Math.abs(y - r.bottom) <= 1.5 || !(inX && inY)); };
-    const arrows = [...d.querySelectorAll('.tour__arrow')].map(l => ({ x1: +l.getAttribute('x1'), y1: +l.getAttribute('y1'), x2: +l.getAttribute('x2'), y2: +l.getAttribute('y2') }));
+    /* ⚠ RESTATED 10.10.2026, same subject (each pointer from the callout's
+       edge to a cut-out's edge): a pointer is a PATH since the owner's son's
+       *"…the lines leading to the arrows beside the door must not be
+       horizontal"* — `M x1 y1 L x2 y2` or `M x1 y1 Q cx cy x2 y2` — read off
+       its own `d`, start, control and end. */
+    const arrows = [...d.querySelectorAll('.tour__arrow')].map(l => {
+      const n = (l.getAttribute('d') || '').match(/-?[\d.]+/g)?.map(Number) || [];
+      const q = /Q/.test(l.getAttribute('d') || '');
+      return { tag: l.tagName, x1: n[0], y1: n[1], cx: q ? n[2] : NaN, cy: q ? n[3] : NaN, x2: n[q ? 4 : 2], y2: n[q ? 5 : 3], curved: q };
+    });
     const out = { step, holes: holes.length, targets: 0, whole: 0, clickThrough: [], empty: [] };
     for (const t of targets) {
       if (!t) continue;
@@ -6205,6 +6214,28 @@ for (const v of VIEWS) {
     out.cardOnHole = stepHoles.some(h => meets(card, h)) || (lp ? meets(card, R(lp)) : false);
     out.arrowsOk = arrows.every(a => onEdge(a.x1, a.y1, card) && holes.some(h => onEdge(a.x2, a.y2, h)));
     out.arrows = arrows.length;
+    /* ⚠ AND THE CURVE'S RULE, 10.10.2026 — per pointer: a path; the chord's
+       angle from horizontal; the bow (a quadratic's furthest point from its
+       chord is half its control point's distance from it); within 15° of
+       horizontal it must be curved by about a quarter of the chord (0.2–0.3);
+       it leaves the callout through its TOP or BOTTOM edge whenever its
+       cut-out stands beside the callout; and the arrowhead — the marker's
+       triangle, 2.25 px a unit at the 2.5 px stroke: its tip 4.5 px past the
+       end along the last tangent, its base 18 px back and 11.25 px either
+       side — whole inside the viewport. */
+    out.curve = arrows.map(a => {
+      const L = Math.hypot(a.x2 - a.x1, a.y2 - a.y1);
+      const angle = Math.atan2(Math.abs(a.y2 - a.y1), Math.abs(a.x2 - a.x1)) * 180 / Math.PI;
+      const bow = a.curved ? Math.abs((a.cx - a.x1) * (a.y2 - a.y1) - (a.cy - a.y1) * (a.x2 - a.x1)) / L / 2 / L : 0;
+      const hole = holes.find(h => onEdge(a.x2, a.y2, h));
+      const beside = hole && (hole.right <= card.left || hole.left >= card.right);
+      const topOrBottom = Math.abs(a.y1 - card.top) <= 1.5 || Math.abs(a.y1 - card.bottom) <= 1.5;
+      const tx0 = a.curved ? a.x2 - a.cx : a.x2 - a.x1, ty0 = a.curved ? a.y2 - a.cy : a.y2 - a.y1, tl = Math.hypot(tx0, ty0) || 1;
+      const tx = tx0 / tl, ty = ty0 / tl, k = 2.25;
+      const head = [[a.x2 + tx * 2 * k, a.y2 + ty * 2 * k], [a.x2 - tx * 8 * k - ty * 5 * k, a.y2 - ty * 8 * k + tx * 5 * k], [a.x2 - tx * 8 * k + ty * 5 * k, a.y2 - ty * 8 * k - tx * 5 * k]];
+      const headIn = head.every(([x, y]) => x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight);
+      return { path: a.tag === 'path', angle, bow, curved: a.curved, beside: !!beside, topOrBottom, headIn };
+    });
     return out;
   });
   for (const [w, h, lang] of [[1280, 720, 'he'], [390, 844, 'ru'], [320, 568, 'ru']]) {
@@ -6294,6 +6325,19 @@ for (const v of VIEWS) {
         if (!m.cardIn) fault('tour', `${tag} step ${k}: the callout leaves the viewport`);
         if (m.cardOnHole) fault('tour', `${tag} step ${k}: the callout covers a cut-out`);
         if (!m.arrows || !m.arrowsOk) fault('tour', `${tag} step ${k}: ${m.arrows} arrow(s), and not every one runs from the callout's edge to a cut-out's edge`);
+        for (const [i, c] of (m.curve || []).entries()) {
+          const at = `${tag} step ${k} pointer ${i + 1}`;
+          curveRead++;
+          if (!c.path) fault('tour', `${at}: a straight line element, not a path`);
+          if (c.angle < 15 && (!c.curved || c.bow < 0.2 || c.bow > 0.3)) {
+            fault('tour', `${at}: its chord is ${c.angle.toFixed(1)}° from horizontal and it ${c.curved ? `bows only ${c.bow.toFixed(2)} of its length` : 'runs straight'} — "must not be horizontal"`);
+          }
+          if (c.curved && (c.bow < 0.2 || c.bow > 0.3)) fault('tour', `${at}: it bows ${c.bow.toFixed(2)} of its chord — a quarter`);
+          if (!c.curved && c.angle <= 45) fault('tour', `${at}: straight at ${c.angle.toFixed(1)}° — only a chord steeper than 45° may stay straight`);
+          if (c.beside && !c.topOrBottom) fault('tour', `${at}: its cut-out stands beside the callout and it leaves through a side edge — through the top or the bottom`);
+          if (!c.headIn) fault('tour', `${at}: its arrowhead leaves the viewport`);
+          if (k === 3 && c.angle < 15) curvedFlat++;
+        }
         if (k === 3) {
           if (m.doorArrows !== 2) fault('tour', `${tag} step 3: ${m.doorArrows || 0} of the door's two arrows on the page — the arrows clause has no subject`);
           else if ((m.pointed || 0) < 2) fault('tour', `${tag} step 3: ${m.pointed || 0} of the door's two arrows has a pointer ending on its cut-out — the words say "the arrows beside the door"`);
@@ -6401,6 +6445,8 @@ for (const v of VIEWS) {
   await raw.close();
   if (steps < 12) fault('tour', `only ${steps} of 12 tour steps were measured`);
   console.log(`    the wall through the scrim, % of bare: ${scrimReadings.join(', ') || 'none read'}`);
+  if (curveRead < steps) fault('tour', `${curveRead} pointers read over ${steps} steps — the curve's clauses are measuring less than they say`);
+  if (faults === before) console.log(`    ${curveRead} pointers: a path each, leaving the callout through its top or bottom where its cut-out is beside it, curved by a quarter of the chord wherever the chord is within 45° of horizontal, its head inside the viewport`);
   if (faults === before) console.log(`    ${steps} steps at three shapes: a modal on a first bare load, the scrim .8 and the wall through it under ${SCRIM_GATE * 100} % of bare, the callout's words ≥ 4.5:1, the picker live in its own cut-out on every step and a language pressed there re-showing the same step in it, the picker home after, the save where it stands with no tour on every step and off the picker, the door's two arrows each in a cut-out with a pointer on the options step (a phone's options lit under the callout, ≥ 64 px), every target whole in its cut-out and not pressable through the scrim, the callout inside the viewport and off the cut-outs, every arrow edge to edge; remembered after the last step, skip and Escape; never on a link, bare or the sheet; with storage refused it shows and ends without throwing`);
 }
 

@@ -3225,7 +3225,7 @@ button.spec__row:focus-visible { outline: 2px solid var(--ink); outline-offset: 
   position: absolute; inset: 0; inline-size: 100%; block-size: 100%;
   pointer-events: none;
 }
-.tour__arrow { stroke: #fff; stroke-width: 2.5; stroke-linecap: round; }
+.tour__arrow { fill: none; stroke: #fff; stroke-width: 2.5; stroke-linecap: round; }   /* a path since 10.10 (js/tour.js `pointer`) */
 .tour__card {
   position: absolute; inline-size: min(300px, calc(100vw - 32px));
   padding: 16px 16px 12px; border-radius: var(--r-card);

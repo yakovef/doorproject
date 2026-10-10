@@ -221,23 +221,68 @@ function yieldTop(aimed) {
   return first.bottom - first.top >= YIELD_MIN ? [first, ...others] : null;
 }
 
-/** One arrow per cut-out: from the callout's edge point nearest the cut-out's
- *  centre to the cut-out's edge point nearest that. */
+/** One arrow per cut-out, from the callout to the cut-out's nearest edge.
+ *
+ * ⚠ A CURVE THAT LEAVES THROUGH THE TOP OR THE BOTTOM — 10.10.2026, the
+ * owner's son: *"At the third step of the tutorial the lines leading to the
+ * arrows beside the door must not be horizontal — it looks very ugly and is
+ * not intuitively understandable."* It was one straight `line` from the
+ * callout's edge point nearest the cut-out to the cut-out's nearest edge, and
+ * on the third step the door's two arrows stand beside the door at its
+ * mid-height with the callout between or beside them, so both pointers ran
+ * flat across the photograph. Now a pointer is a `path`:
+ *   · it LEAVES the callout through its top or bottom edge, whichever is
+ *     nearer the target, never a side (`CORNER` px clear of the rounded
+ *     corners);
+ *   · it ARRIVES on the cut-out's edge facing it — the one across the larger
+ *     of the two gaps — `CORNER` px clear of that cut-out's corners too;
+ *   · where its chord is within `STEEP` (45°) of horizontal it is a quadratic
+ *     curve that bows AWAY from the callout (up off a top edge, down off a
+ *     bottom one) by a quarter of the chord's length — a quadratic's furthest
+ *     point from its chord is half its control point's, so the control stands
+ *     half a chord off the middle — and the head, `orient="auto-start-reverse"`
+ *     on the marker, lies along the curve's last tangent; steeper than that it
+ *     stays straight, which already reads as pointing. One rule for all four
+ *     steps; nothing animates, so `prefers-reduced-motion` has nothing to
+ *     change. `npm run audit` measures the departure, the arrival, the
+ *     chord's angle, the bow and the head on every step. */
+const CORNER = 14;
+const STEEP = 45;
+const BOW = 0.25;
+function pointer(box, h) {
+  const hx = (h.left + h.right) / 2, hy = (h.top + h.bottom) / 2;
+  const ay = hy < (box.top + box.bottom) / 2 ? box.top : box.bottom;
+  const ax = clamp(hx, box.left + CORNER, box.right - CORNER);
+  const cxIn = Math.min(CORNER, (h.right - h.left) / 2), cyIn = Math.min(CORNER, (h.bottom - h.top) / 2);
+  const gx = ax < h.left ? h.left - ax : ax > h.right ? ax - h.right : 0;
+  const gy = ay < h.top ? h.top - ay : ay > h.bottom ? ay - h.bottom : 0;
+  let bx, by;
+  if (gy >= gx && gy > 0) { by = ay < h.top ? h.top : h.bottom; bx = clamp(ax, h.left + cxIn, h.right - cxIn); }
+  else { bx = ax < hx ? h.left : h.right; by = clamp(ay, h.top + cyIn, h.bottom - cyIn); }
+  const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy);
+  if (len < 6) return null;                                  // touching already
+  const f = n => n.toFixed(1);
+  const angle = Math.atan2(Math.abs(dy), Math.abs(dx)) * 180 / Math.PI;
+  if (angle > STEEP) return `M ${f(ax)} ${f(ay)} L ${f(bx)} ${f(by)}`;
+  /* the normal on the callout's far side: up off its top, down off its bottom */
+  let nx = -dy / len, ny = dx / len;
+  if ((ay === box.top) !== (ny < 0)) { nx = -nx; ny = -ny; }
+  const off = len * BOW * 2;
+  const cx = (ax + bx) / 2 + nx * off, cy = (ay + by) / 2 + ny * off;
+  return `M ${f(ax)} ${f(ay)} Q ${f(cx)} ${f(cy)} ${f(bx)} ${f(by)}`;
+}
 function arrows(box, holes) {
   const svg = dlg.querySelector('.tour__arrows');
-  svg.replaceChildren();
+  svg.querySelectorAll('.tour__arrow').forEach(n => n.remove());
   const NS = 'http://www.w3.org/2000/svg';
   for (const h of holes) {
-    const hx = (h.left + h.right) / 2, hy = (h.top + h.bottom) / 2;
-    const ax = clamp(hx, box.left, box.right), ay = clamp(hy, box.top, box.bottom);
-    const bx = clamp(ax, h.left, h.right), by = clamp(ay, h.top, h.bottom);
-    if (Math.hypot(bx - ax, by - ay) < 6) continue;          // touching already
-    const line = document.createElementNS(NS, 'line');
-    line.setAttribute('x1', ax.toFixed(1)); line.setAttribute('y1', ay.toFixed(1));
-    line.setAttribute('x2', bx.toFixed(1)); line.setAttribute('y2', by.toFixed(1));
-    line.setAttribute('class', 'tour__arrow');
-    line.setAttribute('marker-end', 'url(#tour-head)');
-    svg.append(line);
+    const d = pointer(box, h);
+    if (!d) continue;
+    const path = document.createElementNS(NS, 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('class', 'tour__arrow');
+    path.setAttribute('marker-end', 'url(#tour-head)');
+    svg.append(path);
   }
 }
 

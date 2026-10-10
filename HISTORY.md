@@ -26,6 +26,65 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **10.10 — PROMPT F, 3 OF 3: THE TOUR'S POINTERS CURVE.** The owner's son:
+  *"At the third step of the tutorial the lines leading to the arrows beside the
+  door must not be horizontal — it looks very ugly and is not intuitively
+  understandable."*
+  · **What was there.** `arrows(box, holes)` drew one straight
+    `line.tour__arrow` per cut-out, from the callout's edge point nearest the
+    cut-out's centre to the cut-out's nearest edge. On the options step the
+    door's two arrows stand beside the door at its mid-height and the callout
+    between or beside them, so the pointers ran flat across the photograph —
+    at 1440×900 in English a 367 px horizontal line from the callout's side to
+    the options (screenshotted before and after, `tools/_tourptr.mjs`). ⚠ **And
+    no pointer had a head since 28.9**: `arrows` began with
+    `svg.replaceChildren()`, and the arrows' svg is also where `index.html`
+    keeps the `<defs>` with `#tour-head` — so the first step deleted the
+    marker, and every `marker-end` after it pointed at nothing (counted: 0
+    `#tour-head` on every step before, 1 after). Nothing asserted the head.
+  · **What it is** (`pointer` in `js/tour.js`). A `path`. It leaves the
+    callout through its TOP or BOTTOM edge — whichever is nearer the target's
+    centre — 14 px clear of the rounded corners, never a side; it arrives on
+    the cut-out's edge facing it (across the larger of the two gaps), 14 px
+    clear of that cut-out's corners. Where its chord is within 45° of
+    horizontal it is a quadratic that bows AWAY from the callout (up off a top
+    edge, down off a bottom one) by a quarter of the chord — the control half
+    a chord off the middle, since a quadratic's furthest point from its chord
+    is half its control point's; steeper, it stays straight. The marker's
+    `orient="auto-start-reverse"` lays the head along the last tangent. One
+    rule for all four steps; recomputed on every step and resize as the lines
+    were; nothing animates (`prefers-reduced-motion` has nothing to change).
+    `.tour__arrow` gained `fill: none` (a path fills black by default), and
+    only `.tour__arrow` children are cleared now, so the marker stays.
+  · **Measured** (the audit's three shapes): 21 pointers over 12 steps — at
+    1280 he the options pointer, 286 px flat before, a 300 px chord bowing 75 px;
+    the door's arrows' pointers there and on the phones short and steep
+    (18 / 10 px, straight).
+  · **Audit, restated (same subject — each pointer from the callout's edge to
+    a cut-out's edge) on a path**, read off its own `d`; **NEW** per step and
+    pointer: a path, not a line; within 15° of horizontal never straight and
+    bowing 0.2–0.3 of its chord; straight only steeper than 45°; leaving
+    through the top or bottom whenever its cut-out stands beside the callout;
+    the head's triangle (2.25 px a marker unit) whole inside the viewport; and
+    no fewer pointers read than steps (§5.15).
+  · **Falsified.** Every pointer straight (`STEEP` −1) → 8 faults, the angle
+    clause on steps 1–3 at 1280 ("its chord is 0.0° from horizontal and it
+    runs straight") and the 45° clause; the old side-edge departure → 2; the
+    old `arrows` wholesale → 57 (a line, not a path; no head in the viewport).
+    A first falsification was wrong — `STEEP` 90 curves every pointer rather
+    than none, and read clean — and was redone.
+  · **Sheets: 0 bare predicted** (the tour is page chrome, never on a bare
+    sheet). **Run after this commit: 0 bare and 0 lockset moved**, `.stamps.json` and
+    six `shot` sheets only.
+  · **The closing pass** (the brief's): a COMPLETE `npm run audit` on this
+    commit, no faults; `fuzz` 30,000 designs and 1,800 clicks, 238 met the
+    dialog, the reset 85 times — nothing broke; `npm test` after the sheets
+    10,597,472, 0 failed; §0c's date and its Green rows re-read; `PROMPT-F.md`
+    deleted.
+  · **Not done, on purpose:** curving the steep pointers too (a short
+    vertical pointer already reads as pointing, and a bow on 10 px is a
+    hook); animating them.
+
 - **10.10 — PROMPT F, 2 OF 3: THE PANELS UNDER THE WINDOW TAKE THE WINDOW'S
   WIDTH.** The owner's son: *"The panels' width needs to match the width of the
   window — right now it is slightly smaller. The option with 2 panels needs to
@@ -4068,6 +4127,17 @@ oldest lines move to the top of the "moved" section.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **2.10** The arrows remade (C, 2 of 3) — *"bigger and more noticeable"*:
+  60 px paper discs on a shadow, no ring, a 26 px chevron at 3, inverting on
+  hover; 56 px at 1100–1199, 52 on a phone. On no door, column, price, band or
+  wall control at any width; at 320 beside `halfextra2` the redo's named
+  overlap with the arrow 115 → 311 px² (`ARROW_KNOWN`). Long form: `HISTORY.md`.
+- **2.10** The phone's first screen (C, 1 of 3) — *"adapted to the phone in good
+  form"*: below 1100 each step is question · answers · lede · the note (*"under
+  the options"*, his answer) · explainer (`placePanelOrder`); band 1.2/1.0 rem,
+  save 44 px, a 120 ms press. First row whole on every step at 390 and 360 (it
+  was 64–159 px short on arrival); 320's three named; landscape 9 of 9 answers.
+  Sheets `research/phone/`. Long form: `HISTORY.md`.
 - **1.10** The tour: the SAVE STAYS IN ITS PLACE (*"the save button is in the
   same place as the languges, but when the tutorial ends it jumps back"* —
   with `#langs` lifted into the dialog the save's slot was the row's only

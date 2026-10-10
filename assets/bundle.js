@@ -7068,7 +7068,7 @@ ${body}
         [0.248, 0.557],
         [0.248, 0.545]
       ];
-      const CORNER = [
+      const CORNER2 = [
         [0.166, 0.15],
         [0.166, 0.121],
         [0.163, 0.1],
@@ -7109,7 +7109,7 @@ ${body}
         arm(OVAL, rib);
         arm(SCROLL, scr);
         arm(HOOK, scr);
-        arm(CORNER, thin);
+        arm(CORNER2, thin);
         arm(KNEE, thin);
         const lx = U(0.5);
         o.push(solid(`M ${n2(lx)} ${n2(Y(0.176))}
@@ -7415,7 +7415,7 @@ ${body}
     const s = flip ? -1 : 1, ox = flip ? x + w : x;
     const REEDS = 4;
     const pitch = w / REEDS;
-    const BOW2 = w * 0.07;
+    const BOW3 = w * 0.07;
     const at2 = (t) => ox + s * t;
     let out = `
     ${/* ⚠ `data-face`: the bracket is part of the BAND piece, and the band's
@@ -7430,7 +7430,7 @@ ${body}
     for (let i = 0; i < REEDS; i++) {
       const top = (i + 0.5) * pitch;
       const bot = top * 0.58;
-      const waist = (top + bot) / 2 - BOW2;
+      const waist = (top + bot) / 2 - BOW3;
       const foot = y + h * (0.86 + 0.14 * i / (REEDS - 1));
       const d = `M ${n(at2(top))} ${n(y)}
                C ${n(at2(top))} ${n(y + h * 0.18)}
@@ -10463,23 +10463,50 @@ ${plate.defs}${plate.body}
     const first = { ...aimed[0], top: Math.max(aimed[0].top, top + card().offsetHeight + TIGHT) };
     return first.bottom - first.top >= YIELD_MIN ? [first, ...others] : null;
   }
+  var CORNER = 14;
+  var STEEP = 45;
+  var BOW2 = 0.25;
+  function pointer(box, h) {
+    const hx = (h.left + h.right) / 2, hy = (h.top + h.bottom) / 2;
+    const ay = hy < (box.top + box.bottom) / 2 ? box.top : box.bottom;
+    const ax = clamp2(hx, box.left + CORNER, box.right - CORNER);
+    const cxIn = Math.min(CORNER, (h.right - h.left) / 2), cyIn = Math.min(CORNER, (h.bottom - h.top) / 2);
+    const gx = ax < h.left ? h.left - ax : ax > h.right ? ax - h.right : 0;
+    const gy = ay < h.top ? h.top - ay : ay > h.bottom ? ay - h.bottom : 0;
+    let bx, by;
+    if (gy >= gx && gy > 0) {
+      by = ay < h.top ? h.top : h.bottom;
+      bx = clamp2(ax, h.left + cxIn, h.right - cxIn);
+    } else {
+      bx = ax < hx ? h.left : h.right;
+      by = clamp2(ay, h.top + cyIn, h.bottom - cyIn);
+    }
+    const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy);
+    if (len < 6) return null;
+    const f = (n) => n.toFixed(1);
+    const angle = Math.atan2(Math.abs(dy), Math.abs(dx)) * 180 / Math.PI;
+    if (angle > STEEP) return `M ${f(ax)} ${f(ay)} L ${f(bx)} ${f(by)}`;
+    let nx = -dy / len, ny = dx / len;
+    if (ay === box.top !== ny < 0) {
+      nx = -nx;
+      ny = -ny;
+    }
+    const off = len * BOW2 * 2;
+    const cx = (ax + bx) / 2 + nx * off, cy = (ay + by) / 2 + ny * off;
+    return `M ${f(ax)} ${f(ay)} Q ${f(cx)} ${f(cy)} ${f(bx)} ${f(by)}`;
+  }
   function arrows(box, holes) {
     const svg = dlg.querySelector(".tour__arrows");
-    svg.replaceChildren();
+    svg.querySelectorAll(".tour__arrow").forEach((n) => n.remove());
     const NS = "http://www.w3.org/2000/svg";
     for (const h of holes) {
-      const hx = (h.left + h.right) / 2, hy = (h.top + h.bottom) / 2;
-      const ax = clamp2(hx, box.left, box.right), ay = clamp2(hy, box.top, box.bottom);
-      const bx = clamp2(ax, h.left, h.right), by = clamp2(ay, h.top, h.bottom);
-      if (Math.hypot(bx - ax, by - ay) < 6) continue;
-      const line = document.createElementNS(NS, "line");
-      line.setAttribute("x1", ax.toFixed(1));
-      line.setAttribute("y1", ay.toFixed(1));
-      line.setAttribute("x2", bx.toFixed(1));
-      line.setAttribute("y2", by.toFixed(1));
-      line.setAttribute("class", "tour__arrow");
-      line.setAttribute("marker-end", "url(#tour-head)");
-      svg.append(line);
+      const d = pointer(box, h);
+      if (!d) continue;
+      const path = document.createElementNS(NS, "path");
+      path.setAttribute("d", d);
+      path.setAttribute("class", "tour__arrow");
+      path.setAttribute("marker-end", "url(#tour-head)");
+      svg.append(path);
     }
   }
   function paintScrim(holes, aimed = holes.length) {
