@@ -26,6 +26,76 @@ oldest lines move to the top of the "moved" section.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **10.10 — PROMPT F, 2 OF 3: THE PANELS UNDER THE WINDOW TAKE THE WINDOW'S
+  WIDTH.** The owner's son: *"The panels' width needs to match the width of the
+  window — right now it is slightly smaller. The option with 2 panels needs to
+  be identical to the rectangle window's panel: their bottom panel needs to be
+  the same; right now it is not the same shape."*
+  · **What was there.** `faceRowsOn` put the rows a face KEPT under glass at
+    the face's own inset, `leafW * panelInset(detail)` — 0.23 — while the
+    window's lone panel (`plain` behind the square window) stood at the
+    casing's edge, the opening's x less `MOULD_BAND`. §3 said so, and why
+    (Peretz's 14.9 overrule against the owner's son's light). On the main
+    leaf, in mm, before → after (the half sizes' main leaves are the standard
+    / `extra1` / `extra2` widths):
+      standard, half      850 leaf: pair 459 × 0.66–0.92, trio 459 → **499**
+      extra1, halfextra1  925 leaf: pair 500 × 0.66–0.92, trio 500 → **530**
+      extra2, halfextra2 1100 leaf: pair 594 × 0.66–0.92, trio 594 → **604**
+    and the pair now **499 / 530 / 604 × 0.68–0.90 — the lone panel's rows**
+    (on the standard leaf 1394–1845 mm where it was 1353–1886). The fixed
+    leaf of the three double doors already ran its kept rows to the casing
+    (28.9) and does not move.
+  · **What it is** (ours, named so he can reverse any of it in a line). In
+    `faceRowsOn` the casing's inset is ONE expression, read by the kept rows
+    and the lone panel, and returned with `cased: true`; the main leaf's
+    drawing aligns to it whenever `cased` (it did only for the lone panel),
+    and the fixed leaf's call site reads the same value instead of its own
+    copy of the expression. Under the SQUARE window (`win.panel`) the pair's
+    kept lower panel IS the window's lone panel — `faceRowsOn` returns the
+    lone result — so `panel2 + rect` and `plain + rect` draw the identical
+    group (every face's profile is the reed since the ogee came out, so the
+    markup is byte-identical). The trio's plate and lower panel take the
+    casing's width, their rows (`trioRows`) unchanged — the plate is still a
+    53 mm rail under the casing. **A solid face keeps Peretz's 0.23** — he
+    said "match the window", and a solid door has none. Under the slot no
+    panelled face is buildable (its casing runs to 0.82 of the leaf and
+    crosses every kept row) at either inset — unchanged. `faceObstacles`,
+    `panelUnderGlass` and the grip and bow placements read `faceRowsOn`, so
+    they followed without a line; the comments that described the old inset
+    (the drawing's, `faceObstacles`', `panelUnderGlass`'s 1353 mm) corrected.
+    **Prices unmoved**: the pair adds ₪0 beside the square window (A20), the
+    trio ₪450 (A21) — asserted on all six sizes.
+  · **The sheets, predicted before the run.** Every bare-sheet door was drawn
+    with the old renderer and the new (`tools/_predict.mjs`, `render()`
+    markup compared; its control — pair and trio beside the square window —
+    reads "changed"): the 30 gallery doors behind the `corpus-` sheets, the
+    ten `recreate-` cases in both handings, and `against-`/`lockset-`, which
+    draw `d=plain` only. **None carries a window AND a panelled face** — the
+    ten glazed gallery doors are all `plain` (d092 d097 d099 d106 d108 d113
+    d116 d122 d125 d128), the two panelled recreations (d048, d087) are
+    solid. So the prediction is **0 bare sheets**, not the list the brief
+    expected — measured, not assumed. **Run: 0 bare and 0 lockset moved**, as predicted — `.stamps.json` and 11
+    of the 12 `shot` sheets only.
+  · **Units.** RESTATED (same subject — where a kept row stands under glass)
+    from "at the face's own inset" to **flush with the casing**, because he
+    asked for the window's width: the half door's "the fixed leaf's panel is
+    the casing's width" clause gained its main-leaf twin on all six sizes and
+    five faces (30 doors): every main-leaf panel spans the pane's x ± the
+    band; the pair's panel group is the plain door's byte for byte; the
+    trio's plate ≥ 50 mm under the casing (53 on the standard leaf); the
+    solid pair at 0.23; the pair ₪0 and the trio ₪450 beside the window.
+  · **Falsified.** The face's own 0.23 back under glass → 64 faults (the
+    main-leaf clause on every size and the fixed leaf's, which reads the same
+    value now); the pair no longer the window's lone panel → 19 ("not the
+    plain door's" on every size, both pairs).
+  · **Collide.** `-- all` clean on 1,638 buildable designs — the same count as
+    before (no placement became unbuildable): `faceObstacles` agrees with the
+    drawing everywhere and nothing overlaps; `-- boxes` clean.
+  · **Not done, on purpose:** a solid face at the casing's width (there is no
+    casing); the slot's rows (no panelled face stands under it); the trio's
+    rows (he asked about width, and the plate's rail is measured); a
+    `VERSION` (no list moved).
+
 - **10.10 — PROMPT F, 1 OF 3: THE CYLINDER AT ₪100.** The owner's son: *"The
   option with cylinder only needs to be 100 shekels."*
   · **What was there.** `LOCKSET.cylinder` was 0 — the cylinder only

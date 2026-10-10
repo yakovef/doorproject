@@ -3083,6 +3083,75 @@ group("the half door carries the main leaf's face, and is charged for one");
     const here = P({ size, window: 'rect', grille: iron.id }) - P({ size, window: 'rect' });
     ok(here === 2 * perPane, `${size}: ${iron.id} adds ${shekels(here)} on two panes against ${shekels(perPane)} on one`);
   }
+
+  /* ⚠ AND THE MAIN LEAF'S TWIN — 10.10.2026, the owner's son: *"The panels'
+     width needs to match the width of the window — right now it is slightly
+     smaller. The option with 2 panels needs to be identical to the rectangle
+     window's panel: their bottom panel needs to be the same."* On the main
+     leaf the rows a face kept under glass stood at `PANEL_INSET` (459 mm on
+     the 850 leaf) under a 499 mm casing — 20 mm inside each side, which §3
+     said and the drawing did — while the fixed leaf above already ran them
+     to the casing. RESTATED (same subject: where a kept row stands under
+     glass) from "at the face's own inset" to "FLUSH WITH THE CASING", because
+     he asked for the window's width. On every size, behind the square window:
+       · every main-leaf panel spans the casing — the pane's x ± the band;
+       · the pair's panel group is the plain door's, byte for byte (the pair's
+         lower panel IS the window's lone panel there — rows and width);
+       · the trio's plate still clears the casing by its rail (≥ 50 mm — 53
+         on the standard leaf, §3), its rows unchanged;
+       · solid, the pair keeps Peretz's 0.23 (his 14.9 overrule);
+       · and the money does not move: the pair adds nothing beside the square
+         window (A20) and the trio ₪450.
+     Falsified: the face's own 0.23 back under glass → "not flush with the
+     casing" and the pair ≠ plain. */
+  let mainAsked = 0;
+  for (const size of Object.keys(SIZES)) {
+    const groupOf = st => {
+      const svg = render(st), m0 = svg.indexOf('<g id="leaf"');
+      const mainAll = svg.slice(m0, svg.indexOf('<g id="hardware">'));
+      const det = mainAll.slice(mainAll.indexOf('<g id="detail">'));
+      const g0 = det.indexOf('<g data-detail="panel"');
+      return { mainAll, det, group: g0 < 0 ? '' : det.slice(g0, g0 + det.slice(g0).indexOf('>') + 1) + inside(det, det.indexOf('>', g0) + 1) };
+    };
+    const plainRect = groupOf(repair({ ...base, size, window: 'rect', detail: 'plain', handle: 'none', grille: 'none' }).state);
+    for (const detail of ['plain', 'panel2', 'panel2o', 'panel3', 'panel3o']) {
+      const st = repair({ ...base, size, window: 'rect', detail, handle: 'none', grille: 'none' }).state;
+      const tag = `${size}/rect/${detail}`;
+      if (st.window !== 'rect' || st.detail !== detail) { ok(false, `${tag}: the face does not stand beside the square window — this clause is dead`); continue; }
+      const { mainAll, det, group } = groupOf(st);
+      const M = panelsIn(det), gm = glassIn(mainAll);
+      ok(M.length > 0 && gm.x != null, `${tag}: no panel or no glass on the main leaf — this clause is dead`);
+      if (!M.length || gm.x == null) continue;
+      mainAsked++;
+      for (const [i, p] of M.entries()) {
+        const c0 = +gm.x - p.band, c1 = +gm.x + +gm.width + p.band;
+        ok(Math.abs(p.x0 - c0) <= 0.5 && Math.abs(p.x1 - c1) <= 0.5,
+           `${tag}: the main leaf's panel ${i + 1} spans ${p.x0.toFixed(1)}–${p.x1.toFixed(1)} under a casing of `
+         + `${c0.toFixed(1)}–${c1.toFixed(1)} — not flush with the casing ("match the width of the window")`);
+      }
+      const d = byId(DETAILS, detail);
+      if (d.panels === 2) {
+        ok(group && group === plainRect.group,
+           `${tag}: the pair's panel beside the square window is not the plain door's — "their bottom panel needs to be the same"`);
+      }
+      if (d.panels >= 3) {
+        const casingFoot = +gm.y + +gm.height + M[0].band;
+        const plate = M[0];
+        ok(plate.top - casingFoot >= 50,
+           `${tag}: the trio's plate starts ${(plate.top - casingFoot).toFixed(1)} mm under the casing — its rail is 53 on the standard leaf`);
+      }
+    }
+    const solid = render(repair({ ...base, size, window: 'none', detail: 'panel2', handle: 'none' }).state);
+    const sm0 = solid.indexOf('<g id="leaf"'), sml = attrs(/<g id="leaf"[^>]*>/.exec(solid)?.[0]);
+    const S0 = panelsIn(solid.slice(solid.indexOf('<g id="detail">', sm0)));
+    const want = +sml['data-x'] + +sml['data-w'] * 0.23;
+    ok(S0.length === 2 && Math.abs(S0[0].x0 - want) <= 0.5,
+       `${size}/none/panel2: the solid pair stands at ${S0[0] ? S0[0].x0.toFixed(1) : '—'}, not Peretz's 0.23 (${want.toFixed(1)})`);
+    const A = st => P({ size, window: 'rect', handle: 'none', ...st });
+    ok(A({ detail: 'panel2' }) === A({ detail: 'plain' }) && A({ detail: 'panel3' }) - A({ detail: 'plain' }) === 45000,
+       `${size}: beside the square window the pair adds ${shekels(A({ detail: 'panel2' }) - A({ detail: 'plain' }))} and the trio ${shekels(A({ detail: 'panel3' }) - A({ detail: 'plain' }))} — ₪0 and ₪450, unmoved (A20)`);
+  }
+  ok(mainAsked === 6 * 5, `the main-leaf casing clause asked ${mainAsked} of 30 doors`);
 }
 
 group('a panel that is charged for is a panel that is drawn');

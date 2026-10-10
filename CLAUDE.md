@@ -262,6 +262,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **10.10** The PANELS UNDER GLASS ARE THE CASING'S WIDTH (*"match the width
+  of the window … the option with 2 panels needs to be identical to the
+  rectangle window's panel"*): every kept row under glass flush with the
+  casing, both leaves, one expression; beside the square window the pair's
+  lower panel is the window's lone one. Solid faces keep 0.23. 0 bare sheets
+  (no sheet door is glazed and panelled). Long form: `HISTORY.md`.
 - **10.10** The CYLINDER ONLY is **₪100** (*"The option with cylinder only
   needs to be 100 shekels"*; it was included): its tile prints the figure, the
   lock step's explainer says it through `expArgs`, and the lever's fallback
@@ -948,14 +954,27 @@ derived from the WINDOW rather than from another face.
   catalogue entry — `panel2` keeps its lower panel, `panel3` its plate and
   lower); `faceRowsOn` is the one statement, read by the drawing,
   `faceObstacles` and `panelUnderGlass`. Whether kept rows clear the casing is
-  computed: on the standard leaf the casing reaches 1148 mm, the pair's lower
-  panel starts at 1353 (205 clear) and **the trio's plate at 1201, one 53 mm
-  rail below it** — so both stand beside the square window, and a glazed trio
-  costs the plate (A21). The kept panels are at their own 0.23 inset (459 mm),
-  20 mm inside the casing each side — not aligned, because the inset is Peretz's
-  14.9 overrule and the window's own x fractions are the owner's son's light.
-  A face that keeps nothing falls back to the window's own lone panel, aligned
-  to the casing (d097); plain behind the square window draws that.
+  computed: on the standard leaf the casing reaches 1148 mm and **the trio's
+  plate starts at 1201, one 53 mm rail below it**, so both faces stand beside
+  the square window, and a glazed trio costs the plate (A21). ⚠ **Under glass
+  every kept row is FLUSH WITH THE CASING since 10.10** (the owner's son: *"The
+  panels' width needs to match the width of the window — right now it is
+  slightly smaller. The option with 2 panels needs to be identical to the
+  rectangle window's panel"*): they stood at the face's own 0.23 (459 mm on the
+  850 leaf), 20 mm inside the 499 mm casing each side. Now `faceRowsOn` gives
+  every row under glass the casing's inset — ONE expression, read by the kept
+  rows and the lone panel, on both leaves (`cased`) — and **beside the square
+  window the pair's lower panel IS the window's lone panel**, rows and width
+  (499 × 0.68–0.90 where it was 459 × 0.66–0.92), so `panel2` and `plain` draw
+  one picture there (asserted byte for byte). The trio keeps its rows (the
+  plate still a 53 mm rail under the casing) at the casing's width: 499 / 530 /
+  604 mm on the three widths. **A solid face keeps Peretz's 0.23** (his 14.9
+  overrule) — he said "match the window", and a solid door has none. Ours,
+  named so he can reverse any of it in a line. Under the slot no panelled face
+  is buildable (its casing runs to 0.82 of the leaf), unchanged. Prices
+  unmoved (A20, A21, asserted). A face that keeps nothing falls back to the
+  window's own lone panel, aligned to the casing (d097); plain behind the
+  square window draws that.
 - ⚠ **The fixed leaf of a דלת וחצי carries the same face** (28.9, the owner's
   son: *"…a window and a panel at the same width, just like the main door — and
   with 3 panels there should be 3 panels on the half door too"*). It asks
@@ -964,9 +983,9 @@ derived from the WINDOW rather than from another face.
   its own 350 mm, and its glass is the main light's FRACTIONS of its width —
   the square window 148 mm, the slot 112/103/86 mm on the three bands (the 110
   mm clamp is gone). ⚠ **Under glass its rows line up with the CASING** (ours,
-  §0a): at `PANEL_INSET` the kept panel would be 189 mm under a 288 mm casing,
-  where the main leaf's is 459 under 499. The cost: switching the window on
-  widens that leaf's lower panel 189 → 288. **d122's photograph agrees** — its
+  §0a): at `PANEL_INSET` the kept panel would be 189 mm under a 288 mm casing.
+  Since 10.10 the main leaf does the same (above), off the same expression.
+  The cost: switching the window on widens that leaf's lower panel 189 → 288. **d122's photograph agrees** — its
   fixed leaf's panel is the casing's width, and `recreate-d122` now shows it
   (the one bare sheet commit 9 moved); d119's narrow leaf read the panel 0.50
   of the leaf under a 0.34 window — measured, overruled, kept in the comment. Priced as before: the face once, the ironwork per pane (asserted).

@@ -5363,7 +5363,7 @@ ${stops}
         splits: main.splits.map((sp) => ({ x: sp.x * scale, w: sp.w * scale }))
       };
       const f = faceRowsOn(detail, win, own ? [own] : [], sideW, leafH);
-      const alignTo = own ? Math.max(0, own.x - MOULD_BAND) : null;
+      const alignTo = f.cased ? f.inset : null;
       return (own ? aperture({
         x: sideX + own.x,
         y: y0 + own.top,
@@ -5438,9 +5438,10 @@ ${stops}
         the section the seven glazed corpus doors with a panel carry. */
     ""}
     ${/* ⚠ WHICH ROWS, ASKED OF `faceRowsOn` SINCE 26.9.2026 — the same answer
-        `faceObstacles` and the rules get. On a glazed pair that is its lower
-        panel at its own inset; on a plain door behind a square window it is
-        the window's own lone panel, lined up with the casing. */
+        `faceObstacles` and the rules get. Behind a square window it is the
+        window's own lone panel for `plain` and the pair alike (10.10.2026),
+        and the trio's kept rows; under glass all of them at the casing's
+        width (`f.cased`), on a solid leaf the face's own 0.23. */
     ""}
     ${(() => {
       const f = faceRowsOn(detail, win, openings, leafW, leafH);
@@ -5455,7 +5456,7 @@ ${stops}
         f.lone ? null : f.rows,
         0,
         "m",
-        f.lone ? f.inset : null,
+        f.cased ? f.inset : null,
         panelInset(detail),
         mouldOf(detail)
       ) : "";
@@ -5796,20 +5797,24 @@ ${body}
   var panelRows = (detail, leafH) => detail.panels >= 3 ? trioRows(leafH) : detail.panels === 2 ? PANEL_ROWS.pair : detail.top ? PANEL_ROWS.top : [PANEL_ROWS.lone];
   var panelInset = (detail) => (detail.panels >= 3 ? PANEL_INSETS.trio : null) ?? PANEL_INSET;
   function faceRowsOn(detail, win, openings, leafW, leafH) {
-    const none = { rows: [], inset: 0, lone: false };
+    const none = { rows: [], inset: 0, lone: false, cased: false };
     if (detail.classic) return none;
     if (!openings.length) {
-      return detail.panel ? { rows: panelRows(detail, leafH), inset: leafW * panelInset(detail), lone: false } : none;
+      return detail.panel ? { rows: panelRows(detail, leafH), inset: leafW * panelInset(detail), lone: false, cased: false } : none;
     }
-    const kept = (detail.keeps || []).map((i) => panelRows(detail, leafH)[i]).filter(Boolean);
-    if (kept.length) return { rows: kept, inset: leafW * panelInset(detail), lone: false };
-    if (!detail.panel && !win.panel) return none;
+    const casing = Math.max(0, Math.min(...openings.map((o) => o.x)) - MOULD_BAND);
     const winBottom = Math.max(...openings.map((o) => o.top + o.h));
-    return {
+    const lone = {
       rows: [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]],
-      inset: Math.max(0, Math.min(...openings.map((o) => o.x)) - MOULD_BAND),
-      lone: true
+      inset: casing,
+      lone: true,
+      cased: true
     };
+    const kept = (detail.keeps || []).map((i) => panelRows(detail, leafH)[i]).filter(Boolean);
+    if (kept.length && detail.panels === 2 && win.panel) return lone;
+    if (kept.length) return { rows: kept, inset: casing, lone: false, cased: true };
+    if (!detail.panel && !win.panel) return none;
+    return lone;
   }
   function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper, clearTo = 0, key = "m", alignTo = null, inset0 = PANEL_INSET, profile = MOULD_DEFAULT) {
     const band = MOULD_BAND;

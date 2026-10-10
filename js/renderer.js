@@ -3518,7 +3518,10 @@ export function render(state) {
                match and the face keeps `PANEL_INSET` of its own width. The
                cost: switching the window on widens this leaf's lower panel
                189 → 288 mm, where the main leaf's stays put. */
-            const alignTo = own ? Math.max(0, own.x - MOULD_BAND) : null;
+            /* ⚠ AND SINCE 10.10.2026 THE MAIN LEAF DOES THE SAME (`faceRowsOn`'s
+               note): the casing's inset is computed there, once, for both
+               leaves — this was its own copy of the expression. */
+            const alignTo = f.cased ? f.inset : null;
             return (own
                 ? aperture({ x: sideX + own.x, y: y0 + own.top, w: own.w, h: own.h,
                      splits: own.splits.map(sp => ({ x: sideX + sp.x, w: sp.w })),
@@ -3578,14 +3581,15 @@ export function render(state) {
           same rectangle it always drew: `mouldOf(plain)` is the reed, which is
           the section the seven glazed corpus doors with a panel carry. */''}
     ${/* ⚠ WHICH ROWS, ASKED OF `faceRowsOn` SINCE 26.9.2026 — the same answer
-          `faceObstacles` and the rules get. On a glazed pair that is its lower
-          panel at its own inset; on a plain door behind a square window it is
-          the window's own lone panel, lined up with the casing. */''}
+          `faceObstacles` and the rules get. Behind a square window it is the
+          window's own lone panel for `plain` and the pair alike (10.10.2026),
+          and the trio's kept rows; under glass all of them at the casing's
+          width (`f.cased`), on a solid leaf the face's own 0.23. */''}
     ${(() => {
         const f = faceRowsOn(detail, win, openings, leafW, leafH);
         return f.rows.length
           ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom,
-              f.lone ? null : f.rows, 0, 'm', f.lone ? f.inset : null,
+              f.lone ? null : f.rows, 0, 'm', f.cased ? f.inset : null,
               panelInset(detail), mouldOf(detail))
           : '';
       })()}
@@ -4469,31 +4473,59 @@ const panelInset = detail =>
  * The owner's son: the window stays when the face changes, and on a panelled
  * face **the window replaces the upper panel**. So under glass a face draws
  * the rows its catalogue entry KEEPS (`keeps`, indices into its own
- * `panelRows`) at its own inset — the pair's lower panel is the pair's lower
- * panel, 0.66-0.92 at 0.23, whether the top of the door is a panel or glass.
+ * `panelRows`) — at the CASING's width since 10.10.2026 (below), and beside
+ * the square window the pair's lower panel is the window's own lone one.
  * A face that keeps nothing (plain, and any face with no `keeps`) falls back
  * to the lower panel the square window brings of its own (`win.panel`), which
  * lines up with the window's casing — the d097 reading (`appliedFrame`).
  * On a solid leaf every face draws all its rows. The Greek set draws itself
  * and is never asked.
  *
- * Returns `{ rows, inset, lone }`: rows as fractions of the leaf's height,
- * the inset in millimetres from each edge, and whether it is the window's own
- * lone panel (which `appliedFrame` draws against the glass's foot).
+ * Returns `{ rows, inset, lone, cased }`: rows as fractions of the leaf's
+ * height, the inset in millimetres from each edge, whether it is the window's
+ * own lone panel (which `appliedFrame` draws against the glass's foot), and
+ * whether the inset is the CASING's (under glass) rather than the face's own.
  */
+/* ⚠ UNDER GLASS EVERY ROW TAKES THE CASING'S WIDTH, ON THE MAIN LEAF TOO —
+   10.10.2026, the owner's son: *"The panels' width needs to match the width of
+   the window — right now it is slightly smaller. The option with 2 panels
+   needs to be identical to the rectangle window's panel: their bottom panel
+   needs to be the same; right now it is not the same shape."* The kept rows
+   stood at the face's own inset (0.23 of the leaf — 459 mm on the standard
+   850 leaf) under a casing 499 mm wide: 20 mm inside each side, and a pair
+   beside the square window drew a 459 x (0.66-0.92) panel where `plain`
+   drew the window's own 499 x (0.68-0.90) — two shapes for what he sees as
+   one. The fixed leaf already aligned its kept rows to the casing (28.9).
+   So, ours, named so he can reverse it in a line:
+     · every row under glass stands at `casing` — the opening's outer edge
+       less `MOULD_BAND`, ONE expression read by the kept rows and the lone
+       panel alike, on the main leaf and the fixed one (the trio's plate and
+       lower panel take it; their rows, `trioRows`, do not move);
+     · under the SQUARE window (`win.panel`, the window that brings a panel of
+       its own) the pair's kept lower panel IS the window's lone panel — its
+       rows and its width — so `panel2 + rect` and `plain + rect` draw one
+       picture; the price does not move (A20: the window's ₪3,800 pays for the
+       one panel drawn, as before);
+     · a SOLID face keeps Peretz's measured 0.23 (his 14.9 overrule, §3) — he
+       said "match the window", and a solid door has none.
+   Under the slot no panelled face is buildable (the kept rows cross its
+   casing, which runs to 0.82 of the leaf) and that does not change. */
 export function faceRowsOn(detail, win, openings, leafW, leafH) {
-  const none = { rows: [], inset: 0, lone: false };
+  const none = { rows: [], inset: 0, lone: false, cased: false };
   if (detail.classic) return none;
   if (!openings.length) {
     return detail.panel
-      ? { rows: panelRows(detail, leafH), inset: leafW * panelInset(detail), lone: false } : none;
+      ? { rows: panelRows(detail, leafH), inset: leafW * panelInset(detail), lone: false, cased: false } : none;
   }
-  const kept = (detail.keeps || []).map(i => panelRows(detail, leafH)[i]).filter(Boolean);
-  if (kept.length) return { rows: kept, inset: leafW * panelInset(detail), lone: false };
-  if (!detail.panel && !win.panel) return none;
+  const casing = Math.max(0, Math.min(...openings.map(o => o.x)) - MOULD_BAND);
   const winBottom = Math.max(...openings.map(o => o.top + o.h));
-  return { rows: [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]],
-           inset: Math.max(0, Math.min(...openings.map(o => o.x)) - MOULD_BAND), lone: true };
+  const lone = { rows: [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]],
+                 inset: casing, lone: true, cased: true };
+  const kept = (detail.keeps || []).map(i => panelRows(detail, leafH)[i]).filter(Boolean);
+  if (kept.length && detail.panels === 2 && win.panel) return lone;
+  if (kept.length) return { rows: kept, inset: casing, lone: false, cased: true };
+  if (!detail.panel && !win.panel) return none;
+  return lone;
 }
 function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0, key = 'm',
                       alignTo = null, inset0 = PANEL_INSET, profile = MOULD_DEFAULT) {
@@ -4791,10 +4823,11 @@ export const faceObstacles = memo(function faceObstacles(state) {
      function's own. This block computed the inset and the lone row itself —
      the second description of the panel, which drifted 19 mm from the drawing
      once (`npm run collide` caught it) — and asked `hasUpperPanel` to decide
-     between the face's rows and the lone one. Under glass the pair now keeps
-     its lower panel, and a copy of the old arithmetic here would have told
-     every placement rule that panel was the window's lone one, 20 mm off each
-     side. One function draws it and the same function declares it. */
+     between the face's rows and the lone one. A copy of that arithmetic here
+     drifted from the drawing once; since 10.10.2026 the rows under glass
+     stand at the casing's width and the pair's beside the square window IS
+     the lone one, and this list follows without a line changing. One
+     function draws it and the same function declares it. */
   {
     const f = faceRowsOn(detail, byId(WINDOWS, state.window), openings, leafW, leafH);
     for (const [t, b] of f.rows) {
@@ -4980,8 +5013,9 @@ export function bellFits(state) {
  * `apertureLayout`, so which faces can stand beside which window is computed
  * rather than listed, and the day a row or the window is re-measured the
  * answer moves with it. On the standard 850 x 2050 leaf the square window's
- * casing reaches 1148 mm down; the pair's lower panel starts at 1353 (205
- * clear) and the trio's plate at 1072 (76 under).
+ * casing reaches 1148 mm down; the pair's lower panel — the window's own lone
+ * panel there since 10.10.2026 — starts at 1394, and the trio's plate rows are
+ * derived from the casing (`trioRows`).
  */
 export function panelUnderGlass(state) {
   const size = SIZES[state.size] || SIZES.standard;
