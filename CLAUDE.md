@@ -262,6 +262,10 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **17.10** The colour deck photographed (`research/colours/cards/1-5.jpg`,
+  the owner's son): 18 cards, 14 already in the chart and four not (7345D,
+  8075D, 8002D, 9077D); every card +₪200 but the three included ones. The
+  readings and the chart change are PROMPT G's. Long form: `HISTORY.md`.
 - **10.10** The tour's POINTERS CURVE (*"…must not be horizontal — it looks very
   ugly and is not intuitively understandable"*): a path off the callout's top
   or bottom, bowing a quarter of its chord wherever that is within 45° of

@@ -24,6 +24,18 @@ oldest lines move to the top of the "moved" section.
 
 ---
 
+## 17.10.2026 — the colour deck photographed
+
+Five photographs of the רב-בריח fan deck from the owner's son, saved as
+`research/colours/cards/1.jpg … 5.jpg` with a README naming every card in
+frame. Eighteen cards: fourteen codes already in `js/catalog.js` (nine of
+them under a different name on the card than on our chart) and four not —
+אפור אורבני 7345D, שוקולד קקאו 8075D, חמרה 8002D, חול ים 9077D. His rule:
++₪200 for every one but 9016D, 9001D and 7126D. Nothing in the chart moved
+in this commit; the measured hexes, the four new rows and the names are
+the next round's (PROMPT G), with the method and calibration to be written
+into `research/colours/README.md`.
+
 ## Long-form entries since 27.9.2026 — newest first
 
 - **10.10 — PROMPT F, 3 OF 3: THE TOUR'S POINTERS CURVE.** The owner's son:
