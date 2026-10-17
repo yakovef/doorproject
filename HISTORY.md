@@ -38,6 +38,44 @@ into `research/colours/README.md`.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **17.10 — PROMPT G, 2 OF 2: THE CARDS' NAMES ON THE CHART.** Ours, named so he
+  can reverse it in a line: where his deck's card names a colour differently
+  from the chart, the card's name wins — the card is what Peretz holds when he
+  orders; the ID and the CODE never change, and the code is what the order
+  carries.
+  · **What changed.** Eleven labels, in three languages (the brief said nine
+    and listed eleven; the eleven are done): 7240D טאופ → **מוקה** / Mocha /
+    Мокко · 7080D אפור בהיר → **אפור פשתן** / Linen grey · 0096D אפור בינוני →
+    **אפור קלאסי** / Classic grey · 7110D אפור כהה → **אפור בטון** / Concrete
+    grey · 9001D שמנת → **שמנת חלבית** / Milky cream · 9302D לבן שבור → **גרז'** /
+    Greige · 7126D חום-אפור כהה → **אפור בזלת** / Basalt grey (the default
+    door's; its tile's code `7126D` unchanged) · 7021D אפור פחם → **גרפיט** /
+    Graphite · 2030D קרמל → **קפוצ'ינו** / Cappuccino · 6459D ירוק בקבוק →
+    **ירוק פסגות** / Summit green · 7322D כחול פלדה → **אפור שמיים** / Sky grey.
+    9016D and 9005D keep לבן and שחור (the cards say "Extra White" / "Extra
+    Black", in English). Aliases untouched.
+  · **Every reader of a name, grepped.** No copy types a colour's name
+    (`exp.colour.a`, `colour.measured` name none); `js/works.js` carries
+    states only; the message, the summary, the saved rows and the A4 sheet
+    read `L(colour)`; no test or audit matched a name literally — a comment
+    in the units and one in `tools/backdrop.mjs` name אפור פחם as history, and
+    stay. §9's dark-door note named the old labels — corrected, and the deck's
+    darkest card added to it (8075D, 1.80:1 between the twins' inks).
+  · **Units.** The fifteen card-named rows (these eleven and the four added)
+    read their card's name by id in he, en and ru; the default door is still
+    7126D. **Falsified:** the default's old label put back → three faults,
+    one per language.
+  · **ASK-PERETZ** 0a9 (commit 1): the half-framed `1013T` and green — add?
+  · **Gates.** `node --check`; `npm run build`; `npm test` 13,045,569,
+    0 failed after the sheets (13,045,568 with the five staleness rows
+    before); `npm run sheets` — **0 bare and 0 lockset moved**, as predicted,
+    `js/works.js` and `corpus-links.md` byte-identical (`.stamps.json` and the
+    13 `shot` sheets only); `collide -- all` clean, **1,638** designs —
+    UNCHANGED, not grown: the sweep pins one paint, since a colour cannot move
+    geometry; the total that grew is the units' round-trip, 115,600 → 142,800
+    designs (×21/17); a COMPLETE `npm run audit`, no faults. `PROMPT-G.md`
+    deleted.
+
 - **17.10 — PROMPT G, 1 OF 2: FOUR CARDS FROM HIS DECK, MEASURED.** The owner's
   son, with five photographs of the רב-בריח fan deck (`research/colours/cards/`):
   *"Add all of these colours to the section where you select a colour for the

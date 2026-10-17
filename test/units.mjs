@@ -956,6 +956,25 @@ group('price');
       const drawn = render({ ...base, colour: id });
       ok(COLOURS.every(o => o.id === id || render({ ...base, colour: o.id }) !== drawn), `${id} draws the same door as another colour`);
     });
+    /* ⚠ AND THE LABELS ARE THE CARDS' OWN NAMES, 17.10.2026 (G 2 of 2) — read
+       by id, in three languages, so the default door's אפור בזלת (7126D, the
+       code on its tile unchanged) and every renamed row hold their card's
+       name; ids, codes and aliases untouched. Falsified by putting one old
+       label back. */
+    const CARD = { 'rb-7240d': ['מוקה', 'Mocha', 'Мокко'], 'rb-7080d': ['אפור פשתן', 'Linen grey', 'Льняной серый'],
+      'rb-0096d': ['אפור קלאסי', 'Classic grey', 'Классический серый'], 'rb-7110d': ['אפור בטון', 'Concrete grey', 'Бетонный серый'],
+      'rb-9001d': ['שמנת חלבית', 'Milky cream', 'Молочно-кремовый'], 'rb-9302d': ["גרז'", 'Greige', 'Грейдж'],
+      'rb-7126d': ['אפור בזלת', 'Basalt grey', 'Базальтовый серый'], 'rb-7021d': ['גרפיט', 'Graphite', 'Графит'],
+      'rb-2030d': ["קפוצ'ינו", 'Cappuccino', 'Капучино'], 'rb-6459d': ['ירוק פסגות', 'Summit green', 'Горный зелёный'],
+      'rb-7322d': ['אפור שמיים', 'Sky grey', 'Небесно-серый'],
+      'rb-7345d': ['אפור אורבני', 'Urban grey', 'Городской серый'], 'rb-8075d': ['שוקולד קקאו', 'Cocoa', 'Какао'],
+      'rb-8002d': ['חמרה', 'Terracotta', 'Терракота'], 'rb-9077d': ['חול ים', 'Sea sand', 'Морской песок'] };
+    for (const [id, names] of Object.entries(CARD)) ['he', 'en', 'ru'].forEach((lg, i) => {
+      const got = withLang(lg, () => L(byId(COLOURS, id)));
+      ok(got === names[i], `${id} reads "${got}" in ${lg} — the card's name is "${names[i]}"`);
+    });
+    ok(DEFAULTS.colour === 'rb-7126d' && byId(COLOURS, 'rb-7126d').ral === '7126D',
+       `the default door is ${DEFAULTS.colour} ${byId(COLOURS, DEFAULTS.colour).ral} — 7126D, the code its tile prints, unchanged by the renaming`);
     const onDeck = WORKS.filter(w => DECK.some(([id]) => w.state.colour === id));
     ok(!onDeck.length, `gallery doors repainted onto a deck card: ${onDeck.map(w => `${w.id} ${w.state.colour}`).join(', ')} — the gallery keeps its colours`);
   }

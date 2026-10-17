@@ -316,28 +316,36 @@ export const SIZE_ALIAS = {
  * ⚠ Every delta is 0. The old list guessed that some colours cost more; we
  * have no idea which of these do. That question is on the list for Peretz.
  */
+/* ⚠ THE LABELS ARE THE CARDS' OWN NAMES SINCE 17.10.2026 — where his deck's
+   card (`research/colours/cards/`) names a colour differently from what this
+   chart called it, the card's name wins: the card is what Peretz holds when he
+   orders. Eleven rows renamed (מוקה, אפור פשתן, אפור קלאסי, אפור בטון, שמנת
+   חלבית, גרז', אפור בזלת, גרפיט, קפוצ'ינו, ירוק פסגות, אפור שמיים) with a plain
+   English and Russian translation. Labels are not a wire format; the ID and
+   the CODE never change, and the code is what the order carries. 9016D and
+   9005D keep לבן and שחור (the cards say "Extra White" / "Extra Black"). */
 export const COLOURS = [
   /* dark */
   { id: 'rb-9005d', ral: '9005D', hex: '#1D1A18', he: 'שחור',           en: 'Black', ru: 'Чёрный',          aliases: ['ral-9005'] },
-  { id: 'rb-7021d', ral: '7021D', hex: '#2D2D2B', he: 'אפור פחם',       en: 'Charcoal', ru: 'Угольно-серый' },
+  { id: 'rb-7021d', ral: '7021D', hex: '#2D2D2B', he: 'גרפיט', en: 'Graphite', ru: 'Графит' },
   { id: 'rb-5103d', ral: '5103D', hex: '#3D3F54', he: 'כחול לילה',      en: 'Night blue', ru: 'Ночной синий',     aliases: ['ral-5011'] },
-  { id: 'rb-7126d', ral: '7126D', hex: '#453F3F', he: 'חום-אפור כהה',   en: 'Dark umber', ru: 'Тёмная умбра',     aliases: ['ral-7022'] },
+  { id: 'rb-7126d', ral: '7126D', hex: '#453F3F', he: 'אפור בזלת', en: 'Basalt grey', ru: 'Базальтовый серый',     aliases: ['ral-7022'] },
   { id: 'rb-0097d', ral: '0097D', hex: '#4B4952', he: 'אפור אנתרציט',   en: 'Anthracite', ru: 'Антрацит',     aliases: ['ral-7016', 'ral-7024'] },
-  { id: 'rb-6459d', ral: '6459D', hex: '#4F6454', he: 'ירוק בקבוק',     en: 'Bottle green', ru: 'Бутылочно-зелёный',   aliases: ['ral-6009'] },
+  { id: 'rb-6459d', ral: '6459D', hex: '#4F6454', he: 'ירוק פסגות', en: 'Summit green', ru: 'Горный зелёный',   aliases: ['ral-6009'] },
   { id: 'rb-rb09d', ral: 'RB09D', hex: '#55412F', he: 'חום',            en: 'Brown', ru: 'Коричневый',          aliases: ['ral-8017', 'ral-3005'] },
-  { id: 'rb-7110d', ral: '7110D', hex: '#565357', he: 'אפור כהה',       en: 'Dark grey', ru: 'Тёмно-серый',      aliases: ['ral-8019'] },
+  { id: 'rb-7110d', ral: '7110D', hex: '#565357', he: 'אפור בטון', en: 'Concrete grey', ru: 'Бетонный серый',      aliases: ['ral-8019'] },
 
   /* mid */
-  { id: 'rb-7322d', ral: '7322D', hex: '#61697A', he: 'כחול פלדה',      en: 'Steel blue', ru: 'Стальной синий' },
+  { id: 'rb-7322d', ral: '7322D', hex: '#61697A', he: 'אפור שמיים', en: 'Sky grey', ru: 'Небесно-серый' },
   { id: 'rb-6219d', ral: '6219D', hex: '#7A8272', he: 'ירוק מרווה',     en: 'Sage green', ru: 'Шалфейный',     aliases: ['ral-7036', 'ral-7033'] },
-  { id: 'rb-0096d', ral: '0096D', hex: '#86868A', he: 'אפור בינוני',    en: 'Mid grey', ru: 'Средне-серый',       aliases: ['ral-7046'] },
-  { id: 'rb-7240d', ral: '7240D', hex: '#A1928A', he: 'טאופ',           en: 'Taupe', ru: 'Тёмно-бежевый',          aliases: ['ral-1035'] },
-  { id: 'rb-2030d', ral: '2030D', hex: '#BF9367', he: 'קרמל',           en: 'Caramel', ru: 'Карамель' },
+  { id: 'rb-0096d', ral: '0096D', hex: '#86868A', he: 'אפור קלאסי', en: 'Classic grey', ru: 'Классический серый',       aliases: ['ral-7046'] },
+  { id: 'rb-7240d', ral: '7240D', hex: '#A1928A', he: 'מוקה', en: 'Mocha', ru: 'Мокко',          aliases: ['ral-1035'] },
+  { id: 'rb-2030d', ral: '2030D', hex: '#BF9367', he: 'קפוצ\'ינו', en: 'Cappuccino', ru: 'Капучино' },
 
   /* light */
-  { id: 'rb-7080d', ral: '7080D', hex: '#B7B4B2', he: 'אפור בהיר',      en: 'Light grey', ru: 'Светло-серый',     aliases: ['ral-7040'] },
-  { id: 'rb-9001d', ral: '9001D', hex: '#DDCDBD', he: 'שמנת',           en: 'Cream', ru: 'Кремовый',          aliases: ['ral-1013', 'ral-7035'] },
-  { id: 'rb-9302d', ral: '9302D', hex: '#ECEBE7', he: 'לבן שבור',       en: 'Off-white', ru: 'Молочно-белый' },
+  { id: 'rb-7080d', ral: '7080D', hex: '#B7B4B2', he: 'אפור פשתן', en: 'Linen grey', ru: 'Льняной серый',     aliases: ['ral-7040'] },
+  { id: 'rb-9001d', ral: '9001D', hex: '#DDCDBD', he: 'שמנת חלבית', en: 'Milky cream', ru: 'Молочно-кремовый',          aliases: ['ral-1013', 'ral-7035'] },
+  { id: 'rb-9302d', ral: '9302D', hex: '#ECEBE7', he: 'גרז\'', en: 'Greige', ru: 'Грейдж' },
   { id: 'rb-9016d', ral: '9016D', hex: '#F1F0EA', he: 'לבן',            en: 'White', ru: 'Белый',          aliases: ['ral-9016'] },
 
   /* ⚠ FOUR CARDS FROM HIS DECK, APPENDED — 17.10.2026. The owner's son
