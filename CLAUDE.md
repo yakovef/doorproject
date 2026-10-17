@@ -262,6 +262,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **17.10** FOUR CARDS FROM HIS DECK (*"Add all of these colours … all of them
+  except the three that are free should be +200"*): 7345D אפור אורבני, 8075D
+  שוקולד קקאו, 8002D חמרה, 9077D חול ים APPENDED to `COLOURS` (21, no
+  `VERSION`), ₪200 each; hexes MEASURED off his photographs against each
+  card's label, calibrated leave-one-out (`research/colours/README.md`); held
+  out of the gallery's fit, which would have repainted seven doors. Long form: `HISTORY.md`.
 - **17.10** The colour deck photographed (`research/colours/cards/1-5.jpg`,
   the owner's son): 18 cards, 14 already in the chart and four not (7345D,
   8075D, 8002D, 9077D); every card +₪200 but the three included ones. The
@@ -288,17 +294,6 @@ lines here. Dates are the day of the change.
   in the column BESIDE it (stacked, eleven marks were pulled onto the price
   on 22 glazed doors), stacked on six named; `present()` feeds the way on/back and "N of
   M" (9 or 10). T15's typed list had left out `xlock`. Long form: `HISTORY.md`.
-- **2.10** A RESET (*"…2 curved arrows that create a circle"*): the undo
-  group's third pill, outermost, greyed on the default door; it asks, and yes
-  is one undoable step back to the default door, step 01, no checks, a bare
-  address, a toast. On a phone three discs, no words (their answer); beside the
-  52 px arrows the 144 px stack meets them at six named readings, and in Hebrew
-  the glyphs' row precedes the labelled stack for the column (§9). Long form: `HISTORY.md`.
-- **2.10** The send bigger and more present (C, 3 of 3) — *"Make the WhatsApp
-  button bigger"*: on the desktop wall a green 48 px pill, 1 rem at 700, flush
-  with the price, wrapping before it shrinks (one three-line reading named);
-  the bar's send 48 px, .95 rem at 700, the bar still 67 px. Four readings of
-  the column touching the taller price named. Long form: `HISTORY.md`.
 
 ---
 
@@ -2296,7 +2291,7 @@ edit if Peretz says otherwise. `ASK-PERETZ.md` carries the open ones in Hebrew.
 | A7 | The peephole and security latch are standard on every door — the עינית is a ₪0 CHOICE on this strength (the latch was offered as a priced-later choice for one day, 27.9, and withdrawn 28.9) | one number, and whether the tile says כלול |
 | A8 | ~~A single bottom panel is ₪725~~ — closed 14.9: the panel belongs to `WINDOWS.rect` | — |
 | A9 | ~~`Math.ceil` on the handle's 20 cm steps~~ — closed 20.9: two length bands | — |
-| A10 | ~~Colours are all included~~ — settled 30.8: three included, fourteen at +₪200 | — |
+| A10 | ~~Colours are all included~~ — settled 30.8: three included, the rest at +₪200 (fourteen then, eighteen since the deck's four, 17.10) | — |
 | A11 | Panels and stripes are mutually exclusive | one rule in `js/rules.js` |
 | A12 | ~~`barblack` priced as a bar~~ — closed 20.9: black is a finish | — |
 | A13 | `strip` (צוהר גבוה, 27×142 cm) is his "tall" and `rect` (36×90 cm) his "square" | **which window carries ₪4,200 and which ₪3,800** |

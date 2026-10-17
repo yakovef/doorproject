@@ -38,6 +38,77 @@ into `research/colours/README.md`.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **17.10 — PROMPT G, 1 OF 2: FOUR CARDS FROM HIS DECK, MEASURED.** The owner's
+  son, with five photographs of the רב-בריח fan deck (`research/colours/cards/`):
+  *"Add all of these colours to the section where you select a colour for the
+  door. Some of these colours we already have, and all of them except the three
+  that are free should be +200 shekels."*
+  · **The deck as read.** Eighteen cards whole in frame: fourteen codes the
+    chart already carries (7240D 7080D 0096D 7110D 9016D 9001D 9302D 7126D
+    7021D 9005D 2030D 6219D 6459D 7322D) and four it did not — **7345D אפור
+    אורבני, 8075D שוקולד קקאו, 8002D חמרה, 9077D חול ים**. A `1013T` card and a
+    green leaf are only partly in frame in `2.jpg` — not added; one line in
+    `ASK-PERETZ.md` (0a9). Three chart colours are not in the photographs
+    (5103D, 0097D, RB09D) and stay — an id is a wire format, and the deck has
+    more leaves than he photographed.
+  · **What it is.** Four entries APPENDED to `COLOURS` (indices 17–20; the
+    code packs the index, so nothing before them moves — 21 colours in 5 bits,
+    no `VERSION`), each with its card's code and name; `COLOUR` in
+    `js/prices.js` at 200 each. The screen's two groups take them by `delta`;
+    the tile, the summary's swatch, the message, the A4 sheet and the
+    breakdown by derivation. ₪3,195 does not move.
+  · **The hexes, measured** (method and every number in
+    `research/colours/README.md`). Per card: the label's white (bright,
+    unsaturated sticker pixels — text, logo and badge drop out) as the local
+    white; the blade's median over a box clear of label, edges, neighbours and
+    the thumb (each box checked on an overlay — two first placements that read
+    a spread of 23–41 were on a label edge or a neighbouring blade, and moved);
+    white balance in linear light so the label reads the page's paper; then a
+    LIGHTNESS correction in CIELAB, `L' = 1.193 L − 16.19`, chroma × 1.10,
+    fitted on the twelve non-metallic known cards (the metallic 0096D and
+    7110D read 17–23 ΔE off their chart hexes even white-balanced — glitter —
+    and are left out; none of the four is metallic). White balance alone
+    missed the dark cards (9005D 17.2) because the sanded finish throws the
+    room back; a flare offset in linear light was tried and REJECTED — it
+    clipped the darks to black, turned the browns orange and was worse
+    leave-one-out (median 9.5 against 8.0). **Calibration, leave-one-out**:
+    9016D **1.0**, 9005D **8.8**, 7021D **3.7**, 7126D **6.4** ΔE76 from the
+    chart's hexes; the closest two of the new four are **16.7** apart
+    (8002D ~ 8075D), the rest 25.6–56.6. Readings: **7345D #74706A, 8075D
+    #483527, 8002D #6E462B, 9077D #D4C5A8**. Nearest existing: 8075D ~ RB09D
+    5.7 (close on the raster, different cards in his hand).
+  · **⚠ A finding: the gallery would have moved.** `npm run sheets` reruns
+    the corpus fitter, which takes the nearest chart colour inside the family
+    a person named. With the four in its pool it repainted seven of the thirty
+    gallery doors — d030 d038 d063 d072 d078 d099 onto 7345D (the chart had no
+    warm mid grey; now it has one), and **d087, a black door, onto 8075D
+    cocoa** (its L* is under the "black" test's 24). A street-lit median is not
+    evidence enough to repaint a photographed door, and the brief predicted
+    the gallery keeps its colours — so `tools/corpus.mjs` holds the deck's
+    cards out of the gallery's fit (`DECK_ONLY`, with that reason); re-run,
+    `js/works.js` and `corpus-links.md` are byte-identical.
+  · **The dark-door twins, re-read on 8075D** (the darkest of the four): a
+    window design's black twin and door-colour twin, rendered and compared
+    pixel for pixel over the pane — 1.7–6.5 % of it differs by more than 30,
+    design by design, as on the default 7126D (within 0.3 points); 9005D black
+    is where the etched three collapse to 0 %, unchanged.
+  · **Units.** For each of the four, by id: appended at its index; its card's
+    code; ₪3,395 on the standard door; a hex no other colour has and a door no
+    other colour draws; the hex the README's measurement records (a retyped
+    hex breaks against its record); 21 colours inside the 5-bit field; no
+    gallery door on a deck card. The existing walk prices every colour, three
+    included and the rest +₪200.
+  · **Falsified.** One card dropped from `COLOURS` → the catalogue's load
+    guard throws on its orphaned price ("a renamed id, or a price nobody will
+    ever be charged") — the price table's clause, before a test runs; dropped
+    with its price too → the length clause ("the chart holds 20 colours") and the index clause
+    ("rb-9077d is not appended at index 20") fail — 8 rows red with the
+    five sheet-staleness rows and the copy's unbuilt bundle.
+  · **Not done, on purpose:** the half-framed `1013T` and green (asked); the
+    three chart colours absent from the photographs (stay); re-measuring the
+    existing fourteen (the brief: no existing hex changes — the metallic two
+    read far off theirs, recorded in the README for another round).
+
 - **10.10 — PROMPT F, 3 OF 3: THE TOUR'S POINTERS CURVE.** The owner's son:
   *"At the third step of the tutorial the lines leading to the arrows beside the
   door must not be horizontal — it looks very ugly and is not intuitively
@@ -4139,6 +4210,17 @@ into `research/colours/README.md`.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **2.10** A RESET (*"…2 curved arrows that create a circle"*): the undo
+  group's third pill, outermost, greyed on the default door; it asks, and yes
+  is one undoable step back to the default door, step 01, no checks, a bare
+  address, a toast. On a phone three discs, no words (their answer); beside the
+  52 px arrows the 144 px stack meets them at six named readings, and in Hebrew
+  the glyphs' row precedes the labelled stack for the column (§9). Long form: `HISTORY.md`.
+- **2.10** The send bigger and more present (C, 3 of 3) — *"Make the WhatsApp
+  button bigger"*: on the desktop wall a green 48 px pill, 1 rem at 700, flush
+  with the price, wrapping before it shrinks (one three-line reading named);
+  the bar's send 48 px, .95 rem at 700, the bar still 67 px. Four readings of
+  the column touching the taller price named. Long form: `HISTORY.md`.
 - **2.10** The arrows remade (C, 2 of 3) — *"bigger and more noticeable"*:
   60 px paper discs on a shadow, no ring, a 26 px chevron at 3, inverting on
   hover; 56 px at 1100–1199, 52 on a phone. On no door, column, price, band or

@@ -928,6 +928,37 @@ group('price');
   // A link shared before the chart replaced the list must still open a door.
   ok(P({ colour: 'ral-9005' }) === P({ colour: 'rb-9005d' }), 'retired ral-9005 should still resolve');
   ok(byId(COLOURS, 'ral-7016').id === 'rb-0097d', 'anthracite alias should land on 0097D');
+  /* ⚠ FOUR CARDS FROM HIS DECK, 17.10.2026 — the owner's son: *"Add all of
+     these colours … all of them except the three that are free should be +200
+     shekels."* Asked of each by id: APPENDED (indices 17–20 — the code packs
+     the index, so nothing before them may move, and the list fits its 5 bits);
+     its card's code; ₪200 on the standard door; a hex no other colour has,
+     and a drawing no other colour draws; and the hex the one the
+     measurement wrote down (`research/colours/README.md`), so a hex retyped
+     by eye here breaks against its own record. And the gallery keeps its
+     colours: no gallery door was moved onto a deck card (`tools/corpus.mjs`
+     `DECK_ONLY` — offered them, the fitter repainted seven, d087's black
+     onto cocoa). Falsified by dropping one: the length and the price table
+     both fail. */
+  {
+    const DECK = [['rb-7345d', '7345D'], ['rb-8075d', '8075D'], ['rb-8002d', '8002D'], ['rb-9077d', '9077D']];
+    const readme = readFileSync('research/colours/README.md', 'utf8');
+    ok(COLOURS.length === 21 && COLOURS.length <= 2 ** BITS.colour,
+       `the chart holds ${COLOURS.length} colours — 17 and the deck's four, inside the ${2 ** BITS.colour} the code's ${BITS.colour} bits can name`);
+    DECK.forEach(([id, ral], i) => {
+      const c = COLOURS.find(o => o.id === id);
+      ok(c && COLOURS.indexOf(c) === 17 + i, `${id} is not appended at index ${17 + i} (found ${c ? COLOURS.indexOf(c) : 'nothing'}) — an index moved is a code that opens another door`);
+      if (!c) return;
+      ok(c.ral === ral, `${id} carries the code ${c.ral}, not its card's ${ral}`);
+      ok(P({ handle: 'none', colour: id }) === 3395, `${id} is ₪${P({ handle: 'none', colour: id }) - 3195} over the standard door — +₪200, his rule`);
+      ok(COLOURS.filter(o => o.hex.toUpperCase() === c.hex.toUpperCase()).length === 1, `${id}'s hex ${c.hex} is another colour's too`);
+      ok(readme.includes(`**${c.hex.toUpperCase()}**`), `${id}'s hex ${c.hex} is not the one the measurement recorded in research/colours/README.md`);
+      const drawn = render({ ...base, colour: id });
+      ok(COLOURS.every(o => o.id === id || render({ ...base, colour: o.id }) !== drawn), `${id} draws the same door as another colour`);
+    });
+    const onDeck = WORKS.filter(w => DECK.some(([id]) => w.state.colour === id));
+    ok(!onDeck.length, `gallery doors repainted onto a deck card: ${onDeck.map(w => `${w.id} ${w.state.colour}`).join(', ')} — the gallery keeps its colours`);
+  }
   ok(P({ size: 'extra1' }) === 4495, 'the חריגה band, with the fixture\'s Idan bar on it');
   /* ⚠ AND THE THREE WITHDRAWN IDS MUST LAND ON THE BAND THEY WERE ALREADY IN,
      AT THE PRICE THEY ALREADY HAD. `wide` and `tall` were both +25% and are

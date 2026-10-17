@@ -154,13 +154,26 @@ const classOf = hex => {
   return { ...l, C: Math.hypot(l.a, l.b) };
 };
 
+/* ⚠ THE FOUR CARDS HIS DECK ADDED ARE NOT OFFERED TO THE GALLERY'S FIT —
+   17.10.2026. They came from the owner's son's photographs of the fan deck
+   (`research/colours/cards/`), not from any installed door, and offering them
+   here would recolour seven of the thirty gallery doors on the next `npm run
+   corpus`, measured the day they were added: d030 d038 d063 d072 d078 d099
+   onto 7345D (a warm mid grey — the chart had none, see `grey` above), and
+   d087 — a BLACK door, family "black" — onto 8075D cocoa, because a dark
+   chocolate's L* is under the black test's 24. A street-lit median is not
+   evidence enough to repaint a photographed door, and the brief's prediction
+   was that the gallery keeps its colours. A deck card enters the gallery when
+   a person looking at that door's photograph says it is that card. */
+const DECK_ONLY = new Set(['rb-7345d', 'rb-8075d', 'rb-8002d', 'rb-9077d']);
+
 function colourOf(hex, family) {
   const a = toLab(hex);
   const test = FAMILY[family];
-  let pool = COLOURS;
+  let pool = COLOURS.filter(c => !DECK_ONLY.has(c.id));
   let narrowed = false;
   if (test) {
-    const kept = COLOURS.filter(c => test(classOf(c.hex)));
+    const kept = pool.filter(c => test(classOf(c.hex)));
     if (kept.length) { pool = kept; narrowed = true; }
   }
   let best = null, bestD = Infinity;

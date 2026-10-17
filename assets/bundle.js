@@ -1420,7 +1420,13 @@
     "rb-7240d": 200,
     "rb-2030d": 200,
     "rb-7080d": 200,
-    "rb-9302d": 200
+    "rb-9302d": 200,
+    /* the four cards his deck added, 17.10.2026 — the owner's son: *"all of them
+       except the three that are free should be +200 shekels."* */
+    "rb-7345d": 200,
+    "rb-8075d": 200,
+    "rb-8002d": 200,
+    "rb-9077d": 200
   };
 
   // js/catalog.js
@@ -1536,7 +1542,27 @@
     { id: "rb-7080d", ral: "7080D", hex: "#B7B4B2", he: "אפור בהיר", en: "Light grey", ru: "Светло-серый", aliases: ["ral-7040"] },
     { id: "rb-9001d", ral: "9001D", hex: "#DDCDBD", he: "שמנת", en: "Cream", ru: "Кремовый", aliases: ["ral-1013", "ral-7035"] },
     { id: "rb-9302d", ral: "9302D", hex: "#ECEBE7", he: "לבן שבור", en: "Off-white", ru: "Молочно-белый" },
-    { id: "rb-9016d", ral: "9016D", hex: "#F1F0EA", he: "לבן", en: "White", ru: "Белый", aliases: ["ral-9016"] }
+    { id: "rb-9016d", ral: "9016D", hex: "#F1F0EA", he: "לבן", en: "White", ru: "Белый", aliases: ["ral-9016"] },
+    /* ⚠ FOUR CARDS FROM HIS DECK, APPENDED — 17.10.2026. The owner's son
+       photographed the רב-בריח fan deck (`research/colours/cards/1-5.jpg`): *"Add
+       all of these colours to the section where you select a colour for the
+       door … all of them except the three that are free should be +200
+       shekels."* Fourteen of its eighteen cards were already here; these four
+       were not. APPENDED, not slotted into the dark/mid/light runs above: the
+       short code packs the colour as an INDEX, and appending moves no index
+       (§1 — no `VERSION`); the screen orders the chart by price, not by this
+       array. Each `hex` is MEASURED off the photographs, never typed by eye —
+       the card's own white label as the local white (white-balanced to the
+       page's paper in linear light), then a lightness correction in CIELAB
+       fitted on the twelve non-metallic cards the chart already carries and
+       judged leave-one-out (9016D lands 1.0 ΔE from its chart hex, 7021D 3.7,
+       7126D 6.4, 9005D 8.8; the closest two of these four are 16.7 apart).
+       The method, the readings and every distance are in
+       `research/colours/README.md`. Names are the cards' own. */
+    { id: "rb-7345d", ral: "7345D", hex: "#74706A", he: "אפור אורבני", en: "Urban grey", ru: "Городской серый" },
+    { id: "rb-8075d", ral: "8075D", hex: "#483527", he: "שוקולד קקאו", en: "Cocoa", ru: "Какао" },
+    { id: "rb-8002d", ral: "8002D", hex: "#6E462B", he: "חמרה", en: "Terracotta", ru: "Терракота" },
+    { id: "rb-9077d", ral: "9077D", hex: "#D4C5A8", he: "חול ים", en: "Sea sand", ru: "Морской песок" }
   ];
   var WINDOWS = [
     { id: "none", he: "ללא חלון", en: "Solid", ru: "Без окна", rects: [] },

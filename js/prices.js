@@ -607,4 +607,7 @@ export const COLOUR = {
   'rb-6459d': 200, 'rb-rb09d': 200, 'rb-7110d': 200, 'rb-7322d': 200,
   'rb-6219d': 200, 'rb-0096d': 200, 'rb-7240d': 200, 'rb-2030d': 200,
   'rb-7080d': 200, 'rb-9302d': 200,
+  /* the four cards his deck added, 17.10.2026 — the owner's son: *"all of them
+     except the three that are free should be +200 shekels."* */
+  'rb-7345d': 200, 'rb-8075d': 200, 'rb-8002d': 200, 'rb-9077d': 200,
 };
