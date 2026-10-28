@@ -83,9 +83,9 @@ obvious thing to use?** Correct and dull is a real failure on a page whose job
 is to make a stranger confident enough to send an order to a man they have
 never met. You may restructure the flow, retype it, relight it, rewrite the
 copy, redraw the brand and the favicon, change what a step contains, or decide
-a step should not exist. `DESIGN-LEVEL.md` and `GUIDED-FLOW.md` on
-`origin/claude/app-design-mockup-review-qt00n6` are the standing north-star for
-what "good" means here — `git show` them, do not copy them onto this branch.
+a step should not exist. `DESIGN-LEVEL.md` and `GUIDED-FLOW.md`, at the repository's
+root, are the standing north-star for what "good" means here (they came from
+the design-mockup review, merged long ago; its branch was deleted 28.10.2026).
 
 ⚠ **The DOOR is the exception.** It is governed by REALISM.md §6 — compare
 against a photograph, every time — so ambition there means measuring something
@@ -212,8 +212,10 @@ Adding an option means adding its price there in the same commit: `priceInto`
 in `catalog.js` throws at load if an option has no price or a price has no
 option, because the alternative is a door that silently costs nothing.
 
-**3. Never push anywhere but `claude/door-builder-website-plan-rgg7gu`, and
-never open a pull request.** That branch is what GitHub Pages serves.
+**3. Never push anywhere but `main`, never create a branch, and never open a
+pull request.** `main` is the only branch, for ever (the owner's son,
+28.10.2026), and the branch GitHub Pages serves. Fetch and rebase before you
+push; never force-push.
 
 **4. Never change a measured number by eye.** `FALLOFF`, `MOULD`,
 `PANEL_INSET`, the hardware footprints — these came from photographs and from
@@ -502,7 +504,7 @@ Two things follow for you:
 
 - **Push early if a run is long.** Anything not pushed lives only in an
   ephemeral container.
-- **`git fetch` first, every run.** A human works on this branch too, and you
+- **`git fetch` first, every run.** A human works on `main` too, and you
   are long-lived, so your working copy can be stale in a way a fresh session's
   never is. Pull or rebase; never force.
 

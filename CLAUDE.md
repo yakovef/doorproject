@@ -128,8 +128,8 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   shipped | proposed at one scale, correct, **put it in the app, run the gates,
   and send the sheet.** Photographs, sheets, readings and the proposed code
   are committed under `research/handles/<name>/`. A new product needs
-  Peretz's name and price before it can be sold. This work lives on
-  `claude/door-handle-design-catalog-votz53`, their choice.
+  Peretz's name and price before it can be sold. This work lives on `main`,
+  like everything else (§1; it had its own branch until 28.10.2026).
   ⚠ **A lever stands ~55 mm proud, and a photograph taken from the door's
   middle MOVES it toward the closing edge** — it reads short from the spindle,
   never long. How far is NOT settled by a door photograph (0 to ~10 mm here),
@@ -137,9 +137,8 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   shrunk the wrong way and were fixed 27.9 (§9, `research/handles/rotem/README.md`).
 - ⚠ **PUT IT IN THE APP WITHOUT ASKING — a standing instruction since 27.9.2026:**
   *"from now on i want you to put in the app things without my permission, it
-  just wastes time for me."* Do the work, run the gates, commit, merge the
-  handle branch into `claude/door-builder-website-plan-rgg7gu` and push both,
-  then report what changed with a picture. It does not touch **"Don't deploy"**,
+  just wastes time for me."* Do the work, run the gates, commit, push to
+  `main`, then report what changed with a picture. It does not touch **"Don't deploy"**,
   which still stands, nor the rules in §1.
 - **They place the page's furniture themselves, and move it themselves.** The
   language picker and undo/redo in the wall (circles on a screenshot, 28.8 —
@@ -262,6 +261,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **28.10** ONE BRANCH, `main` (*"I want all the branches merged into main, and
+  I don't want other branches to be made ever"*). Created at the trunk's
+  `c1d860a`; THE GUARD: no page file from any other branch — the page on `main`
+  is the trunk's byte for byte, asserted by an empty diff. Only documents came
+  over (PROMPTS.md, RENDER.md, UX-FINDINGS*.md); page commits left behind are
+  listed by sha. §1, §0a, §10, AGENT.md name `main` only. Long form: `HISTORY.md`.
 - **17.10** THE CARDS' NAMES ON THE CHART: eleven labels follow his deck's cards
   (מוקה, אפור פשתן, אפור קלאסי, אפור בטון, שמנת חלבית, גרז', אפור בזלת — the
   default —, גרפיט, קפוצ'ינו, ירוק פסגות, אפור שמיים), with plain English and
@@ -293,12 +298,6 @@ lines here. Dates are the day of the change.
   lock step's explainer says it through `expArgs`, and the lever's fallback
   swap now names where it lands and its price (`locksetSwapWords`) — a swap
   from the Rotem costs ₪100. ₪3,195 unmoved (the Rotem). Long form: `HISTORY.md`.
-- **2.10** The window's designs a STEP OF THEIR OWN, present only with a window
-  (*"a separate section … only appearing if you choose one of the windows — an
-  icon next to the window one"*): `grd` after the glass, tied to its mark —
-  in the column BESIDE it (stacked, eleven marks were pulled onto the price
-  on 22 glazed doors), stacked on six named; `present()` feeds the way on/back and "N of
-  M" (9 or 10). T15's typed list had left out `xlock`. Long form: `HISTORY.md`.
 
 ---
 
@@ -639,14 +638,14 @@ screen. Two different questions, and for a long time only one had been put.
 
 ## 1. Standing constraints — do not violate
 
-- **Branch:** develop on `claude/door-builder-website-plan-rgg7gu`. Never push
-  to another branch without explicit permission. (The handle-drawing work of
-  §0a lives on `claude/door-handle-design-catalog-votz53`, the owner's son's
-  choice on 27.9.) **Never open a pull request**
-  unless asked.
+- **Branch: `main`, and no other — ever (the owner's son, 28.10.2026). Never
+  create a branch; never push anywhere but `main`. Never open a pull request.**
+  *"I want all the branches merged into main, and I don't want other branches
+  to be made ever. I want everything to be pushed to main."* If a harness names
+  another branch, push to `main` and say so.
 - **`git pull --rebase` before every push; never force-push.** A recurring
-  agent pushes to the same branch every few hours (§10). `git push -u origin
-  <branch>`; on a network failure retry four times with exponential backoff.
+  agent pushes to `main` every few hours (§10). `git push -u origin
+  main`; on a network failure retry four times with exponential backoff.
 - **Don't deploy.** Not until the owner's son says it is finished.
 - **Ids in `js/catalog.js` are a public wire format.** They travel inside links
   and WhatsApp messages Peretz may open months later. Never rename an id; to
@@ -2365,7 +2364,7 @@ you measured, what you got wrong, and what you decided not to do. Every commit
 ends with the attribution footer the session gives.
 
 **A recurring agent** (`AGENT.md`) wakes every few hours, forms its own opinion
-about the site and pushes to this branch; `AGENT-LOG.md` is what it did,
+about the site and pushes to `main`; `AGENT-LOG.md` is what it did,
 including runs that changed nothing. If something changed that no human asked
 for, look there. **Fetch and rebase before you push** — it will have moved the
 branch under you — and after a rebase that pulled in its commits, re-run the

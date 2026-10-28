@@ -38,6 +38,65 @@ into `research/colours/README.md`.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **28.10 — PROMPT H: ONE BRANCH, `main`, AND THE PAGE DOES NOT MOVE.** His
+  words: *"I want all the branches merged into main, and I don't want other
+  branches to be made ever. I want everything to be pushed to main."* and
+  *"Make sure that the website won't downgrade with this."*
+  Ours, named so he can reverse any in a line: `main` was CREATED at
+  `c1d860a`, the head of `claude/door-builder-website-plan-rgg7gu` (every
+  round since August; there was no `main`). **The guard:** no commit from
+  any other branch touches `index.html`, `css/`, `js/`, `assets/`, `test/` or
+  `tools/` on `main`; an old branch is an old attempt, measured on a page the
+  trunk has since moved past. Only files outside the page came over, each by
+  a merge commit (`--no-ff`), never rebased, never squashed.
+  · **The branches, measured 28.10** (ahead / behind the trunk):
+    `app-design-mockup-review-qt00n6` `02a9543` 0/21 — fully merged;
+    `door-handle-design-catalog-votz53` `4fbb96c` 0/26 — fully merged;
+    `eloquent-cori-i0kfjb` `0de46af` 2/11 — page + sheets;
+    `app-review-upgrades-2gn7vq` `5c5c571` 6/112 — page + three new documents;
+    `elegant-knuth-89z101` `54b647d` 4/100 — page + sheets (its documents and
+    photographs already on the trunk, identical);
+    `prompt-optimization-guide-a22nek` `df4a8ad` 1/284 — PROMPTS.md;
+    `vibrant-bell-az9c38` `ad9394e` 2/112 — page + sheets.
+  · **Merged, documents only:** `cfdc01b` brings RENDER.md, UX-FINDINGS.md
+    and UX-FINDINGS2.md from `app-review-upgrades` (UX-FINDINGS.md is cited
+    eight times below and was never in the trunk — those citations no longer
+    dangle); `e402be8` brings PROMPTS.md, the prompt-writing chat's memory.
+    Both merges took the new files and nothing else (`git merge --no-ff
+    --no-commit`, then `git checkout HEAD -- .`); `prompt-optimization`'s
+    CLAUDE.md hunk, an August paragraph naming its own branch, was not taken.
+  · **Left behind, for him to say** — page commits, NOT merged:
+    `eloquent-cori` `5ee5b8f` 2.10 "The redesign round, prompt 1: words,
+    destinations, names, quieter chrome" and `0de46af` 2.10 its sheets — **work
+    the trunk lacks and he asked to see first** (*"before you push that to the
+    main branch i would like to see how it looks"*); it was never shown and
+    never merged. `app-review-upgrades` `b3ab973` `f13ba27` `666c9b3`
+    `5cc598c` `fcb54b2` `5c5c571` (25.9, a UX round; reachable for ever as
+    parents of `cfdc01b`). `elegant-knuth` `c135061` `fc6d0e6` `2fdb0ed`
+    `54b647d` (27–29.9, the ironwork — the trunk already draws five bars, ported
+    in `d797065`). `vibrant-bell` `c2f8175` `ad9394e` (25.9, eight notes and a
+    traced vine — the trunk traced its own on 26.9).
+  · **The law rewritten:** CLAUDE.md §1's first bullet is his line; §0a's
+    handle paragraph, its "merge the handle branch … push both", §10's
+    recurring agent, AGENT.md's never #3 and its north-star note, README's
+    Pages instructions and PROMPTS.md now name `main` only. The rebase-before-
+    push rule stays. Old branch names inside this archive and AGENT-LOG.md stay:
+    they are the record.
+  · **Not done by us, for him:** the session's proxy refuses branch deletion
+    and repository-settings writes (HTTP 403, policy — not retried). So, in
+    this order: Settings → Pages → source `main` / root; Settings → General →
+    default branch `main`; then delete the eight `claude/…` branches.
+  · **Gates on `main` (`e402be8`), beside the trunk's (`c1d860a`, 17.10):**
+    npm test 13,045,569 passed / 0 failed (the same); audit ✓ no faults (the
+    same; one line differs only in WHICH width holds the 10.6:1 minimum ink —
+    en 1680×950 here, en 1536×864 then, the same figure on identical files);
+    collide `-- all` 1,638 clean and `-- boxes` every fitting inside its
+    declaration, 109 mm against MOUNT_REACH 121 (the same); sheets 0 bare and
+    0 lockset moved, `js/works.js` byte-identical, the 12 `shot` sheets only
+    (§7). The build leaves `assets/bundle.js` and `index.html` unchanged.
+    **The diff assertion** — `git diff c1d860a main --stat -- index.html css
+    js assets test tools` — prints nothing: not a byte of the page moved.
+
 - **17.10 — PROMPT G, 2 OF 2: THE CARDS' NAMES ON THE CHART.** Ours, named so he
   can reverse it in a line: where his deck's card names a colour differently
   from the chart, the card's name wins — the card is what Peretz holds when he
@@ -4248,6 +4307,12 @@ into `research/colours/README.md`.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **2.10** The window's designs a STEP OF THEIR OWN, present only with a window
+  (*"a separate section … only appearing if you choose one of the windows — an
+  icon next to the window one"*): `grd` after the glass, tied to its mark —
+  in the column BESIDE it (stacked, eleven marks were pulled onto the price
+  on 22 glazed doors), stacked on six named; `present()` feeds the way on/back and "N of
+  M" (9 or 10). T15's typed list had left out `xlock`. Long form: `HISTORY.md`.
 - **2.10** A RESET (*"…2 curved arrows that create a circle"*): the undo
   group's third pill, outermost, greyed on the default door; it asks, and yes
   is one undoable step back to the default door, step 01, no checks, a bare

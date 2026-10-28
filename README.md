@@ -23,7 +23,7 @@
 `https://<שם-המשתמש>.github.io/doorproject/`.
 
 להפעיל: **Settings → Pages → Source: Deploy from a branch**, ולבחור את הענף
-`claude/door-builder-website-plan-rgg7gu` ותיקייה `/ (root)`. הקובץ `.nojekyll`
+`main` ותיקייה `/ (root)`. הקובץ `.nojekyll`
 כבר במאגר, וצריך אותו — בלעדיו GitHub מתעלם מתיקיות שמתחילות בקו תחתון.
 
 ### 2. להוריד ולפתוח בלחיצה כפולה — עובד גם בלי אינטרנט ⭐

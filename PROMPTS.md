@@ -66,7 +66,7 @@ once — it changes how the prompts should be written:
   the repo already says otherwise.
 
 **The receiving agent** is a Claude Code session on this repo, on branch
-`claude/door-builder-website-plan-rgg7gu`, which has read `CLAUDE.md`. So:
+`main` — the only branch, for ever (28.10.2026) — which has read `CLAUDE.md`. So:
 
 - **Do not re-explain `CLAUDE.md`. Cite it.** "§5.13 — ids are document-global"
   costs six words and lands harder than a paragraph. Citing also survives the
@@ -376,11 +376,11 @@ read. Otherwise the agent will helpfully build something.
 - **Where the output goes:** a fenced block in the chat, ready to paste, with
   two or three lines from me after it saying what I added and why. Save to a
   file only if asked.
-- **Branch for this chat's own commits:** `claude/prompt-optimization-guide-a22nek`.
-  The main coding agent's branch is `claude/door-builder-website-plan-rgg7gu` —
-  the transformed prompts should say so, and should say **do not open a pull
-  request** unless asked, and **fetch and rebase before pushing** because the
-  recurring agent in `AGENT.md` moves that branch every few hours.
+- **Branch for this chat's own commits:** `main`, like everything else — no
+  other branch is ever made (the owner's son, 28.10.2026). The transformed
+  prompts should say so, and should say **never open a pull request**, and
+  **fetch and rebase before pushing** because the recurring agent in
+  `AGENT.md` moves `main` every few hours.
 - **Keep this file current.** A new failure shape learned in this chat, a
   routing case §4 does not cover, a phrasing that demonstrably worked — it goes
   in here the same day, for the same reason `CLAUDE.md` §0b exists: after a
