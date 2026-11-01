@@ -44,7 +44,8 @@
 
 import { L, T, withLang } from './copy.js';
 import {
-  bellFinish, byId, colourCode, COLOURS, DETAILS, glassRows, glazedPanels, GRILLES, grillePlacement,
+  bellFinish, byId, colourCode, COLOURS, DETAILS, glassRows, glazedPanels, GRILLE_ON, grilleOnOf, GRILLES,
+  grillePlacement,
   gripTakesFinish, handleLength, HANDINGS, HANDLES, HANDLE_FINISHES, isGlazed, LOCKSETS,
   MASHKOFS, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BELLS, BOWS, PEEPHOLES,
 } from './catalog.js';
@@ -148,8 +149,19 @@ export function specRows(state) {
   if (isGlazed(state) && g.id !== 'none') {
     const label = T(g.glass ? 'row.glass' : 'row.grille');
     const name = dropPrefix(L(g), label);
-    rows.push({ key: 'grille', label, id: g.id,
-                value: `${name}${grillePlacement(state)}` });
+    /* ⚠ AND WHICH LEAF IT IS ON, WHEN IT IS NOT BOTH — 1.11.2026. On a
+       door-and-a-half the design can be on the main leaf only or the fixed
+       leaf only (`GRILLE_ON`); the window is on both either way, so without
+       these words Peretz would fit ironwork on a pane the customer left
+       clear — or ring up. Part of the VALUE, so the message, the summary's
+       tile name and the A4 sheet say it off this one statement (§2). Named
+       in place of `grillePlacement`'s "where", which would say the same leaf
+       twice; one pane, so no count. `side` rides on the row for the
+       summary's short name. */
+    const on = grilleOnOf(state);
+    const side = on === 'both' ? null : L(byId(GRILLE_ON, on));
+    rows.push({ key: 'grille', label, id: g.id, ...(side ? { side } : {}),
+                value: side ? `${name}, ${side}` : `${name}${grillePlacement(state)}` });
   }
 
   /* The finish rides on the GRIP, because that is the product it is a fact

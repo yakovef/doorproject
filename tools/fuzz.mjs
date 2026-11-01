@@ -32,7 +32,7 @@
 import { chromium } from 'playwright';
 import { tourless } from './browser.mjs';
 import { assertFreshBundle } from './fresh.mjs';
-import { BELLS, BOWS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES, HANDLE_LENS,
+import { BELLS, BOWS, COLOURS, DETAILS, GRILLE_ON, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES, HANDLE_LENS,
          LOCKSETS, MASHKOFS, PEEPHOLES, PIRZUL, SIZES, SPECIAL_LOCKS, STRIPE_SLOTS,
          unpackStripes, WINDOWS }
   from '../js/catalog.js';
@@ -120,6 +120,10 @@ console.log(`seed ${SEED}\n\nA. ${CASES} random designs, all nine axes at once`)
       handleFinish: pick(HANDLE_FINISHES).id,
       handleLen: pick(HANDLE_LENS),
       grab:    pick(BOWS).id,
+      /* Which leaf the window's design goes on, 1.11.2026 — drawn like every
+         other field; on a door without two glazed leaves and a design,
+         `repair` sends it home. */
+      grilleOn: pick(GRILLE_ON).id,
       ...unpackStripes(Math.floor(r() * STRIPE_SLOTS)),
     };
     /* ⚠ AND THE BOW WAS LEFT OUT THE SAME WAY — 26.9.2026, the day it became a

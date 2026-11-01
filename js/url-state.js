@@ -20,7 +20,7 @@
  * length was THEN; only this header was claiming a present tense.
  */
 
-import { BELLS, BOWS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES,
+import { BELLS, BOWS, COLOURS, DETAILS, GRILLE_ON, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES,
          HANDLE_LEGACY, HANDLE_LENS, LOCKSETS,
          MASHKOFS, packStripes, PEEPHOLES, PIRZUL, SIZE_ALIAS, SIZES, SPECIAL_LOCKS,
          STRIPE_MAX, STRIPE_LEGACY, STRIPE_SLOTS, unpackStripes, WINDOWS } from './catalog.js';
@@ -302,7 +302,24 @@ import { repair } from './rules.js';
    different door. Payload 54 -> 55; `TOTAL_BITS` reserves the check nibble
    before rounding and stays 60, so the code stays twelve characters. The
    `?...=` form is not indexed: a link naming either id opens it. */
-export const VERSION = 28;
+/* ⚠ 29: 1.11.2026. Which leaf of a door-and-a-half the window's design goes
+   on — the owner's son: *"The default when choosing a design should be that it
+   will be on both the doors. They need to be able to choose on which side they
+   want to remove what."* A new two-bit field `grilleOn` (`GRILLE_ON`: both ·
+   main · side, `gs=`) APPENDED at the END of the pack order, after the bow.
+   Nothing moved index — but the code packs its first field highest, so an
+   appended field shifts every field before it, and a v28 code read under this
+   layout would be a different door; it is refused with the version notice.
+   Payload 55 -> 57, and that crosses a character: twelve characters hold 60
+   bits, the check nibble is reserved before the rounding (`CHECK_MIN`), so 57
+   + 4 rounds to 65 and the code is THIRTEEN characters from today. The
+   `version` field went 5 -> 6 bits in the same change (29 was within four of
+   its ceiling — see `BITS`): payload 58, still 65, still thirteen. Nothing was
+   shaved to keep it at twelve — `handle` keeps its spare bit for the products
+   Peretz has not named, and the check keeps its four. The `?...=` form is not
+   indexed: a link without `gs=` opens with the design on both leaves, as it
+   always did. */
+export const VERSION = 29;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -390,6 +407,9 @@ export const DEFAULTS = {
   /* The horizontal bow, a piece of the face since 26.9.2026 — off, like every
      other thing the customer adds. */
   grab: 'nograb',
+  /* Which leaf the window's design goes on, 1.11.2026 — both, which is what
+     every door drew before the field existed (`GRILLE_ON`). */
+  grilleOn: 'both',
   mashkof: 'mk-std',
   pirzul:  'pz-nickel',
   /* ⚠ THE PULL HANDLE'S FINISH, 20.9.2026 — nickel until the customer picks,
@@ -472,6 +492,10 @@ export function toQuery(state) {
      handle until today; checked free in `KNOWN` and `RETIRED` before it was
      taken. */
   p.set('gb', state.grab);
+  /* ⚠ `gs` — WHICH LEAF THE DESIGN GOES ON, 1.11.2026, A NEW PARAMETER. Checked
+     free in `KNOWN` and `RETIRED` before it was taken. A link without it opens
+     with the design on both leaves, which is what every link meant before. */
+  p.set('gs', state.grilleOn);
   p.set('hl', String(state.handleLen));
   /* ⚠ ONE PARAMETER FOR THREE PROPERTIES, the same ordinal the code packs.
      Three separate parameters could carry `sd=h&sc=0` or `sd=none&sc=7` — a
@@ -537,7 +561,7 @@ export function fromQuery(search) {
      language is a fact about the reader, which is also why it is not in the
      short code (see `js/copy.js`). */
   const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'hf', 'hl', 'sp',
-                           'd', 's', 'h', 'bl', 'ey', 'gb',
+                           'd', 's', 'h', 'bl', 'ey', 'gb', 'gs',
                            'code', 'bare', 'sheet', 'lang']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
      still. Withdrawing an option is OUR change and not the customer's mistake,
@@ -706,6 +730,7 @@ export function fromQuery(search) {
   take('bell', 'bl', BELLS);
   take('peephole', 'ey', PEEPHOLES);
   take('grab', 'gb', BOWS);
+  take('grilleOn', 'gs', GRILLE_ON);
   /* ⚠ A NUMBER, SO `take` CANNOT DO IT — `take` resolves an id against a list
      and reports an unknown one. A length is neither: it is one of eight
      values, and anything else is a link we cannot read. Refused with the same
@@ -946,7 +971,12 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    more RB products he has not named yet (ASK-PERETZ §1f then; its answered
    table since 27.9), and a field at its
    ceiling is what the 14.9 lockset overflow was about. Payload 53. */
-export const BITS = { version: 5, colour: 5, size: 3, handing: 2, window: 2,
+/* ⚠ `version` IS SIX BITS SINCE 1.11.2026 (VERSION 29): five bits hold 31, and
+   `npm test` asks for four versions of headroom before a bump rather than
+   during one — 29 left two. Widened inside the same layout change that VERSION
+   29 already is, so it costs no extra bump; 58 + 4 still rounds to 65, and the
+   code stays the thirteen characters `grilleOn` made it. */
+export const BITS = { version: 6, colour: 5, size: 3, handing: 2, window: 2,
                       grille: 5, handle: 4, lockset: 4, detail: 3,
                       speciallock: 2, mashkof: 3, pirzul: 2, handleLen: 4,
                       stripes: 5, bell: 1, peephole: 2, handleFinish: 2,
@@ -954,7 +984,14 @@ export const BITS = { version: 5, colour: 5, size: 3, handing: 2, window: 2,
                          the pack order like the bell before it. Payload 54;
                          `TOTAL_BITS` reserves the check nibble before rounding
                          and stays at 60, so the code stays twelve characters. */
-                      grab: 1 };
+                      grab: 1,
+                      /* Which leaf the design goes on, 1.11.2026: two bits for
+                         three entries, APPENDED after the bow. Payload 58
+                         with the wider version field;
+                         `TOTAL_BITS` reserves the check nibble before rounding,
+                         so it goes 60 -> 65 and the code thirteen characters
+                         (see the note on `VERSION` 29). */
+                      grilleOn: 2 };
 /* The payload does not divide by 5, so the code carries the next multiple up
    and the top bits are always zero. Rounding UP is the only safe direction:
    truncating would drop the low bits of the last field. Both numbers are
@@ -1072,6 +1109,7 @@ export function encodeCode(state) {
     [Math.max(0, PEEPHOLES.findIndex(x => x.id === state.peephole)), BITS.peephole],
     [Math.max(0, HANDLE_FINISHES.findIndex(x => x.id === state.handleFinish)), BITS.handleFinish],
     [Math.max(0, BOWS.findIndex(x => x.id === state.grab)), BITS.grab],
+    [Math.max(0, GRILLE_ON.findIndex(x => x.id === state.grilleOn)), BITS.grilleOn],
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -1141,6 +1179,7 @@ export function decodeCode(code) {
   const peep    = PEEPHOLES[read(BITS.peephole)];
   const hf      = HANDLE_FINISHES[read(BITS.handleFinish)];
   const bow     = BOWS[read(BITS.grab)];
+  const on      = GRILLE_ON[read(BITS.grilleOn)];
   /* ⚠ `hLen === undefined`, NOT `!hLen`. Zero is a VALID value — it is the
      "as the model comes" default and the commonest length in the range — and
      `!0` is true, so a truthiness guard refused every code for an untouched
@@ -1148,13 +1187,13 @@ export function decodeCode(code) {
      "not found"; this one is a number and needed its own test. */
   if (!colour || !size || !handing || !window || !grille || !handle || !lockset
       || !detail || !special || !mashkof || !pirzul || hLen === undefined
-      || !bell || !peep || !hf || !bow) return null;
+      || !bell || !peep || !hf || !bow || !on) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
     speciallock: special.id, mashkof: mashkof.id, pirzul: pirzul.id,
     bell: bell.id, peephole: peep.id, handleFinish: hf.id, grab: bow.id,
-    handleLen: hLen, ...unpackStripes(sp),
+    grilleOn: on.id, handleLen: hLen, ...unpackStripes(sp),
   };
 }

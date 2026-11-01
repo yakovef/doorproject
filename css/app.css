@@ -4623,7 +4623,10 @@ html.is-live .wa__off { display: none; }
   animation: fitPart .30s var(--ease-fit) both;
 }
 #stage[data-changed="window"] #glazing,
-#stage[data-changed="grille"] #glazing { animation: openUp .36s var(--ease-fit) both; }
+#stage[data-changed="grille"] #glazing,
+/* Which leaf the design goes on, 1.11.2026: both leaves' panes, since one of
+   them gained the design and the other lost it. */
+#stage[data-changed="grilleOn"] [data-pane] { animation: openUp .36s var(--ease-fit) both; }
 @keyframes openUp { from { opacity: 0; transform: scaleY(.94); } }
 
 #stage[data-changed="handle"] [data-hw="handle"],

@@ -1128,6 +1128,31 @@ export const BOWS = [
 ];
 
 /**
+ * ⚠ WHICH LEAF THE WINDOW'S DESIGN GOES ON — 1.11.2026, the owner's son:
+ * *"When choosing the door-and-a-half and then choosing a design, it
+ * automatically puts a design on the half door. Figure out where to put an
+ * option of removing a design on either of the sides."* and *"The default when
+ * choosing a design should be that it will be on both the doors. They need to
+ * be able to choose on which side they want to remove what."*
+ *
+ * A field of its own (`grilleOn`, `gs=`, two bits APPENDED after the bow, so
+ * `VERSION` 29), not a second design list: the DESIGN stays one choice, and
+ * this says where it goes. `both` is the default and the list's first entry,
+ * so every link and code written before today opens exactly as it was seen.
+ * Ids are a wire format from today, like every list here.
+ * It means something only where there are TWO glazed leaves and a design —
+ * `grilleOnHasSubject` below — and `repair` sends it home to `both` anywhere
+ * else (`SAID.grilleOnHome`). The WINDOW stays on both leaves whatever this
+ * says (ours: his words name the design; a window on one leaf of a
+ * door-and-a-half is a different door, and `ASK-PERETZ.md` asks him).
+ */
+export const GRILLE_ON = [
+  { id: 'both', he: 'שתי הכנפיים',     en: 'Both leaves',     ru: 'Обе створки' },
+  { id: 'main', he: 'כנף ראשית בלבד', en: 'Main leaf only',  ru: 'Только основная' },
+  { id: 'side', he: 'כנף קבועה בלבד', en: 'Fixed leaf only', ru: 'Только неподвижная' },
+];
+
+/**
  * ⚠ AND THE עינית IS ₪0 BECAUSE IT IS ALREADY INCLUDED, WHICH IS NOT A GUESS.
  * Peretz named no price, and the work order offered ₪0-with-a-question or
  * visible-but-disabled. Neither is needed: `CLAUDE.md` §9 assumption A7 has
@@ -2238,9 +2263,37 @@ export function glazedPanels(state) {
   return out;
 }
 
-/** Total glazed openings in the design. What ironwork is counted in. */
+/**
+ * ⚠ WHERE THE DESIGN GOES ON A DOOR WITH TWO GLAZED LEAVES — 1.11.2026 (see
+ * `GRILLE_ON`). Asked only where the question has a subject: a design chosen,
+ * and glass in the main leaf AND in the side leaf. Everywhere else the answer
+ * is `both`, whatever the state carries, so a state that has not been through
+ * `repair` yet can never count a door's glass away (`isGlazed` reads
+ * `paneCount` below).
+ */
+export const grilleOnHasSubject = state => {
+  if (!state.grille || state.grille === 'none') return false;
+  const ids = glazedPanels(state).map(p => p.id);
+  return ids.includes('leaf') && ids.includes('side');
+};
+export const grilleOnOf = state =>
+  grilleOnHasSubject(state) ? byId(GRILLE_ON, state.grilleOn).id : 'both';
+
+/** The glazed panels that CARRY the design: `glazedPanels`, less the leaf the
+ *  customer took the design off (`grilleOn`). The glass itself is still
+ *  `glazedPanels` — the window stays on both leaves. */
+export const designPanels = state => {
+  const on = grilleOnOf(state);
+  return glazedPanels(state).filter(p => on === 'both' || (on === 'main' ? p.id === 'leaf' : p.id === 'side'));
+};
+
+/** Total glazed openings in the design. What ironwork is counted in.
+ *  ⚠ SINCE 1.11.2026 IT READS `grilleOn`: on a door-and-a-half with the design
+ *  on one leaf, that leaf's pane is the one charged and drawn — so the price,
+ *  `isGlazed`, the spec and the sheet follow from this one statement. With no
+ *  design, or one leaf of glass, it is every pane, as before. */
 export const paneCount = state =>
-  glazedPanels(state).reduce((n, p) => n + p.panes, 0);
+  designPanels(state).reduce((n, p) => n + p.panes, 0);
 
 /**
  * WHERE the ironwork goes, as a phrase, and HOW MANY panels it is.
@@ -2265,7 +2318,11 @@ export const paneCount = state =>
  * panes: the price would double and the message would say nothing.
  */
 export function grillePlacement(state) {
-  const panels = glazedPanels(state);
+  /* The panels that CARRY the design (1.11.2026): the same list `paneCount`
+     counts, so the count and the where cannot disagree. Where the customer
+     took the design off one leaf, `specRows` names the side in words instead
+     (`GRILLE_ON`) and does not ask this. */
+  const panels = designPanels(state);
   const n = paneCount(state);
   const count = n > 1 ? ` (${T('row.units', n)})` : '';
   /* No glass at all: there is no grille to place, and joining an empty list

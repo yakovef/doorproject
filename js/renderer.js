@@ -16,8 +16,8 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { bellFinish, BOWS, byId, COLOURS, DETAILS, FINISHES, gripFinish, GRILLES, HANDINGS, HANDLES,
-         glassRows, handleLength, LOCKSETS, MASHKOF_MAX, MASHKOF_PARTS, MASHKOFS, PEEPHOLES, PIRZUL,
+import { bellFinish, BOWS, byId, COLOURS, DETAILS, FINISHES, gripFinish, GRILLE_ON, grilleOnOf, GRILLES,
+         HANDINGS, HANDLES, glassRows, handleLength, LOCKSETS, MASHKOF_MAX, MASHKOF_PARTS, MASHKOFS, PEEPHOLES, PIRZUL,
          REBATE, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
 import { L, T } from './copy.js';
 import { describeSentence } from './spec.js';
@@ -1797,6 +1797,18 @@ export function render(state) {
   const handing = byId(HANDINGS, state.handing);
   const win     = byId(WINDOWS, state.window);
   const grille  = byId(GRILLES, state.grille);
+  /* ⚠ WHICH LEAF CARRIES THE DESIGN — 1.11.2026 (`GRILLE_ON`). The window is
+     on both leaves whatever this says; the leaf the customer took the design
+     off gets plain glass, the `none` entry, through the same `aperture`. Asked
+     of `grilleOnOf`, the statement `paneCount` counts by, so the drawing and
+     the price cannot disagree about which pane carries it. `design` marks
+     each pane `data-design="on|off"` ONLY when the choice is not both, so
+     every door drawn before the field existed is drawn byte for byte. */
+  const on      = grilleOnOf(state);
+  const plain   = byId(GRILLES, 'none');
+  const mainGrille = on === 'side' ? plain : grille;
+  const sideGrille = on === 'main' ? plain : grille;
+  const design  = which => (on === 'both' ? null : (which === on ? 'on' : 'off'));
   const handle  = gripOf(state);
   const lockset = byId(LOCKSETS, state.lockset);
   const special = byId(SPECIAL_LOCKS, state.speciallock);
@@ -2044,7 +2056,7 @@ export function render(state) {
       band: detail.classic ? CLASSIC_BAND : MOULD_BAND,
       x: mainX + o.x, y: y0 + o.top, w: o.w, h: o.h,
       splits: o.splits.map(sp => ({ x: mainX + sp.x, w: sp.w })),
-      paint, edge, grille, key: 'm' + i, profile: mouldOf(detail),
+      paint, edge, grille: mainGrille, design: design('main'), key: 'm' + i, profile: mouldOf(detail),
       leaf: { x: mainX, y: y0, w: leafW, h: leafH },
     })).join('')}
   </g>`;
@@ -3394,7 +3406,8 @@ export function render(state) {
        be defined: fourteen of the thirty measured records have no sill at all,
        and the sixteen that do run a median 0.0175 of leaf height. -->
 
-  ${sideW ? `<g id="side-leaf" data-glazed="${!!size.sideGlazed}">${leaf(sideX, sideW)}${
+  ${sideW ? `<g id="side-leaf" data-glazed="${!!size.sideGlazed}"${
+      design('side') ? ` data-design="${design('side')}"` : ''}>${leaf(sideX, sideW)}${
       /* A SIDELIGHT is glass by definition — that is the whole product, and
          four doors in the corpus have one (d117 d122 d123 d128). It does not
          take the main leaf's window SHAPE: on all four the side panel is its
@@ -3438,7 +3451,8 @@ export function render(state) {
             const o = classicFixedLight(sideW, leafH);
             return (glazedSet
               ? aperture({ band: CLASSIC_BAND, x: sideX + o.x, y: y0 + o.top, w: o.w, h: o.h,
-                           ornW: openings[0].w, paint, edge, grille, key: 's',
+                           ornW: openings[0].w, paint, edge, grille: sideGrille,
+                           design: design('side'), key: 's',
                            profile: mouldOf(detail),
                            leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
               : '')
@@ -3452,7 +3466,8 @@ export function render(state) {
             const top = y0 + (openings.length ? openings[0].top : leafH * 0.09);
             const tall = openings.length ? openings[0].h : leafH * 0.79;
             return aperture({ x: sideX + 95, y: top, w: sideW - 190, h: tall,
-                              paint, edge, grille, key: 's', profile: mouldOf(detail),
+                              paint, edge, grille: sideGrille, design: design('side'), key: 's',
+                              profile: mouldOf(detail),
                               leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
               + (detail.panel || win.panel
                   ? appliedFrame(sideX, y0, sideW, leafH, paint, pale, top + tall, null, 0, 's',
@@ -3526,7 +3541,8 @@ export function render(state) {
                 ? aperture({ x: sideX + own.x, y: y0 + own.top, w: own.w, h: own.h,
                      splits: own.splits.map(sp => ({ x: sideX + sp.x, w: sp.w })),
                      ornW: main.w,
-                     paint, edge, grille, key: 's', profile: mouldOf(detail),
+                     paint, edge, grille: sideGrille, design: design('side'), key: 's',
+                     profile: mouldOf(detail),
                      leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
                 : '')
               + (f.rows.length
@@ -6898,7 +6914,7 @@ export const apertureLayout = memo(function apertureLayout(win, leafW, leafH) {
    other opening in the range is unaffected. */
 function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
                     splits = [], band = MOULD_BAND, ornW = null,
-                    profile = MOULD_DEFAULT }) {
+                    profile = MOULD_DEFAULT, design = null }) {
   /* WORKED GLASS IS A GRILLE NOW. The pattern in the pane and the ironwork
      over it were two choices and are one, so the same option decides both:
      `glass: true` in the catalogue means it is etched into the glass, and
@@ -6943,7 +6959,8 @@ function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
   const M = band, MF = band;
   const id = `cl-${key}`;
   return `
-    <g data-pane="${key}" data-glass="${grille.glass ? grille.id.replace(/-light$/, '') : 'clear'}">
+    <g data-pane="${key}" data-glass="${grille.glass ? grille.id.replace(/-light$/, '') : 'clear'}"${
+      design ? ` data-design="${design}"` : ''}>
       ${moulding(x - M, y - M, w + M * 2, h + M + MF, M, paint, isLight(paint),
                  leaf, `a${key}`, profile)}
       <!-- inner rebate: the glass is set back behind the moulding, so the last
@@ -11028,6 +11045,48 @@ export function grilleGlyph(grille, paint = TILE_PAINT) {
     ${glass ? glass.veil
             : `<g>${grillePaths(grille.id, 0, 0, S, S, grilleTint(grille, paint))}</g>`}
     <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
+  </svg>`;
+}
+
+/**
+ * WHICH LEAF THE DESIGN GOES ON — the three tiles' pictures, 1.11.2026.
+ *
+ * The two leaves of a door-and-a-half, the main one and the narrow fixed one,
+ * each with its window, and the CHOSEN design drawn in its own art (the same
+ * `grillePaths` and `glazingArt` the door and `grilleGlyph` use, in the door's
+ * paint for a `-light` twin) on the leaf or leaves this entry names; the other
+ * pane is plain glass. So the three tiles are three pictures of the one
+ * design, and they change with the design — the page redraws them when the
+ * design or the paint moves (`composite` on the group). Not drawn at the
+ * door's proportions: a tile is 300 units square, and the fixed leaf's 350 mm
+ * against the main leaf's 850 would leave its pane too narrow to read, so the
+ * fixed leaf here is half the main one, and the ironwork on it is drawn at the
+ * main pane's scale and clipped (`ornW`), as on the door.
+ */
+export function grilleOnGlyph(o, state = {}) {
+  const S = 300;
+  const g = byId(GRILLES, state.grille);
+  const paint = state.colour ? byId(COLOURS, state.colour).hex : TILE_PAINT;
+  const y = 30, h = 240;
+  const leaves = [{ id: 'main', x: 34, w: 148 }, { id: 'side', x: 196, w: 74 }];
+  const mainPane = leaves[0].w * 0.6;
+  const pane = (lf) => {
+    const ww = lf.w * 0.6, wx = lf.x + (lf.w - ww) / 2, wy = y + h * 0.14, wh = h * 0.40;
+    const carries = g.id !== 'none' && (o.id === 'both' || o.id === lf.id);
+    const clip = `gso-${o.id}-${lf.id}`;
+    const art = !carries ? ''
+      : g.glass ? glazingArt(g.id, wx, wy, ww, wh, paint, clip, mainPane).veil
+      : grillePaths(g.id, wx, wy, ww, wh, grilleTint(g, paint), mainPane);
+    return `<rect x="${lf.x}" y="${y}" width="${lf.w}" height="${h}" fill="none"
+                  stroke="currentColor" stroke-width="12"/>
+      <rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="${ww.toFixed(1)}" height="${wh.toFixed(1)}" fill="#7C8891"/>
+      <clipPath id="${clip}"><rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="${ww.toFixed(1)}" height="${wh.toFixed(1)}"/></clipPath>
+      <g clip-path="url(#${clip})" data-design="${carries ? 'on' : 'off'}">${art}</g>
+      <rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="${ww.toFixed(1)}" height="${wh.toFixed(1)}" fill="none"
+            stroke="currentColor" stroke-width="8"/>`;
+  };
+  return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
+    ${leaves.map(pane).join('')}
   </svg>`;
 }
 

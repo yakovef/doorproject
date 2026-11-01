@@ -29,14 +29,14 @@
 
 import {
   BELLS, BOWS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS, finishHasSubject, grilleHasSubject,
-  GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LOCKSETS, MASHKOFS,
+  GRILLE_ON, grilleOnHasSubject, GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LOCKSETS, MASHKOFS,
   mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, BUILD_A,
   PEEPHOLES, PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_A, STRIPE_MAX, WINDOWS,
 } from './catalog.js';
 import { breakdownRows, deltaLabel, formatAgorot, priceAgorot, priceLabel, priceParts, tileAgorot }
   from './price.js';
 import {
-  describe, detailGlyph, grilleGlyph, handleGlyph, locksetGlyph,
+  describe, detailGlyph, grilleGlyph, grilleOnGlyph, handleGlyph, locksetGlyph,
   bellGlyph, bowGlyph, handleFinishGlyph, copyOf, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
   panelUnderGlass, specialLockGlyph, stripeTileGlyph,
   windowGlyph,
@@ -233,6 +233,25 @@ const GROUPS = [
         : T('g.grille.plusMany');
       return [[T('g.grille.free'), free], [plus, paid]];
     } },
+
+  /* ⚠ WHICH LEAF THE DESIGN GOES ON — 1.11.2026, the owner's son: *"When
+     choosing the door-and-a-half and then choosing a design, it automatically
+     puts a design on the half door. Figure out where to put an option of
+     removing a design on either of the sides."* and *"The default when
+     choosing a design should be that it will be on both the doors."* Ours,
+     named so he can reverse it in a line: a THIRD group on the designs step,
+     under the design tiles — three square tiles, both leaves · the main leaf
+     only · the fixed leaf only — shown only where it has a subject (a design
+     on a door with two glazed leaves), by the finish group's `when`. Each tile
+     is the two leaves with THIS design where that choice puts it (`composite`
+     redraws them when the design or the paint moves) and prints what the
+     design costs there, off `priceParts` (`tilePrice` → the design's row).
+     Second in the step, so the band's `nowLabel` and the arrows beside the
+     door stay the designs'. */
+  { key: 'grilleOn', title: 'g.grilleOn', in: 'grd', kind: 'sq', list: () => GRILLE_ON,
+    glyph: o => grilleOnGlyph(o, state), hint: 'g.grilleOn.h',
+    composite: st => `${st.grille}|${st.colour}`,
+    when: grilleOnHasSubject },
 
   { key: 'handle', title: 'g.handle', in: 'grip', kind: 'hw', list: () => HANDLES,
     glyph: handleGlyph, hint: 'g.handle.h' },
@@ -508,7 +527,9 @@ const SECTIONS = [
      arguments (§5.25): the etched designs' surcharge per window, and the
      double door that has two panes. */
   { key: 'grd',    title: 'step.grd.t',    sub: 'step.grd.s',    lede: 'step.grd.l', exp: 'exp.grd',
-    expArgs: () => [formatAgorot(byId(GRILLES, 'vine').delta), L(SIZES.half)],
+    /* {2}–{4}: the three leaf choices by their tiles' own names (1.11.2026). */
+    expArgs: () => [formatAgorot(byId(GRILLES, 'vine').delta), L(SIZES.half),
+                    ...GRILLE_ON.map(o => L(o))],
     when: grilleHasSubject },
   { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face',
     expArgs: () => [formatAgorot(STRIPE_A.h), formatAgorot(STRIPE_A.v),
@@ -3058,7 +3079,8 @@ function commitChoice(key, { fixed, said, stood, memo }) {
  * — so nothing is typed here and a field added later names itself. A field
  * with no row of its own is named by the row it is shown on.
  */
-const ROW_OF = { stripeDir: 'stripes', stripeCount: 'stripes', stripeTight: 'stripes', handleLen: 'handle' };
+const ROW_OF = { stripeDir: 'stripes', stripeCount: 'stripes', stripeTight: 'stripes', handleLen: 'handle',
+                 grilleOn: 'grille' };
 function confirmSentence(what, lost) {
   const rows = specRows(state);
   const keys = [...new Set(lost.map(k => ROW_OF[k] || k))];
@@ -3543,7 +3565,12 @@ function paint() {
          the row's first phrase, so the name under the picture is always
          words of the order. */
       const said = String(r.value);
-      return o && said.includes(L(o)) ? L(o) : said.split(/ — | · /)[0];
+      /* ⚠ AND THE LEAF, WHEN THE DESIGN IS ON ONE (1.11.2026): the row's value
+         ends ", כנף ראשית בלבד", and the name under the picture keeps it — the
+         picture is the design's, so the words are what say which leaf. */
+      const core = r.side ? said.slice(0, -(`, ${r.side}`).length) : said;
+      const base = o && core.includes(L(o)) ? L(o) : core.split(/ — | · /)[0];
+      return r.side ? `${base}, ${r.side}` : base;
     };
     table.replaceChildren(...specRows(state).map(r => {
       const step = stepFor(r.key);

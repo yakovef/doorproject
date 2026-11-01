@@ -22,7 +22,7 @@ import { crashed } from './browser.mjs';
 import { load, lum } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
 import { deltaLabel, formatAgorot, priceAgorot, priceLabel, priceParts } from '../js/price.js';
-import { DETAILS, GRILLES, SIZES } from '../js/catalog.js';
+import { byId as byIdList, DETAILS, GRILLE_ON as GRILLE_ON_LIST, GRILLES, SIZES } from '../js/catalog.js';
 import { detailGlyph, stripeTileGlyph } from '../js/renderer.js';
 import { SECTION_ICON, SPEC_ICON } from '../js/icons.js';
 import { L, setLang, T, withLang } from '../js/copy.js';
@@ -8519,6 +8519,193 @@ for (const v of VIEWS) {
   if (!home.notice) fault('finish-group', 'a bell alone with hf=hf-gold came back nickel WITHOUT a notice — a link changed its price in silence');
   await pg.close();
   if (faults === before) console.log(`    ${asked} readings: hidden with nothing to paint and beside a bell alone, shown with a bar or the bow (a bell beside one too), by link and by tap; a stale gold finish on a lone bell comes home to nickel with a notice`);
+}
+
+/* ── THE DESIGN ON ONE LEAF OF A DOOR-AND-A-HALF — 1.11.2026 ──────────────
+   The owner's son: *"When choosing the door-and-a-half and then choosing a
+   design, it automatically puts a design on the half door. Figure out where to
+   put an option of removing a design on either of the sides."* and *"The
+   default when choosing a design should be that it will be on both the
+   doors."* `npm test` holds the field to the price, the code and the words;
+   this holds the PAGE to it. The leaf group (`grilleOn`) on the designs' step,
+   under the design tiles: three tiles ≥ 44 px, each priced, there only on a
+   door with two glazed leaves and a design — by link and by tap, both ways.
+   Tapping "main leaf only": the fixed leaf's pane goes to plain glass ON THE
+   RASTER (the same pixels as that pane with no design), the price moves by
+   exactly one pane, the summary's name and the send's href change, the band
+   above the door does not, and nothing asks (a choice inside the design's own
+   step takes nothing else away); the undo brings both back. A size with no
+   side leaf ASKS, and yes lands on both. The arrows walk the designs, never
+   the leaves. §5.15: every reading asserts its subject. Falsified by dropping
+   the group's `when` (the single-size clauses fire) and by letting the
+   renderer ignore the field (the raster clause fires). */
+{
+  console.log('\nthe design on one leaf of a door-and-a-half');
+  const before = faults;
+  let asked = 0;
+  /* The toast an undo or a repair raises stands over the door on a phone, and
+     the change cue (`data-changed`) holds the panes on an animation layer that
+     rasterises a shade differently once it has run; neither is the drawing,
+     so both are cleared for the reading (and nothing else). */
+  const shot = async (pg, sel, tag) => {
+    /* a repaint replays the door's entrance, so the reading waits for the
+       page's animations to finish (§7: a fixed wait is a guess) */
+    const settled = await pg.waitForFunction(() => document.getAnimations().every(a => a.playState !== 'running'),
+                                             null, { timeout: 4000 }).then(() => true, () => false);
+    if (!settled) fault('grille-leaves', `${tag}: the page never finished animating — the raster would read the animation`);
+    const box = await pg.evaluate(q => {
+      for (const t of document.querySelectorAll('.toast, #toast')) t.style.visibility = 'hidden';
+      document.querySelector('#stage')?.removeAttribute('data-changed');
+      const r = document.querySelector(q)?.getBoundingClientRect();
+      return r && r.width > 4 ? { x: r.x, y: r.y, width: r.width, height: r.height } : null;
+    }, sel);
+    if (!box) return null;
+    const f = `/tmp/audit-leaves-${process.pid}-${tag}.png`;
+    await pg.screenshot({ path: f, clip: box });
+    return load(f);
+  };
+  /* the fixed leaf's GLASS — its pane rectangle, not the pane's group, whose
+     box takes in the clipped ironwork's overflow */
+  const PANE = '#stage #side-leaf [data-pane="s"] rect[fill="url(#glass)"]';
+  const differ = (a, b) => {
+    if (!a || !b || a.w !== b.w || a.h !== b.h) return 1;
+    let n = 0;
+    for (let i = 0; i < a.d.length; i += 4) if (Math.abs(lum(a.d, i) - lum(b.d, i)) > 12) n++;
+    return n / (a.w * a.h);
+  };
+  for (const [lang, vw, vh] of [['he', 1280, 800], ['ru', 390, 844]]) {
+    const pg = await b.newPage({ viewport: { width: vw, height: vh } });
+    const tag = `${lang} ${vw}x${vh}`;
+    const go = async q => {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}${q}`);
+      await pg.waitForTimeout(400);
+      await pg.evaluate(() => document.querySelector('.steps__step[data-step="grd"]')?.click());
+      await pg.waitForTimeout(250);
+    };
+    const read = () => pg.evaluate(() => {
+      const f = document.querySelector('.field[data-group="grilleOn"]');
+      const g = document.querySelector('.field[data-group="grille"]');
+      if (!f || !g) return null;
+      const tiles = [...f.querySelectorAll('[role="radio"]')];
+      return {
+        seen: f.checkVisibility(), hidden: f.hidden, after: !!(g.compareDocumentPosition(f) & Node.DOCUMENT_POSITION_FOLLOWING),
+        inStep: f.closest('.sect')?.dataset.section,
+        tiles: tiles.map(t => { const r = t.getBoundingClientRect();
+          return { id: t.dataset.id, w: r.width, h: r.height, meta: (t.querySelector('.tile__meta')?.textContent || '').trim(),
+                   on: t.getAttribute('aria-checked') === 'true' }; }),
+        code: document.querySelector('#code')?.textContent || '',
+        price: (document.querySelector('#price')?.textContent || '').trim(),
+        wa: document.querySelector('[data-wa]')?.getAttribute('href') || '',
+        band: (document.querySelector('.stage__band')?.textContent || '').replace(/\s+/g, ' ').trim(),
+        sum: (document.querySelector('#spec .spec__row[data-key="grille"] .spec__name')?.textContent || '').trim(),
+        sideDesign: document.querySelector('#stage #side-leaf')?.getAttribute('data-design') || null,
+        dialog: !!document.querySelector('#confirm')?.open,
+      };
+    });
+    /* by link: shown on a door-and-a-half with a design; hidden on a single
+       leaf, on a solid door, and with no design */
+    for (const [q, want, what] of [['&s=half&w=rect&g=vine', true, 'a door-and-a-half with the vine'],
+         ['&s=halfextra2&w=strip&g=grid', true, 'the widest door-and-a-half, the slot and the grid'],
+         ['&s=standard&w=rect&g=vine', false, 'a single leaf with the vine'],
+         ['&s=half&w=rect&g=none', false, 'a door-and-a-half with no design']]) {
+      await go(q);
+      const m = await read();
+      if (!m) { fault('grille-leaves', `${tag} ${what}: no leaf group or no designs group on the page`); continue; }
+      asked++;
+      if (m.seen !== want || m.hidden === want) fault('grille-leaves', `${tag} ${what} (link): the leaf choice is ${m.seen ? 'shown' : 'hidden'} — it should be ${want ? 'shown' : 'hidden'}`);
+      if (want) {
+        if (m.inStep !== 'grd' || !m.after) fault('grille-leaves', `${tag} ${what}: the leaf group is on "${m.inStep}"${m.after ? '' : ', above the designs'} — it is the designs' step's, under the designs`);
+        if (m.tiles.map(t => t.id).join() !== 'both,main,side') fault('grille-leaves', `${tag} ${what}: the tiles are ${m.tiles.map(t => t.id).join(',')}`);
+        for (const t of m.tiles) {
+          if (t.w < 44 || t.h < 44) fault('grille-leaves', `${tag} ${what}: the ${t.id} tile is ${t.w.toFixed(0)}×${t.h.toFixed(0)} — under 44 px`);
+          if (!t.meta) fault('grille-leaves', `${tag} ${what}: the ${t.id} tile prints no price`);
+        }
+        if (!m.tiles.find(t => t.id === 'both')?.on) fault('grille-leaves', `${tag} ${what}: "both leaves" is not the choice a link without gs= opens on`);
+      }
+    }
+    /* by tap, both ways: the slot onto a door-and-a-half, the window off */
+    await go('&s=half&w=rect&g=scroll');
+    const shown = await read();
+    await pg.evaluate(() => document.querySelector('.steps__step[data-step="glass"]')?.click());
+    await pg.waitForTimeout(200);
+    await pg.evaluate(() => document.querySelector('.field[data-group="window"] [data-id="none"]')?.click());
+    await pg.waitForTimeout(250);
+    if (await pg.evaluate(() => !!document.querySelector('#confirm')?.open)) await pg.evaluate(() => document.querySelector('#confirm-yes')?.click());
+    await pg.waitForTimeout(250);
+    const gone = await read();
+    asked++;
+    if (!shown?.seen || (gone && gone.seen)) fault('grille-leaves', `${tag} by tap: the leaf choice was ${shown?.seen ? 'shown' : 'hidden'} with the window and is ${gone?.seen ? 'still shown' : 'hidden'} without it`);
+
+    /* the tap on "main leaf only" */
+    await go('&s=half&w=rect&g=vine');
+    const m0 = await read();
+    const side0 = await shot(pg, PANE, 'before');
+    await pg.evaluate(() => document.querySelector('.field[data-group="grilleOn"] [data-id="main"]')?.click());
+    await pg.waitForTimeout(450);
+    const m1 = await read();
+    const side1 = await shot(pg, PANE, 'after');
+    if (!m0 || !m1 || !side0 || !side1) { fault('grille-leaves', `${tag}: the tap on "main leaf only" has no subject (no group or no fixed-leaf pane)`); await pg.close(); continue; }
+    asked++;
+    if (m1.dialog) { fault('grille-leaves', `${tag}: "main leaf only" asked first — it takes nothing else away`); await pg.keyboard.press('Escape'); }
+    const c0 = decodeCode(m0.code), c1 = decodeCode(m1.code);
+    if (!c1 || c1.grilleOn !== 'main') fault('grille-leaves', `${tag}: the tap did not land — the door says ${c1 && c1.grilleOn}`);
+    if (m1.sideDesign !== 'off') fault('grille-leaves', `${tag}: #side-leaf says the design is "${m1.sideDesign}" after "main leaf only"`);
+    const pane = byIdList(GRILLES, 'vine').delta;
+    if (c0 && c1 && priceAgorot(c0) - priceAgorot(c1) !== pane) fault('grille-leaves', `${tag}: the price moved by ${formatAgorot(priceAgorot(c0) - priceAgorot(c1))} — one pane of the vine is ${formatAgorot(pane)}`);
+    if (c1 && m1.price !== formatAgorot(priceAgorot(c1))) fault('grille-leaves', `${tag}: the page shows ${m1.price} and priceAgorot says ${formatAgorot(priceAgorot(c1))}`);
+    if (m0.wa === m1.wa) fault('grille-leaves', `${tag}: the WhatsApp href did not change — the order does not say which leaf`);
+    if (m0.sum === m1.sum || !m1.sum.includes(withLang(lang, () => L(byIdList(GRILLE_ON_LIST, 'main'))))) fault('grille-leaves', `${tag}: the summary's tile reads "${m1.sum}" (was "${m0.sum}") — it does not name the leaf`);
+    if (m0.band !== m1.band) fault('grille-leaves', `${tag}: the band above the door moved with the leaf ("${m0.band}" → "${m1.band}") — it is the design's`);
+    /* the raster: the fixed leaf's pane is the plain pane now */
+    const moved = differ(side0, side1);
+    if (moved < 0.02) fault('grille-leaves', `${tag}: the fixed leaf's pane barely moved on the raster (${(moved * 100).toFixed(1)}% of its pixels) — the design is still drawn there`);
+    /* the undo brings both back */
+    await pg.evaluate(() => document.querySelector('#undo-btn')?.click());
+    await pg.waitForTimeout(450);
+    const m2 = await read();
+    const side2 = await shot(pg, PANE, 'undo');
+    asked++;
+    if (!m2 || decodeCode(m2.code)?.grilleOn !== 'both' || differ(side0, side2) > 0.002) fault('grille-leaves', `${tag}: the undo did not bring the design back to both leaves (${m2 && decodeCode(m2.code)?.grilleOn}, ${(differ(side0, side2) * 100).toFixed(2)}% of the pane differs)`);
+    /* the reference: that pane on the same door with no design at all */
+    await go('&s=half&w=rect&g=vine&gs=main');
+    const sideRef = await shot(pg, PANE, 'ref');
+    await go('&s=half&w=rect&g=none');
+    const sidePlain = await shot(pg, PANE, 'plain');
+    asked++;
+    if (differ(sideRef, sidePlain) > 0.002) fault('grille-leaves', `${tag}: with the design on the main leaf only, the fixed pane is not the plain pane (${(differ(sideRef, sidePlain) * 100).toFixed(2)}% differs)`);
+    /* a size with no side leaf ASKS, and yes lands on both */
+    await go('&s=half&w=rect&g=vine&gs=side');
+    await pg.evaluate(() => document.querySelector('.steps__step[data-step="fit"]')?.click());
+    await pg.waitForTimeout(250);
+    await pg.evaluate(() => document.querySelector('.field[data-group="size"] [data-id="standard"]')?.click());
+    await pg.waitForTimeout(300);
+    const askedSize = await pg.evaluate(() => {
+      const d = document.querySelector('#confirm');
+      if (!d || !d.open) return false;
+      document.querySelector('#confirm-yes').click();
+      return true;
+    });
+    await pg.waitForTimeout(350);
+    const m3 = await read();
+    asked++;
+    if (!askedSize) fault('grille-leaves', `${tag}: the standard size took "fixed leaf only" without asking`);
+    if (!m3 || decodeCode(m3.code)?.grilleOn !== 'both' || decodeCode(m3.code)?.size !== 'standard') fault('grille-leaves', `${tag}: yes did not land on a standard door with the design on both (${m3 && JSON.stringify(decodeCode(m3.code))})`);
+    /* the arrows walk the designs, not the leaves */
+    await go('&s=half&w=rect&g=grid&gs=main');
+    const walk = [];
+    for (let k = 0; k < 2; k++) {
+      await pg.evaluate(() => document.querySelector('.stage__arrow--next')?.click());
+      await pg.waitForTimeout(200);
+      if (await pg.evaluate(() => !!document.querySelector('#confirm')?.open)) await pg.keyboard.press('Escape');
+      const c = decodeCode((await read())?.code || '');
+      walk.push(c && `${c.grille}/${c.grilleOn}`);
+    }
+    asked++;
+    if (walk.some(w => !w || !w.endsWith('/main')) || walk[0].startsWith('grid/')) fault('grille-leaves', `${tag}: the arrows walked ${walk.join(' → ')} from grid/main — they should move the design and keep the leaf`);
+    await pg.close();
+  }
+  if (asked < 20) fault('grille-leaves', `only ${asked} of 20 readings taken — this check is measuring less than it says`);
+  if (faults === before) console.log(`    ${asked} readings, he 1280 and ru 390: the leaf choice under the designs only on a door with two glazed leaves and a design, by link and by tap, three priced tiles ≥ 44 px; "main leaf only" draws the fixed pane plain on the raster, moves the price by one pane, renames the summary's tile and the send, leaves the band, asks nothing, and undoes; a single size asks and lands on both; the arrows move the design and keep the leaf`);
 }
 
 /* ── THE פרזול TILES ARE THIS DOOR'S — 27.9.2026 ───────────────────────────

@@ -52,6 +52,81 @@ into `research/colours/README.md`.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **1.11 — PROMPT I, 1 OF 2: THE DESIGN ON ONE LEAF OR BOTH.** His words:
+  *"When choosing the door-and-a-half and then choosing a design, it
+  automatically puts a design on the half door. Figure out where to put an
+  option of removing a design on either of the sides."* and *"The default when
+  choosing a design should be that it will be on both the doors. They need to
+  be able to choose on which side they want to remove what."*
+  Ours, named so he can reverse any in a line: a THIRD heading on the designs'
+  step, under the design tiles — three square tiles, שתי הכנפיים · כנף ראשית
+  בלבד · כנף קבועה בלבד — shown only on a door with two glazed leaves and a
+  design (the finish group's `when`); the WINDOW stays on both leaves (his
+  words name the design; a window on one leaf is a different door —
+  `ASK-PERETZ.md` 0h2 asks him); `both` the default, so every link and code
+  ever sent opens as it was seen; the tiles draw THIS design where it goes and
+  print each choice's price; the order says the leaf in words when not both.
+  · **The field.** `grilleOn`, `GRILLE_ON` (both · main · side, he/en/ru —
+    ids a wire format from today), `gs=` (joins `KNOWN`; absent = both), two
+    bits APPENDED after the bow, and `version` 5 → 6 bits in the same change
+    (`npm test` wants four versions of headroom; 29 left two): payload 55 →
+    58, `TOTAL_BITS` 60 → 65 —
+    ⚠ **the code is THIRTEEN characters now**: twelve hold 60 bits and the
+    check nibble is reserved before the rounding, so 57 + 4 crossed one
+    (the version's bit fits in what that opened).
+    Nothing was shaved to keep twelve (`handle` keeps its spare bit for the
+    products Peretz has not named; the check keeps its four). `VERSION` 29; a
+    v28 code is refused with the notice (asserted on two real v28 codes).
+  · **One statement.** `designPanels`/`grilleOnOf` in `js/catalog.js`, read
+    by `paneCount` — so the price (per pane carrying the design), `isGlazed`,
+    `grillePlacement`, the spec and the sheet follow; `grilleOnOf` answers
+    `both` wherever there are not two glazed leaves and a design, so an
+    unrepaired state cannot count glass away. `render` draws the leaf the
+    design is off as plain glass through the same `aperture` (the `none`
+    entry, so etched glass and the `-light` twins follow the same switch) and
+    marks each pane and `#side-leaf` `data-design="on|off"` ONLY when not both.
+  · **Nothing sent before today moves.** 9,792 doors (six sizes × every
+    window, design and face × two paints × two handings × bow off/on) drawn by
+    the old renderer and the new from the same link: byte-identical; 1,224
+    links' price and order lines: identical. In the suite: a link without
+    `gs=` and with `gs=both` are one drawing (seven links), and `gs=main|side`
+    on every single size lands on that same door with `SAID.grilleOnHome`.
+  · **Rules.** `repair` sends it home when the design, the window or the side
+    leaf goes, and says so (`fix.grilleOnHome`, the choice named through an
+    argument); `conflicts.grilleOn` refuses main/side where the group has no
+    subject (`why.grilleOnOne`, for the rules' other readers — the page hides
+    the group). `displacedBy`: a design tap OWNS the leaf (`OWNED.grille` —
+    swapping keeps "main leaf only", none sends it home, neither asks); a size
+    with no side leaf takes it and asks (`ROW_OF.grilleOn` names the grille
+    row in the dialog).
+  · **Words.** The grille row's value carries the leaf when not both ("גפן,
+    כנף ראשית בלבד"), in place of `grillePlacement`'s "where", so the message,
+    the summary's tile name (kept with the design's picture) and the A4 sheet
+    say it off one statement; `exp.grd.a` gains one sentence through
+    `expArgs` (the three names, no price typed).
+  · **Asserted.** Units (239 in the new group): the panes charged and drawn
+    on all three doubles × an included and a priced design — two/one/one,
+    one pane = the design's delta, T1 on all three, the off pane byte-equal to
+    the door with no design and the on pane to the door with it on both; the
+    home rule both ways with its sentence; the dialog four ways; the link and
+    code on all three doubles × all three choices; the words in three
+    languages; the tile sweep (three distinct pictures per design, each
+    carrying the design exactly where it says). The round-trip sweep ×3 on
+    the doubles with glass and a design: 142,800 → 269,136 designs. The "bow's bit did
+    not cost a character" clause RESTATED, not weakened: on the layout without
+    the new field it still fits, and `grilleOn` is asserted to be what cost the
+    thirteenth character. Audit (20 readings, he 1280 and ru 390): the group
+    under the designs only with its subject, by link and by tap; "main leaf
+    only" draws the fixed pane as the plain pane ON THE RASTER, moves the
+    price by one pane, renames the summary's tile and the send, leaves the
+    band, asks nothing, undoes; a single size asks and lands on both; the
+    arrows move the design and keep the leaf. Fuzz draws `grilleOn`.
+    Falsified: `paneCount` reading every pane — 27 clauses, the one-pane price
+    among them; the `repair` branch dropped — the single-size home clauses;
+    the group's `when` dropped — the audit's single-size and no-design clauses; the renderer ignoring the field —
+    both raster clauses (0.0 % moved; 30–37 % off the plain pane).
+  · **Gates.** npm test **25,277,369, 0 failed** (the ×3 sweep nearly doubles the total; ~10½ min); collide `-- all` 1,638 clean (unchanged), `-- boxes` clean; sheets **0 bare and 0 lockset moved**, `js/works.js` byte-identical — `.stamps.json`, `corpus-links.md` (v=29, `gs=both`) and the 12 `shot` sheets, as predicted.
+
 - **28.10 — PROMPT H: ONE BRANCH, `main`, AND THE PAGE DOES NOT MOVE.** His
   words: *"I want all the branches merged into main, and I don't want other
   branches to be made ever. I want everything to be pushed to main."* and
@@ -4321,6 +4396,17 @@ into `research/colours/README.md`.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **10.10** The PANELS UNDER GLASS ARE THE CASING'S WIDTH (*"match the width
+  of the window … the option with 2 panels needs to be identical to the
+  rectangle window's panel"*): every kept row under glass flush with the
+  casing, both leaves, one expression; beside the square window the pair's
+  lower panel is the window's lone one. Solid faces keep 0.23. 0 bare sheets
+  (no sheet door is glazed and panelled). Long form: `HISTORY.md`.
+- **10.10** The CYLINDER ONLY is **₪100** (*"The option with cylinder only
+  needs to be 100 shekels"*; it was included): its tile prints the figure, the
+  lock step's explainer says it through `expArgs`, and the lever's fallback
+  swap now names where it lands and its price (`locksetSwapWords`) — a swap
+  from the Rotem costs ₪100. ₪3,195 unmoved (the Rotem). Long form: `HISTORY.md`.
 - **2.10** The window's designs a STEP OF THEIR OWN, present only with a window
   (*"a separate section … only appearing if you choose one of the windows — an
   icon next to the window one"*): `grd` after the glass, tied to its mark —

@@ -252,6 +252,13 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   and the option's name over the door is set in **the title's own face**
   (Bona Nova). On 2.10: on a phone undo, redo and reset are **three icon
   discs, no words** (the words stay for screen readers).
+  **Taken for them in prompt I (1.11)**, each reversible in a line: the
+  design's leaf is a THIRD heading on the designs' step under the design tiles
+  (three square tiles, shown only with two glazed leaves and a design); the
+  WINDOW stays on both leaves (a window on one leaf is asked of Peretz,
+  `ASK-PERETZ.md` 0h2); `both` is the default, so every link and code ever
+  sent opens as it was seen; the tiles draw the design where it goes and print
+  each choice's price; the order says the leaf in words when it is not both.
 
 ---
 
@@ -261,6 +268,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **1.11** THE DESIGN ON ONE LEAF OR BOTH (*"…choose on which side they want
+  to remove what"*): `grilleOn` (both · main · side, `gs=`, two bits, `VERSION`
+  29, version field 6 bits) — ⚠ the code is THIRTEEN characters. A third
+  heading under the designs on a door-and-a-half; the window stays on both;
+  `paneCount` counts the panes carrying the design; the order names the leaf.
+  0 bare sheets. Long form: `HISTORY.md`.
 - **1.11** Two generated rooms for the room picker, saved as evidence only:
   `research/backdrops/gen-street.webp` (Jerusalem stone, outside) and
   `gen-stairwell.webp` (an older landing, terrazzo), 1536 × 1024, with a
@@ -292,17 +305,6 @@ lines here. Dates are the day of the change.
   or bottom, bowing a quarter of its chord wherever that is within 45° of
   horizontal; the arrowheads — gone since 28.9, their marker deleted with the
   old lines — draw again. 0 bare sheets. Long form: `HISTORY.md`.
-- **10.10** The PANELS UNDER GLASS ARE THE CASING'S WIDTH (*"match the width
-  of the window … the option with 2 panels needs to be identical to the
-  rectangle window's panel"*): every kept row under glass flush with the
-  casing, both leaves, one expression; beside the square window the pair's
-  lower panel is the window's lone one. Solid faces keep 0.23. 0 bare sheets
-  (no sheet door is glazed and panelled). Long form: `HISTORY.md`.
-- **10.10** The CYLINDER ONLY is **₪100** (*"The option with cylinder only
-  needs to be 100 shekels"*; it was included): its tile prints the figure, the
-  lock step's explainer says it through `expArgs`, and the lever's fallback
-  swap now names where it lands and its price (`locksetSwapWords`) — a swap
-  from the Rotem costs ₪100. ₪3,195 unmoved (the Rotem). Long form: `HISTORY.md`.
 
 ---
 
@@ -590,7 +592,7 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | **13,045,569, 0 failed** on prompt G's 2 of 2 (17.10, after its sheets — the total grew with 21 colours in every sweep: the round-trip 115,600 → 142,800 designs; colour headroom 11) · **10,597,472, 0 failed** on prompt F's 3 of 3 (10.10, after its sheets; 10,597,472 on its 2 of 2 after its sheets, 10,597,362 on its 1 of 3 with the five staleness rows) · **10,595,731, 0 failed** on prompt D's 2 of 2 (2.10, after its sheets; 10,595,657 on its 1 of 2 — the reset's copy and source checks — before the sheets, the five staleness rows the only red) · **10,595,593 assertions, 0 failed** on prompt C's 3 of 3 (2.10; the same total on each of its commits — the round is page and instrument, not catalogue) and with the stripes as tiles, prompt B's 3 of 3 on the A round's five (29.9; 10,595,605 before that rebase, 10,595,466 on B's 2 of 3, 10,595,363 on its 1); re-read on the merged tree in A's closing pass, 30.9: the same 10,595,593, 0 failed (10,595,454 on A's 5 of 5 before B's 3 landed). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 2.10 |
+| `npm test` | **25,277,369, 0 failed** on prompt I's 1 of 2 (1.11, after its sheets — the round-trip sweep ×3 on the doubles with glass and a design: 142,800 → 269,136 designs, and the total nearly doubled with it; ~10½ min) · **13,045,569, 0 failed** on prompt G's 2 of 2 (17.10, after its sheets — the total grew with 21 colours in every sweep: the round-trip 115,600 → 142,800 designs; colour headroom 11) · **10,597,472, 0 failed** on prompt F's 3 of 3 (10.10, after its sheets; 10,597,472 on its 2 of 2 after its sheets, 10,597,362 on its 1 of 3 with the five staleness rows) · **10,595,731, 0 failed** on prompt D's 2 of 2 (2.10, after its sheets; 10,595,657 on its 1 of 2 — the reset's copy and source checks — before the sheets, the five staleness rows the only red) · **10,595,593 assertions, 0 failed** on prompt C's 3 of 3 (2.10; the same total on each of its commits — the round is page and instrument, not catalogue) and with the stripes as tiles, prompt B's 3 of 3 on the A round's five (29.9; 10,595,605 before that rebase, 10,595,466 on B's 2 of 3, 10,595,363 on its 1); re-read on the merged tree in A's closing pass, 30.9: the same 10,595,593, 0 failed (10,595,454 on A's 5 of 5 before B's 3 landed). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 2.10 |
 | `npm run audit` | **A COMPLETE run on prompt G's 2 of 2 (17.10, `0b2766b`): no faults** — 21 colours on the chart · **A COMPLETE run on prompt F's 3 of 3 (10.10, `ecedfc6`): no faults** — the curved pointers' clauses (21 pointers over 12 steps) among them; the cylinder's price and the panels under glass reach the page through blocks that read clean · **A COMPLETE run on prompt D's 2 of 2 (2.10, over `69723b0`): no faults** — the designs' step, "N of M", the glazed column beside the glass on 84 of 90 doors and the tapped window among them. Its 1 of 2 (the reset), complete over the arrows: every block clean but for chromium dying in the price-card sweep, which re-run alone read none; over the send, the wall blocks re-run clean · **No faults on prompt C's 3 of 3** (2.10), the phone's first-row, the arrows' look and the send-as-pill clauses among them; its 1 of 3 read 1 (the note's `42ch`, fixed), its 2 of 3 read 2 (the `ARROW_KNOWN` reading its bigger arrows raised, raised). **On `87af342` — B's 3 of 3 on A's five, the branch both rounds share — a COMPLETE run: no faults** (A's closing pass, 30.9). The two B's pre-rebase run below left to A's regions do not reproduce on the merged tree: `halfextra1` had left `ARROW_KNOWN` in A's 2 of 5 (`893f851`, §9 — B's tree had the band commit and not that one), and the drawer's toggle was the block's seeding, an init script since A's 5 of 5 (30 rows, 5 shapes, he and ru). A's 3 of 3 (`cc19850`), a complete run: no faults. ⚠ **On prompt B's 3 of 3 (29.9), before its rebase: 5 faults, none in its rows** — the 320×568 `halfextra1` redo-on-arrow reading GONE in he and ru (the band commit `08a59ed` made the side-by-side glyphs fit there: 37 → 0 px², measured on `d3b54e6` against `08a59ed`; its region, and the exemption asks to come out) and 3 of the saved-designs drawer's (its toggle off the page in one case — the unexplained fault below, again). Its own blocks — the six-tile cycle, the designs unlocking, the stripe tiles' pictures (closest 58%) and fit — clean. the full run at the end of the 28.9 round read **4 faults, all fixed in commit 10** (§0b). ⚠ **The re-run after the fix did not finish** — the container restarted under it — and was clean through every block up to the navigator's (the undo and landscape blocks among them); the blocks after that were clean on the first run, before the fix, and are not re-run ⚠ **On `629f7d0` (the כדור merged onto 10 of 10): 6 faults, every one the saved-designs drawer's** — its toggle not on the page in ru at 390×844 and 834×1112, the stale design not reaching the drawer (he, ru), 8 of 10 cases opened, 24 of 30 rows. The drawer is the 5-of-10 save dialog's; the כדור touched no page code. Not fixed here ⚠ **And a COMPLETE run on `629f7d0` + the ironwork port (29.9, every block to the end) read no faults at all, the drawer's 30 rows at 5 shapes in two languages included** — so those 6 did not reproduce once. ⚠ **Explained 29.9 (A's 5 of 5):** the block wrote the saved doors on one load and read them on the next, and a navigation can land in a new renderer before the write reaches it — seeded by an init script now | 2.10 |
 | `npm run collide` | `-- all` clean on prompt G's 2 of 2 (17.10): **1,638**, unchanged — the sweep pins one paint (`rb-0097d`), since a colour cannot move geometry, so the deck's four add nothing to it · `-- all` clean on prompt F's 2 of 3 (10.10: the panels under glass at the casing's width — 1,638 buildable designs, the count unchanged, `faceObstacles` agreeing with the drawing everywhere) and `-- boxes` clean; `-- boxes` clean on prompt D's 2 of 2 (2.10: every fitting inside what it declares, the deepest mount 109 under `MOUNT_REACH` 121) and on prompt C's 3 of 3 (2.10); re-read clean on prompt B's 3 of 3 (29.9), the same 1,638 — `all` (1,638 designs — 1,468 base, 602 with the bow, plus 170 face-detail) and `boxes` clean with the כדור redrawn (28.9: drawn 33/33/33, declared 35/35/35; the bow 0/300/21 in 4/305/26; the knob-plate 46/46/155 in 48/48/157; the deepest mount 109, the עילי's) | 2.10 |
 | `npm run fuzz` | Prompt F's 3 of 3 (10.10): the same counts as D's — 30,000 designs, 1,800 clicks, 238 met the dialog (125 / 113), the reset 85 times (75 asked, 33 yes, 42 no) — nothing broke. Prompt D's 2 of 2: 30,000 designs, 1,800 clicks, **238** met the confirm dialog — 125 yes, 113 no, the door unchanged after every no — and **the reset among the clicks** (its own seeded coin): pressed 85 times, 75 asked (the rest on the default door, greyed), 33 yes and back to the default door, 42 no — nothing broke (prompt D's 2 of 2, 2.10). Prompt C's 3 of 3: 195 met the dialog, 107 yes / 88 no, nothing broke | 2.10 |
@@ -657,7 +659,7 @@ screen. Two different questions, and for a long time only one had been put.
   retire an option, alias its id onto the nearest real one, for ever.
 - **The short code stores INDICES**, which no alias can rescue. Any change to
   an option list's ORDER or to the bit layout needs a `VERSION` bump in
-  `js/url-state.js` (**28** since 29.9 — read the file, do not trust this figure),
+  `js/url-state.js` (**29** since 1.11 — read the file, do not trust this figure),
   so an old code is refused with a notice rather than decoded into a different
   door. **Appending to the end of a list, or changing a property, costs no
   bump.**
@@ -986,6 +988,9 @@ derived from the WINDOW rather than from another face.
   unmoved (A20, A21, asserted). A face that keeps nothing falls back to the
   window's own lone panel, aligned to the casing (d097); plain behind the
   square window draws that.
+- The fixed leaf's glass carries the window's design unless the customer took
+  it off that leaf (`grilleOn`, 1.11, "The glass" below) — then it is plain
+  glass, and so is the main pane under "fixed leaf only".
 - ⚠ **The fixed leaf of a דלת וחצי carries the same face** (28.9, the owner's
   son: *"…a window and a panel at the same width, just like the main door — and
   with 3 panels there should be 3 panels on the half door too"*). It asks
@@ -1090,6 +1095,20 @@ included ones, then the priced ones with the surcharge PER WINDOW in the
 heading (ironwork is sold by the pane) — each black design with its `-light`
 twin beside it. The array's order is the code's and does not move; the
 twins were appended at its end, which is why they drew apart.
+⚠ **On a door-and-a-half the design can be on one leaf** (1.11, the owner's
+son: *"…choose on which side they want to remove what"*, the default *"on
+both the doors"*): `grilleOn` (`GRILLE_ON` both · main · side, `gs=`, two bits,
+`VERSION` 29). The WINDOW stays on both leaves (ours — a window on one leaf is
+a question for Peretz, `ASK-PERETZ.md` 0h2); the leaf the design is off draws
+plain glass through the same `aperture` (the `none` entry), and each pane and
+`#side-leaf` carry `data-design="on|off"` ONLY when the choice is not both, so
+every door drawn before is byte-identical (9,792 doors swept old against new).
+`paneCount` reads it through `designPanels`/`grilleOnOf` — the one statement
+— so the price is per pane carrying the design, and `grilleOnOf` answers
+`both` wherever there are not two glazed leaves and a design, so no state can
+count a door's glass away. `repair` sends it home there with
+`SAID.grilleOnHome`; the grille row names the leaf in words when not both
+("גפן, כנף ראשית בלבד"), the summary's tile name with it.
 
 ⚠ **No line round the inside of the glass** (27.9, the owner's son). `aperture`
 drew a two-device-pixel stroke of the paint darkened 0.6 over every pane — a
@@ -1180,6 +1199,17 @@ for the same half of the leaf and `repair` trades between them.
   under it where the tab would meet the arrow, the line across the column's
   gap. A LINK with a design and no window still brings the window
   (`SAID.windowAdded`), and the step with it.
+  ⚠ **And under the design tiles, on a door with two glazed leaves and a
+  design, a THIRD heading: which leaf** (1.11, ours — the owner's son asked
+  only *"figure out where to put an option"*): the group `grilleOn`, three
+  square tiles (שתי הכנפיים · כנף ראשית בלבד · כנף קבועה בלבד), hidden by the
+  finish group's `when` (`grilleOnHasSubject`) everywhere else. Each tile is
+  the two leaves with THIS design where the choice puts it (`grilleOnGlyph`,
+  redrawn by `composite` when the design or paint moves) and prints the
+  design's row for that choice (`tileAgorot('grilleOn')`). Second in the step,
+  so the band and the arrows stay the designs'. A design tap OWNS the leaf
+  (`OWNED.grille`: swapping keeps "main leaf only", none takes it home, neither
+  asks); a size with no side leaf takes it and asks.
 - **The face step is ONE radio group of six** (29.9, the owner's son: *"…the
   arrows go through the stripes as well — 2 panel, 3 panel, greek set, then
   horizontal stripes, then vertical stripes, then nothing, and the cycle
@@ -1833,6 +1863,13 @@ are not in `VIEWS`:
   each against the other and every face tile, at the size they ship); the
   gallery grid never one column, no tile under 132 px; the photographed floor
   and sconces measured in pixels against the drawn ones.
+- **the design on one leaf** (1.11) — on a door-and-a-half with a design the
+  leaf group under the designs, three priced tiles ≥ 44 px, and hidden on a
+  single leaf, a solid door and with no design, by link and by tap; "main
+  leaf only" draws the fixed pane as the plain pane ON THE RASTER, moves the
+  price by one pane, renames the summary's tile and the send, leaves the
+  band, asks nothing, and undoes; a size with no side leaf asks and lands on
+  both; the arrows move the design and keep the leaf (he 1280, ru 390).
 - **copy** — no explainer contradicts the price on its step; the
   colour-at-the-measure sentence on the colour step and the summary in all
   three languages.
@@ -1933,8 +1970,10 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 ## 8. Things that will bite
 
 - **BigInt is required** in `url-state.js`: the code layout is **wider than 32
-  bits** (the payload is 54 bits and `TOTAL_BITS` rounds it, with the check
-  nibble, to 60 on 28.9 — read the file). The build targets es2020, so
+  bits** (the payload is 58 bits since 1.11 — `grilleOn`'s two crossed a
+  character, and `version` went to six bits in the same change — and
+  `TOTAL_BITS` rounds it, with the check nibble, to 65: a THIRTEEN-character
+  code; read the file). The build targets es2020, so
   `Object.hasOwn` is unavailable — use `Object.prototype.hasOwnProperty.call`.
 - **The short code is an ENCODING, not a hash.** It decodes without a server,
   because it is read aloud down the telephone.
@@ -2281,7 +2320,8 @@ Section numbers here are that file's. Ask **1a** first (A13, which window is
 and a fixed half — the drawing on three sizes, A18); **1g** (the rose's size);
 **0j** (26.9: whether a glazed trio exists — to the owner's son; whether a glazed
 pair is the ₪3,800 alone, A20; that the square window moved 131 mm down);
-**0a2** (the ₪300 bell: ring, electric push, or both); **0a5** (a gold פרזול's
+**0h2** (1.11: a window on one leaf of a door-and-a-half and none on the
+other — does he build it?); **0a2** (the ₪300 bell: ring, electric push, or both); **0a5** (a gold פרזול's
 keyhole); **1b** (a picture of the curved lever, the Idan's stock length, a
 picture of the digital viewer); **1c** (the wide-margin three-panel doors); **2** (ברזל
 מחושל on ten doors he says do not carry it); **3** (warranty term, permission to
