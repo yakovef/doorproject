@@ -268,6 +268,13 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **1.11** THE TWO ROOMS GRADED AND MEASURED (PROMPT J 1 of 2; *"Backgrounds
+  that will show how the door looks in a setting that is other than just a
+  perfect hall"*): `npm run backdrop -- <name>` → `assets/room-gen-street.webp`,
+  `room-gen-stairwell.webp`, the wall at his 220 (MIX solved per room, 0.72 /
+  0.66 — his 0.6 left the stone at 212); floor, lamps, objects MEASURED into
+  `ROOMS` (sets); the audit asserts wall, lamps, only wall behind every door and
+  the price ≥ 4.5:1 on each. Not yet shown. 0 bare sheets. Long form: `HISTORY.md`.
 - **1.11** THE DESIGN ON ONE LEAF OR BOTH (*"…choose on which side they want
   to remove what"*): `grilleOn` (both · main · side, `gs=`, two bits, `VERSION`
   29, version field 6 bits) — ⚠ the code is THIRTEEN characters. A third
@@ -290,21 +297,6 @@ lines here. Dates are the day of the change.
   default —, גרפיט, קפוצ'ינו, ירוק פסגות, אפור שמיים), with plain English and
   Russian. Ids, codes and aliases untouched; nothing typed a name. 0 bare
   sheets. Long form: `HISTORY.md`.
-- **17.10** FOUR CARDS FROM HIS DECK (*"Add all of these colours … all of them
-  except the three that are free should be +200"*): 7345D אפור אורבני, 8075D
-  שוקולד קקאו, 8002D חמרה, 9077D חול ים APPENDED to `COLOURS` (21, no
-  `VERSION`), ₪200 each; hexes MEASURED off his photographs against each
-  card's label, calibrated leave-one-out (`research/colours/README.md`); held
-  out of the gallery's fit, which would have repainted seven doors. Long form: `HISTORY.md`.
-- **17.10** The colour deck photographed (`research/colours/cards/1-5.jpg`,
-  the owner's son): 18 cards, 14 already in the chart and four not (7345D,
-  8075D, 8002D, 9077D); every card +₪200 but the three included ones. The
-  readings and the chart change are PROMPT G's. Long form: `HISTORY.md`.
-- **10.10** The tour's POINTERS CURVE (*"…must not be horizontal — it looks very
-  ugly and is not intuitively understandable"*): a path off the callout's top
-  or bottom, bowing a quarter of its chord wherever that is within 45° of
-  horizontal; the arrowheads — gone since 28.9, their marker deleted with the
-  old lines — draw again. 0 bare sheets. Long form: `HISTORY.md`.
 
 ---
 
@@ -708,6 +700,10 @@ works from `file://` and Peretz can open the folder on his own laptop.
 - **`assets/room.webp` and `assets/room-wide.webp`** are the photographed room
   in two crops; `pickRoom` measures the stage and fetches ONE. Delete them and
   the page is complete, the door standing in the drawn room the SVG contains.
+  **`assets/room-gen-street.webp` and `room-gen-stairwell.webp`** (1.11) are
+  two more rooms, one framing each, graded by `npm run backdrop -- <name>`
+  from `research/backdrops/<name>.webp` (no name: the owner's two, into their
+  old file names, byte-identical). Measured in `research/backdrops/README.md`.
 - **`assets/fonts/`** — the page's own type since 28.9: **Rubik** (the text,
   and the face Peretz's own site uses) and **Bona Nova** (the price, the `<h1>`,
   the band's title), nine woff2 files, one per script per face behind its
@@ -825,6 +821,22 @@ the A4 sheet show, and what a visitor sees if the file does not arrive. The seam
 pieces that belong to the photograph (a tight contact shadow, a wider pool, a
 stronger casing shadow) are emitted on every door at `opacity="0"` and raised
 only by `.is-photo`.
+
+⚠ **Three photographs since 1.11.2026, one grading, never in the order.** The
+owner's entrance (two framings, `set: 'home'`) and two generated rooms — a
+Jerusalem-stone street entrance and an older stairwell (one framing each) —
+are SETS in `ROOMS` (js/app.js); `pickRoom` scores one set's crops and never
+across sets. Every one is graded by `tools/backdrop.mjs` to the SAME wall
+luma — his desktop room's 220, read off the file — because the ground under
+the swatch must not shift with the room: the curve, reference and band are
+his, and MIX is solved per room (his 0.6; the street 0.72, the stairwell
+0.66). The room is STAGING: never in the state, the URL, the short code, the
+WhatsApp message or the sheet. A fourth needs his photograph or his word —
+and a room is never generated or invented here. ⚠ No crop of a photograph
+keeps its lamps better than the whole of it (`placeRoom` takes the largest of
+three ratios, and a crop only raises one), so the two new rooms have no
+portrait framing and lose a lamp at the side on stages narrower than ~0.95 of
+their height (§9).
 
 - **The room's own light is painted UNDER the door** (`#roomPool`, `#roomFall`
   in `#backdrop`). Deepening the `#vignette`, which is painted last over the
@@ -1733,7 +1745,7 @@ against nothing and landed on "slightly better".
 | `npm run lockset` | our lock furniture beside photographs of it, each photograph beside our door in **that door's own paint**, both scaled by the LEAF. One `fitting()` measures photo and render alike, and it prints its own calibration |
 | `npm run shot` | the whole page at twelve sizes and designs — ⚠ **not byte-stable** (two runs of identical code differ on ~7 of 12, up to 9/255 in one small box), so it proves nothing either way |
 | `npm run sheets` | regenerates every family. **The 51 bare sheet files (`corpus-`, `recreate-`, `against-`; a few are withdrawn designs' and no longer rewritten) and the 6 `lockset-` sheets are the proof**: `?bare=1` rasterises flat vector with no webfont, photograph or animation, so they are stable |
-| `npm run backdrop` | rebuilds both rooms in `assets/` from the owner's originals; the asset is a pure function of an original plus one number |
+| `npm run backdrop` | rebuilds both of the owner's rooms in `assets/` from his originals; `-- <name>` grades `research/backdrops/<name>.webp` into `assets/room-<name>.webp`, measuring its floor line and solving MIX so its wall lands on his (1.11). The asset is a pure function of an original plus one number |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and de-skews it bilinearly from four measured corners (§3) |
 
 ⚠ **`npm test`'s freshness check hashes `js/`, `css/` and `index.html` for
@@ -1855,6 +1867,13 @@ are not in `VIEWS`:
   block of text on every step, 390 and 1280 × three languages (~720 readings),
   measured in Rubik and in its fallback: none moves by more than a line, at
   most 2 in 100 move at all (28.9 1c).
+- **the other rooms** (1.11) — each new room's wall, decoded off its ASSET,
+  within 2 luma of both of the owner's files; both lamps whole with their own
+  height of wall above them at eleven desktop shapes (1100×800 to 2560×1440;
+  the stairwell at 1100×800 named); no lamp, planter, pilaster, soffit,
+  window or switch plate under the settled `#frame` at every shape × size;
+  and the price's ground ≥ 4.5:1 under the figure on each room at every
+  width in three languages, the room laid where `placeRoom` puts it.
 - **pictures** — the navigator's eleven marks (21 px; the SEEN ones exactly the
   steps present, 2.10) and the spec's fourteen
   (28 px since 27.9 — the summary's fallback for a row whose step has no tile
@@ -2148,6 +2167,14 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   every phone. `…slice` would crop the door's head and foot (forbidden); a
   portrait tile loses the name and price row. The thirty tiles are distinct at
   shipped size (closest pair 2.07%, none under 0.45%).
+- **On the narrowest and tallest desktop stages the two new rooms lose a lamp
+  at the side** (1.11). A 3:2 photograph covering a stage narrower than ~0.95
+  of its height is scaled by the height, and its lamps leave the sides: at
+  1100×800 the street's are whole by 1 px and the stairwell's left one is
+  9.6 px out (named in the audit, `LAMP_KNOWN`); any window taller than about
+  0.8 of its width at 1100–1440 is worse. His room has the portrait framing
+  there; these have none, and no crop makes one (§3). What would close it is
+  a taller photograph of each room.
 - **On a phone the wall's controls cannot stand beside the two biggest
   doors** (14.9; four on 27.9, three on 28.9 — the band went onto the
   photograph and the crop gave 202 units more wall above the door, so every

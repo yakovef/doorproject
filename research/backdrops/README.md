@@ -14,16 +14,118 @@ kept. Both were prompted square-on, a 50 mm lens at eye level, the floor
 line horizontal at about 80 % of the height, an empty zone of plain wall
 45 % wide in the centre, two lights at 25 % and 75 % of the width.
 
-Nothing below has been measured yet. PROMPT J measures, per room, the
-floor line, the lamps' centres and their height of wall, and the empty
-zone behind the widest door, and grades each through `npm run backdrop`
-so the wall beside the door lands where the owner's does (§3: the
-ground under the swatch must not shift). The readings go under here.
+## Measured — 1.11.2026 (PROMPT J, commit 1)
 
-Seen by eye before measuring, to be checked: in `gen-street` the
-planter's stone kerb starts at about 87 % of the width, and the stone's
-joints cross the empty zone (joints are wall, not objects); in
-`gen-stairwell` the switch and bell plates stand at about 3 % of the
-width, the window at the top-left corner, and the dado's top edge runs
-across the whole wall at about 55 % of the height — it will cross behind
-every door.
+Every number below is off the originals (1536 × 1024 each), with the methods
+named; the owner's two rooms were re-measured the same way first, as the
+calibration. `tools/_room.mjs`, `_lamp.mjs` and `_obj.mjs` were scratch
+(gitignored); the floor measurement lives in `tools/backdrop.mjs` itself.
+
+### The floor line
+
+The strongest 4-px luminance step per column across the centre half, refined
+to a sub-pixel, a least-squares line trimmed four times. On the owner's
+originals it returns **827.4** of 941 and **1214.4** of 1448, against the
+recorded 827.4 and 1214.5. Both new rooms have a skirting, and the floor line
+is the skirting's FOOT, as on his (on the street the skirting's top is the
+stronger step, 864, so the search is held to the band the junction is in):
+
+| | y | fraction | tilt | rms |
+|---|---|---|---|---|
+| `gen-street` | 904.7 | 0.88352 | 0.006° | 0.24 px over 213 columns |
+| `gen-stairwell` | 893.1 | 0.87221 | −0.015° | 0.62 px over 216 columns |
+
+### The lamps
+
+The fitting's body, as the largest connected region past a threshold in a
+window round it — dark (luma < 90) for the street's square fittings, bright
+(> 240) for the stairwell's discs, extended by their measured chrome ring. The
+same method on the owner's wide room returns his right-hand lamp exactly:
+centre 1288.5 (his `lampCx` 452.5), 326..403 (his 326/402).
+
+| | left fitting | right fitting | `lampCx` (right) | height |
+|---|---|---|---|---|
+| `gen-street` | 329..376 × 361..418 | 1164..1211 × 360..418 | 419.5 / 1536 | 58 px |
+| `gen-stairwell` | 317..389 × 302..372 | 1146..1217 × 305..377 | 413.5 / 1536 | 72 px |
+
+⚠ The stairwell's LEFT fitting is the one farther out (415 from the centre
+against 413.5), so the audit asks both lamps of each room, not the right.
+
+### The empty zone, and what is not wall
+
+Between the lamps' inner edges: **0.244–0.758** of the width on the street
+(0.513 wide), **0.253–0.746** on the stairwell (0.493), against the owner's
+wide room's 0.244–0.761. Outside it, measured and handed to the audit as
+boxes it must never find under `#frame`:
+
+| | what | box (px of the original) | how |
+|---|---|---|---|
+| street | the planter's leaves and kerb | x ≥ 1297, y ≥ 498 | the first column holding ≥ 3 leafy pixels (g ≥ r, or luma < 110) above the kerb; the kerb's face at 1336 below 865 |
+| street | the porch pilaster's edge | x ≤ 55 | the vertical step's median, rows 100–850 (p10–p90 53–56) |
+| street | the soffit | y ≤ 34 | the horizontal step's median |
+| stairwell | the switch and bell plates | 32..69 × 430..519 | pixels off the local wall (luma 182) by > 25 |
+| stairwell | the window | 0..127 × 0..173 | the frame's step (124, 170) and its 3 px shadow |
+
+Stone joints, the leaves' shadow on the stone and the stairwell's dado line
+(its top at ~0.55 of the height, behind every door) are wall. Swept on the real
+page at eleven desktop shapes (1100×800 to 2560×1440), all six sizes: **no
+fitting and no object under any door**, and none under the price.
+
+### The grading
+
+Through `npm run backdrop -- <name>` — the owner's curve, reference and band.
+⚠ **Not at the owner's MIX 0.6**, and the reason is the number MIX 0.6 was
+derived from: it is the fraction that put HIS wall at 218–220, the luma a pale
+leaf's corpus ratio asks for (`tools/backdrop.mjs`' header). The street's
+stone starts at 175 where his plaster was 194, and at 0.6 lands at **212.3**;
+the stairwell at **216.8**. The same door would stand on a darker wall in one
+room than in another — the ground shifting under the swatch, CLAUDE.md §3. So
+the wall is what is held, and MIX is solved per room so the band lands on his
+desktop room's luma, read off `assets/room-wide.webp` (220.1):
+
+| | wall before | MIX | exponents r / g / b | wall after | r/b | file |
+|---|---|---|---|---|---|---|
+| owner, tall | #CFBCAB 191 | 0.6 | 1.3185 / 1.4322 / 1.5040 | #E3D9CF 218 | 1.097 | `room.webp` 81.7 KB |
+| owner, wide | #D0BFB2 194 | 0.6 | 1.3105 / 1.4082 / 1.4449 | #E3DBD2 220 | 1.081 | `room-wide.webp` 77.7 KB |
+| `gen-street` | #C6AB91 175 | **0.7248** | 1.5098 / 1.7590 / 1.9947 | #E4DBCF 220 | 1.101 | `room-gen-street.webp` 320.4 KB |
+| `gen-stairwell` | #C3B9AC 186 | **0.6638** | 1.4761 / 1.5255 / 1.5687 | #E1DCD3 220 | 1.066 | `room-gen-stairwell.webp` 235.1 KB |
+
+Read back off the shipped files by the audit (`the other rooms`): street
+**220.0**, stairwell **220.6**, against his 219.1 (tall) and 220.1 (wide) —
+within 2 of both. A room that would need MIX outside 0..1 is refused by the
+tool. Re-grading the owner's room writes his two files byte-identical.
+
+⚠ **One file each, no wide crop**, and it is arithmetic, not taste:
+`placeRoom` scales by the largest of floor-to-top, floor-to-foot and
+width-to-width, and cutting rows or columns off a picture can only raise one of
+them — a crop only zooms in, and the lamps move out. His two files are two
+framings of one entrance; a crop of one photograph is not a framing.
+
+### Resolution
+
+At the 1920×918 stage (1500 css px wide) both new rooms are drawn at **0.977**
+of their pixels — no upscale at 1× (his wide room 0.964). The most any desktop
+shape asks, of the eleven swept: **1.05** (street) and **1.06** (stairwell) at
+1920×1080, **1.42 / 1.44** at 2560×1440, against his wide room's 1.15 and 1.56
+at the same two. On a 2× screen each is twice that, as his is. No room is
+softer than the door at 1×; none was sharpened.
+
+### The lamps in frame — and where they cannot be
+
+Both fittings whole, each with its own height of wall above it (`pickRoom`'s
+criterion), at every desktop shape from **1152×800 to 2560×1440**. Not on the
+narrowest and the tallest desktop stages: the stage's width over its height
+falls under ~0.95 (1100×800, and any window taller than about 0.8 of its
+width at 1100–1440), the photograph is scaled up to cover the height, and the
+lamps leave the sides — at 1100×800 the street's are whole by 1 px and the
+stairwell's left one 9.6 px out (named in the audit). His room has the
+portrait framing there; these have none, and no crop can make one. A taller
+photograph of each would.
+
+### The price on each room
+
+The room laid on the stage exactly where `placeRoom` puts it, the price's ink
+made transparent, the darkest 5 % under the figure: **≥ 9.77:1** against
+`--ink` on 66 pictures (eleven widths × three languages × two rooms; lowest
+Russian at 1100×800 on the street, where the figure stands over the leaves'
+shadow on the stone). The gate is 4.5.

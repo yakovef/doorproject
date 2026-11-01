@@ -24,6 +24,86 @@ oldest lines move to the top of the "moved" section.
 
 ---
 
+## 1.11.2026 — PROMPT J, 1 of 2: the two rooms graded and measured, as assets
+
+His words (the owner's son): *"An option to change the background: some
+customers want to know how a door looks with different backgrounds. PC
+exclusive — I don't think there is enough space on the phone."* and
+*"Backgrounds that will show how the door looks in a setting that is other
+than just a perfect hall."* This commit makes the two generated rooms
+(`29782a6`) into assets, measured; the picker is the next.
+
+**The tool.** `npm run backdrop -- <name>` reads `research/backdrops/<name>.webp`
+and writes `assets/room-<name>.webp` through the owner's grading — his curve
+(`1 − (1 − v)^p`, three exponents solved per channel), his reference
+(`DRAWN_WALL` #F0EDE7) and his band (x 0.30–0.70, 0.15 of the height to 10 px
+over the floor). With no name it grades his two originals into their old file
+names, and they come out **byte-identical** (re-run and diffed). It prints the
+wall's median before and after and the exponents, and it MEASURES the floor
+line rather than taking it typed: the strongest 4-px luminance step per column
+across the centre half, sub-pixel, a trimmed line — on his originals 827.4 and
+1214.4 against the recorded 827.4 and 1214.5. On the street the skirting's top
+(864) is the stronger step, so each named room carries the band to look in.
+
+**What was falsified, and decided: MIX is solved per room.** The brief said
+"MIX 0.6, the wall beside the door at the measured 218–220 luma". At 0.6 the
+street's stone (175 before) lands at **212.3** and the stairwell (186) at
+**216.8** — 7.8 and 3.3 under his desktop room's 220.1, outside the 2-luma
+gate the same brief set. MIX 0.6 is not a taste: the tool's own header derives
+it from that wall (a pale leaf's corpus leaf/wall ratio, 1.072, asks for 220).
+So the WALL is held and MIX solved per room so the band lands on his
+`room-wide.webp` as graded (read off the file at run time, not typed): street
+**0.7248** (exponents 1.5098 / 1.7590 / 1.9947, #C6AB91 → #E4DBCF, r/b 1.366 →
+1.101), stairwell **0.6638** (1.4761 / 1.5255 / 1.5687, #C3B9AC → #E1DCD3,
+1.134 → 1.066). A room needing MIX outside 0..1 is refused. Reversible in one
+line (`mix = MIX`), at the cost of the 2-luma gate.
+
+**No wide crop, and why.** `placeRoom` scales by max(floor-to-top,
+floor-to-foot, width-to-width); removing rows or columns from a picture raises
+one of the three or none, so a crop only zooms in and moves the lamps out. His
+two files are two framings of one entrance; a crop of one photograph is not
+another. So one file each: 320.4 KB and 235.1 KB at webp q0.9 (budget 400).
+
+**Measured into `ROOMS`** (js/app.js, now SETS — `set: 'home'` for his two
+crops, one set per new room; `pickRoom(…, set)` scores one set's crops and
+never across): floor 904.7 / 893.1 of 1024 (tilt 0.006° / −0.015°, rms 0.24 /
+0.62 px); the right lamp's centre 419.5 / 413.5 from the picture's centre;
+the lamps' head and foot 360..418 / 305..377. The lamp method (largest
+connected region past a threshold in a window) run on his wide room returns
+his 452.5 and 326..403 exactly. The objects that must never be behind the
+door, measured: the street's planter (x ≥ 1297 above its kerb, the kerb's face
+at 1336), its porch pilaster (x ≤ 55) and the soffit (y ≤ 34); the
+stairwell's switch and bell plates (32..69 × 430..519) and its window (0..127 ×
+0..173). Stone joints, the leaves' shadow and the dado line are wall.
+
+**The audit's new block, `the other rooms`**, four clauses, each asked of
+pixels: (1) each new file's wall decoded off the asset within 2 luma of both of
+his — street **220.0**, stairwell **220.6** against **219.1** / **220.1**; (2)
+both lamps whole with a lamp's height of wall above them at eleven desktop
+shapes (1100×800 … 2560×1440) — 22 shape-rooms, one named: **1100×800
+stairwell, −9.6 px** (the street is whole there by 1 px); (3) no lamp or
+object under the settled `#frame` — **176 doors** (eleven shapes × six sizes
+in Hebrew, the standard door in English and Russian, two rooms), none; (4) the
+room laid on the stage where `placeRoom` puts it, the price's ink transparent,
+the darkest 5 % under the figure — **≥ 9.77:1 on 66 pictures** (lowest Russian
+1100×800 on the street, over the leaves' shadow), gate 4.5. Falsified each:
+the ungraded original as the street (174.9 — two faults), the exemption
+dropped (1100×800 faults at 9.6) and moved to a shape where the lamp is whole
+("take the exemption out"), a box put behind the door (3,514 px² at every
+size), a #3A3A3A room (1.48:1, and its wall 58.0).
+
+**Found, not fixed (§9):** below a stage ratio of ~0.95 (1100×800, and windows
+taller than ~0.8 of their width at 1100–1440) the 3:2 rooms are scaled by
+height and their lamps leave the sides; his room has his portrait framing
+there. A taller photograph of each would close it.
+
+**Resolution:** at the 1920×918 stage both are drawn at 0.977 of their pixels
+(his wide 0.964); the most any swept shape asks is 1.05 / 1.06 at 1920×1080
+and 1.42 / 1.44 at 2560×1440 (his 1.15 and 1.56). No sharpening.
+
+**Gates:** `node --check`, build, `npm test` **13,045,569, 0 failed**,
+`npm run sheets` — predicted 0 bare; four moved by 2–8 px of 1/255 (`corpus-04`, `corpus-06`, `recreate-d048`, `recreate-d087`) and the UNCHANGED commit, regenerated in a worktree on the same container, wrote the same four byte for byte — the container, not the change; the committed bytes were kept.
+
 ## 1.11.2026 — two generated rooms for the room picker
 
 The owner's son wants customers to see the door in settings *"other than
@@ -4396,6 +4476,21 @@ into `research/colours/README.md`.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **17.10** FOUR CARDS FROM HIS DECK (*"Add all of these colours … all of them
+  except the three that are free should be +200"*): 7345D אפור אורבני, 8075D
+  שוקולד קקאו, 8002D חמרה, 9077D חול ים APPENDED to `COLOURS` (21, no
+  `VERSION`), ₪200 each; hexes MEASURED off his photographs against each
+  card's label, calibrated leave-one-out (`research/colours/README.md`); held
+  out of the gallery's fit, which would have repainted seven doors. Long form: `HISTORY.md`.
+- **17.10** The colour deck photographed (`research/colours/cards/1-5.jpg`,
+  the owner's son): 18 cards, 14 already in the chart and four not (7345D,
+  8075D, 8002D, 9077D); every card +₪200 but the three included ones. The
+  readings and the chart change are PROMPT G's. Long form: `HISTORY.md`.
+- **10.10** The tour's POINTERS CURVE (*"…must not be horizontal — it looks very
+  ugly and is not intuitively understandable"*): a path off the callout's top
+  or bottom, bowing a quarter of its chord wherever that is within 45° of
+  horizontal; the arrowheads — gone since 28.9, their marker deleted with the
+  old lines — draw again. 0 bare sheets. Long form: `HISTORY.md`.
 - **10.10** The PANELS UNDER GLASS ARE THE CASING'S WIDTH (*"match the width
   of the window … the option with 2 panels needs to be identical to the
   rectangle window's panel"*): every kept row under glass flush with the

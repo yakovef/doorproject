@@ -16,6 +16,7 @@
  * Run: npm run audit
  */
 import { chromium } from 'playwright';
+import { readFileSync } from 'node:fs';
 import { tourless } from './browser.mjs';
 import { assertFreshBundle } from './fresh.mjs';
 import { crashed } from './browser.mjs';
@@ -3652,6 +3653,184 @@ for (const v of VIEWS) {
     if (!faults) { /* keep the log quiet on a clean run */ }
   }
   if (!faults) console.log('  every stage: lamps whole, price card between the stage\'s top and foot, chrome clear');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   THE OTHER ROOMS — GRADED TO HIS WALL, LAMPS IN FRAME, ONLY WALL BEHIND
+   THE DOOR, THE PRICE READABLE ON THEM. 1.11.2026 (PROMPT J, commit 1).
+   ═══════════════════════════════════════════════════════════════════
+   The owner's son: *"An option to change the background … Backgrounds that
+   will show how the door looks in a setting that is other than just a perfect
+   hall."* Two more photographs, `assets/room-gen-street.webp` and
+   `assets/room-gen-stairwell.webp`, graded by `npm run backdrop -- <name>`.
+   Four questions, each asked of the pixels:
+
+     1 THE GROUND UNDER THE SWATCH DOES NOT SHIFT (CLAUDE.md §3): each new
+       file's wall — the band the grading reads, decoded off the ASSET —
+       within 2 luma of both of the owner's files;
+     2 THE LAMPS ARE IN FRAME at every desktop stage shape: both fittings
+       whole, each with its own height of wall above it (`pickRoom`'s
+       criterion), from their measured boxes — the stairwell's LEFT fitting is
+       the farther out, so both are asked;
+     3 ONLY WALL BEHIND THE DOOR: no fitting and no object (the street's
+       planter and pilaster and the soffit; the stairwell's window and its
+       switch and bell plates) under the settled `#frame`, at every shape and
+       every size;
+     4 THE PRICE IS READABLE ON EACH: the room laid on the stage exactly where
+       `placeRoom` puts it, the price's ink made transparent, the darkest 5 %
+       under the figure ≥ 4.5:1 against `--ink`, at every desktop width in
+       three languages — on the stone that is where the leaves' shadow is.
+
+   ⚠ The constants are this file's own copy, measured off the originals
+   (`research/backdrops/README.md`), not borrowed from js/app.js — an
+   instrument that reads the implementation's table cannot notice it change.
+   ⚠ Until the picker exists the room is laid on the stage by this block
+   (the same three numbers `fitStage` writes); with the picker the price
+   sweep's clause 6 asks it of the real page on all three rooms. */
+{
+  console.log('\nthe other rooms: graded to his wall, lamps in frame, only wall behind the door, the price readable');
+  const before = faults;
+  const PX = (q, W0, H0) => q.map((v, i) => v / (i % 2 ? H0 : W0));
+  const NEW = {
+    'gen-street': { file: 'assets/room-gen-street.webp', floor: 904.7 / 1024, aspect: 1536 / 1024,
+      lamps: [[329, 361, 376, 418], [1164, 360, 1211, 418]].map(q => PX(q, 1536, 1024)),
+      things: { planter: [1297, 498, 1536, 1024], pilaster: [0, 0, 55, 1024], soffit: [0, 0, 1536, 34] } },
+    'gen-stairwell': { file: 'assets/room-gen-stairwell.webp', floor: 893.1 / 1024, aspect: 1536 / 1024,
+      lamps: [[317, 302, 389, 372], [1146, 305, 1217, 377]].map(q => PX(q, 1536, 1024)),
+      things: { plates: [32, 430, 69, 519], window: [0, 0, 127, 173] } },
+  };
+  for (const r of Object.values(NEW)) for (const k in r.things) r.things[k] = PX(r.things[k], 1536, 1024);
+  /* the live room's own floor, to find the line the door stands on */
+  const LIVE_FLOOR = { 'room.webp': 1214.5 / 1448, 'room-wide.webp': 827.4 / 941 };
+  const place = (r, bw, bh, yb) => {
+    const h = Math.max(yb / r.floor, (bh - yb) / (1 - r.floor), bw / r.aspect), w = h * r.aspect;
+    return { w, h, top: yb - r.floor * h, left: bw / 2 - w / 2 };
+  };
+  /* 2 — named: on the narrowest desktop stage the stairwell has no framing
+     narrow enough (a crop cannot help, §9); its left lamp's edge reads −9.6 px.
+     Held to the reading − 2 and asserted still needed. */
+  const LAMP_KNOWN = { '1100x800 gen-stairwell': -9.6 };
+  const lampSeen = new Set();
+  const SHAPES = [[1100, 800], [1152, 800], [1200, 800], [1280, 720], [1366, 768], [1440, 900],
+                  [1536, 864], [1680, 950], [1920, 918], [1920, 1080], [2560, 1440]];
+  const pg = await b.newPage();
+
+  /* 1 — the walls, off the files */
+  const band = async (file, floor) => pg.evaluate(async ([d, floor]) => {
+    const img = new Image(); img.src = 'data:image/webp;base64,' + d; await img.decode();
+    const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+    const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+    const W = c.width, H = c.height, D = x.getImageData(0, 0, W, H).data, fy = Math.round(floor * H);
+    const m = [0, 1, 2].map(k => { const a = [];
+      for (let y = Math.round(H * 0.15); y < fy - 10; y += 4) for (let x2 = Math.round(W * 0.3); x2 < W * 0.7; x2 += 4) a.push(D[(y * W + x2) * 4 + k]);
+      a.sort((u, v) => u - v); return a[a.length >> 1]; });
+    return 0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2];
+  }, [readFileSync(file).toString('base64'), floor]);
+  const home = { 'room.webp': await band('assets/room.webp', LIVE_FLOOR['room.webp']),
+                 'room-wide.webp': await band('assets/room-wide.webp', LIVE_FLOOR['room-wide.webp']) };
+  const walls = [];
+  for (const [k, r] of Object.entries(NEW)) {
+    const l = await band(r.file, r.floor);
+    walls.push(`${k} ${l.toFixed(1)}`);
+    for (const [hk, hl] of Object.entries(home)) {
+      if (Math.abs(l - hl) > 2) fault('rooms', `${k}: its wall reads luma ${l.toFixed(1)} against the owner's `
+        + `${hk} ${hl.toFixed(1)} — more than 2 apart, so the same door stands on a different ground in each room`);
+    }
+  }
+
+  let shapes = 0, readings = 0, contrasts = 0, lowest = 99, lowestAt = '';
+  const rel = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+  const INK = 0.2126 * rel(0x1C) + 0.7152 * rel(0x1A) + 0.0722 * rel(0x17);   // --ink
+  for (const lang of ['he', 'en', 'ru']) {
+    for (const [vw, vh] of SHAPES) {
+      await pg.setViewportSize({ width: vw, height: vh });
+      for (const size of Object.keys(SIZES)) {
+        /* the stage's crop is one per viewport; the door is the only thing a
+           size moves, so the lamps are asked once and the door every time */
+        if (lang !== 'he' && size !== 'standard') continue;
+        await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=${size}`);
+        await pg.waitForSelector('#stage svg #frame');
+        const g = await pg.evaluate(async () => {
+          const finite = document.getAnimations().filter(a => a.effect && a.effect.getComputedTiming().iterations !== Infinity);
+          await Promise.race([Promise.all(finite.map(a => a.finished.catch(() => {}))), new Promise(r => setTimeout(r, 3000))]);
+          const st = document.querySelector('#stage'), box = st.getBoundingClientRect(), cs = getComputedStyle(st);
+          const svg = st.querySelector('svg'), f = svg.querySelector('#frame'), bb = f.getBBox(), m = f.getScreenCTM();
+          const pt = (x, y) => { const q = svg.createSVGPoint(); q.x = x; q.y = y; return q.matrixTransform(m); };
+          const a = pt(bb.x, bb.y), c = pt(bb.x + bb.width, bb.y + bb.height);
+          const fig = document.querySelector('.quote .send__figure').getBoundingClientRect();
+          return { photo: document.documentElement.classList.contains('is-photo'),
+            file: (cs.backgroundImage.match(/([a-z0-9-]+\.webp)/) || [])[1] || null,
+            bw: box.width, bh: box.height, bx: box.x, by: box.y,
+            py: parseFloat(st.style.getPropertyValue('--photo-y')), ph: parseFloat(st.style.getPropertyValue('--photo-h')),
+            fr: [a.x - box.x, a.y - box.y, c.x - box.x, c.y - box.y],
+            fig: { left: fig.left, top: fig.top, right: fig.right, bottom: fig.bottom, height: fig.height } };
+        });
+        const tag = `${vw}x${vh}`;
+        if (!g.photo || !(g.file in LIVE_FLOOR)) { fault('rooms', `${lang} ${tag} ${size}: the owner's room is not up (${g.file}) — no floor line to stand the others on`); continue; }
+        const yb = g.py + LIVE_FLOOR[g.file] * g.ph;
+        for (const [k, r] of Object.entries(NEW)) {
+          const p = place(r, g.bw, g.bh, yb);
+          const box = q => [p.left + q[0] * p.w, p.top + q[1] * p.h, p.left + q[2] * p.w, p.top + q[3] * p.h];
+          /* 2 */
+          if (lang === 'he' && size === 'standard') {
+            shapes++;
+            const clear = Math.min(...r.lamps.map(q => { const [x0, y0, x1, y1] = box(q); return Math.min(x0, g.bw - x1, y0 - (y1 - y0), g.bh - y1); }));
+            const known = LAMP_KNOWN[`${tag} ${k}`];
+            if (known !== undefined) {
+              if (clear < 0) lampSeen.add(`${tag} ${k}`);
+              if (clear < known - 2) fault('rooms', `${tag} ${k}: a lamp's edge stands ${clear.toFixed(1)} px — named at ${known}`);
+            } else if (clear < 0) {
+              fault('rooms', `${tag} ${k}: a lamp is ${(-clear).toFixed(1)} px out of the stage, or has less than its own height of wall above it`);
+            }
+          }
+          /* 3 */
+          readings++;
+          for (const [t, q] of [...r.lamps.map((q, i) => [i ? 'right lamp' : 'left lamp', q]), ...Object.entries(r.things)]) {
+            const [x0, y0, x1, y1] = box(q);
+            const ov = Math.max(0, Math.min(x1, g.fr[2]) - Math.max(x0, g.fr[0])) * Math.max(0, Math.min(y1, g.fr[3]) - Math.max(y0, g.fr[1]));
+            if (ov > 0) fault('rooms', `${lang} ${tag} ${size} ${k}: the ${t} stands ${ov.toFixed(0)} px² behind the door`);
+          }
+          /* 4 — the standard door, every width, three languages */
+          if (size === 'standard') {
+            const ok = await pg.evaluate(async ([d, w, h, top]) => {
+              const img = new Image(); img.src = 'data:image/webp;base64,' + d; await img.decode();
+              const st = document.querySelector('#stage');
+              st.style.backgroundImage = `url("${img.src}")`;
+              st.style.setProperty('--photo-w', `${w.toFixed(1)}px`);
+              st.style.setProperty('--photo-h', `${h.toFixed(1)}px`);
+              st.style.setProperty('--photo-y', `${top.toFixed(1)}px`);
+              await new Promise(r2 => requestAnimationFrame(() => requestAnimationFrame(r2)));
+              return true;
+            }, [readFileSync(r.file).toString('base64'), p.w, p.h, p.top]);
+            if (!ok) continue;
+            await pg.addStyleTag({ content: '.quote .send__figure, .quote .send__chev { color: transparent !important; }' });
+            const bx = g.fig, x0 = Math.max(0, bx.left);
+            const shot = `/tmp/audit-rooms-${process.pid}.png`;
+            await pg.screenshot({ path: shot, clip: { x: x0, y: Math.max(0, bx.top), width: Math.max(1, Math.min(bx.right, vw) - x0), height: Math.max(1, bx.height) } });
+            const im = load(shot), ls = [];
+            for (let i = 0; i < im.d.length; i += 4) ls.push(0.2126 * rel(im.d[i]) + 0.7152 * rel(im.d[i + 1]) + 0.0722 * rel(im.d[i + 2]));
+            ls.sort((u, v) => u - v);
+            const cr = (ls[Math.floor(ls.length * 0.05)] + 0.05) / (INK + 0.05);
+            contrasts++;
+            if (cr < lowest) { lowest = cr; lowestAt = `${lang} ${tag} ${k}`; }
+            if (cr < 4.5) fault('rooms', `${lang} ${tag} ${k}: the price is ink on a picture whose darkest 5 % reads ${cr.toFixed(2)}:1 — under 4.5`);
+            /* and the stage back to the owner's room for the next room */
+            await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=${size}`);
+            await pg.waitForSelector('#stage svg #frame');
+            await pg.waitForTimeout(400);
+          }
+        }
+      }
+    }
+  }
+  await pg.close();
+  /* §5.15 — every clause found its subject */
+  if (shapes < SHAPES.length * 2) fault('rooms', `the lamps were asked at ${shapes} shape-rooms — expected ${SHAPES.length * 2}`);
+  if (contrasts < SHAPES.length * 3 * 2) fault('rooms', `the price was read on ${contrasts} pictures — expected ${SHAPES.length * 3 * 2}`);
+  for (const k of Object.keys(LAMP_KNOWN)) if (!lampSeen.has(k)) fault('rooms', `${k}: named as a lamp out of frame and it is whole now — take the exemption out`);
+  if (faults === before) console.log(`  walls ${walls.join(', ')} against his ${Object.values(home).map(v => v.toFixed(1)).join(' / ')}; `
+    + `lamps whole at ${shapes} shape-rooms (named: ${Object.keys(LAMP_KNOWN).join(', ')}); nothing but wall behind `
+    + `${readings} doors; the price ≥ ${lowest.toFixed(2)}:1 on ${contrasts} pictures (lowest ${lowestAt})`);
 }
 
 /* ═══════════════════════════════════════════════════════════════════

@@ -12574,6 +12574,7 @@ ${plate.defs}${plate.body}
   var ROOMS = [
     {
       id: "tall",
+      set: "home",
       el: "room-src",
       floor: 1214.5 / 1448,
       aspect: 1086 / 1448,
@@ -12583,14 +12584,58 @@ ${plate.defs}${plate.body}
     },
     {
       id: "wide",
+      set: "home",
       el: "room-wide-src",
       floor: 827.4 / 941,
       aspect: 1672 / 941,
       lampCx: 452.5 / 1672,
       lampTop: 326 / 941,
       lampBot: 402 / 941
+    },
+    /* ⚠ TWO MORE ROOMS, ONE FRAMING EACH — 1.11.2026 (PROMPT J). The owner's
+       son: *"An option to change the background … Backgrounds that will show
+       how the door looks in a setting that is other than just a perfect
+       hall."* Each is its own SET: `pickRoom` chooses among one room's crops
+       and never across rooms, so a set holding one file always gets that file.
+       Every number is measured off the 1536 × 1024 original
+       (`research/backdrops/README.md` has the readings and the method):
+         floor    `npm run backdrop -- <name>` prints it — the skirting's FOOT,
+                  as on the owner's room (the street's skirting top at 864 is
+                  the stronger step and is not the floor): street 904.7, tilt
+                  0.006°, rms 0.24 px; stairwell 893.1, −0.015°, 0.62 px.
+         lamp*    the RIGHT fitting's body, off a threshold on the original —
+                  the street's dark box 1164..1211 × 360..418 (luma < 90), the
+                  stairwell's bright disc and its ring 1146..1217 × 305..377. The
+                  method run on the owner's wide room returns his 452.5 and
+                  326..403 exactly.
+       ⚠ NO SECOND CROP, AND IT IS ARITHMETIC: `placeRoom` scales by the
+       largest of three ratios and a crop can only raise one, so no crop of a
+       photograph keeps its lamps better than the whole of it does. On a stage
+       narrower than ~0.95 of its height (1100 × 800 and taller windows) these
+       two have nothing to fall back to and a lamp leaves the side; the
+       owner's room has his portrait framing there. CLAUDE.md §9. */
+    {
+      id: "gen-street",
+      set: "gen-street",
+      el: "room-gen-street",
+      floor: 904.7 / 1024,
+      aspect: 1536 / 1024,
+      lampCx: 419.5 / 1536,
+      lampTop: 360 / 1024,
+      lampBot: 418 / 1024
+    },
+    {
+      id: "gen-stairwell",
+      set: "gen-stairwell",
+      el: "room-gen-stairwell",
+      floor: 893.1 / 1024,
+      aspect: 1536 / 1024,
+      lampCx: 413.5 / 1536,
+      lampTop: 305 / 1024,
+      lampBot: 377 / 1024
     }
   ];
+  var roomSet = "home";
   function placeRoom(room, boxW, boxH, yBase) {
     const h = Math.max(
       yBase / room.floor,
@@ -12609,9 +12654,10 @@ ${plate.defs}${plate.body}
       lampBot: top + room.lampBot * h
     };
   }
-  function pickRoom(boxW, boxH, yBase) {
+  function pickRoom(boxW, boxH, yBase, set2 = roomSet) {
     const MARGIN = 6;
-    const scored = ROOMS.map((r) => {
+    const crops = ROOMS.filter((r) => r.set === set2);
+    const scored = (crops.length ? crops : ROOMS.filter((r) => r.set === "home")).map((r) => {
       const p = placeRoom(r, boxW, boxH, yBase);
       const half = p.w * 0.02;
       const lampH = p.lampBot - p.lampTop;
@@ -12628,7 +12674,7 @@ ${plate.defs}${plate.body}
       return { ...p, off };
     });
     const usable = scored.filter((s) => Number.isFinite(s.off));
-    if (!usable.length) return ROOMS[0];
+    if (!usable.length) return scored[0].room;
     return (usable.find((s) => s.off <= 0) || usable.slice().sort((a, b) => a.off - b.off)[0]).room;
   }
   var liveRoom = null;
