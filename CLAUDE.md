@@ -261,6 +261,11 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **1.11** Two generated rooms for the room picker, saved as evidence only:
+  `research/backdrops/gen-street.webp` (Jerusalem stone, outside) and
+  `gen-stairwell.webp` (an older landing, terrazzo), 1536 × 1024, with a
+  README. The page is untouched; grading, measuring and the desktop-only
+  picker are PROMPT J's. Long form: `HISTORY.md`.
 - **28.10** ONE BRANCH, `main` (*"I want all the branches merged into main, and
   I don't want other branches to be made ever"*). Created at the trunk's
   `c1d860a`; THE GUARD: no page file from any other branch — the page on `main`

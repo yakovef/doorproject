@@ -24,6 +24,20 @@ oldest lines move to the top of the "moved" section.
 
 ---
 
+## 1.11.2026 — two generated rooms for the room picker
+
+The owner's son wants customers to see the door in settings *"other than
+just a perfect hall"*, on a desktop only (*"I don't think there is enough
+space on the phone"*). He generated rooms from prompts written square-on
+with an empty centre and two lights; a first hall came out too like the
+owner's room and was dropped. Kept: `research/backdrops/gen-street.webp`
+(a building entrance in Jerusalem stone) and `gen-stairwell.webp` (an
+older building's landing, plaster over terrazzo), both 1536 × 1024. Their
+README lists what is visible and what must still be measured. Nothing in
+`js/`, `css/`, `assets/` or `index.html` moved; PROMPT J grades them
+through `npm run backdrop`, measures the floor line and lamps, and builds
+the picker.
+
 ## 17.10.2026 — the colour deck photographed
 
 Five photographs of the רב-בריח fan deck from the owner's son, saved as
