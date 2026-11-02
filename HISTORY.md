@@ -266,6 +266,20 @@ into `research/colours/README.md`.
   send all clean; `collide -- boxes` clean (deepest mount 109 of 121);
   `latency` 446 ms worst against 600, the element counts `main`'s exactly
   (268 · 1,017 · 656 — the redesign drew nothing in the stage); 0 bare sheets.
+  **Then merged with prompts I and J** (`4364eab`), which another chat pushed
+  while this was gated: the code merged on its own, the hashes and sheets were
+  rebuilt, the logs keep both sides. On the whole: `npm test` 25,277,519 / 0
+  failed; 0 bare sheets; a complete audit, 8 faults, and every one read on
+  `main` as prompt J pushed it (`cb486b4`) in the same container, so none is
+  the merge's: the summary's two marks above; the room picker's reload clause
+  reopening on the home room one time in three (replayed: 1 of 3 on `main`, 1
+  of 3 merged — the block saves the room on one load and reads it on the
+  next, which §7 names as an instrument's flake; its two keyboard faults start
+  from the wrong room because of it); and the room picker standing on the
+  designs' tab beside the glass mark in Russian at 1100×800 (standard, half:
+  513 px²) and 1152×800 (half: 281) — the tab's edge at x 488, the picker's at
+  496, pixel-identical with and without the merge. Both of those are prompt
+  J's region, left to it and named.
   The redesign's own entry, as it was written on its branch:
 
 - **2.10 — THE REDESIGN ROUND, PROMPT 1: WORDS, DESTINATIONS, NAMES, AND
