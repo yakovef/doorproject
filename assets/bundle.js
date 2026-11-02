@@ -5871,10 +5871,17 @@ ${body}
   var panelRows = (detail, leafH) => detail.panels >= 3 ? trioRows(leafH) : detail.panels === 2 ? PANEL_ROWS.pair : detail.top ? PANEL_ROWS.top : [PANEL_ROWS.lone];
   var panelInset = (detail) => (detail.panels >= 3 ? PANEL_INSETS.trio : null) ?? PANEL_INSET;
   function faceRowsOn(detail, win, openings, leafW, leafH) {
-    const none = { rows: [], inset: 0, lone: false, cased: false };
+    const none = { rows: [], inset: 0, lone: false, cased: false, plate: null };
     if (detail.classic) return none;
+    const plateRow = (kept2 = null) => detail.panels >= 3 && (kept2 === null || kept2.includes(1)) ? panelRows(detail, leafH)[1] : null;
     if (!openings.length) {
-      return detail.panel ? { rows: panelRows(detail, leafH), inset: leafW * panelInset(detail), lone: false, cased: false } : none;
+      return detail.panel ? {
+        rows: panelRows(detail, leafH),
+        inset: leafW * panelInset(detail),
+        lone: false,
+        cased: false,
+        plate: plateRow()
+      } : none;
     }
     const casing = Math.max(0, Math.min(...openings.map((o) => o.x)) - MOULD_BAND);
     const winBottom = Math.max(...openings.map((o) => o.top + o.h));
@@ -5882,11 +5889,12 @@ ${body}
       rows: [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]],
       inset: casing,
       lone: true,
-      cased: true
+      cased: true,
+      plate: null
     };
     const kept = (detail.keeps || []).map((i) => panelRows(detail, leafH)[i]).filter(Boolean);
     if (kept.length && detail.panels === 2 && win.panel) return lone;
-    if (kept.length) return { rows: kept, inset: casing, lone: false, cased: true };
+    if (kept.length) return { rows: kept, inset: casing, lone: false, cased: true, plate: plateRow(detail.keeps || []) };
     if (!detail.panel && !win.panel) return none;
     return lone;
   }
@@ -6044,6 +6052,22 @@ ${body}
     out.push(...fittingBoxes(state2, leafW, leafH));
     return out;
   }, (st) => `${st.size}|${st.detail}|${st.window}|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}|${st.handing}|${st.handle === BOW_AS_GRIP}`);
+  function plateField(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const detail = byId(DETAILS, state2.detail);
+    const win = byId(WINDOWS, state2.window);
+    const f = faceRowsOn(detail, win, apertureLayout(win, leafW, leafH), leafW, leafH);
+    if (!f.plate) return null;
+    const [t, b] = f.plate;
+    return {
+      x: f.inset + MOULD_BAND,
+      y: leafH * t + MOULD_BAND,
+      w: leafW - f.inset * 2 - MOULD_BAND * 2,
+      h: leafH * (b - t) - MOULD_BAND * 2
+    };
+  }
+  var BOW_PLATE_MARGIN = 5;
   function peepholeFits(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
@@ -6122,11 +6146,12 @@ ${body}
     const raw = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state2));
     const panelled = detail.panel && !glassRows(byId(WINDOWS, state2.window));
     const standoff = raw;
+    const field = plateField(state2);
     const grabY = () => {
+      if (field) return field.y + field.h / 2;
       if (detail.classic) return leafH * (CLASSIC_ROWS.band[0] + CLASSIC_ROWS.band[1]) / 2;
       if (panelled) {
         const rows = panelRows(detail, leafH);
-        if (rows.length >= 3) return leafH * (rows[1][0] + rows[1][1]) / 2;
         if (rows.length === 2) return leafH * (rows[0][1] + rows[1][0]) / 2;
       }
       if (detail.panel && (detail.keeps || []).length && glassRows(byId(WINDOWS, state2.window))) {
@@ -6140,7 +6165,7 @@ ${body}
       return leafH * GRAB.fromTop;
     };
     const homeY = handle.style === "grab" ? grabY() : leafH - HANDLE_AFF;
-    const homeX = handle.style === "grab" ? (leafW - GRAB.len) / 2 : backset + standoff;
+    const homeX = handle.style === "grab" ? (field ? field.x + field.w / 2 : leafW / 2) - GRAB.len / 2 : backset + standoff;
     return { x: homeX, y: homeY, rot: 0 };
   }
   function gripHomeUncached(state2) {
@@ -6233,7 +6258,17 @@ ${body}
   var bowState = (state2) => ({ ...state2, handle: BOW_AS_GRIP, handleLen: 0, grab: "nograb" });
   var bowHome = (state2) => gripIdeal(bowState(state2));
   var bowPlacement = (state2, place = null) => gripPlacement(bowState(state2), place || bowHome(state2));
-  var bowFits = (state2) => !gripClashesLockset(bowState(state2)) && bowPlacement(state2).ok;
+  var bowFits = (state2) => !gripClashesLockset(bowState(state2)) && bowPlacement(state2).ok && bowInPlate(state2);
+  function bowInPlate(state2) {
+    const f = plateField(state2);
+    if (!f) return true;
+    const size = SIZES[state2.size] || SIZES.standard;
+    const leafW = size.w - REBATE * 2;
+    const p = bowHome(state2);
+    const x0 = hingeLeftOf(state2) ? leafW - (p.x + GRAB.len) : p.x;
+    const m = BOW_PLATE_MARGIN;
+    return x0 >= f.x + m - 1e-6 && x0 + GRAB.len <= f.x + f.w - m + 1e-6 && p.y - GRAB.rose >= f.y + m - 1e-6 && p.y + GRAB.rose <= f.y + f.h - m + 1e-6;
+  }
   function bowBox(state2, leafW, leafH) {
     const p = bowHome(state2);
     const f = handleFootprint(byId(BOWS, "grab"), leafH);

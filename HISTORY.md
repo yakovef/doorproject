@@ -209,6 +209,82 @@ into `research/colours/README.md`.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **1.11 — PROMPT I, 2 OF 2: THE BOW INSIDE THE TRIO'S MIDDLE PANEL.** His
+  words: *"If there is a horizontal pull and 3 panels, then the horizontal
+  pull always ends up being inside the middle panel."* — with a screenshot of
+  the trio under the square window, the bow lying on the rail between the
+  window's casing and the plate, across the plate's top moulding.
+  Ours: "inside the middle panel" means wholly inside the plate's FIELD (the
+  flat inside its moulding), centred on it, on every size, solid or glazed,
+  at least 5 mm off the moulding; where a field could not hold it the bow
+  would be refused on that face (Peretz's ranking, face > bow) — none needs to
+  be.
+  · **Measured first, off the drawing** (`tools/_bowplate.mjs`, real getBBox:
+    the field off the moulding runs' inner edges, the bow off its metal),
+    `?s=…&d=panel3&gb=grab`, before → after:
+
+        size        glass  field (mm)      bow 300×42, clear L/R/T/B → after
+        standard    solid  319.0 × 52.7    9.5/9.5/5.4/5.3   (unchanged)
+        standard    rect   358.7 × 52.7    29.3/29.3/−117.6/128.3 → 29.3/29.3/5.4/5.3
+        extra1      solid  359.5 × 66.8    29.8/29.8/12.4/12.4 (unchanged)
+        extra1      rect   390.4 × 66.8    45.2/45.2/−119.6/144.4 → 45.2/45.2/12.4/12.4
+        extra2      solid  454.0 × 80.9    77.0/77.0/19.5/19.4 (unchanged)
+        extra2      rect   464.2 × 80.9    82.1/82.1/−121.5/160.4 → 82.1/82.1/19.5/19.4
+        the three doubles read as their single (the main leaf is the same)
+
+    Glazed, the bow's centre stood 123 / 132 / 141 mm above the field's.
+  · **The cause, §5.10's shape.** `gripIdeal` homed the solid trio's bow off
+    `panelRows` (the plate row — right), and let the glazed trio fall through
+    to the PAIR's branch of 26.9: "the rail between the window's casing foot
+    and the top of the panel the face keeps", read off `faceObstacles`. On the
+    trio the first kept row IS the plate, so that rail is the 53 mm one above
+    it. Two statements of where the bow goes on one face, agreeing on the
+    solid door every check ran on. No new §5 number; cited at §5.10.
+  · **The change.** `faceRowsOn` names the plate row beside the rows it is one
+    of (`plate`); `plateField(state)` is the field — that row inside
+    `MOULD_BAND` at the face's inset (the casing's under glass) — read by
+    `gripIdeal` (the home: its centre, x and y), by `bowInPlate` (part of
+    `bowFits`: the drawn metal, `GRAB.len` × 2 `GRAB.rose`, ≥
+    `BOW_PLATE_MARGIN` 5 mm inside) and, through `faceRowsOn`, by
+    `faceObstacles` and the drawing. Every size holds the bow; nothing is
+    refused, so no `why.bowPlate` was added (a reason with no reader); a field
+    that could not hold it would grey the bow with `why.bowFace` through
+    `bowObstacle`'s existing `face` branch.
+  · **The bar beside the bow** (`why.gripOnBow`) re-measured: on the trio with
+    the bow, every bar × length × lockset × size × two handings, old against
+    new — 4,800 of 7,200 keep their bar both times; the bar stands on the stile
+    and the bow moved only inside the face. Collide's buildable count 1,638,
+    unchanged.
+  · **Asserted.** Units (a new group, 249): on 6 sizes × solid/glazed × two
+    handings, `plateField` equals the drawn field to 0.05 mm, `faceObstacles`'
+    plate equals the drawn plate round it, the bow's drawn metal is inside the
+    field ≥ 5 mm off every moulding and centred within 1 mm, its home is the
+    field's centre, the price ₪300 unmoved; beside them what must STAY true —
+    the solid trio's home where it was, the pair's rail solid and under the
+    window, no field on any other face. Audit (4 readings): on the standard
+    trio solid and glazed at 390 and 1440, the pixels the bow brightens lie
+    between the plate's inner moulding edges on the picture and span its
+    width; the summary and the message name it. Falsified: the old home back
+    alone — the new fit refuses the glazed bow (25 clauses, "did not stand
+    together"); the whole old behaviour (home and no fit) — the inside-the-
+    field clause on the glazed standard, −117.6 mm, and the audit's two glazed
+    readings; a 10 mm margin — refuses exactly the standard and the double,
+    solid and glazed.
+  · **Sheets: 0 bare and 0 lockset moved**, as predicted (`against-grab`
+    draws the bow on a plain leaf; no gallery, recreate or lockset door
+    carries it) — `.stamps.json` and eight `shot` sheets.
+  · **Gates.** Rebased twice over another session's PROMPT J (the room
+    picker — `js/app.js`, `css/app.css`, `index.html`, the audit), the gates
+    were re-run on the merged tree each time: npm test **25,277,637, 0
+    failed**, collide 1,638 clean and `-- boxes` clean, sheets 0 bare; the
+    complete audit over J's FIRST commit read no faults, and over its SECOND
+    (the room picker) **3 faults, none this round's** — `nav-column`, ru
+    1100×800 standard and `half` glazed and ru 1152×800 `half` glazed, "the
+    designs' mark beside the glass stands on a wall control" (513 / 513 / 281
+    px²) — reproduced exactly on `cb486b4` alone, without either of I's
+    commits: the picker's tab and the designs' tab meet in the Russian column.
+    Left to that round, named here. On I's own tree before them: npm test **25,277,594, 0 failed**; collide `-- all` 1,638 clean (unchanged), `-- boxes` clean (the bow drawn 0 / 300 / 21 in 4 / 305 / 26); fuzz with `grilleOn` in the sweep — 30,000 designs, 1,800 clicks, 231 met the dialog (104 yes / 127 no; the leaf tiles are among the clicks now), the reset 85 times (76 asked, 33 yes, 43 no), nothing broke; audit complete, no faults (both new blocks among it; the only other line apart from 17.10's is which desktop width holds the 10.6:1 minimum ink — a tie on identical figures).
+
 - **1.11 — PROMPT I, 1 OF 2: THE DESIGN ON ONE LEAF OR BOTH.** His words:
   *"When choosing the door-and-a-half and then choosing a design, it
   automatically puts a design on the half door. Figure out where to put an

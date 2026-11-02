@@ -8,10 +8,10 @@ import { SECTION_ICON, sectionIcon, SPEC_ICON, specIcon } from '../js/icons.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceLabel, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
-  bellGlyph, bowGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
+  bellGlyph, bowGlyph, BOW_PLATE_MARGIN, detailGlyph, faceObstacles, plateField, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, grilleOnGlyph, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
   bellFits, bowFeet, bowFits, bowHome, bowPlacement, locksetGlyph, mashkofGlyph, panelUnderGlass, spawnIndexOf, spawnSpots, peepholeFits,
-  peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph, stripeTileGlyph, TRIO_RAIL,
+  MOULD_BAND, peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph, stripeTileGlyph, TRIO_RAIL,
   windowGlyph,
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
@@ -7718,6 +7718,105 @@ group('the window design on one leaf of a door-and-a-half — 1.11.2026');
      'the order does not say the design is on the main leaf only');
   ok(withLang('he', () => summaryLine({ ...one }).includes(L(byId(GRILLE_ON, 'side')))),
      'the one-line summary does not say the design is on the fixed leaf only');
+}
+
+/* ── THE BOW INSIDE THE TRIO'S MIDDLE PANEL — 1.11.2026 ──────────────────
+   The owner's son: *"If there is a horizontal pull and 3 panels, then the
+   horizontal pull always ends up being inside the middle panel."* — with a
+   screenshot of the glazed trio, the bow on the rail above the plate, across
+   its top moulding. Measured before the fix: 123–141 mm above the field's
+   centre on every glazed size; the solid trio centred. One statement of the
+   plate's field now (`plateField`, `faceRowsOn`'s plate row inside
+   `MOULD_BAND`), read by the home, the fit and the obstacle list. */
+group('the bow stands inside the trio\'s handle plate — 1.11.2026');
+{
+  const num = v => Number(v);
+  /* The DRAWN plate field, off the main leaf's moulding paths (the shortest
+     moulded rectangle on the trio is its plate), and the DRAWN bow, off its
+     metal (rect, circle, ellipse — never a shadow) — both in leaf-local mm. */
+  const drawn = svg => {
+    const leafAt = svg.indexOf('<g id="leaf"');
+    const lx = num((/<g id="leaf" data-x="([\d.]+)"/.exec(svg) || [])[1]);
+    const ly = num((/<g id="leaf"[^>]*>\s*<rect x="[\d.]+" y="([\d.]+)"/.exec(svg) || [])[1]);
+    /* Every moulded rectangle drawn on the main leaf — the face's and the
+       casing's — as a top run paired with the bottom run of the same width
+       below it (a nested relight group means the face's own `</g>` cannot
+       bound it); the shortest is the plate. */
+    const region = svg.slice(leafAt);
+    const runs = o => [...region.matchAll(new RegExp(`<path d="([^"]+)" fill="url\\(#mould-[a-z]+-${o}\\)"`, 'g'))]
+      .map(m => m[1].match(/-?[\d.]+/g).map(Number));
+    const t = runs('t'), b = runs('b');
+    const rects = t.map(tt => {
+      const bb = b.filter(r => Math.abs(r[0] - tt[0]) < 0.01 && Math.abs(r[2] - tt[2]) < 0.01 && r[1] > tt[1])
+                  .sort((p, q) => p[1] - q[1])[0];
+      return bb && { x: tt[5] - lx, y: tt[4] - ly, w: tt[3] - tt[5], h: bb[4] - tt[4] };
+    }).filter(Boolean);
+    const plate = rects.length ? rects.reduce((a, c) => (c.h < a.h ? c : a)) : null;
+    const bowAt = svg.indexOf('data-hw="bow"');
+    let box = null;
+    if (bowAt > 0) {
+      const g = svg.slice(bowAt, svg.indexOf('<!-- The shaft', bowAt) + 2000);
+      for (const m of g.matchAll(/<(rect|circle|ellipse)\s([^>]*)\/>/g)) {
+        const a = m[2]; if (/filter=/.test(a)) continue;
+        const at = k => num((new RegExp(`\\b${k}="(-?[\\d.]+)"`).exec(a) || [])[1]);
+        const [x0, y0, x1, y1] = m[1] === 'rect' ? [at('x'), at('y'), at('x') + at('width'), at('y') + at('height')]
+          : m[1] === 'circle' ? [at('cx') - at('r'), at('cy') - at('r'), at('cx') + at('r'), at('cy') + at('r')]
+          : [at('cx') - at('rx'), at('cy') - at('ry'), at('cx') + at('rx'), at('cy') + at('ry')];
+        if ([x0, y0, x1, y1].some(Number.isNaN)) continue;
+        box = box ? { x0: Math.min(box.x0, x0), y0: Math.min(box.y0, y0), x1: Math.max(box.x1, x1), y1: Math.max(box.y1, y1) }
+                  : { x0, y0, x1, y1 };
+      }
+    }
+    return { plate, bow: box && { x: box.x0 - lx, y: box.y0 - ly, w: box.x1 - box.x0, h: box.y1 - box.y0 } };
+  };
+  let n = 0;
+  for (const size of Object.keys(SIZES)) for (const window of ['none', 'rect']) for (const handing of ['right-in', 'left-in']) {
+    const st = repair({ ...DEFAULTS, size, window, handing, detail: 'panel3', grab: 'grab', lockset: 'cylinder' }).state;
+    const tag = `${size}/${window}/${handing}`;
+    ok(st.grab === 'grab' && st.detail === 'panel3' && st.window === window, `${tag}: the trio and the bow did not stand together — no subject`);
+    const F = plateField(st);
+    ok(F, `${tag}: the trio has no plate field`);
+    if (!F) continue;
+    const d = drawn(render(st));
+    ok(d.plate && d.bow && d.bow.w > 290, `${tag}: the plate or the bow could not be read off the drawing — this check is dead`);
+    if (!d.plate || !d.bow) continue;
+    n++;
+    /* the one statement is the drawing's plate (§5.10) */
+    ok(['x', 'y', 'w', 'h'].every(k => Math.abs(d.plate[k] - F[k]) < 0.05),
+       `${tag}: plateField ${JSON.stringify(F)} is not the drawn field ${JSON.stringify(d.plate)}`);
+    const obs = faceObstacles({ ...st, grab: 'nograb' }).find(o => o.kind === 'panel' && Math.abs(o.y + MOULD_BAND - F.y) < 0.05);
+    ok(obs && Math.abs(obs.x + MOULD_BAND - F.x) < 0.05 && Math.abs(obs.w - MOULD_BAND * 2 - F.w) < 0.05 && Math.abs(obs.h - MOULD_BAND * 2 - F.h) < 0.05,
+       `${tag}: faceObstacles' plate ${JSON.stringify(obs)} is not the drawn plate round the field`);
+    /* the bow wholly inside the field, ≥ 5 mm off the moulding, centred */
+    const B = d.bow, m = BOW_PLATE_MARGIN;
+    const clear = [B.x - F.x, F.x + F.w - (B.x + B.w), B.y - F.y, F.y + F.h - (B.y + B.h)];
+    ok(clear.every(c => c >= m - 0.05), `${tag}: the bow stands ${clear.map(c => c.toFixed(1)).join('/')} mm off the plate's moulding (L/R/T/B) — ${m} wanted`);
+    ok(Math.abs(B.x + B.w / 2 - (F.x + F.w / 2)) <= 1 && Math.abs(B.y + B.h / 2 - (F.y + F.h / 2)) <= 1,
+       `${tag}: the bow is not centred on the plate's field`);
+    ok(Math.abs(bowHome(st).y - (F.y + F.h / 2)) < 0.01, `${tag}: the bow's home ${bowHome(st).y} is not the field's centre ${F.y + F.h / 2}`);
+    /* the price unmoved: ₪300 plus the finish */
+    ok(priceAgorot(st) - priceAgorot({ ...st, grab: 'nograb' }) === 30000, `${tag}: the bow on the trio is not ₪300`);
+  }
+  ok(n === 24, `only ${n} of 24 trio doors were measured`);
+  /* §5.22's pair: what must STAY true beside what had to BECOME true. The
+     pair's home is unchanged — its rail, solid and under the square window —
+     and the solid trio's is where it always was (the plate row's centre). */
+  for (const size of ['standard', 'halfextra2']) {
+    const lh = SIZES[size].h - REBATE;
+    const solidTrio = { ...DEFAULTS, size, detail: 'panel3', grab: 'grab', lockset: 'cylinder' };
+    const F = plateField(solidTrio);
+    ok(F && Math.abs(bowHome(solidTrio).y - (F.y + F.h / 2)) < 0.01, `${size}: the solid trio's bow moved`);
+    const pair = { ...DEFAULTS, size, detail: 'panel2', grab: 'grab', lockset: 'cylinder' };
+    ok(plateField(pair) === null && plateField({ ...DEFAULTS, size }) === null && plateField({ ...DEFAULTS, size, detail: 'classic' }) === null,
+       `${size}: a face with no handle plate has a plate field`);
+    const glazedPair = { ...pair, window: 'rect' };
+    const obs = faceObstacles({ ...glazedPair, grab: 'nograb' });
+    const foot = Math.max(...obs.filter(o => o.kind === 'window').map(o => o.y + o.h));
+    const top = Math.min(...obs.filter(o => o.kind === 'panel').map(o => o.y));
+    ok(top > foot && Math.abs(bowHome(glazedPair).y - (foot + top) / 2) < 0.01,
+       `${size}: the pair's bow left its rail under the window`);
+    ok(bowHome(pair).y > lh * 0.5 && bowHome(pair).y < lh * 0.7, `${size}: the solid pair's bow left its rail`);
+  }
 }
 
 await checkLanguages();

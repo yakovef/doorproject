@@ -4527,19 +4527,28 @@ const panelInset = detail =>
    Under the slot no panelled face is buildable (the kept rows cross its
    casing, which runs to 0.82 of the leaf) and that does not change. */
 export function faceRowsOn(detail, win, openings, leafW, leafH) {
-  const none = { rows: [], inset: 0, lone: false, cased: false };
+  const none = { rows: [], inset: 0, lone: false, cased: false, plate: null };
   if (detail.classic) return none;
+  /* ⚠ AND WHICH ROW IS THE HANDLE PLATE — 1.11.2026. The trio's middle row
+     (`trioRows`' second) is the plate a bow is bolted through; it is named
+     here, beside the rows it is one of, so `plateField` — the bow's home, its
+     fit and the obstacle a bar is placed against — reads the plate the
+     drawing draws and never works it out again (§5.10). Null on every other
+     face, and under glass only while the face keeps that row. */
+  const plateRow = (kept = null) => detail.panels >= 3 && (kept === null || kept.includes(1))
+    ? panelRows(detail, leafH)[1] : null;
   if (!openings.length) {
     return detail.panel
-      ? { rows: panelRows(detail, leafH), inset: leafW * panelInset(detail), lone: false, cased: false } : none;
+      ? { rows: panelRows(detail, leafH), inset: leafW * panelInset(detail), lone: false, cased: false,
+          plate: plateRow() } : none;
   }
   const casing = Math.max(0, Math.min(...openings.map(o => o.x)) - MOULD_BAND);
   const winBottom = Math.max(...openings.map(o => o.top + o.h));
   const lone = { rows: [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]],
-                 inset: casing, lone: true, cased: true };
+                 inset: casing, lone: true, cased: true, plate: null };
   const kept = (detail.keeps || []).map(i => panelRows(detail, leafH)[i]).filter(Boolean);
   if (kept.length && detail.panels === 2 && win.panel) return lone;
-  if (kept.length) return { rows: kept, inset: casing, lone: false, cased: true };
+  if (kept.length) return { rows: kept, inset: casing, lone: false, cased: true, plate: plateRow(detail.keeps || []) };
   if (!detail.panel && !win.panel) return none;
   return lone;
 }
@@ -4867,6 +4876,44 @@ export const faceObstacles = memo(function faceObstacles(state) {
 }, st => `${st.size}|${st.detail}|${st.window}|${st.bell}|${st.peephole}|${st.speciallock}|${st.grab}|${st.handing}|${st.handle === BOW_AS_GRIP}`);
 
 /**
+ * ⚠ THE TRIO'S HANDLE PLATE — ITS FIELD, ONE STATEMENT — 1.11.2026.
+ *
+ * The owner's son: *"If there is a horizontal pull and 3 panels, then the
+ * horizontal pull always ends up being inside the middle panel."* — with a
+ * screenshot of the glazed trio, the bow lying on the rail ABOVE the plate,
+ * across its top moulding. Measured before the fix, off the drawing: on every
+ * glazed size the bow stood 123–141 mm above the field's centre (the square
+ * window's casing foot and the plate's top, halved — the PAIR's "rail between
+ * the window and the panel the face keeps" from 26.9, asked of a face whose
+ * first kept row is the plate), while the solid trio, which read the plate
+ * through `panelRows`, stood centred in it. Two statements of where the bow
+ * goes on one face, and they came apart under glass (§5.10).
+ *
+ * So the plate's FIELD — the flat inside its moulding, `faceRowsOn`'s plate
+ * row inside `MOULD_BAND` at that face's inset (the casing's under glass,
+ * 0.23 of the leaf solid) — is stated once, here, and read by `gripIdeal` (the
+ * bow's home: its centre), `bowFits` (the bow wholly inside it) and, through
+ * `faceRowsOn`, `faceObstacles` and the drawing. Leaf-local millimetres,
+ * `x` from the leaf's left edge; null on every face that is not the trio.
+ */
+export function plateField(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const detail = byId(DETAILS, state.detail);
+  const win = byId(WINDOWS, state.window);
+  const f = faceRowsOn(detail, win, apertureLayout(win, leafW, leafH), leafW, leafH);
+  if (!f.plate) return null;
+  const [t, b] = f.plate;
+  return { x: f.inset + MOULD_BAND, y: leafH * t + MOULD_BAND,
+           w: leafW - f.inset * 2 - MOULD_BAND * 2, h: leafH * (b - t) - MOULD_BAND * 2 };
+}
+/* How far the bow's metal stays off the plate's moulding on every side — the
+   owner's son's "inside the middle panel", read as a clear gap, not a touch.
+   On the tightest field (the solid standard and doubles: 319 × 52.7 mm) the
+   300 × 42 bow stands 9.5 mm clear across and 5.4 / 5.3 mm down. */
+export const BOW_PLATE_MARGIN = 5;
+
+/**
  * Is there room under the glazing for the panel the customer is paying for?
  *
  * `appliedFrame` returns '' when the rectangle it is asked for is smaller than
@@ -5191,11 +5238,18 @@ function gripIdeal(state) {
      `CLASSIC_ROWS` — so the home cannot drift from the moulding it sits in;
      a fraction typed here would be §5.10. The plain leaf and every glazed
      face keep 0.59. */
+  /* ⚠ THE TRIO'S PLATE, SOLID OR GLAZED, OFF ONE STATEMENT — 1.11.2026: the
+     centre of its FIELD (`plateField`). The solid trio read `panelRows` here
+     and the glazed one fell through to the pair's rail below — 123–141 mm
+     above the plate, across its top moulding (the owner's son's screenshot).
+     The field is centred on the leaf on every face that has one, so `homeX`
+     below is its centre too. */
+  const field = plateField(state);
   const grabY = () => {
+    if (field) return field.y + field.h / 2;
     if (detail.classic) return leafH * (CLASSIC_ROWS.band[0] + CLASSIC_ROWS.band[1]) / 2;
     if (panelled) {
       const rows = panelRows(detail, leafH);
-      if (rows.length >= 3) return leafH * (rows[1][0] + rows[1][1]) / 2;
       if (rows.length === 2) return leafH * (rows[0][1] + rows[1][0]) / 2;
     }
     /* ⚠ AND UNDER A WINDOW, THE RAIL IS BETWEEN THE CASING AND THE PANEL THE
@@ -5227,7 +5281,7 @@ function gripIdeal(state) {
      The axis is the bow's outboard tip and it runs GRAB.len inboard, so
      centred on a leaf means half the leftover on each side. */
   const homeX = handle.style === 'grab'
-    ? (leafW - GRAB.len) / 2
+    ? (field ? field.x + field.w / 2 : leafW / 2) - GRAB.len / 2
     : backset + standoff;
   return { x: homeX, y: homeY, rot: 0 };
 }
@@ -5526,7 +5580,31 @@ export const bowPlacement = (state, place = null) =>
 /** The bow's two bolted feet — its roses — where it stands. */
 export const bowFeet = (state, place = null) => gripFeet(bowState(state), place || bowHome(state));
 export const bowFits = state =>
-  !gripClashesLockset(bowState(state)) && bowPlacement(state).ok;
+  !gripClashesLockset(bowState(state)) && bowPlacement(state).ok && bowInPlate(state);
+/**
+ * ⚠ ON THE TRIO THE BOW STANDS WHOLLY INSIDE THE PLATE'S FIELD — 1.11.2026,
+ * the owner's son: *"…the horizontal pull always ends up being inside the
+ * middle panel."* Its posts, finials and knobs — the drawn metal, `GRAB.len`
+ * tip to tip and the roses' `GRAB.rose` either side of the shaft, which is
+ * what `npm run collide -- boxes` measures off the drawing (0 / 300 / 21) and
+ * not the declared footprint — at least `BOW_PLATE_MARGIN` off the moulding
+ * on every side. Where a field could not hold it the bow would be refused on
+ * that face (`bowObstacle` → `face`, Peretz's ranking: face > bow), never
+ * drawn across a moulding; measured, every size holds it (the tightest field,
+ * the solid standard, 9.5 mm across and 5.3 mm down). True on every other
+ * face, which has no plate.
+ */
+function bowInPlate(state) {
+  const f = plateField(state);
+  if (!f) return true;
+  const size = SIZES[state.size] || SIZES.standard;
+  const leafW = size.w - REBATE * 2;
+  const p = bowHome(state);
+  const x0 = hingeLeftOf(state) ? leafW - (p.x + GRAB.len) : p.x;
+  const m = BOW_PLATE_MARGIN;
+  return x0 >= f.x + m - 1e-6 && x0 + GRAB.len <= f.x + f.w - m + 1e-6
+      && p.y - GRAB.rose >= f.y + m - 1e-6 && p.y + GRAB.rose <= f.y + f.h - m + 1e-6;
+}
 /** The bow's box on this leaf, in the leaf-left coordinates `faceObstacles`
  *  works in — off the same footprint `gripPlacement` measures it with. */
 function bowBox(state, leafW, leafH) {
