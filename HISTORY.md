@@ -96,6 +96,19 @@ into `research/colours/README.md`.
   audit on another machine. The audit's first complete run here was cut off
   by the session's 30-minute limit on background jobs after Chromium died in
   the arrow-order walk; it was re-run detached.
+  **The phone's navigator row** (seen on the after picture): each button was a
+  fixed share of the row while its mark grew to fit its word, so marks lay on
+  their neighbours — "Отделка" over "Доп. замок" by 14.8 px at 390 ru, "Extra
+  lock" over "Window" by 9.6, "מנעול נוסף" by 6.6. Below 1100 a button now
+  never shrinks below its mark (`flex: 1 0 auto`): no overlap at 320, 390 or
+  834 in three languages, the tablet's even spread kept (smallest 68–72 px).
+  **The gates on the final merge:** `npm test` 13,045,676 / 0 failed; a
+  COMPLETE `npm run audit`, run detached: 2 faults, both the summary's two
+  marks above (this container's, identical on `main`) — the font swap, the
+  column, the arrows, the phone's first screen, the tour, the price and the
+  send all clean; `collide -- boxes` clean (deepest mount 109 of 121);
+  `latency` 446 ms worst against 600, the element counts `main`'s exactly
+  (268 · 1,017 · 656 — the redesign drew nothing in the stage); 0 bare sheets.
   The redesign's own entry, as it was written on its branch:
 
 - **2.10 — THE REDESIGN ROUND, PROMPT 1: WORDS, DESTINATIONS, NAMES, AND
