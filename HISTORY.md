@@ -24,6 +24,38 @@ oldest lines move to the top of the "moved" section.
 
 ---
 
+## 1.11.2026 — PROMPT J, after the full audit: the picker yields to the designs' tab
+
+The full `npm run audit` on `cb486b4` read **5 faults**. Three were the
+picker's: in Russian at 1100×800 (standard and `half`) and 1152×800 (`half`)
+on a GLAZED door, the navigator column's `nav-column` clause found the
+designs' mark — which stands BESIDE the glass mark in a tab outside the
+column's own box (2.10) — under "a wall control" (513 / 513 / 281 px²). The
+wall control was the picker: `placeRooms` read the column's box, which does
+not contain the tab, and stood beside it. Its own block had swept solid doors
+only, so it could not see the case.
+
+**Fixed:** every visible navigator mark is an obstacle; after the corner and
+beside the column the picker tries beside the tab, and then the stage's right
+edge above the undo group — at 1100 in Russian beside the glazed double the
+left wall holds nothing (column and tab to ~136 px, the door from 171), and
+the fallback had laid it on the column (3,136 px², a whole mark). The column
+never yields to staging. **The picker's block now sweeps glazed doors too and
+names every mark:** 576 readings, on nothing; the `nav-column` block re-run
+alone: 0 faults. Falsified: with the marks taken out of `placeRooms`'
+obstacles the block reproduces the audit's exact fault (513 / 513 / 281 px²
+on the `grd` mark).
+
+**And the memory clause was rewritten by §7's own rule:** a run of it reloaded
+straight after a tap and read the owner's room — a storage write not yet
+reaching the next renderer (§7, 29.9). The write is asserted on the page that
+made it; the READ at boot is asked of a page seeded by an init script.
+
+**The other two faults are this container's:** the `marks` clause reads the
+summary's "grab" mark at 4.8 % ink and "stripes" at 4.6 % (floor 5 %) — and
+reads the same on `adf5ee8` and on `29782a6`, whose page is G's byte for byte
+and whose audit read clean on 17.10. No icon or its CSS moved since 2.10.
+
 ## 1.11.2026 — PROMPT J, 2 of 2: the room picker, on the wall, desktop only
 
 His words: *"An option to change the background: some customers want to know
@@ -4629,6 +4661,12 @@ into `research/colours/README.md`.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **28.10** ONE BRANCH, `main` (*"I want all the branches merged into main, and
+  I don't want other branches to be made ever"*). Created at the trunk's
+  `c1d860a`; THE GUARD: no page file from any other branch — the page on `main`
+  is the trunk's byte for byte, asserted by an empty diff. Only documents came
+  over (PROMPTS.md, RENDER.md, UX-FINDINGS*.md); page commits left behind are
+  listed by sha. §1, §0a, §10, AGENT.md name `main` only. Long form: `HISTORY.md`.
 - **17.10** THE CARDS' NAMES ON THE CHART: eleven labels follow his deck's cards
   (מוקה, אפור פשתן, אפור קלאסי, אפור בטון, שמנת חלבית, גרז', אפור בזלת — the
   default —, גרפיט, קפוצ'ינו, ירוק פסגות, אפור שמיים), with plain English and

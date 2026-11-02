@@ -12863,9 +12863,11 @@ ${plate.defs}${plate.body}
     const col = wrapEl.querySelector(":scope > .steps");
     const colR = col && col.getClientRects().length ? col.getBoundingClientRect() : null;
     const bd = document.querySelector("#breakdown");
+    const marks = col ? [...col.querySelectorAll(".steps__step")].filter((e) => !e.hidden && e.getClientRects().length).map((e) => e.getBoundingClientRect()) : [];
     const obstacles = [
       frame,
       colR,
+      ...marks,
       ...[...wrapEl.querySelectorAll(".stage__arrow, .stage__hud .hud__slot, .stage__undo, .stage__band")].filter((e) => e.getClientRects().length).map((e) => e.getBoundingClientRect()),
       ...[...document.querySelectorAll("#quote")].filter((q) => getComputedStyle(q).position !== "fixed").map((q) => q.getBoundingClientRect()),
       ...bd && !bd.hidden ? [bd.getBoundingClientRect()] : []
@@ -12874,20 +12876,27 @@ ${plate.defs}${plate.body}
     const wordsTop = words.length ? Math.min(...words.map((r) => r.top)) : null;
     const hits = (a, c) => a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
     const lefts = [st.left + 8];
-    if (colR && colR.left < st.left + st.width / 2) lefts.push(colR.right + 8);
+    if (colR && colR.left < st.left + st.width / 2) {
+      lefts.push(colR.right + 8);
+      const out = Math.max(colR.right, ...marks.map((r) => r.right));
+      if (out > colR.right) lefts.push(out + 8);
+    }
     const rs = roomsEl.style;
-    const place = (left, mode) => {
+    const place = (left, mode, foot = st.bottom - 8) => {
       roomsEl.dataset.mode = mode;
-      rs.setProperty("--rooms-l", `${Math.round(left - wrap.left)}px`);
-      rs.setProperty("--rooms-b", `${Math.round(wrap.bottom - st.bottom + 8)}px`);
+      rs.setProperty("--rooms-b", `${Math.round(wrap.bottom - foot)}px`);
+      rs.setProperty("--rooms-l", `${Math.round((left ?? st.right - 8 - roomsEl.offsetWidth) - wrap.left)}px`);
       let g = roomsEl.getBoundingClientRect();
-      if (wordsTop !== null && words.some((w) => w.left < g.right && w.right > g.left)) {
+      if (wordsTop !== null && foot > wordsTop - 8 && words.some((w) => w.left < g.right && w.right > g.left)) {
         rs.setProperty("--rooms-b", `${Math.round(wrap.bottom - wordsTop + 8)}px`);
         g = roomsEl.getBoundingClientRect();
       }
       return g.left >= st.left && g.right <= st.right && g.top >= st.top && !obstacles.some((o) => hits(g, o));
     };
     for (const left of lefts) for (const mode of ["row", "stack"]) if (place(left, mode)) return;
+    const un = wrapEl.querySelector(".stage__undo");
+    const ub = un && un.getClientRects().length ? un.getBoundingClientRect().top - 8 : st.bottom - 8;
+    for (const mode of ["stack", "row"]) if (place(null, mode, ub)) return;
     place(lefts[0], "row");
   }
   function placeUndo() {

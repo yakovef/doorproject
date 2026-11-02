@@ -4134,7 +4134,13 @@ function placeRooms() {
   const col = wrapEl.querySelector(':scope > .steps');
   const colR = col && col.getClientRects().length ? col.getBoundingClientRect() : null;
   const bd = document.querySelector('#breakdown');
-  const obstacles = [frame, colR,
+  /* ⚠ AND EVERY MARK OF THE COLUMN, NOT ONLY ITS BOX: the designs' mark stands
+     BESIDE the glass mark in a tab outside the column's own box (2.10), and
+     the first full audit found the picker beside the column standing on it
+     in Russian at 1100–1152 on a glazed door (281–513 px²). */
+  const marks = col ? [...col.querySelectorAll('.steps__step')].filter(e => !e.hidden && e.getClientRects().length)
+    .map(e => e.getBoundingClientRect()) : [];
+  const obstacles = [frame, colR, ...marks,
     ...[...wrapEl.querySelectorAll('.stage__arrow, .stage__hud .hud__slot, .stage__undo, .stage__band')]
       .filter(e => e.getClientRects().length).map(e => e.getBoundingClientRect()),
     ...[...document.querySelectorAll('#quote')].filter(q => getComputedStyle(q).position !== 'fixed')
@@ -4146,20 +4152,35 @@ function placeRooms() {
   const wordsTop = words.length ? Math.min(...words.map(r => r.top)) : null;
   const hits = (a, c) => a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
   const lefts = [st.left + 8];
-  if (colR && colR.left < st.left + st.width / 2) lefts.push(colR.right + 8);
+  if (colR && colR.left < st.left + st.width / 2) {
+    lefts.push(colR.right + 8);
+    /* and beside the designs' tab where it stands out of the column — in
+       Russian at 1100–1152 on a glazed door it fills the place beside the
+       column's foot, and without this the picker fell back onto the column */
+    const out = Math.max(colR.right, ...marks.map(r => r.right));
+    if (out > colR.right) lefts.push(out + 8);
+  }
   const rs = roomsEl.style;
-  const place = (left, mode) => {
+  const place = (left, mode, foot = st.bottom - 8) => {
     roomsEl.dataset.mode = mode;
-    rs.setProperty('--rooms-l', `${Math.round(left - wrap.left)}px`);
-    rs.setProperty('--rooms-b', `${Math.round(wrap.bottom - st.bottom + 8)}px`);
+    rs.setProperty('--rooms-b', `${Math.round(wrap.bottom - foot)}px`);
+    /* `left` null: flush with the stage's RIGHT edge, 8 px in */
+    rs.setProperty('--rooms-l', `${Math.round((left ?? st.right - 8 - roomsEl.offsetWidth) - wrap.left)}px`);
     let g = roomsEl.getBoundingClientRect();
-    if (wordsTop !== null && words.some(w => w.left < g.right && w.right > g.left)) {
+    if (wordsTop !== null && foot > wordsTop - 8 && words.some(w => w.left < g.right && w.right > g.left)) {
       rs.setProperty('--rooms-b', `${Math.round(wrap.bottom - wordsTop + 8)}px`);
       g = roomsEl.getBoundingClientRect();
     }
     return g.left >= st.left && g.right <= st.right && g.top >= st.top && !obstacles.some(o => hits(g, o));
   };
   for (const left of lefts) for (const mode of ['row', 'stack']) if (place(left, mode)) return;
+  /* ⚠ AND WHERE THE LEFT WALL HOLDS NOTHING — Russian at 1100 beside the
+     glazed double, where the column and the designs' tab reach 136 px and the
+     door starts at 171 — the right edge, above the undo group (never on the
+     column: the way through the page outranks staging). */
+  const un = wrapEl.querySelector('.stage__undo');
+  const ub = un && un.getClientRects().length ? un.getBoundingClientRect().top - 8 : st.bottom - 8;
+  for (const mode of ['stack', 'row']) if (place(null, mode, ub)) return;
   place(lefts[0], 'row');
 }
 

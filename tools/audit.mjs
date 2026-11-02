@@ -3883,8 +3883,10 @@ for (const v of VIEWS) {
   const pp = await b.newPage();
   for (const lang of ['he', 'en', 'ru']) for (const [w, h] of SHAPES) {
     await pp.setViewportSize({ width: w, height: h });
-    for (const size of Object.keys(SIZES)) {
-      await pp.goto(`${PAGE}?lang=${lang}&s=${size}`);
+    for (const size of Object.keys(SIZES)) for (const win of ['', '&w=rect']) {
+      /* glazed too: a window puts the designs' mark beside the column (2.10),
+         in a tab outside the column's own box — the first full audit's find */
+      await pp.goto(`${PAGE}?lang=${lang}&s=${size}${win}`);
       await pp.waitForSelector('#stage svg #frame'); await settle(pp);
       /* on a step, where the arrows stand, not the summary a link opens on */
       await pp.evaluate(() => document.querySelector('.steps__step[data-step="fit"]').click());
@@ -3908,14 +3910,16 @@ for (const v of VIEWS) {
             ...[...document.querySelectorAll('.stage__hud .hud__slot')].map(e => ['a wall control', R(e)]),
             ...[...document.querySelectorAll('.stage__undo .undo-pill')].map(e => ['an undo pill', R(e)]),
             ['the band', vis(document.querySelector('.stage__band')) ? R(document.querySelector('.stage__band')) : null],
-            ['the column', vis(document.querySelector('.stage-wrap > .steps')) ? R(document.querySelector('.stage-wrap > .steps')) : null]]
+            ['the column', vis(document.querySelector('.stage-wrap > .steps')) ? R(document.querySelector('.stage-wrap > .steps')) : null],
+            /* every mark, since the designs' tab stands outside the column's box */
+            ...[...document.querySelectorAll('.stage-wrap > .steps .steps__step')].filter(e => !e.hidden && vis(e)).map(e => [`the ${e.dataset.step} mark`, R(e)])]
             .filter(([, r]) => r && r.width);
           const words = [...document.querySelectorAll('.trust__i')].map(R).filter(r => r.width && ov(g, r));
           return { mode: el.dataset.mode, on: wall.map(([k, r]) => [k, ov(g, r)]).filter(([, o]) => o),
             inside: g.left >= st.left - 0.5 && g.right <= st.right + 0.5 && g.top >= st.top - 0.5 && g.bottom <= st.bottom + 0.5,
             words: words.length, corner: Math.round(g.left - st.left), open: !!(bd && !bd.hidden) };
         });
-        const tag = `${lang} ${w}x${h} ${size}${open ? ' (breakdown open)' : ''}`;
+        const tag = `${lang} ${w}x${h} ${size}${win ? ' glazed' : ''}${open ? ' (breakdown open)' : ''}`;
         if (!m) { fault('rooms-picker', `${tag}: no picker on the wall`); continue; }
         if (open && !m.open) fault('rooms-picker', `${tag}: the breakdown did not open — that half of the clause has no subject`);
         placed++; modes[`${m.mode}@${m.corner <= 9 ? 'corner' : 'beside'}`] = (modes[`${m.mode}@${m.corner <= 9 ? 'corner' : 'beside'}`] || 0) + 1;
@@ -3931,7 +3935,7 @@ for (const v of VIEWS) {
   }
   await pp.close();
   for (const k of Object.keys(KNOWN)) if (!seen.has(k)) fault('rooms-picker', `${k}: named and clear now — take it out`);
-  if (placed < 3 * SHAPES.length * 6 * 2) fault('rooms-picker', `the picker was placed ${placed} times — expected ${3 * SHAPES.length * 12}`);
+  if (placed < 3 * SHAPES.length * 6 * 4) fault('rooms-picker', `the picker was placed ${placed} times — expected ${3 * SHAPES.length * 24}`);
 
   /* 4, 5, 6 — what a tap does, and what it does not */
   const look = pg => pg.evaluate(() => ({
@@ -3961,12 +3965,8 @@ for (const v of VIEWS) {
       if (z.checked.join() !== k) fault('rooms-picker', `${tag}: the radio says ${z.checked.join() || 'nothing'}`);
       if (z.stored !== k) fault('rooms-picker', `${tag}: stored ${z.stored}`);
     }
-    /* remembered */
+    /* the keys, from the stairwell */
     await tapRoom(pg, 'gen-stairwell');
-    await pg.reload(); await pg.waitForTimeout(1500);
-    const back = await bgFile(pg);
-    if (!/^room-gen-stairwell/.test(back || '')) fault('rooms-picker', `${lang} ${w}x${h}: after a reload the stage shows ${back}, not the stairwell this browser chose`);
-    /* the keys */
     await pg.evaluate(() => document.querySelector('.room[aria-checked="true"]').focus());
     const nextKey = lang === 'he' ? 'ArrowLeft' : 'ArrowRight';
     await pg.keyboard.press(nextKey); await pg.waitForTimeout(700);
@@ -3979,7 +3979,19 @@ for (const v of VIEWS) {
     if ((await look(pg)).checked.join() !== 'gen-street') fault('rooms-picker', `${lang}: Enter on the street did not choose it`);
     const sz = await pg.evaluate(() => [...document.querySelectorAll('.room')].map(b => { const r = b.getBoundingClientRect(); return Math.min(r.width, r.height); }));
     if (sz.length !== 3 || sz.some(s => s < 44)) fault('rooms-picker', `${lang}: the rooms measure ${sz.join(', ')} px — 44 on both axes (T14)`);
-    await pg.evaluate(() => { try { localStorage.removeItem('dm.room.v1'); } catch {} });
+    /* remembered: the page WRITES the choice (asserted above, `stored`, on the
+       same page) and READS it at boot — asked here of a page whose storage
+       is SEEDED by an init script, never written on one load and read on the
+       next: a navigation can land in a new renderer before the write reaches
+       it (§7, 29.9), which the first full run of this clause reproduced once
+       in four. The room's file is fetched after the page is up, so the
+       reading waits for it. */
+    await pg.addInitScript(() => { try { localStorage.setItem('dm.room.v1', 'gen-stairwell'); } catch {} });
+    await pg.reload(); await pg.waitForSelector('#stage svg #frame');
+    let back = null;
+    for (let i = 0; i < 100 && !/^room-gen-stairwell/.test(back || ''); i++) { await pg.waitForTimeout(50); back = await bgFile(pg); }
+    const radio = (await look(pg)).checked.join();
+    if (!/^room-gen-stairwell/.test(back || '')) fault('rooms-picker', `${lang} ${w}x${h}: after a reload the stage shows ${back} and the radio says ${radio}, not the stairwell this browser chose`);
     if (errs.length) fault('rooms-picker', `${lang} ${w}x${h}: ${errs.join('; ')}`);
     await pg.close();
   }
