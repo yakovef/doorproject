@@ -9090,6 +9090,91 @@ for (const v of VIEWS) {
   if (faults === before) console.log(`    ${asked} readings, he 1280 and ru 390: the leaf choice under the designs only on a door with two glazed leaves and a design, by link and by tap, three priced tiles ≥ 44 px; "main leaf only" draws the fixed pane plain on the raster, moves the price by one pane, renames the summary's tile and the send, leaves the band, asks nothing, and undoes; a single size asks and lands on both; the arrows move the design and keep the leaf`);
 }
 
+/* ── THE BOW STANDS INSIDE THE TRIO'S MIDDLE PANEL — 1.11.2026 ───────────
+   The owner's son: *"If there is a horizontal pull and 3 panels, then the
+   horizontal pull always ends up being inside the middle panel."* — with a
+   screenshot of the trio under the square window, the bow on the rail above
+   the plate, across its top moulding. `npm test` holds the bow's drawn box
+   inside the plate's field in millimetres; this holds the PICTURE to it: on
+   the glazed and the solid standard trio, at 390 and 1440, the pixels the bow
+   BRIGHTENS (the door with it against the same door without it — its
+   shadow only darkens, so it is not counted) lie between the plate's inner
+   moulding edges, read off the drawn moulding on screen, and span most of the
+   bow's own width — moulding, field, bow, field, moulding; never bow on
+   moulding. The summary's tile and the message name the bow as before.
+   Falsified by putting the old home back: the glazed rows fire. */
+{
+  console.log('\nthe bow stands inside the trio\'s middle panel');
+  const before = faults;
+  let asked = 0;
+  for (const [vw, vh] of [[390, 844], [1440, 900]]) for (const w of ['rect', 'none']) {
+    const pg = await b.newPage({ viewport: { width: vw, height: vh } });
+    const tag = `${vw}x${vh} ${w === 'rect' ? 'under the square window' : 'solid'}`;
+    const look = async gb => {
+      await pg.goto(`file://${process.cwd()}/index.html?lang=he&s=standard&w=${w}&d=panel3&gb=${gb}&k=cylinder`);
+      await pg.waitForTimeout(300);
+      await pg.waitForFunction(() => document.getAnimations().every(a => a.playState !== 'running'), null, { timeout: 4000 }).catch(() => {});
+      return pg.evaluate(() => {
+        for (const t of document.querySelectorAll('.toast, #toast')) t.style.visibility = 'hidden';
+        const svg = document.querySelector('#stage svg');
+        if (!svg) return null;
+        /* the main leaf's moulded rectangles: each a t, b, l, r run in order;
+           the shortest is the handle plate */
+        const runs = [...svg.querySelectorAll('path[fill^="url(#mould-"]')]
+          .filter(p => !p.closest('#side-leaf, clipPath, defs'));
+        const rects = [];
+        for (let i = 0; i + 3 < runs.length; i++) {
+          if (!/-t\)$/.test(runs[i].getAttribute('fill'))) continue;
+          const [t, bo, l, r] = runs.slice(i, i + 4).map(p => p.getBoundingClientRect());
+          rects.push({ top: t.bottom, bottom: bo.top, left: l.right, right: r.left, h: bo.bottom - t.top });
+        }
+        const plate = rects.length ? rects.reduce((a, c) => (c.h < a.h ? c : a)) : null;
+        const bow = document.querySelector('#stage [data-hw="bow"]')?.getBoundingClientRect();
+        const row = document.querySelector('#spec .spec__row[data-key="grab"]');
+        return { plate, bow: bow && { left: bow.left, right: bow.right, top: bow.top, bottom: bow.bottom },
+                 dpr: window.devicePixelRatio, sum: !!row, wa: document.querySelector('[data-wa]')?.getAttribute('href') || '' };
+      });
+    };
+    const shotOf = async (m, tagx) => {
+      const pad = 40;
+      const clip = { x: Math.max(0, m.plate.left - pad), y: Math.max(0, m.plate.top - pad),
+                     width: m.plate.right - m.plate.left + pad * 2, height: m.plate.bottom - m.plate.top + pad * 2 };
+      const f = `/tmp/audit-bowplate-${process.pid}-${tagx}.png`;
+      await pg.screenshot({ path: f, clip });
+      return { img: load(f), clip };
+    };
+    const without = await look('nograb');
+    const withBow = await look('grab');
+    if (!without?.plate || !withBow?.plate || !withBow.bow) { fault('bow-plate', `${tag}: no plate or no bow on the page — nothing to measure`); await pg.close(); continue; }
+    const B = await shotOf(withBow, 'with');
+    await look('nograb');
+    const N = await shotOf(withBow, 'without');
+    asked++;
+    /* the bright pixels the bow adds, in CSS px on the page */
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    const k = withBow.dpr || 1;
+    for (let y = 0; y < B.img.h; y++) for (let x = 0; x < B.img.w; x++) {
+      const i = (y * B.img.w + x) * 4;
+      if (lum(B.img.d, i) - lum(N.img.d, i) > 25) {
+        x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+      }
+    }
+    if (x1 < 0) { fault('bow-plate', `${tag}: the bow brightens nothing on the picture — this check sees no bow`); await pg.close(); continue; }
+    const P = withBow.plate, bw = withBow.bow.right - withBow.bow.left;
+    const top = B.clip.y + y0 / k, bottom = B.clip.y + (y1 + 1) / k, left = B.clip.x + x0 / k, right = B.clip.x + (x1 + 1) / k;
+    if (right - left < bw * 0.8) fault('bow-plate', `${tag}: the bow's metal reads ${(right - left).toFixed(1)} px wide of its ${bw.toFixed(1)} — the reading does not see the bow`);
+    if (top < P.top - 1 || bottom > P.bottom + 1 || left < P.left - 1 || right > P.right + 1) {
+      fault('bow-plate', `${tag}: the bow's metal spans ${left.toFixed(1)}–${right.toFixed(1)} × ${top.toFixed(1)}–${bottom.toFixed(1)} px and the plate's field `
+        + `${P.left.toFixed(1)}–${P.right.toFixed(1)} × ${P.top.toFixed(1)}–${P.bottom.toFixed(1)} — the bow is on the moulding, not inside the middle panel`);
+    }
+    if (!withBow.sum) fault('bow-plate', `${tag}: the summary has no tile for the bow`);
+    if (!/%D7%9E%D7%90%D7%97%D7%96|מאחז/.test(decodeURIComponent(withBow.wa) + withBow.wa)) fault('bow-plate', `${tag}: the message does not name the bow`);
+    await pg.close();
+  }
+  if (asked < 4) fault('bow-plate', `only ${asked} of 4 readings taken — this check is measuring less than it says`);
+  if (faults === before) console.log(`    ${asked} readings, the standard trio solid and under the square window at 390 and 1440: the bow's metal lies between the plate's inner moulding edges on the picture and spans its own width; the summary and the message name it`);
+}
+
 /* ── THE פרזול TILES ARE THIS DOOR'S — 27.9.2026 ───────────────────────────
    The owner's son: *"in the pirzul icons show the lever the person chose …
    the peephole if chosen."* (The peephole came out of them 28.9, when it
