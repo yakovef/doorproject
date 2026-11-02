@@ -257,6 +257,26 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   and the option's name over the door is set in **the title's own face**
   (Bona Nova). On 2.10: on a phone undo, redo and reset are **three icon
   discs, no words** (the words stay for screen readers).
+  **Taken for them in prompt I (1.11)**, each reversible in a line: the
+  design's leaf is a THIRD heading on the designs' step under the design tiles
+  (three square tiles, shown only with two glazed leaves and a design); the
+  WINDOW stays on both leaves (a window on one leaf is asked of Peretz,
+  `ASK-PERETZ.md` 0h2); `both` is the default, so every link and code ever
+  sent opens as it was seen; the tiles draw the design where it goes and print
+  each choice's price; the order says the leaf in words when it is not both.
+  **Taken for them in PROMPT J (1.11)**, each reversible in a line — his words:
+  *"An option to change the background … PC exclusive — I don't think there is
+  enough space on the phone"*, *"Backgrounds … other than just a perfect
+  hall"*: the room is STAGING (never in the state, the URL, the code, the
+  message or the sheet), remembered per browser (`dm.room.v1`, behind a try),
+  the page opening on his room; three 44 px rooms on an ink tab at the stage's
+  BOTTOM-LEFT, the chosen one in the navigator's live square, ≥ 1100 only and
+  absent from a phone's document; the order his room · the street · the
+  stairwell; every room graded to HIS wall (MIX solved per room — ours: his
+  0.6 left the stone 8 luma darker); in English and Russian, where that
+  corner is the column's, beside the column (ours: the column never yields to
+  staging); the names מבואה · כניסה לבניין · חדר מדרגות (ours). A fourth room
+  needs his photograph or his word, and a room is never generated here.
 
 ---
 
@@ -276,6 +296,25 @@ lines here. Dates are the day of the change.
   (the font fallback cannot follow the medium weight); the phone row's buttons
   grow with their worded marks. Audit: 2 faults, both this container's
   (identical on `main`). Long form: `HISTORY.md`.
+- **1.11** THE ROOM PICKER (PROMPT J 2 of 2; *"PC exclusive"*): three 44 px
+  rooms on an ink tab at the stage's bottom-left (`.stage__rooms`, a radio
+  group, `placeRooms`), beside the column in en/ru; ≥ 1100 only, absent from a
+  phone's DOM; a tap fetches that room and changes nothing else — drawing,
+  price, address, code byte-identical (asserted); `dm.room.v1`. The price
+  read on all three rooms (81). 0 bare sheets. Long form: `HISTORY.md`.
+- **1.11** THE TWO ROOMS GRADED AND MEASURED (PROMPT J 1 of 2; *"Backgrounds
+  that will show how the door looks in a setting that is other than just a
+  perfect hall"*): `npm run backdrop -- <name>` → `assets/room-gen-street.webp`,
+  `room-gen-stairwell.webp`, the wall at his 220 (MIX solved per room, 0.72 /
+  0.66 — his 0.6 left the stone at 212); floor, lamps, objects MEASURED into
+  `ROOMS` (sets); the audit asserts wall, lamps, only wall behind every door and
+  the price ≥ 4.5:1 on each. Not yet shown. 0 bare sheets. Long form: `HISTORY.md`.
+- **1.11** THE DESIGN ON ONE LEAF OR BOTH (*"…choose on which side they want
+  to remove what"*): `grilleOn` (both · main · side, `gs=`, two bits, `VERSION`
+  29, version field 6 bits) — ⚠ the code is THIRTEEN characters. A third
+  heading under the designs on a door-and-a-half; the window stays on both;
+  `paneCount` counts the panes carrying the design; the order names the leaf.
+  0 bare sheets. Long form: `HISTORY.md`.
 - **1.11** Two generated rooms for the room picker, saved as evidence only:
   `research/backdrops/gen-street.webp` (Jerusalem stone, outside) and
   `gen-stairwell.webp` (an older landing, terrazzo), 1536 × 1024, with a
@@ -287,37 +326,6 @@ lines here. Dates are the day of the change.
   is the trunk's byte for byte, asserted by an empty diff. Only documents came
   over (PROMPTS.md, RENDER.md, UX-FINDINGS*.md); page commits left behind are
   listed by sha. §1, §0a, §10, AGENT.md name `main` only. Long form: `HISTORY.md`.
-- **17.10** THE CARDS' NAMES ON THE CHART: eleven labels follow his deck's cards
-  (מוקה, אפור פשתן, אפור קלאסי, אפור בטון, שמנת חלבית, גרז', אפור בזלת — the
-  default —, גרפיט, קפוצ'ינו, ירוק פסגות, אפור שמיים), with plain English and
-  Russian. Ids, codes and aliases untouched; nothing typed a name. 0 bare
-  sheets. Long form: `HISTORY.md`.
-- **17.10** FOUR CARDS FROM HIS DECK (*"Add all of these colours … all of them
-  except the three that are free should be +200"*): 7345D אפור אורבני, 8075D
-  שוקולד קקאו, 8002D חמרה, 9077D חול ים APPENDED to `COLOURS` (21, no
-  `VERSION`), ₪200 each; hexes MEASURED off his photographs against each
-  card's label, calibrated leave-one-out (`research/colours/README.md`); held
-  out of the gallery's fit, which would have repainted seven doors. Long form: `HISTORY.md`.
-- **17.10** The colour deck photographed (`research/colours/cards/1-5.jpg`,
-  the owner's son): 18 cards, 14 already in the chart and four not (7345D,
-  8075D, 8002D, 9077D); every card +₪200 but the three included ones. The
-  readings and the chart change are PROMPT G's. Long form: `HISTORY.md`.
-- **10.10** The tour's POINTERS CURVE (*"…must not be horizontal — it looks very
-  ugly and is not intuitively understandable"*): a path off the callout's top
-  or bottom, bowing a quarter of its chord wherever that is within 45° of
-  horizontal; the arrowheads — gone since 28.9, their marker deleted with the
-  old lines — draw again. 0 bare sheets. Long form: `HISTORY.md`.
-- **10.10** The PANELS UNDER GLASS ARE THE CASING'S WIDTH (*"match the width
-  of the window … the option with 2 panels needs to be identical to the
-  rectangle window's panel"*): every kept row under glass flush with the
-  casing, both leaves, one expression; beside the square window the pair's
-  lower panel is the window's lone one. Solid faces keep 0.23. 0 bare sheets
-  (no sheet door is glazed and panelled). Long form: `HISTORY.md`.
-- **10.10** The CYLINDER ONLY is **₪100** (*"The option with cylinder only
-  needs to be 100 shekels"*; it was included): its tile prints the figure, the
-  lock step's explainer says it through `expArgs`, and the lever's fallback
-  swap now names where it lands and its price (`locksetSwapWords`) — a swap
-  from the Rotem costs ₪100. ₪3,195 unmoved (the Rotem). Long form: `HISTORY.md`.
 
 ---
 
@@ -399,6 +407,24 @@ into the live step before its explainer — the owner's son: the note goes
 *"under the options"*. Above 1100 all three go home (the note under the
 picture). `buildPanel` rescues the note before it empties the panel. The save
 disc is 44 px on a phone (52 above).
+
+⚠ **THE ROOM PICKER, DESKTOP ONLY (1.11)** — the owner's son: *"An option to
+change the background: some customers want to know how a door looks with
+different backgrounds. PC exclusive — I don't think there is enough space on
+the phone."* `.stage__rooms`, a radio group ("רקע") of three 44 px rooms —
+his · the street · the stairwell — on an ink tab like the column's, the
+chosen one in its live square. `placeRooms` (js/app.js, run at the end of
+`placeSteps` and from `fitStage`) stands it at the stage's BOTTOM-LEFT, 8 px
+in, 8 px above the trust band's words where its width meets them, as a row or
+a stack — the first that touches no door, arrow, price, open breakdown, wall
+control, undo pill, band or column; in English and Russian that corner is the
+column's, so the same two shapes are tried beside it (measured: 288 readings,
+1100–1920 × three languages × six sizes, breakdown shut and open, on nothing).
+Below 1100 it is taken OUT of the document (`hidden` in the markup for a page
+without script; lazy images), and a phone shows his room whatever this
+browser stored. A tap stores the room, marks it and asks `armRoom` for that
+room's crop; the file is fetched only then; the door, the price, the address
+and the code do not move (asserted byte for byte).
 
 The page has no header. The language picker stands in the wall's top-right
 corner in every language (placed by the owner with circles on a screenshot,
@@ -605,7 +631,7 @@ the artefact** — walking §7's T-list means grepping for each one.
 
 | gate | reading | when |
 |---|---|---|
-| `npm test` | **13,045,676, 0 failed** on the redesign's merge (1.11; `main` before it read 13,045,569 in the same container — the new words are among the copy checked) · **13,045,569, 0 failed** on prompt G's 2 of 2 (17.10, after its sheets — the total grew with 21 colours in every sweep: the round-trip 115,600 → 142,800 designs; colour headroom 11) · **10,597,472, 0 failed** on prompt F's 3 of 3 (10.10, after its sheets; 10,597,472 on its 2 of 2 after its sheets, 10,597,362 on its 1 of 3 with the five staleness rows) · **10,595,731, 0 failed** on prompt D's 2 of 2 (2.10, after its sheets; 10,595,657 on its 1 of 2 — the reset's copy and source checks — before the sheets, the five staleness rows the only red) · **10,595,593 assertions, 0 failed** on prompt C's 3 of 3 (2.10; the same total on each of its commits — the round is page and instrument, not catalogue) and with the stripes as tiles, prompt B's 3 of 3 on the A round's five (29.9; 10,595,605 before that rebase, 10,595,466 on B's 2 of 3, 10,595,363 on its 1); re-read on the merged tree in A's closing pass, 30.9: the same 10,595,593, 0 failed (10,595,454 on A's 5 of 5 before B's 3 landed). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 2.10 |
+| `npm test` | **25,277,369, 0 failed** on prompt I's 1 of 2 (1.11, after its sheets — the round-trip sweep ×3 on the doubles with glass and a design: 142,800 → 269,136 designs, and the total nearly doubled with it; ~10½ min) · **13,045,676, 0 failed** on the redesign's merge before prompt I and J reached it (1.11; `main` before it read 13,045,569 in the same container — the new words are among the copy checked) · **13,045,569, 0 failed** on prompt G's 2 of 2 (17.10, after its sheets — the total grew with 21 colours in every sweep: the round-trip 115,600 → 142,800 designs; colour headroom 11) · **10,597,472, 0 failed** on prompt F's 3 of 3 (10.10, after its sheets; 10,597,472 on its 2 of 2 after its sheets, 10,597,362 on its 1 of 3 with the five staleness rows) · **10,595,731, 0 failed** on prompt D's 2 of 2 (2.10, after its sheets; 10,595,657 on its 1 of 2 — the reset's copy and source checks — before the sheets, the five staleness rows the only red) · **10,595,593 assertions, 0 failed** on prompt C's 3 of 3 (2.10; the same total on each of its commits — the round is page and instrument, not catalogue) and with the stripes as tiles, prompt B's 3 of 3 on the A round's five (29.9; 10,595,605 before that rebase, 10,595,466 on B's 2 of 3, 10,595,363 on its 1); re-read on the merged tree in A's closing pass, 30.9: the same 10,595,593, 0 failed (10,595,454 on A's 5 of 5 before B's 3 landed). The total is the product of catalogue list lengths and is not evidence of anything; read the failure count | 2.10 |
 | `npm run audit` | **A COMPLETE run on the redesign's merge (1.11, `6b790dd` + its follow-up): 2 faults, both the container's** — the summary's fallback marks for the bow and the stripes ink 4.76 % / 4.59 % of 28 px against a 5 % floor, read identically on `main` (`29782a6`) in the same container; every block the merge touches clean · **A COMPLETE run on prompt G's 2 of 2 (17.10, `0b2766b`): no faults** — 21 colours on the chart · **A COMPLETE run on prompt F's 3 of 3 (10.10, `ecedfc6`): no faults** — the curved pointers' clauses (21 pointers over 12 steps) among them; the cylinder's price and the panels under glass reach the page through blocks that read clean · **A COMPLETE run on prompt D's 2 of 2 (2.10, over `69723b0`): no faults** — the designs' step, "N of M", the glazed column beside the glass on 84 of 90 doors and the tapped window among them. Its 1 of 2 (the reset), complete over the arrows: every block clean but for chromium dying in the price-card sweep, which re-run alone read none; over the send, the wall blocks re-run clean · **No faults on prompt C's 3 of 3** (2.10), the phone's first-row, the arrows' look and the send-as-pill clauses among them; its 1 of 3 read 1 (the note's `42ch`, fixed), its 2 of 3 read 2 (the `ARROW_KNOWN` reading its bigger arrows raised, raised). **On `87af342` — B's 3 of 3 on A's five, the branch both rounds share — a COMPLETE run: no faults** (A's closing pass, 30.9). The two B's pre-rebase run below left to A's regions do not reproduce on the merged tree: `halfextra1` had left `ARROW_KNOWN` in A's 2 of 5 (`893f851`, §9 — B's tree had the band commit and not that one), and the drawer's toggle was the block's seeding, an init script since A's 5 of 5 (30 rows, 5 shapes, he and ru). A's 3 of 3 (`cc19850`), a complete run: no faults. ⚠ **On prompt B's 3 of 3 (29.9), before its rebase: 5 faults, none in its rows** — the 320×568 `halfextra1` redo-on-arrow reading GONE in he and ru (the band commit `08a59ed` made the side-by-side glyphs fit there: 37 → 0 px², measured on `d3b54e6` against `08a59ed`; its region, and the exemption asks to come out) and 3 of the saved-designs drawer's (its toggle off the page in one case — the unexplained fault below, again). Its own blocks — the six-tile cycle, the designs unlocking, the stripe tiles' pictures (closest 58%) and fit — clean. the full run at the end of the 28.9 round read **4 faults, all fixed in commit 10** (§0b). ⚠ **The re-run after the fix did not finish** — the container restarted under it — and was clean through every block up to the navigator's (the undo and landscape blocks among them); the blocks after that were clean on the first run, before the fix, and are not re-run ⚠ **On `629f7d0` (the כדור merged onto 10 of 10): 6 faults, every one the saved-designs drawer's** — its toggle not on the page in ru at 390×844 and 834×1112, the stale design not reaching the drawer (he, ru), 8 of 10 cases opened, 24 of 30 rows. The drawer is the 5-of-10 save dialog's; the כדור touched no page code. Not fixed here ⚠ **And a COMPLETE run on `629f7d0` + the ironwork port (29.9, every block to the end) read no faults at all, the drawer's 30 rows at 5 shapes in two languages included** — so those 6 did not reproduce once. ⚠ **Explained 29.9 (A's 5 of 5):** the block wrote the saved doors on one load and read them on the next, and a navigation can land in a new renderer before the write reaches it — seeded by an init script now | 2.10 |
 | `npm run collide` | `-- all` clean on prompt G's 2 of 2 (17.10): **1,638**, unchanged — the sweep pins one paint (`rb-0097d`), since a colour cannot move geometry, so the deck's four add nothing to it · `-- all` clean on prompt F's 2 of 3 (10.10: the panels under glass at the casing's width — 1,638 buildable designs, the count unchanged, `faceObstacles` agreeing with the drawing everywhere) and `-- boxes` clean; `-- boxes` clean on prompt D's 2 of 2 (2.10: every fitting inside what it declares, the deepest mount 109 under `MOUNT_REACH` 121) and on prompt C's 3 of 3 (2.10); re-read clean on prompt B's 3 of 3 (29.9), the same 1,638 — `all` (1,638 designs — 1,468 base, 602 with the bow, plus 170 face-detail) and `boxes` clean with the כדור redrawn (28.9: drawn 33/33/33, declared 35/35/35; the bow 0/300/21 in 4/305/26; the knob-plate 46/46/155 in 48/48/157; the deepest mount 109, the עילי's) | 2.10 |
 | `npm run fuzz` | Prompt F's 3 of 3 (10.10): the same counts as D's — 30,000 designs, 1,800 clicks, 238 met the dialog (125 / 113), the reset 85 times (75 asked, 33 yes, 42 no) — nothing broke. Prompt D's 2 of 2: 30,000 designs, 1,800 clicks, **238** met the confirm dialog — 125 yes, 113 no, the door unchanged after every no — and **the reset among the clicks** (its own seeded coin): pressed 85 times, 75 asked (the rest on the default door, greyed), 33 yes and back to the default door, 42 no — nothing broke (prompt D's 2 of 2, 2.10). Prompt C's 3 of 3: 195 met the dialog, 107 yes / 88 no, nothing broke | 2.10 |
@@ -672,7 +698,7 @@ screen. Two different questions, and for a long time only one had been put.
   retire an option, alias its id onto the nearest real one, for ever.
 - **The short code stores INDICES**, which no alias can rescue. Any change to
   an option list's ORDER or to the bit layout needs a `VERSION` bump in
-  `js/url-state.js` (**28** since 29.9 — read the file, do not trust this figure),
+  `js/url-state.js` (**29** since 1.11 — read the file, do not trust this figure),
   so an old code is refused with a notice rather than decoded into a different
   door. **Appending to the end of a list, or changing a property, costs no
   bump.**
@@ -721,6 +747,14 @@ works from `file://` and Peretz can open the folder on his own laptop.
 - **`assets/room.webp` and `assets/room-wide.webp`** are the photographed room
   in two crops; `pickRoom` measures the stage and fetches ONE. Delete them and
   the page is complete, the door standing in the drawn room the SVG contains.
+  **`assets/room-gen-street.webp` and `room-gen-stairwell.webp`** (1.11) are
+  two more rooms, one framing each, graded by `npm run backdrop -- <name>`
+  from `research/backdrops/<name>.webp` (no name: the owner's two, into their
+  old file names, byte-identical). Measured in `research/backdrops/README.md`.
+  Each room's 88 px **`…-thumb.webp`** (his: `room-wide-thumb.webp`) is the
+  picker's tile, written by the same run. The two new rooms' URLs are on their
+  picker buttons (`data-href`), the thumbnails' on their `<img>`s, each
+  stamped by the build; a new room is fetched only when it is chosen.
 - **`assets/fonts/`** — the page's own type since 28.9: **Rubik** (the text,
   and the face Peretz's own site uses) and **Bona Nova** (the price, the `<h1>`,
   the band's title), nine woff2 files, one per script per face behind its
@@ -838,6 +872,23 @@ the A4 sheet show, and what a visitor sees if the file does not arrive. The seam
 pieces that belong to the photograph (a tight contact shadow, a wider pool, a
 stronger casing shadow) are emitted on every door at `opacity="0"` and raised
 only by `.is-photo`.
+
+⚠ **Three photographs since 1.11.2026, one grading, never in the order.** The
+owner's entrance (two framings, `set: 'home'`) and two generated rooms — a
+Jerusalem-stone street entrance and an older stairwell (one framing each) —
+are SETS in `ROOMS` (js/app.js); `pickRoom` scores one set's crops and never
+across sets. A customer chooses the set on a desktop with the room picker (§0c,
+`dm.room.v1`); below 1100 it is always his. Every one is graded by `tools/backdrop.mjs` to the SAME wall
+luma — his desktop room's 220, read off the file — because the ground under
+the swatch must not shift with the room: the curve, reference and band are
+his, and MIX is solved per room (his 0.6; the street 0.72, the stairwell
+0.66). The room is STAGING: never in the state, the URL, the short code, the
+WhatsApp message or the sheet. A fourth needs his photograph or his word —
+and a room is never generated or invented here. ⚠ No crop of a photograph
+keeps its lamps better than the whole of it (`placeRoom` takes the largest of
+three ratios, and a crop only raises one), so the two new rooms have no
+portrait framing and lose a lamp at the side on stages narrower than ~0.95 of
+their height (§9).
 
 - **The room's own light is painted UNDER the door** (`#roomPool`, `#roomFall`
   in `#backdrop`). Deepening the `#vignette`, which is painted last over the
@@ -1001,6 +1052,9 @@ derived from the WINDOW rather than from another face.
   unmoved (A20, A21, asserted). A face that keeps nothing falls back to the
   window's own lone panel, aligned to the casing (d097); plain behind the
   square window draws that.
+- The fixed leaf's glass carries the window's design unless the customer took
+  it off that leaf (`grilleOn`, 1.11, "The glass" below) — then it is plain
+  glass, and so is the main pane under "fixed leaf only".
 - ⚠ **The fixed leaf of a דלת וחצי carries the same face** (28.9, the owner's
   son: *"…a window and a panel at the same width, just like the main door — and
   with 3 panels there should be 3 panels on the half door too"*). It asks
@@ -1105,6 +1159,20 @@ included ones, then the priced ones with the surcharge PER WINDOW in the
 heading (ironwork is sold by the pane) — each black design with its `-light`
 twin beside it. The array's order is the code's and does not move; the
 twins were appended at its end, which is why they drew apart.
+⚠ **On a door-and-a-half the design can be on one leaf** (1.11, the owner's
+son: *"…choose on which side they want to remove what"*, the default *"on
+both the doors"*): `grilleOn` (`GRILLE_ON` both · main · side, `gs=`, two bits,
+`VERSION` 29). The WINDOW stays on both leaves (ours — a window on one leaf is
+a question for Peretz, `ASK-PERETZ.md` 0h2); the leaf the design is off draws
+plain glass through the same `aperture` (the `none` entry), and each pane and
+`#side-leaf` carry `data-design="on|off"` ONLY when the choice is not both, so
+every door drawn before is byte-identical (9,792 doors swept old against new).
+`paneCount` reads it through `designPanels`/`grilleOnOf` — the one statement
+— so the price is per pane carrying the design, and `grilleOnOf` answers
+`both` wherever there are not two glazed leaves and a design, so no state can
+count a door's glass away. `repair` sends it home there with
+`SAID.grilleOnHome`; the grille row names the leaf in words when not both
+("גפן, כנף ראשית בלבד"), the summary's tile name with it.
 
 ⚠ **No line round the inside of the glass** (27.9, the owner's son). `aperture`
 drew a two-device-pixel stroke of the paint darkened 0.6 over every pane — a
@@ -1203,6 +1271,17 @@ for the same half of the leaf and `repair` trades between them.
   under it where the tab would meet the arrow, the line across the column's
   gap. A LINK with a design and no window still brings the window
   (`SAID.windowAdded`), and the step with it.
+  ⚠ **And under the design tiles, on a door with two glazed leaves and a
+  design, a THIRD heading: which leaf** (1.11, ours — the owner's son asked
+  only *"figure out where to put an option"*): the group `grilleOn`, three
+  square tiles (שתי הכנפיים · כנף ראשית בלבד · כנף קבועה בלבד), hidden by the
+  finish group's `when` (`grilleOnHasSubject`) everywhere else. Each tile is
+  the two leaves with THIS design where the choice puts it (`grilleOnGlyph`,
+  redrawn by `composite` when the design or paint moves) and prints the
+  design's row for that choice (`tileAgorot('grilleOn')`). Second in the step,
+  so the band and the arrows stay the designs'. A design tap OWNS the leaf
+  (`OWNED.grille`: swapping keeps "main leaf only", none takes it home, neither
+  asks); a size with no side leaf takes it and asks.
 - **The face step is ONE radio group of six** (29.9, the owner's son: *"…the
   arrows go through the stripes as well — 2 panel, 3 panel, greek set, then
   horizontal stripes, then vertical stripes, then nothing, and the cycle
@@ -1726,7 +1805,7 @@ against nothing and landed on "slightly better".
 | `npm run lockset` | our lock furniture beside photographs of it, each photograph beside our door in **that door's own paint**, both scaled by the LEAF. One `fitting()` measures photo and render alike, and it prints its own calibration |
 | `npm run shot` | the whole page at twelve sizes and designs — ⚠ **not byte-stable** (two runs of identical code differ on ~7 of 12, up to 9/255 in one small box), so it proves nothing either way |
 | `npm run sheets` | regenerates every family. **The 51 bare sheet files (`corpus-`, `recreate-`, `against-`; a few are withdrawn designs' and no longer rewritten) and the 6 `lockset-` sheets are the proof**: `?bare=1` rasterises flat vector with no webfont, photograph or animation, so they are stable |
-| `npm run backdrop` | rebuilds both rooms in `assets/` from the owner's originals; the asset is a pure function of an original plus one number |
+| `npm run backdrop` | rebuilds both of the owner's rooms in `assets/` from his originals; `-- <name>` grades `research/backdrops/<name>.webp` into `assets/room-<name>.webp`, measuring its floor line and solving MIX so its wall lands on his (1.11). The asset is a pure function of an original plus one number |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and de-skews it bilinearly from four measured corners (§3) |
 
 ⚠ **`npm test`'s freshness check hashes `js/`, `css/` and `index.html` for
@@ -1787,7 +1866,8 @@ are not in `VIEWS`:
   out-of-room readings named, 2.10), the figure's ink ≥ 4.5:1 on the picture
   under it, the send a green pill (2.10: ground, no underline, ≥ 48 px, 1 rem
   at 700, flush with the price, ≤ 2 lines but the one named, white ≥ 3:1 on
-  it); the phone bar 67 px with a 48 px send at 700, its breakdown centred on the figure or held inside
+  it) — on each of the three rooms since 1.11, chosen by a tap (81 readings);
+  the phone bar 67 px with a 48 px send at 700, its breakdown centred on the figure or held inside
   the stage (named); the picker top-right in all three languages; the פרזול
   tiles redrawn when the lock furniture changes.
 - **repairs** — a real repair at every viewport, every sentence on screen, its
@@ -1848,6 +1928,23 @@ are not in `VIEWS`:
   block of text on every step, 390 and 1280 × three languages (~720 readings),
   measured in Rubik and in its fallback: none moves by more than a line, at
   most 2 in 100 move at all (28.9 1c).
+- **the other rooms** (1.11) — each new room's wall, decoded off its ASSET,
+  within 2 luma of both of the owner's files; both lamps whole with their own
+  height of wall above them at eleven desktop shapes (1100×800 to 2560×1440;
+  the stairwell at 1100×800 named); no lamp, planter, pilaster, soffit,
+  window or switch plate under the settled `#frame` at every shape × size;
+  and the price's ground ≥ 4.5:1 under the figure on each room at every
+  width in three languages, the room laid where `placeRoom` puts it.
+- **the room picker** (1.11) — no `.stage__rooms` in the phone's document at
+  390 and 320 (with a room stored too), a phone's load asks for no thumbnail
+  or new room; a desktop load asks for nothing but the page, its type, his two
+  rooms and the three thumbnails; the picker on nothing at 8 widths × 3
+  languages × 6 sizes, breakdown shut and open; a tap shows that room and the
+  drawing, price, address, code, WhatsApp link, frame box and `--frame-*` are
+  byte-identical; remembered across a reload; storage refused opens his room
+  and still works; arrows choose and wrap, Enter chooses, 44 px; nothing
+  running after a tap under reduced motion; absent in bare mode and on the
+  sheet; the tour's first cut-outs never on it.
 - **pictures** — the navigator's eleven marks (21 px; the SEEN ones exactly the
   steps present, 2.10) and the spec's fourteen
   (28 px since 27.9 — the summary's fallback for a row whose step has no tile
@@ -1856,6 +1953,13 @@ are not in `VIEWS`:
   each against the other and every face tile, at the size they ship); the
   gallery grid never one column, no tile under 132 px; the photographed floor
   and sconces measured in pixels against the drawn ones.
+- **the design on one leaf** (1.11) — on a door-and-a-half with a design the
+  leaf group under the designs, three priced tiles ≥ 44 px, and hidden on a
+  single leaf, a solid door and with no design, by link and by tap; "main
+  leaf only" draws the fixed pane as the plain pane ON THE RASTER, moves the
+  price by one pane, renames the summary's tile and the send, leaves the
+  band, asks nothing, and undoes; a size with no side leaf asks and lands on
+  both; the arrows move the design and keep the leaf (he 1280, ru 390).
 - **copy** — no explainer contradicts the price on its step; the
   colour-at-the-measure sentence on the colour step and the summary in all
   three languages.
@@ -1956,8 +2060,10 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
 ## 8. Things that will bite
 
 - **BigInt is required** in `url-state.js`: the code layout is **wider than 32
-  bits** (the payload is 54 bits and `TOTAL_BITS` rounds it, with the check
-  nibble, to 60 on 28.9 — read the file). The build targets es2020, so
+  bits** (the payload is 58 bits since 1.11 — `grilleOn`'s two crossed a
+  character, and `version` went to six bits in the same change — and
+  `TOTAL_BITS` rounds it, with the check nibble, to 65: a THIRTEEN-character
+  code; read the file). The build targets es2020, so
   `Object.hasOwn` is unavailable — use `Object.prototype.hasOwnProperty.call`.
 - **The short code is an ENCODING, not a hash.** It decodes without a server,
   because it is read aloud down the telephone.
@@ -2132,6 +2238,14 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs` (gitignored).
   every phone. `…slice` would crop the door's head and foot (forbidden); a
   portrait tile loses the name and price row. The thirty tiles are distinct at
   shipped size (closest pair 2.07%, none under 0.45%).
+- **On the narrowest and tallest desktop stages the two new rooms lose a lamp
+  at the side** (1.11). A 3:2 photograph covering a stage narrower than ~0.95
+  of its height is scaled by the height, and its lamps leave the sides: at
+  1100×800 the street's are whole by 1 px and the stairwell's left one is
+  9.6 px out (named in the audit, `LAMP_KNOWN`); any window taller than about
+  0.8 of its width at 1100–1440 is worse. His room has the portrait framing
+  there; these have none, and no crop makes one (§3). What would close it is
+  a taller photograph of each room.
 - **On a phone the wall's controls cannot stand beside the two biggest
   doors** (14.9; four on 27.9, three on 28.9 — the band went onto the
   photograph and the crop gave 202 units more wall above the door, so every
@@ -2304,7 +2418,8 @@ Section numbers here are that file's. Ask **1a** first (A13, which window is
 and a fixed half — the drawing on three sizes, A18); **1g** (the rose's size);
 **0j** (26.9: whether a glazed trio exists — to the owner's son; whether a glazed
 pair is the ₪3,800 alone, A20; that the square window moved 131 mm down);
-**0a2** (the ₪300 bell: ring, electric push, or both); **0a5** (a gold פרזול's
+**0h2** (1.11: a window on one leaf of a door-and-a-half and none on the
+other — does he build it?); **0a2** (the ₪300 bell: ring, electric push, or both); **0a5** (a gold פרזול's
 keyhole); **1b** (a picture of the curved lever, the Idan's stock length, a
 picture of the digital viewer); **1c** (the wide-margin three-panel doors); **2** (ברזל
 מחושל on ten doors he says do not carry it); **3** (warranty term, permission to

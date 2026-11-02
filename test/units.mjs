@@ -2,14 +2,14 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { BELLS, BOWS, glassRows, PEEPHOLES, STRIPE_SLOTS, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, finishHasSubject, grilleHasSubject, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
+import { BELLS, BOWS, designPanels, isGlazed, GRILLE_ON, grilleOnHasSubject, grilleOnOf, glassRows, PEEPHOLES, STRIPE_SLOTS, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, finishHasSubject, grilleHasSubject, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
 import { contrast, lighten, scaleTone, silhouette } from '../js/colour.js';
 import { SECTION_ICON, sectionIcon, SPEC_ICON, specIcon } from '../js/icons.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceLabel, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
   bellGlyph, bowGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
-  gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
+  gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, grilleOnGlyph, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
   bellFits, bowFeet, bowFits, bowHome, bowPlacement, locksetGlyph, mashkofGlyph, panelUnderGlass, spawnIndexOf, spawnSpots, peepholeFits,
   peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph, stripeTileGlyph, TRIO_RAIL,
   windowGlyph,
@@ -65,13 +65,16 @@ const base = { colour: 'rb-7126d', window: 'none', grille: 'none',
                /* The horizontal bow, 26.9.2026 — added with the field, and the
                   check below that every DEFAULTS key is here said so first. */
                grab: 'nograb',
+               /* Which leaf the window's design goes on, 1.11.2026 — added
+                  with the field. */
+               grilleOn: 'both',
                detail: 'plain', size: 'standard', handing: 'right-in' };
 
 /** The keys a design is made of, in one place, so a new one cannot be forgotten
  *  by half the round-trip checks below. */
 const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle',
               'lockset', 'speciallock', 'bell', 'peephole', 'mashkof', 'pirzul',
-              'handleLen', 'handleFinish', 'grab', 'detail'];
+              'handleLen', 'handleFinish', 'grab', 'grilleOn', 'detail'];
 
 /* ⚠ THE GUARD THAT WOULD HAVE CAUGHT TWO STALE FIXTURES, AND IT COST NOTHING.
    `base` and `everyState`'s stem are both descriptions of "a door" written by
@@ -159,6 +162,14 @@ function* everyState() {
         if (L === stem.handleLen) continue;
         out.push({ ...stem, handle: 'idan', lockset: 'coral', handleLen: L });
       }
+      /* ⚠ AND WHICH LEAF THE DESIGN IS ON (1.11.2026), ×3 WHERE IT HAS A
+         SUBJECT: on a door with two glazed leaves and a design, every door
+         above is emitted again with the design on the main leaf only and on
+         the fixed leaf only. Elsewhere the field has one value (`repair`
+         sends it home), and `buildable` refuses the other two. */
+      if (grilleOnHasSubject(stem)) {
+        for (const st of out.slice()) for (const on of GRILLE_ON.slice(1)) out.push({ ...st, grilleOn: on.id });
+      }
       for (const st of out) if (buildable(st)) yield st;
     }
 }
@@ -236,7 +247,7 @@ group('short code round-trip');
     grille: GRILLES, handle: HANDLES, lockset: LOCKSETS, detail: DETAILS,
     speciallock: SPECIAL_LOCKS, mashkof: MASHKOFS, pirzul: PIRZUL, handleLen: HANDLE_LENS,
     stripes: { length: STRIPE_SLOTS }, bell: BELLS, peephole: PEEPHOLES,
-    handleFinish: HANDLE_FINISHES, grab: BOWS,
+    handleFinish: HANDLE_FINISHES, grab: BOWS, grilleOn: GRILLE_ON,
   };
   for (const field of Object.keys(BITS)) {
     if (field === 'version') continue;
@@ -2272,6 +2283,19 @@ group('every option tile draws its own picture');
   for (const x of PEEPHOLES) check('peephole', x.id, peepholeGlyph(x));
   for (const x of SPECIAL_LOCKS) check('special', x.id, specialLockGlyph(x));
   for (const x of BOWS) check('bow', x.id, bowGlyph(x));
+  /* ⚠ WHICH LEAF THE DESIGN GOES ON, 1.11.2026 — three pictures PER DESIGN:
+     the tiles draw the chosen design, so each design is its own trio, keyed
+     by it (the same choice on two designs is two pictures, which is right).
+     And the leaf that carries the design must be the one the tile names —
+     read off the panes' own `data-design`, not the markup's difference.
+     Falsified by drawing the design on both leaves on every tile. */
+  for (const g of GRILLES.filter(x => x.id !== 'none')) for (const o of GRILLE_ON) {
+    const svg = grilleOnGlyph(o, { grille: g.id, colour: 'rb-7126d' });
+    check(`grilleOn/${g.id}`, o.id, svg);
+    const marks = [...svg.matchAll(/data-design="(on|off)"/g)].map(m => m[1]).join(',');
+    ok(marks === { both: 'on,on', main: 'on,off', side: 'off,on' }[o.id],
+       `the ${o.id} tile of ${g.id} carries the design on ${marks} (main,fixed)`);
+  }
   /* ⚠ AND THE "NONE" TILES ACROSS LISTS, 26.9.2026. The key above carries the
      list's name, so it can never see two different questions declined with
      one picture — and the bow is the fourth "none" on the face and fittings
@@ -5421,11 +5445,28 @@ group('the horizontal bow is its own field on the face step — 26.9.2026');
      the bow must not do is cost a character: without its bit the payload and
      the four-bit check still round to the same number of five-bit characters
      the default door encodes to. Falsified by giving the bow seven bits. */
+  /* ⚠ RESTATED 1.11.2026, NOT WEAKENED. Which leaf the design goes on
+     (`grilleOn`, two bits) was appended after the bow and took the payload
+     55 → 57, past the 56 twelve characters hold with the four-bit check — so
+     the code is thirteen characters now, and the clause "the bow's bit did not
+     cost a character" read against today's payload would be false for a
+     reason that is not the bow's. What it asserted still holds and is still
+     asserted: on the layout without the new field, the bow's bit fits inside
+     the same twelve characters it fitted when it was added. And the new fact
+     beside it: the code's length is the payload plus the check rounded up —
+     derived, never typed — and the field that crossed the character is
+     `grilleOn`, by exactly one. Falsified by giving the bow seven bits (the
+     first clause), and by giving `grilleOn` one bit (the third). */
   {
     const payload = Object.values(BITS).reduce((a, b) => a + b, 0);
-    ok(Math.ceil((payload - BITS.grab + 4) / 5) === CODE_LEN && Math.ceil((payload + 4) / 5) === CODE_LEN,
-       `the bow's bit cost a character: ${Math.ceil((payload - BITS.grab + 4) / 5)} without it, `
-     + `${Math.ceil((payload + 4) / 5)} with it, the default door encodes to ${CODE_LEN}`);
+    const before = payload - BITS.grilleOn;
+    ok(Math.ceil((before - BITS.grab + 4) / 5) === Math.ceil((before + 4) / 5),
+       `the bow's bit cost a character: ${Math.ceil((before - BITS.grab + 4) / 5)} without it, `
+     + `${Math.ceil((before + 4) / 5)} with it, on the layout before grilleOn`);
+    ok(Math.ceil((payload + 4) / 5) === CODE_LEN,
+       `the code is ${CODE_LEN} characters and the payload ${payload} plus the check rounds to ${Math.ceil((payload + 4) / 5)}`);
+    ok(Math.ceil((before + 4) / 5) === CODE_LEN - 1,
+       `grilleOn's two bits are not the thirteenth character: ${Math.ceil((before + 4) / 5)} without them, ${CODE_LEN} with`);
   }
   for (const gb of BOWS) {
     const st = repair({ ...solid, grab: gb.id }).state;
@@ -5492,6 +5533,9 @@ group('the horizontal bow is its own field on the face step — 26.9.2026');
       colour: ids(COLOURS).slice(0, 3), grille: ids(GRILLES).slice(0, 4), mashkof: ids(MASHKOFS),
       pirzul: ids(PIRZUL), handleFinish: ids(HANDLE_FINISHES),
       stripeDir: ['none', 'h', 'v'], stripeCount: [0, 1, 3], stripeTight: [false, true],
+      /* which leaf the design goes on, 1.11.2026 — it moves no face box, and
+         the sweep says so rather than assuming it */
+      grilleOn: ids(GRILLE_ON),
     };
     ok(Object.keys(DEFAULTS).every(k => k === 'grip' || VARY[k]),
        `the completeness sweep does not vary ${Object.keys(DEFAULTS).filter(k => k !== 'grip' && !VARY[k])} — a new field is a field the key may need`);
@@ -5521,8 +5565,9 @@ group('the פרזול tiles are a composite of this door — 27.9.2026');
      VERSION 27, `lt=` retired.) Falsified 27.9 by drawing the old Coral-only
      glyph (the lockset clause). */
   /* 28 since 29.9: `grille` went to five bits for ברזל מחושל's two entries.
+     29 since 1.11: `grilleOn`, which leaf the design goes on, appended.
      The latch's number stays burnt either way — 26 is never reused. */
-  ok(VERSION === 28, `VERSION is ${VERSION}: the latch's bit left the layout at 27, the grille field widened at 28, and 26 is never reused`);
+  ok(VERSION === 29, `VERSION is ${VERSION}: the latch's bit left the layout at 27, the grille field widened at 28, the leaf field arrived at 29, and 26 is never reused`);
   ok(!('latch' in DEFAULTS) && !('latch' in BITS), 'the withdrawn latch is still a field');
   ok(!fromQuery('?lt=latch').notice && !('latch' in fromQuery('?lt=latch').state),
      'a link from the latch\'s day raises a notice or carries the field — lt= is retired, silently');
@@ -6171,6 +6216,7 @@ group('a handle the customer moved reaches the order');
     bell:        other(BELLS, DEFAULTS.bell),
     peephole:    other(PEEPHOLES, DEFAULTS.peephole),
     grab:        other(BOWS, DEFAULTS.grab),
+    grilleOn:    other(GRILLE_ON, DEFAULTS.grilleOn),
     mashkof:     other(MASHKOFS, DEFAULTS.mashkof),
     pirzul:      other(PIRZUL, DEFAULTS.pirzul),
     handleFinish: other(HANDLE_FINISHES, DEFAULTS.handleFinish),
@@ -7535,6 +7581,149 @@ group('no two rows of the A4 order sheet carry the same heading');
        + `a reader cannot tell which row is which (${seen.join(' · ')})`);
     }
   }
+}
+
+/* ── WHICH LEAF THE WINDOW'S DESIGN GOES ON — 1.11.2026 ────────────────
+   The owner's son: *"When choosing the door-and-a-half and then choosing a
+   design, it automatically puts a design on the half door. Figure out where to
+   put an option of removing a design on either of the sides."* and *"The
+   default when choosing a design should be that it will be on both the
+   doors."* `grilleOn` (`GRILLE_ON`, `gs=`, two bits, `VERSION` 29). */
+group('the window design on one leaf of a door-and-a-half — 1.11.2026');
+{
+  const P = st => priceAgorot(repair({ ...DEFAULTS, ...st }).state);
+  /* ── nothing sent before today moves (T12's shape): a link without `gs=`
+     and the same link with `gs=both` are one door, byte for byte — and on a
+     single size `gs=main` lands on that same door, said. */
+  const links = ['', '?s=half&w=rect&g=grid', '?s=half&w=strip&g=vine-light&d=panel2',
+                 '?s=halfextra2&w=rect&g=circles&d=classic', '?s=standard&w=rect&g=vine',
+                 '?s=extra1&w=strip&g=iron', '?s=extra2&w=rect&g=tree-light&d=panel3'];
+  for (const q of links) {
+    const a = fromQuery(q || '?'), b = fromQuery(`${q || '?'}&gs=both`);
+    ok(a.state.grilleOn === 'both' && render(a.state) === render(b.state),
+       `${q || 'the bare page'}: a link without gs= is not the door gs=both draws`);
+    ok(toQuery(a.state).includes('gs=both'), `${q || 'the bare page'}: the link does not carry gs=`);
+  }
+  for (const sz of Object.keys(SIZES).filter(k => !SIZES[k].side)) for (const gs of ['main', 'side']) {
+    const q = `?s=${sz}&w=rect&g=grid`;
+    const r = fromQuery(`${q}&gs=${gs}`);
+    ok(r.state.grilleOn === 'both' && render(r.state) === render(fromQuery(q).state),
+       `${sz}: gs=${gs} on a single leaf kept ${r.state.grilleOn} — the repair did not send it home`);
+    ok(r.notice === 'combination-fixed' && r.said.includes(T('fix.grilleOnHome', L(byId(GRILLE_ON, gs)))),
+       `${sz}: gs=${gs} went home without saying so (${r.notice}; ${r.said.join(' · ')})`);
+  }
+
+  /* ── the panes: charged and drawn on the leaves the field names. `vine` is
+     a priced design (one pane = its delta), `grid` an included one. */
+  for (const size of Object.keys(SIZES).filter(k => SIZES[k].side)) for (const g of ['grid', 'vine']) {
+    const at = gs => repair({ ...DEFAULTS, size, window: 'rect', grille: g, grilleOn: gs }).state;
+    const both = at('both'), main = at('main'), side = at('side');
+    ok(both.grilleOn === 'both' && main.grilleOn === 'main' && side.grilleOn === 'side',
+       `${size}/${g}: the fixtures did not stand (${both.grilleOn}/${main.grilleOn}/${side.grilleOn}) — no subject`);
+    ok(paneCount(both) === 2 && paneCount(main) === 1 && paneCount(side) === 1,
+       `${size}/${g}: panes ${paneCount(both)}/${paneCount(main)}/${paneCount(side)} for both/main/side`);
+    const pane = byId(GRILLES, g).delta;
+    ok(priceParts(both).grille === 2 * pane && priceParts(main).grille === pane && priceParts(side).grille === pane,
+       `${size}/${g}: the design is charged ${priceParts(both).grille}/${priceParts(main).grille}/${priceParts(side).grille}, `
+     + `one pane is ${pane}`);
+    ok(priceAgorot(both) - priceAgorot(main) === pane && priceAgorot(main) === priceAgorot(side),
+       `${size}/${g}: main leaf only moves the price by ${priceAgorot(both) - priceAgorot(main)}, one pane is ${pane}`);
+    ok(tileAgorot('grilleOn', main) === pane && tileAgorot('grilleOn', both) === 2 * pane,
+       `${size}/${g}: the leaf tiles print ${tileAgorot('grilleOn', both)}/${tileAgorot('grilleOn', main)} — not the design's row`);
+    for (const st of [both, main, side]) {
+      const sum = breakdownRows(st).reduce((n, r) => n + r.agorot, 0);
+      ok(sum === priceAgorot(st), `${size}/${g}/${st.grilleOn}: the breakdown sums to ${sum}, the total is ${priceAgorot(st)} (T1)`);
+      ok(isGlazed(st), `${size}/${g}/${st.grilleOn}: the door stopped being glazed`);
+      ok(designPanels(st).length === paneCount(st), `${size}/${g}/${st.grilleOn}: designPanels and paneCount disagree`);
+    }
+    /* drawn: the leaf the design is off is PLAIN GLASS — the same pane the
+       door draws with no design at all — and the leaf it is on is the pane
+       the door draws with the design on both. */
+    const plainSvg = render({ ...both, grille: 'none' }), bothSvg = render(both);
+    const sidePane = svg => (svg.match(/<g data-pane="s"[\s\S]*?<rect x="[^"]+" y="[^"]+" width="[^"]+" height="34"/) || [''])[0]
+      .replace(/ data-design="\w+"/, '');
+    const mainPane = svg => (svg.match(/<g data-pane="m0"[\s\S]*?<rect x="[^"]+" y="[^"]+" width="[^"]+" height="34"/) || [''])[0]
+      .replace(/ data-design="\w+"/, '');
+    ok(sidePane(bothSvg) && mainPane(bothSvg), `${size}/${g}: the panes could not be read out of the drawing — this check is dead`);
+    const mSvg = render(main), sSvg = render(side);
+    ok(/id="side-leaf"[^>]*data-design="off"/.test(mSvg) && /id="side-leaf"[^>]*data-design="on"/.test(sSvg),
+       `${size}/${g}: #side-leaf does not say which leaf carries the design`);
+    ok(!/data-design=/.test(bothSvg), `${size}/${g}: both leaves marks a pane — a door drawn before today would not be byte-identical`);
+    ok(sidePane(mSvg) === sidePane(plainSvg) && mainPane(mSvg) === mainPane(bothSvg),
+       `${size}/${g}: main leaf only did not draw the fixed leaf's pane plain and the main pane with the design`);
+    ok(sidePane(sSvg) === sidePane(bothSvg) && mainPane(sSvg) === mainPane(plainSvg),
+       `${size}/${g}: fixed leaf only did not draw the main pane plain and the fixed pane with the design`);
+    ok(mSvg !== bothSvg && sSvg !== bothSvg && mSvg !== sSvg, `${size}/${g}: the three choices are not three drawings`);
+  }
+
+  /* ── the rule is in the state (§5.21): `repair` sends it home when the
+     design, the window or the side leaf goes, and says so. Falsified by
+     dropping the branch in `repair`. */
+  const one = { ...DEFAULTS, size: 'half', window: 'rect', grille: 'vine', grilleOn: 'side' };
+  for (const [what, st] of [['the design', { ...one, grille: 'none' }], ['the window', { ...one, window: 'none', grille: 'none' }],
+                            ['the side leaf', { ...one, size: 'standard' }], ['the side leaf (extra)', { ...one, size: 'extra2' }]]) {
+    const r = repair(st);
+    ok(r.state.grilleOn === 'both', `${what} went and "fixed leaf only" stayed (${r.state.grilleOn})`);
+    ok(r.said.includes(T('fix.grilleOnHome', L(byId(GRILLE_ON, 'side')))), `${what} went and the leaf went home without its sentence`);
+  }
+  ok(!repair(one).changed.length, 'a door-and-a-half with the design on the fixed leaf is repaired — it is buildable');
+  ok(grilleOnOf({ ...one, size: 'standard' }) === 'both' && paneCount({ ...one, size: 'standard' }) === 1,
+     'an unrepaired single leaf carrying gs=side counts its glass away');
+  /* the conflicts table agrees with the group's subject */
+  ok(!Object.keys(conflicts(one).grilleOn).length, 'the leaf tiles are greyed on a door-and-a-half with a design');
+  ok(Object.keys(conflicts({ ...one, size: 'standard', grilleOn: 'both' }).grilleOn).sort().join() === 'main,side',
+     'on a single leaf the one-leaf choices are not refused by the rules');
+
+  /* ── the confirm dialog: a size with no side leaf takes the choice (asks);
+     a design swap keeps it and taking the design off owns it (asks nothing);
+     the leaf tap itself takes nothing. */
+  {
+    const st = repair(one).state;
+    ok(displacedBy(st, repair({ ...st, size: 'standard' }, 'size').state, 'size').includes('grilleOn'),
+       'a size with no side leaf takes "fixed leaf only" and the dialog would not ask');
+    const swap = repair({ ...st, grille: 'circles' }, 'grille').state;
+    ok(swap.grilleOn === 'side' && !displacedBy(st, swap, 'grille').length, 'swapping the design lost the leaf, or asked');
+    ok(!displacedBy(st, repair({ ...st, grille: 'none' }, 'grille').state, 'grille').length,
+       'taking the design off asks about the leaf it was on');
+    ok(!displacedBy(st, repair({ ...st, grilleOn: 'main' }, 'grilleOn').state, 'grilleOn').length, 'a leaf tap asks');
+  }
+
+  /* ── the wire format: a link and a code carry all three on every double;
+     the code is one character longer and an old one is refused. */
+  for (const size of Object.keys(SIZES).filter(k => SIZES[k].side)) for (const o of GRILLE_ON) {
+    const st = repair({ ...DEFAULTS, size, window: 'strip', grille: 'scroll', grilleOn: o.id }).state;
+    ok(st.grilleOn === o.id, `${size}/${o.id}: the fixture did not stand`);
+    const q = fromQuery(toQuery(st));
+    ok(q.state.grilleOn === o.id && q.notice === null, `${size}: a link lost ${o.id} (${q.state.grilleOn}, ${q.notice})`);
+    const c = decodeCode(encodeCode(st));
+    ok(c && c.grilleOn === o.id && KEYS.every(k => c[k] === st[k]), `${size}: a code lost ${o.id}`);
+  }
+  ok(toQuery({ ...one }).includes('gs=side'), 'the leaf rides in gs=');
+  ok(VERSION === 29, `VERSION is ${VERSION} — the leaf's bits are a layout change`);
+  /* The default door's code at VERSION 28 (8f20091) and a door-and-a-half
+     with the vine: both refused, never decoded into another door. */
+  for (const old of ['DM-W30002000002', 'DM-W3CJ02000006']) {
+    ok(decodeCode(old) === null, `the v28 code ${old} decoded under v29`);
+    ok(fromQuery(`?code=${old}`).notice === 'code-unknown', `the v28 code ${old} opened without the notice`);
+  }
+
+  /* ── the words: the grille row names the leaf exactly when it is not both,
+     in three languages, and the message (always Hebrew) carries it. */
+  for (const lang of LANG_IDS) withLang(lang, () => {
+    for (const o of GRILLE_ON) {
+      const st = repair({ ...one, grilleOn: o.id }).state;
+      const row = specRows(st).find(r => r.key === 'grille');
+      ok(row, `${lang}/${o.id}: no grille row`);
+      if (!row) continue;
+      const named = row.value.includes(L(o));
+      ok(o.id === 'both' ? !named && !row.side : named && row.side === L(o) && row.value.endsWith(`, ${L(o)}`),
+         `${lang}/${o.id}: the grille row reads "${row.value}"`);
+    }
+  });
+  ok(specLines({ ...one, grilleOn: 'main' }).some(l => l.endsWith(', כנף ראשית בלבד')),
+     'the order does not say the design is on the main leaf only');
+  ok(withLang('he', () => summaryLine({ ...one }).includes(L(byId(GRILLE_ON, 'side')))),
+     'the one-line summary does not say the design is on the fixed leaf only');
 }
 
 await checkLanguages();

@@ -24,6 +24,163 @@ oldest lines move to the top of the "moved" section.
 
 ---
 
+## 1.11.2026 — PROMPT J, 2 of 2: the room picker, on the wall, desktop only
+
+His words: *"An option to change the background: some customers want to know
+how a door looks with different backgrounds. PC exclusive — I don't think
+there is enough space on the phone."*
+
+**What it is.** `.stage__rooms` in `index.html`, inside `.stage-wrap` and never
+inside `.stage` (whose markup `paint` rewrites): a `role="radiogroup"` labelled
+"רקע" / Background / Фон, holding three `<button role="radio">` — his room
+(מבואה), the street (כניסה לבניין), the stairwell (חדר מדרגות) — each a 38 px
+thumbnail in a 44 px button on an ink tab like the navigator column's, the
+chosen one in the column's live square (`--surface`). The thumbnails are
+`npm run backdrop`'s, 88 px squares of the graded rooms, ~1 KB each, stamped
+by the build; the two new rooms' URLs are on their buttons (`data-href`),
+stamped, so each URL is written once.
+
+**Behaviour.** A tap stores the room (`dm.room.v1`, behind a try), marks the
+radio and calls `armRoom`, which asks `pickRoom` for that room's crop (sets
+since commit 1) and fetches its file only now; the load handler drops a file
+that arrives after a later choice or a resize across 1100 (`shownSet`). Below
+1100 the stage is always his room, whatever is stored. Arrows choose the next
+room and wrap, in the row's reading direction; Enter and Space are the
+button's. `.room`'s 120 ms background transition is off under reduced motion;
+there is no fade on the room itself.
+
+**Desktop only, and absent below.** `hidden` in the markup (a page without
+script never shows it, its images lazy), and `placeRooms` takes the element OUT
+of the document below 1100, in bare mode and on the sheet, putting it back
+(and translating it) when the window crosses 1100 again.
+
+**Where it stands.** `placeRooms`, run at the end of `placeSteps` (which runs
+whenever the column might move) and from `fitStage`: the stage's bottom-left,
+8 px in, 8 px above the trust band's words where its width meets them
+(`placeUndo`'s rule); `row` then `stack`, the first touching no door (settled
+frame), arrow, price, open breakdown, wall control, undo group, band or
+column. ⚠ **Found while designing it:** in English and Russian that corner is
+the COLUMN's (it faces the panel), with its foot 8–70 px over the stage's
+foot at 1100–1366. Lifting the column over the picker would have pulled it up
+onto the price at 1100–1152 (it is already giving its gaps there), so the
+column never yields to staging: the same two shapes are tried BESIDE it.
+Measured by the audit, 8 widths (1100–1920) × three languages × six sizes,
+the breakdown shut and open: **288 readings, on nothing, none named** —
+`row` at the corner 166, `stack` at the corner 6 (Hebrew at 1100 beside the
+wider doors), `row` beside the column 60, `stack` beside it 56.
+
+**The audit**, a new block (`the room picker`) and restatements:
+- phone: no `.stage__rooms` in the document at 390 and 320, with the street
+  stored too; a phone's load asks for no thumbnail or new room;
+- desktop load: every request is the page, its type, his two rooms or the
+  three thumbnails;
+- placement: the 288 readings above;
+- taps: nine taps in three languages and three doors (the double in white, a
+  glazed door with a design) — the stage shows the room's file and the radio
+  says so; the drawing's markup, the price, `location.href`, the code, every
+  `[data-wa]` href, the frame's settled box and `--frame-*` byte-identical;
+- storage and keys: remembered across a reload; storage refused opens his
+  room and still works; arrow keys and Enter; 44 px;
+- motion, bare and tour: nothing running after a tap under reduced motion;
+  absent in bare mode and on the sheet; the tour's first cut-outs never on it.
+- restated: the price's contrast clause on all three rooms by a tap (27 → 81
+  readings, commit 1's injected reading retired); `.stage__rooms` joins the
+  wall-control lists of the price, band and column clauses.
+
+**Falsified**, each in a throwaway copy:
+- the room written into the address → the href clause fails, on every tap;
+- the picker kept below 1100 → four phone faults;
+- the obstacle test removed → 3,136 px² on the column in Russian at 1100;
+- a new room preloaded → five request faults;
+- the transition left on under reduced motion → the motion fault.
+⚠ **The brief's own falsification did not fail, and why:** "store the room in
+the state" (`state = { ...state, room }`) leaves the address, the code and the
+drawing unchanged, because `toQuery`, `encodeCode` and `render` read only the
+fields they know. The clause catches the room reaching the ADDRESS, which is
+the leak that matters; a field that dies at the serialiser is not one.
+
+**Gates:** see the commit message.
+
+## 1.11.2026 — PROMPT J, 1 of 2: the two rooms graded and measured, as assets
+
+His words (the owner's son): *"An option to change the background: some
+customers want to know how a door looks with different backgrounds. PC
+exclusive — I don't think there is enough space on the phone."* and
+*"Backgrounds that will show how the door looks in a setting that is other
+than just a perfect hall."* This commit makes the two generated rooms
+(`29782a6`) into assets, measured; the picker is the next.
+
+**The tool.** `npm run backdrop -- <name>` reads `research/backdrops/<name>.webp`
+and writes `assets/room-<name>.webp` through the owner's grading — his curve
+(`1 − (1 − v)^p`, three exponents solved per channel), his reference
+(`DRAWN_WALL` #F0EDE7) and his band (x 0.30–0.70, 0.15 of the height to 10 px
+over the floor). With no name it grades his two originals into their old file
+names, and they come out **byte-identical** (re-run and diffed). It prints the
+wall's median before and after and the exponents, and it MEASURES the floor
+line rather than taking it typed: the strongest 4-px luminance step per column
+across the centre half, sub-pixel, a trimmed line — on his originals 827.4 and
+1214.4 against the recorded 827.4 and 1214.5. On the street the skirting's top
+(864) is the stronger step, so each named room carries the band to look in.
+
+**What was falsified, and decided: MIX is solved per room.** The brief said
+"MIX 0.6, the wall beside the door at the measured 218–220 luma". At 0.6 the
+street's stone (175 before) lands at **212.3** and the stairwell (186) at
+**216.8** — 7.8 and 3.3 under his desktop room's 220.1, outside the 2-luma
+gate the same brief set. MIX 0.6 is not a taste: the tool's own header derives
+it from that wall (a pale leaf's corpus leaf/wall ratio, 1.072, asks for 220).
+So the WALL is held and MIX solved per room so the band lands on his
+`room-wide.webp` as graded (read off the file at run time, not typed): street
+**0.7248** (exponents 1.5098 / 1.7590 / 1.9947, #C6AB91 → #E4DBCF, r/b 1.366 →
+1.101), stairwell **0.6638** (1.4761 / 1.5255 / 1.5687, #C3B9AC → #E1DCD3,
+1.134 → 1.066). A room needing MIX outside 0..1 is refused. Reversible in one
+line (`mix = MIX`), at the cost of the 2-luma gate.
+
+**No wide crop, and why.** `placeRoom` scales by max(floor-to-top,
+floor-to-foot, width-to-width); removing rows or columns from a picture raises
+one of the three or none, so a crop only zooms in and moves the lamps out. His
+two files are two framings of one entrance; a crop of one photograph is not
+another. So one file each: 320.4 KB and 235.1 KB at webp q0.9 (budget 400).
+
+**Measured into `ROOMS`** (js/app.js, now SETS — `set: 'home'` for his two
+crops, one set per new room; `pickRoom(…, set)` scores one set's crops and
+never across): floor 904.7 / 893.1 of 1024 (tilt 0.006° / −0.015°, rms 0.24 /
+0.62 px); the right lamp's centre 419.5 / 413.5 from the picture's centre;
+the lamps' head and foot 360..418 / 305..377. The lamp method (largest
+connected region past a threshold in a window) run on his wide room returns
+his 452.5 and 326..403 exactly. The objects that must never be behind the
+door, measured: the street's planter (x ≥ 1297 above its kerb, the kerb's face
+at 1336), its porch pilaster (x ≤ 55) and the soffit (y ≤ 34); the
+stairwell's switch and bell plates (32..69 × 430..519) and its window (0..127 ×
+0..173). Stone joints, the leaves' shadow and the dado line are wall.
+
+**The audit's new block, `the other rooms`**, four clauses, each asked of
+pixels: (1) each new file's wall decoded off the asset within 2 luma of both of
+his — street **220.0**, stairwell **220.6** against **219.1** / **220.1**; (2)
+both lamps whole with a lamp's height of wall above them at eleven desktop
+shapes (1100×800 … 2560×1440) — 22 shape-rooms, one named: **1100×800
+stairwell, −9.6 px** (the street is whole there by 1 px); (3) no lamp or
+object under the settled `#frame` — **176 doors** (eleven shapes × six sizes
+in Hebrew, the standard door in English and Russian, two rooms), none; (4) the
+room laid on the stage where `placeRoom` puts it, the price's ink transparent,
+the darkest 5 % under the figure — **≥ 9.77:1 on 66 pictures** (lowest Russian
+1100×800 on the street, over the leaves' shadow), gate 4.5. Falsified each:
+the ungraded original as the street (174.9 — two faults), the exemption
+dropped (1100×800 faults at 9.6) and moved to a shape where the lamp is whole
+("take the exemption out"), a box put behind the door (3,514 px² at every
+size), a #3A3A3A room (1.48:1, and its wall 58.0).
+
+**Found, not fixed (§9):** below a stage ratio of ~0.95 (1100×800, and windows
+taller than ~0.8 of their width at 1100–1440) the 3:2 rooms are scaled by
+height and their lamps leave the sides; his room has his portrait framing
+there. A taller photograph of each would close it.
+
+**Resolution:** at the 1920×918 stage both are drawn at 0.977 of their pixels
+(his wide 0.964); the most any swept shape asks is 1.05 / 1.06 at 1920×1080
+and 1.42 / 1.44 at 2560×1440 (his 1.15 and 1.56). No sharpening.
+
+**Gates:** `node --check`, build, `npm test` **13,045,569, 0 failed**,
+`npm run sheets` — predicted 0 bare; four moved by 2–8 px of 1/255 (`corpus-04`, `corpus-06`, `recreate-d048`, `recreate-d087`) and the UNCHANGED commit, regenerated in a worktree on the same container, wrote the same four byte for byte — the container, not the change; the committed bytes were kept.
+
 ## 1.11.2026 — two generated rooms for the room picker
 
 The owner's son wants customers to see the door in settings *"other than
@@ -156,6 +313,80 @@ into `research/colours/README.md`.
   above); the sheets moved the 12 `shot` sheets and `.stamps.json` only
   (predicted: no bare sheet — the drawing is untouched). `npm run audit` not
   yet run on this round.
+- **1.11 — PROMPT I, 1 OF 2: THE DESIGN ON ONE LEAF OR BOTH.** His words:
+  *"When choosing the door-and-a-half and then choosing a design, it
+  automatically puts a design on the half door. Figure out where to put an
+  option of removing a design on either of the sides."* and *"The default when
+  choosing a design should be that it will be on both the doors. They need to
+  be able to choose on which side they want to remove what."*
+  Ours, named so he can reverse any in a line: a THIRD heading on the designs'
+  step, under the design tiles — three square tiles, שתי הכנפיים · כנף ראשית
+  בלבד · כנף קבועה בלבד — shown only on a door with two glazed leaves and a
+  design (the finish group's `when`); the WINDOW stays on both leaves (his
+  words name the design; a window on one leaf is a different door —
+  `ASK-PERETZ.md` 0h2 asks him); `both` the default, so every link and code
+  ever sent opens as it was seen; the tiles draw THIS design where it goes and
+  print each choice's price; the order says the leaf in words when not both.
+  · **The field.** `grilleOn`, `GRILLE_ON` (both · main · side, he/en/ru —
+    ids a wire format from today), `gs=` (joins `KNOWN`; absent = both), two
+    bits APPENDED after the bow, and `version` 5 → 6 bits in the same change
+    (`npm test` wants four versions of headroom; 29 left two): payload 55 →
+    58, `TOTAL_BITS` 60 → 65 —
+    ⚠ **the code is THIRTEEN characters now**: twelve hold 60 bits and the
+    check nibble is reserved before the rounding, so 57 + 4 crossed one
+    (the version's bit fits in what that opened).
+    Nothing was shaved to keep twelve (`handle` keeps its spare bit for the
+    products Peretz has not named; the check keeps its four). `VERSION` 29; a
+    v28 code is refused with the notice (asserted on two real v28 codes).
+  · **One statement.** `designPanels`/`grilleOnOf` in `js/catalog.js`, read
+    by `paneCount` — so the price (per pane carrying the design), `isGlazed`,
+    `grillePlacement`, the spec and the sheet follow; `grilleOnOf` answers
+    `both` wherever there are not two glazed leaves and a design, so an
+    unrepaired state cannot count glass away. `render` draws the leaf the
+    design is off as plain glass through the same `aperture` (the `none`
+    entry, so etched glass and the `-light` twins follow the same switch) and
+    marks each pane and `#side-leaf` `data-design="on|off"` ONLY when not both.
+  · **Nothing sent before today moves.** 9,792 doors (six sizes × every
+    window, design and face × two paints × two handings × bow off/on) drawn by
+    the old renderer and the new from the same link: byte-identical; 1,224
+    links' price and order lines: identical. In the suite: a link without
+    `gs=` and with `gs=both` are one drawing (seven links), and `gs=main|side`
+    on every single size lands on that same door with `SAID.grilleOnHome`.
+  · **Rules.** `repair` sends it home when the design, the window or the side
+    leaf goes, and says so (`fix.grilleOnHome`, the choice named through an
+    argument); `conflicts.grilleOn` refuses main/side where the group has no
+    subject (`why.grilleOnOne`, for the rules' other readers — the page hides
+    the group). `displacedBy`: a design tap OWNS the leaf (`OWNED.grille` —
+    swapping keeps "main leaf only", none sends it home, neither asks); a size
+    with no side leaf takes it and asks (`ROW_OF.grilleOn` names the grille
+    row in the dialog).
+  · **Words.** The grille row's value carries the leaf when not both ("גפן,
+    כנף ראשית בלבד"), in place of `grillePlacement`'s "where", so the message,
+    the summary's tile name (kept with the design's picture) and the A4 sheet
+    say it off one statement; `exp.grd.a` gains one sentence through
+    `expArgs` (the three names, no price typed).
+  · **Asserted.** Units (239 in the new group): the panes charged and drawn
+    on all three doubles × an included and a priced design — two/one/one,
+    one pane = the design's delta, T1 on all three, the off pane byte-equal to
+    the door with no design and the on pane to the door with it on both; the
+    home rule both ways with its sentence; the dialog four ways; the link and
+    code on all three doubles × all three choices; the words in three
+    languages; the tile sweep (three distinct pictures per design, each
+    carrying the design exactly where it says). The round-trip sweep ×3 on
+    the doubles with glass and a design: 142,800 → 269,136 designs. The "bow's bit did
+    not cost a character" clause RESTATED, not weakened: on the layout without
+    the new field it still fits, and `grilleOn` is asserted to be what cost the
+    thirteenth character. Audit (20 readings, he 1280 and ru 390): the group
+    under the designs only with its subject, by link and by tap; "main leaf
+    only" draws the fixed pane as the plain pane ON THE RASTER, moves the
+    price by one pane, renames the summary's tile and the send, leaves the
+    band, asks nothing, undoes; a single size asks and lands on both; the
+    arrows move the design and keep the leaf. Fuzz draws `grilleOn`.
+    Falsified: `paneCount` reading every pane — 27 clauses, the one-pane price
+    among them; the `repair` branch dropped — the single-size home clauses;
+    the group's `when` dropped — the audit's single-size and no-design clauses; the renderer ignoring the field —
+    both raster clauses (0.0 % moved; 30–37 % off the plain pane).
+  · **Gates.** npm test **25,277,369, 0 failed** (the ×3 sweep nearly doubles the total; ~10½ min); collide `-- all` 1,638 clean (unchanged), `-- boxes` clean; sheets **0 bare and 0 lockset moved**, `js/works.js` byte-identical — `.stamps.json`, `corpus-links.md` (v=29, `gs=both`) and the 12 `shot` sheets, as predicted.
 
 - **28.10 — PROMPT H: ONE BRANCH, `main`, AND THE PAGE DOES NOT MOVE.** His
   words: *"I want all the branches merged into main, and I don't want other
@@ -4426,6 +4657,37 @@ into `research/colours/README.md`.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **17.10** THE CARDS' NAMES ON THE CHART: eleven labels follow his deck's cards
+  (מוקה, אפור פשתן, אפור קלאסי, אפור בטון, שמנת חלבית, גרז', אפור בזלת — the
+  default —, גרפיט, קפוצ'ינו, ירוק פסגות, אפור שמיים), with plain English and
+  Russian. Ids, codes and aliases untouched; nothing typed a name. 0 bare
+  sheets. Long form: `HISTORY.md`.
+- **17.10** FOUR CARDS FROM HIS DECK (*"Add all of these colours … all of them
+  except the three that are free should be +200"*): 7345D אפור אורבני, 8075D
+  שוקולד קקאו, 8002D חמרה, 9077D חול ים APPENDED to `COLOURS` (21, no
+  `VERSION`), ₪200 each; hexes MEASURED off his photographs against each
+  card's label, calibrated leave-one-out (`research/colours/README.md`); held
+  out of the gallery's fit, which would have repainted seven doors. Long form: `HISTORY.md`.
+- **17.10** The colour deck photographed (`research/colours/cards/1-5.jpg`,
+  the owner's son): 18 cards, 14 already in the chart and four not (7345D,
+  8075D, 8002D, 9077D); every card +₪200 but the three included ones. The
+  readings and the chart change are PROMPT G's. Long form: `HISTORY.md`.
+- **10.10** The tour's POINTERS CURVE (*"…must not be horizontal — it looks very
+  ugly and is not intuitively understandable"*): a path off the callout's top
+  or bottom, bowing a quarter of its chord wherever that is within 45° of
+  horizontal; the arrowheads — gone since 28.9, their marker deleted with the
+  old lines — draw again. 0 bare sheets. Long form: `HISTORY.md`.
+- **10.10** The PANELS UNDER GLASS ARE THE CASING'S WIDTH (*"match the width
+  of the window … the option with 2 panels needs to be identical to the
+  rectangle window's panel"*): every kept row under glass flush with the
+  casing, both leaves, one expression; beside the square window the pair's
+  lower panel is the window's lone one. Solid faces keep 0.23. 0 bare sheets
+  (no sheet door is glazed and panelled). Long form: `HISTORY.md`.
+- **10.10** The CYLINDER ONLY is **₪100** (*"The option with cylinder only
+  needs to be 100 shekels"*; it was included): its tile prints the figure, the
+  lock step's explainer says it through `expArgs`, and the lever's fallback
+  swap now names where it lands and its price (`locksetSwapWords`) — a swap
+  from the Rotem costs ₪100. ₪3,195 unmoved (the Rotem). Long form: `HISTORY.md`.
 - **2.10** The window's designs a STEP OF THEIR OWN, present only with a window
   (*"a separate section … only appearing if you choose one of the windows — an
   icon next to the window one"*): `grd` after the glass, tied to its mark —

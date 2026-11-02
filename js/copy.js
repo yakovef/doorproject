@@ -271,6 +271,12 @@ export const UI = {
      under an old name is a string nobody can find the history of. */
   'undo':             ['ביטול השינוי האחרון', 'Undo the last change', 'Отменить последнее изменение'],
   'undo.group':       ['ביטול, חזרה ואיפוס', 'Undo, redo and reset', 'Отменить, вернуть и сбросить'],
+  /* The room picker (1.11.2026, PROMPT J): a desktop-only radio group of three
+     rooms the door can be seen in. Staging — none of these reaches the order. */
+  'rooms.group':        ['רקע', 'Background', 'Фон'],
+  'rooms.home':         ['מבואה', 'Hallway', 'Холл'],
+  'rooms.gen-street':   ['כניסה לבניין', 'Building entrance', 'Вход в здание'],
+  'rooms.gen-stairwell':['חדר מדרגות', 'Stairwell', 'Лестничная клетка'],
   'redo':             ['החזרת השינוי', 'Redo the change', 'Вернуть изменение'],
   'redo.done':        ['החזרנו את השינוי', 'Change restored', 'Изменение возвращено'],
   'undo.done':        ['הצעד האחרון בוטל', 'Last step undone', 'Последний шаг отменён'],
@@ -541,6 +547,12 @@ export const UI = {
   'g.grille.h':       ['מה שנמצא בתוך הזכוכית. נספר לפי מספר הפתחים.',
                        'What fills the glass. Counted per opening.',
                        'Наполнение стекла. Считается по числу проёмов.'],
+  /* Which leaf the design goes on, 1.11.2026 — shown only on a door with two
+     glazed leaves and a design (`GRILLE_ON`). */
+  'g.grilleOn':       ['על איזו כנף', 'On which leaf', 'На какой створке'],
+  'g.grilleOn.h':     ['כשיש שתי כנפיים עם חלון, העיצוב נכנס לשתיהן. אפשר להשאיר אותו רק באחת — בשנייה תישאר זכוכית שקופה.',
+                       'With two glazed leaves the design goes in both. You can keep it on one only — the other keeps clear glass.',
+                       'Когда остеклены обе створки, дизайн ставится в обе. Можно оставить его только на одной — на другой останется прозрачное стекло.'],
 
   /* ── the step explainers — §10.4's `<details>` ─────────────────────
      ⚠ NOT ONE NEW CLAIM ON PERETZ'S BEHALF. Every sentence below restates
@@ -622,11 +634,12 @@ export const UI = {
                        'Окон два: узкое вертикальное и прямоугольное. Прямоугольное всегда идёт с нижней панелью. Можно и без окна. Если выбрать окно, после этого шага откроется шаг «Дизайн окна» — наполнение стекла; без окна этого шага нет. У двери «{0}» ДВА остеклённых проёма.'],
   /* the designs' explainer (2.10.2026). `{0}` is the etched designs'
      surcharge per window and `{1}` the double door, both out of the catalogue
-     (§5.25: no figure or name typed). */
+     (§5.25: no figure or name typed). `{2}`–`{4}` (1.11.2026): the three leaf
+     choices, by their tiles' names (`GRILLE_ON`). */
   'exp.grd.q':            ['מה נכנס לתוך החלון?', 'What goes inside the window?', 'Что ставится в окно?'],
-  'exp.grd.a':            ['עיצוב החלון הוא מה שנמצא בתוך הזכוכית: סורג ברזל שמותקן מעל הזכוכית, או דוגמה שחרוטה בזכוכית עצמה. כל עיצוב מגיע בשני צבעים — שחור, או בגוון הדלת. הסורגים כלולים במחיר; הדוגמאות החרוטות הן העיצובים המיוחדים, בתוספת {0} לכל חלון. בדלת {1} יש שני פתחים מזוגגים, והעיצוב נכנס לשניהם ומתומחר לפי מספרם. אפשר גם בלי עיצוב — זכוכית שקופה בלבד.',
-                           'The window design is what fills the glass: iron bars fitted over the glass, or a pattern etched into the glass itself. Every design comes in two colours — black, or the door’s colour. The bars are included in the price; the etched patterns are the special designs, at {0} extra per window. A {1} door has TWO glazed openings, and the design goes in both and is priced per opening. Going without a design is a choice too — clear glass only.',
-                           'Дизайн окна — это наполнение стекла: железная решётка поверх стекла или узор, вытравленный в самом стекле. Каждый дизайн есть в двух цветах — чёрный или в цвет двери. Решётки входят в цену; вытравленные узоры — это особые дизайны, доплата {0} за каждое окно. У двери «{1}» ДВА остеклённых проёма: дизайн ставится в оба и считается по их числу. Можно и без дизайна — только прозрачное стекло.'],
+  'exp.grd.a':            ['עיצוב החלון הוא מה שנמצא בתוך הזכוכית: סורג ברזל שמותקן מעל הזכוכית, או דוגמה שחרוטה בזכוכית עצמה. כל עיצוב מגיע בשני צבעים — שחור, או בגוון הדלת. הסורגים כלולים במחיר; הדוגמאות החרוטות הן העיצובים המיוחדים, בתוספת {0} לכל חלון. בדלת {1} יש שני פתחים מזוגגים, והעיצוב נכנס לשניהם ומתומחר לפי מספרם — או רק לאחד מהם: {2}, {3} או {4}; בשני נשארת זכוכית שקופה, ומשלמים רק על החלון שיש בו עיצוב. אפשר גם בלי עיצוב — זכוכית שקופה בלבד.',
+                           'The window design is what fills the glass: iron bars fitted over the glass, or a pattern etched into the glass itself. Every design comes in two colours — black, or the door’s colour. The bars are included in the price; the etched patterns are the special designs, at {0} extra per window. A {1} door has TWO glazed openings, and the design goes in both and is priced per opening — or in one of them only: {2}, {3} or {4}; the other keeps clear glass, and you pay only for the window that carries the design. Going without a design is a choice too — clear glass only.',
+                           'Дизайн окна — это наполнение стекла: железная решётка поверх стекла или узор, вытравленный в самом стекле. Каждый дизайн есть в двух цветах — чёрный или в цвет двери. Решётки входят в цену; вытравленные узоры — это особые дизайны, доплата {0} за каждое окно. У двери «{1}» ДВА остеклённых проёма: дизайн ставится в оба и считается по их числу — или только в один: {2}, {3} или {4}; во втором остаётся прозрачное стекло, и оплачивается только окно с дизайном. Можно и без дизайна — только прозрачное стекло.'],
   'exp.grip.q':           ['איזה אורך לבחור?', 'What length should I choose?', 'Какую длину выбрать?'],
   /* ⚠ TWO PRICES PER BAR SINCE 20.9.2026, NOT A RATE. Peretz: *"cylinder
      (idan) 500, from 70-100 cm · cylinder but bigger 800, from 120-200 cm"* —
@@ -988,6 +1001,9 @@ export const UI = {
   'why.bowWindow':       ['אין מקום למאחז האופקי ליד החלון הזה', 'No room for the horizontal pull beside this window', 'Рядом с этим окном нет места для горизонтальной скобы'],
   'why.bowFace':         ['אין מקום למאחז האופקי על עיצוב החזית הזה', 'No room for the horizontal pull on this face', 'На этом оформлении нет места для горизонтальной скобы'],
   'why.bowDoor':         ['אין מקום למאחז האופקי על הדלת', 'No room for the horizontal pull on the door', 'На двери нет места для горизонтальной скобы'],
+  /* 1.11.2026: one leaf only needs two glazed leaves and a design. The group
+     is hidden where this is true; the sentence is for the rules' other readers. */
+  'why.grilleOnOne':     ['רק בדלת עם שתי כנפיים עם חלון ועיצוב', 'Only on a door with two glazed leaves and a design', 'Только у двери с двумя остеклёнными створками и дизайном'],
   'why.bowWithWindow':   ['עם החלון הזה אין מקום למאחז האופקי', 'This window leaves no room for the horizontal pull', 'С этим окном нет места для горизонтальной скобы'],
   'why.leverBow':        ['המאחז האופקי בדרך', 'The horizontal pull is in the way', 'Мешает горизонтальная скоба'],
   'why.noRoomHandleBow': ['המאחז האופקי לא משאיר מקום לידית הזו', 'The horizontal pull leaves no room for this handle', 'Горизонтальная скоба не оставляет места для этой ручки'],
@@ -1006,6 +1022,8 @@ export const UI = {
   'fix.noPanelRoom':     ['הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום', 'We removed the panel — the tall window leaves no room for it', 'Мы убрали панель — высокому окну не хватает места'],
   'fix.faceCleared':     ['החלקנו את הדלת — ידית שקועה דורשת פנים חלקות', 'We smoothed the face — a recessed channel needs it plain', 'Мы сделали полотно гладким — врезная ручка этого требует'],
   'fix.grilleGone':      ['הסרנו את הסורג — אין חלון', 'We removed the grille — there is no window', 'Мы убрали решётку — окна нет'],
+  /* `{0}` is the leaf choice that went, by its tile's name (1.11.2026). */
+  'fix.grilleOnHome':    ['ביטלנו את „{0}“ — אין בדלת הזו שתי כנפיים עם חלון ועיצוב', 'We cancelled “{0}” — this door has no two glazed leaves with a design', 'Мы отменили «{0}» — у этой двери нет двух остеклённых створок с дизайном'],
   'fix.finishHome':      ['גוון הידית חזר לניקל — אין ידית משיכה על הדלת', 'The handle finish is back to nickel — there is no pull handle on the door', 'Отделка ручки снова никель — на двери нет ручки-скобы'],
   'fix.gripGone':        ['הסרנו את ידית המשיכה — אין לה מקום כאן', 'We removed the pull handle — there is no room for it here', 'Мы убрали ручку-скобу — для неё здесь нет места'],
   'fix.bowGone':         ['הסרנו את המאחז האופקי — אין לו מקום כאן', 'We removed the horizontal pull — there is no room for it here', 'Мы убрали горизонтальную скобу — для неё здесь нет места'],

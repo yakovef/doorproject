@@ -110,6 +110,12 @@
        under an old name is a string nobody can find the history of. */
     "undo": ["ביטול השינוי האחרון", "Undo the last change", "Отменить последнее изменение"],
     "undo.group": ["ביטול, חזרה ואיפוס", "Undo, redo and reset", "Отменить, вернуть и сбросить"],
+    /* The room picker (1.11.2026, PROMPT J): a desktop-only radio group of three
+       rooms the door can be seen in. Staging — none of these reaches the order. */
+    "rooms.group": ["רקע", "Background", "Фон"],
+    "rooms.home": ["מבואה", "Hallway", "Холл"],
+    "rooms.gen-street": ["כניסה לבניין", "Building entrance", "Вход в здание"],
+    "rooms.gen-stairwell": ["חדר מדרגות", "Stairwell", "Лестничная клетка"],
     "redo": ["החזרת השינוי", "Redo the change", "Вернуть изменение"],
     "redo.done": ["החזרנו את השינוי", "Change restored", "Изменение возвращено"],
     "undo.done": ["הצעד האחרון בוטל", "Last step undone", "Последний шаг отменён"],
@@ -436,6 +442,14 @@
       "What fills the glass. Counted per opening.",
       "Наполнение стекла. Считается по числу проёмов."
     ],
+    /* Which leaf the design goes on, 1.11.2026 — shown only on a door with two
+       glazed leaves and a design (`GRILLE_ON`). */
+    "g.grilleOn": ["על איזו כנף", "On which leaf", "На какой створке"],
+    "g.grilleOn.h": [
+      "כשיש שתי כנפיים עם חלון, העיצוב נכנס לשתיהן. אפשר להשאיר אותו רק באחת — בשנייה תישאר זכוכית שקופה.",
+      "With two glazed leaves the design goes in both. You can keep it on one only — the other keeps clear glass.",
+      "Когда остеклены обе створки, дизайн ставится в обе. Можно оставить его только на одной — на другой останется прозрачное стекло."
+    ],
     /* ── the step explainers — §10.4's `<details>` ─────────────────────
        ⚠ NOT ONE NEW CLAIM ON PERETZ'S BEHALF. Every sentence below restates
        something this repository already knows: a figure he gave on 26.8, a rule
@@ -528,12 +542,13 @@
     ],
     /* the designs' explainer (2.10.2026). `{0}` is the etched designs'
        surcharge per window and `{1}` the double door, both out of the catalogue
-       (§5.25: no figure or name typed). */
+       (§5.25: no figure or name typed). `{2}`–`{4}` (1.11.2026): the three leaf
+       choices, by their tiles' names (`GRILLE_ON`). */
     "exp.grd.q": ["מה נכנס לתוך החלון?", "What goes inside the window?", "Что ставится в окно?"],
     "exp.grd.a": [
-      "עיצוב החלון הוא מה שנמצא בתוך הזכוכית: סורג ברזל שמותקן מעל הזכוכית, או דוגמה שחרוטה בזכוכית עצמה. כל עיצוב מגיע בשני צבעים — שחור, או בגוון הדלת. הסורגים כלולים במחיר; הדוגמאות החרוטות הן העיצובים המיוחדים, בתוספת {0} לכל חלון. בדלת {1} יש שני פתחים מזוגגים, והעיצוב נכנס לשניהם ומתומחר לפי מספרם. אפשר גם בלי עיצוב — זכוכית שקופה בלבד.",
-      "The window design is what fills the glass: iron bars fitted over the glass, or a pattern etched into the glass itself. Every design comes in two colours — black, or the door’s colour. The bars are included in the price; the etched patterns are the special designs, at {0} extra per window. A {1} door has TWO glazed openings, and the design goes in both and is priced per opening. Going without a design is a choice too — clear glass only.",
-      "Дизайн окна — это наполнение стекла: железная решётка поверх стекла или узор, вытравленный в самом стекле. Каждый дизайн есть в двух цветах — чёрный или в цвет двери. Решётки входят в цену; вытравленные узоры — это особые дизайны, доплата {0} за каждое окно. У двери «{1}» ДВА остеклённых проёма: дизайн ставится в оба и считается по их числу. Можно и без дизайна — только прозрачное стекло."
+      "עיצוב החלון הוא מה שנמצא בתוך הזכוכית: סורג ברזל שמותקן מעל הזכוכית, או דוגמה שחרוטה בזכוכית עצמה. כל עיצוב מגיע בשני צבעים — שחור, או בגוון הדלת. הסורגים כלולים במחיר; הדוגמאות החרוטות הן העיצובים המיוחדים, בתוספת {0} לכל חלון. בדלת {1} יש שני פתחים מזוגגים, והעיצוב נכנס לשניהם ומתומחר לפי מספרם — או רק לאחד מהם: {2}, {3} או {4}; בשני נשארת זכוכית שקופה, ומשלמים רק על החלון שיש בו עיצוב. אפשר גם בלי עיצוב — זכוכית שקופה בלבד.",
+      "The window design is what fills the glass: iron bars fitted over the glass, or a pattern etched into the glass itself. Every design comes in two colours — black, or the door’s colour. The bars are included in the price; the etched patterns are the special designs, at {0} extra per window. A {1} door has TWO glazed openings, and the design goes in both and is priced per opening — or in one of them only: {2}, {3} or {4}; the other keeps clear glass, and you pay only for the window that carries the design. Going without a design is a choice too — clear glass only.",
+      "Дизайн окна — это наполнение стекла: железная решётка поверх стекла или узор, вытравленный в самом стекле. Каждый дизайн есть в двух цветах — чёрный или в цвет двери. Решётки входят в цену; вытравленные узоры — это особые дизайны, доплата {0} за каждое окно. У двери «{1}» ДВА остеклённых проёма: дизайн ставится в оба и считается по их числу — или только в один: {2}, {3} или {4}; во втором остаётся прозрачное стекло, и оплачивается только окно с дизайном. Можно и без дизайна — только прозрачное стекло."
     ],
     "exp.grip.q": ["איזה אורך לבחור?", "What length should I choose?", "Какую длину выбрать?"],
     /* ⚠ TWO PRICES PER BAR SINCE 20.9.2026, NOT A RATE. Peretz: *"cylinder
@@ -939,6 +954,9 @@
     "why.bowWindow": ["אין מקום למאחז האופקי ליד החלון הזה", "No room for the horizontal pull beside this window", "Рядом с этим окном нет места для горизонтальной скобы"],
     "why.bowFace": ["אין מקום למאחז האופקי על עיצוב החזית הזה", "No room for the horizontal pull on this face", "На этом оформлении нет места для горизонтальной скобы"],
     "why.bowDoor": ["אין מקום למאחז האופקי על הדלת", "No room for the horizontal pull on the door", "На двери нет места для горизонтальной скобы"],
+    /* 1.11.2026: one leaf only needs two glazed leaves and a design. The group
+       is hidden where this is true; the sentence is for the rules' other readers. */
+    "why.grilleOnOne": ["רק בדלת עם שתי כנפיים עם חלון ועיצוב", "Only on a door with two glazed leaves and a design", "Только у двери с двумя остеклёнными створками и дизайном"],
     "why.bowWithWindow": ["עם החלון הזה אין מקום למאחז האופקי", "This window leaves no room for the horizontal pull", "С этим окном нет места для горизонтальной скобы"],
     "why.leverBow": ["המאחז האופקי בדרך", "The horizontal pull is in the way", "Мешает горизонтальная скоба"],
     "why.noRoomHandleBow": ["המאחז האופקי לא משאיר מקום לידית הזו", "The horizontal pull leaves no room for this handle", "Горизонтальная скоба не оставляет места для этой ручки"],
@@ -957,6 +975,8 @@
     "fix.noPanelRoom": ["הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום", "We removed the panel — the tall window leaves no room for it", "Мы убрали панель — высокому окну не хватает места"],
     "fix.faceCleared": ["החלקנו את הדלת — ידית שקועה דורשת פנים חלקות", "We smoothed the face — a recessed channel needs it plain", "Мы сделали полотно гладким — врезная ручка этого требует"],
     "fix.grilleGone": ["הסרנו את הסורג — אין חלון", "We removed the grille — there is no window", "Мы убрали решётку — окна нет"],
+    /* `{0}` is the leaf choice that went, by its tile's name (1.11.2026). */
+    "fix.grilleOnHome": ["ביטלנו את „{0}“ — אין בדלת הזו שתי כנפיים עם חלון ועיצוב", "We cancelled “{0}” — this door has no two glazed leaves with a design", "Мы отменили «{0}» — у этой двери нет двух остеклённых створок с дизайном"],
     "fix.finishHome": ["גוון הידית חזר לניקל — אין ידית משיכה על הדלת", "The handle finish is back to nickel — there is no pull handle on the door", "Отделка ручки снова никель — на двери нет ручки-скобы"],
     "fix.gripGone": ["הסרנו את ידית המשיכה — אין לה מקום כאן", "We removed the pull handle — there is no room for it here", "Мы убрали ручку-скобу — для неё здесь нет места"],
     "fix.bowGone": ["הסרנו את המאחז האופקי — אין לו מקום כאן", "We removed the horizontal pull — there is no room for it here", "Мы убрали горизонтальную скобу — для неё здесь нет места"],
@@ -2171,6 +2191,11 @@
       photo: null
     }
   ];
+  var GRILLE_ON = [
+    { id: "both", he: "שתי הכנפיים", en: "Both leaves", ru: "Обе створки" },
+    { id: "main", he: "כנף ראשית בלבד", en: "Main leaf only", ru: "Только основная" },
+    { id: "side", he: "כנף קבועה בלבד", en: "Fixed leaf only", ru: "Только неподвижная" }
+  ];
   var PEEPHOLES = [
     { id: "nopeep", he: "ללא", en: "None", ru: "Нет" },
     { id: "peep", he: "עינית", en: "Peephole", ru: "Глазок" },
@@ -2925,9 +2950,19 @@
     }
     return out;
   }
-  var paneCount = (state2) => glazedPanels(state2).reduce((n, p) => n + p.panes, 0);
+  var grilleOnHasSubject = (state2) => {
+    if (!state2.grille || state2.grille === "none") return false;
+    const ids = glazedPanels(state2).map((p) => p.id);
+    return ids.includes("leaf") && ids.includes("side");
+  };
+  var grilleOnOf = (state2) => grilleOnHasSubject(state2) ? byId(GRILLE_ON, state2.grilleOn).id : "both";
+  var designPanels = (state2) => {
+    const on = grilleOnOf(state2);
+    return glazedPanels(state2).filter((p) => on === "both" || (on === "main" ? p.id === "leaf" : p.id === "side"));
+  };
+  var paneCount = (state2) => designPanels(state2).reduce((n, p) => n + p.panes, 0);
   function grillePlacement(state2) {
-    const panels = glazedPanels(state2);
+    const panels = designPanels(state2);
     const n = paneCount(state2);
     const count = n > 1 ? ` (${T("row.units", n)})` : "";
     if (!panels.length) return "";
@@ -3162,6 +3197,7 @@
     if (groupKey === "size") return priceAgorot(state2);
     if (groupKey === "handleFinish") return byId(HANDLE_FINISHES, state2.handleFinish).delta;
     const parts = priceParts(state2);
+    if (groupKey === "grilleOn") return parts.grille;
     return Object.prototype.hasOwnProperty.call(parts, groupKey) ? parts[groupKey] : void 0;
   }
   var ALWAYS = ["door", "cylinder", "lock", "mashkof", "install", "measure"];
@@ -3253,11 +3289,14 @@
     if (isGlazed(state2) && g.id !== "none") {
       const label = T(g.glass ? "row.glass" : "row.grille");
       const name = dropPrefix(L(g), label);
+      const on = grilleOnOf(state2);
+      const side = on === "both" ? null : L(byId(GRILLE_ON, on));
       rows.push({
         key: "grille",
         label,
         id: g.id,
-        value: `${name}${grillePlacement(state2)}`
+        ...side ? { side } : {},
+        value: side ? `${name}, ${side}` : `${name}${grillePlacement(state2)}`
       });
     }
     const barLen = hd.priceKind === "bar" ? ` · ${T("len.cm", Math.round(handleLength(state2) / 10))}` : "";
@@ -3927,6 +3966,11 @@ ${stops}
     const handing = byId(HANDINGS, state2.handing);
     const win = byId(WINDOWS, state2.window);
     const grille = byId(GRILLES, state2.grille);
+    const on = grilleOnOf(state2);
+    const plain = byId(GRILLES, "none");
+    const mainGrille = on === "side" ? plain : grille;
+    const sideGrille = on === "main" ? plain : grille;
+    const design = (which) => on === "both" ? null : which === on ? "on" : "off";
     const handle = gripOf(state2);
     const lockset = byId(LOCKSETS, state2.lockset);
     const special = byId(SPECIAL_LOCKS, state2.speciallock);
@@ -4001,7 +4045,8 @@ ${stops}
       splits: o.splits.map((sp) => ({ x: mainX + sp.x, w: sp.w })),
       paint: paint2,
       edge,
-      grille,
+      grille: mainGrille,
+      design: design("main"),
       key: "m" + i,
       profile: mouldOf(detail),
       leaf: { x: mainX, y: y0, w: leafW, h: leafH }
@@ -5321,7 +5366,7 @@ ${stops}
        be defined: fourteen of the thirty measured records have no sill at all,
        and the sixteen that do run a median 0.0175 of leaf height. -->
 
-  ${sideW ? `<g id="side-leaf" data-glazed="${!!size.sideGlazed}">${leaf(sideX, sideW)}${/* A SIDELIGHT is glass by definition — that is the whole product, and
+  ${sideW ? `<g id="side-leaf" data-glazed="${!!size.sideGlazed}"${design("side") ? ` data-design="${design("side")}"` : ""}>${leaf(sideX, sideW)}${/* A SIDELIGHT is glass by definition — that is the whole product, and
        four doors in the corpus have one (d117 d122 d123 d128). It does not
        take the main leaf's window SHAPE: on all four the side panel is its
        own slim light, and one of them has a solid door beside a glazed
@@ -5370,7 +5415,8 @@ ${stops}
         ornW: openings[0].w,
         paint: paint2,
         edge,
-        grille,
+        grille: sideGrille,
+        design: design("side"),
         key: "s",
         profile: mouldOf(detail),
         leaf: { x: sideX, y: y0, w: sideW, h: leafH }
@@ -5385,7 +5431,8 @@ ${stops}
         h: tall,
         paint: paint2,
         edge,
-        grille,
+        grille: sideGrille,
+        design: design("side"),
         key: "s",
         profile: mouldOf(detail),
         leaf: { x: sideX, y: y0, w: sideW, h: leafH }
@@ -5425,7 +5472,8 @@ ${stops}
         ornW: main.w,
         paint: paint2,
         edge,
-        grille,
+        grille: sideGrille,
+        design: design("side"),
         key: "s",
         profile: mouldOf(detail),
         leaf: { x: sideX, y: y0, w: sideW, h: leafH }
@@ -6732,13 +6780,14 @@ ${body}
     splits = [],
     band = MOULD_BAND,
     ornW = null,
-    profile = MOULD_DEFAULT
+    profile = MOULD_DEFAULT,
+    design = null
   }) {
     const glass = grille.glass ? glazingArt(grille.id, x, y, w, h, paint2, key, ornW) : null;
     const M = band, MF = band;
     const id = `cl-${key}`;
     return `
-    <g data-pane="${key}" data-glass="${grille.glass ? grille.id.replace(/-light$/, "") : "clear"}">
+    <g data-pane="${key}" data-glass="${grille.glass ? grille.id.replace(/-light$/, "") : "clear"}"${design ? ` data-design="${design}"` : ""}>
       ${moulding(
       x - M,
       y - M,
@@ -8889,6 +8938,30 @@ ${plate.defs}${plate.body}
     <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
   </svg>`;
   }
+  function grilleOnGlyph(o, state2 = {}) {
+    const S = 300;
+    const g = byId(GRILLES, state2.grille);
+    const paint2 = state2.colour ? byId(COLOURS, state2.colour).hex : TILE_PAINT;
+    const y = 30, h = 240;
+    const leaves = [{ id: "main", x: 34, w: 148 }, { id: "side", x: 196, w: 74 }];
+    const mainPane = leaves[0].w * 0.6;
+    const pane = (lf) => {
+      const ww = lf.w * 0.6, wx = lf.x + (lf.w - ww) / 2, wy = y + h * 0.14, wh = h * 0.4;
+      const carries = g.id !== "none" && (o.id === "both" || o.id === lf.id);
+      const clip = `gso-${o.id}-${lf.id}`;
+      const art = !carries ? "" : g.glass ? glazingArt(g.id, wx, wy, ww, wh, paint2, clip, mainPane).veil : grillePaths(g.id, wx, wy, ww, wh, grilleTint(g, paint2), mainPane);
+      return `<rect x="${lf.x}" y="${y}" width="${lf.w}" height="${h}" fill="none"
+                  stroke="currentColor" stroke-width="12"/>
+      <rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="${ww.toFixed(1)}" height="${wh.toFixed(1)}" fill="#7C8891"/>
+      <clipPath id="${clip}"><rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="${ww.toFixed(1)}" height="${wh.toFixed(1)}"/></clipPath>
+      <g clip-path="url(#${clip})" data-design="${carries ? "on" : "off"}">${art}</g>
+      <rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="${ww.toFixed(1)}" height="${wh.toFixed(1)}" fill="none"
+            stroke="currentColor" stroke-width="8"/>`;
+    };
+    return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
+    ${leaves.map(pane).join("")}
+  </svg>`;
+  }
   var SIZE_FRAME = (() => {
     const all = Object.values(SIZES);
     return {
@@ -9520,7 +9593,9 @@ ${plate.defs}${plate.body}
       peephole: {},
       bell: {},
       /* The horizontal bow, a field of its own since 26.9.2026. */
-      grab: {}
+      grab: {},
+      /* Which leaf the window's design goes on, 1.11.2026. */
+      grilleOn: {}
       /* GONE, 29.9.2026: `stripes`, a sentence rather than a map,
          "because the stripes are no longer options with ids". They
          are tiles again (`STRIPE_TILE`), greyed in `detail` like
@@ -9611,6 +9686,9 @@ ${plate.defs}${plate.body}
         if (!gripFits({ ...state2, lockset: k.id })) out.lockset[k.id] = T("why.leverBar");
       }
     }
+    if (!grilleOnHasSubject(state2)) {
+      for (const o of GRILLE_ON.slice(1)) out.grilleOn[o.id] = T("why.grilleOnOne");
+    }
     return out;
   }
   var SAID = {
@@ -9653,13 +9731,21 @@ ${plate.defs}${plate.body}
        beside it) — see repair. */
     bowGone: "fix.bowGone",
     /* 28.9.2026: no pull handle left for a finish to belong to — see repair. */
-    finishHome: "fix.finishHome"
+    finishHome: "fix.finishHome",
+    /* 1.11.2026: the design on one leaf, where there are not two glazed leaves
+       with a design — see repair. */
+    grilleOnHome: "fix.grilleOnHome"
   };
   var WHY_UNDER_GLASS = { top: "why.winTakesTop", plate: "why.winPlate", room: "why.noRoomBelow" };
   var BOW_WHY = { window: "why.bowWindow", face: "why.bowFace", door: "why.bowDoor" };
   var NOTHING = /^(none|no[a-z]*)$/;
   var FACE_FIELDS = ["detail", "stripeDir", "stripeCount", "stripeTight"];
-  var OWNED = { stripes: FACE_FIELDS, detail: FACE_FIELDS, handle: ["handle", "handleLen"] };
+  var OWNED = {
+    stripes: FACE_FIELDS,
+    detail: FACE_FIELDS,
+    handle: ["handle", "handleLen"],
+    grille: ["grille", "grilleOn"]
+  };
   var ownedBy = (key) => OWNED[key] || [key];
   var NOT_A_LOSS = /* @__PURE__ */ new Set(["handleLen", "stripeTight", "handleFinish"]);
   function displacedBy(before, after, tapped, restored2 = []) {
@@ -9774,6 +9860,11 @@ ${plate.defs}${plate.body}
       s.handleFinish = HANDLE_FINISHES[0].id;
       change("handleFinish", SAID.finishHome);
     }
+    if (!grilleOnHasSubject(s) && s.grilleOn && s.grilleOn !== GRILLE_ON[0].id) {
+      const was = byId(GRILLE_ON, s.grilleOn);
+      s.grilleOn = GRILLE_ON[0].id;
+      change("grilleOn", SAID.grilleOnHome, L(was));
+    }
     return { state: s, changed, said };
   }
 
@@ -9868,7 +9959,7 @@ ${plate.defs}${plate.body}
   var checkBadge = () => `<svg class="steps__vg" viewBox="0 0 24 24" aria-hidden="true">${CHECK_BADGE}</svg>`;
 
   // js/url-state.js
-  var VERSION = 28;
+  var VERSION = 29;
   var DEFAULTS = {
     /* ⚠ 7126D, NOT THE ANTHRACITE, AND THE REASON IS THE OPENING PRICE.
        Peretz priced colour on 30.8.2026: 9016T, 9001T and 7126D are in the
@@ -9909,6 +10000,9 @@ ${plate.defs}${plate.body}
     /* The horizontal bow, a piece of the face since 26.9.2026 — off, like every
        other thing the customer adds. */
     grab: "nograb",
+    /* Which leaf the window's design goes on, 1.11.2026 — both, which is what
+       every door drew before the field existed (`GRILLE_ON`). */
+    grilleOn: "both",
     mashkof: "mk-std",
     pirzul: "pz-nickel",
     /* ⚠ THE PULL HANDLE'S FINISH, 20.9.2026 — nickel until the customer picks,
@@ -9944,6 +10038,7 @@ ${plate.defs}${plate.body}
     p.set("bl", state2.bell);
     p.set("ey", state2.peephole);
     p.set("gb", state2.grab);
+    p.set("gs", state2.grilleOn);
     p.set("hl", String(state2.handleLen));
     p.set("sp", String(packStripes(state2)));
     p.set("d", state2.detail);
@@ -9974,6 +10069,7 @@ ${plate.defs}${plate.body}
       "bl",
       "ey",
       "gb",
+      "gs",
       "code",
       "bare",
       "sheet",
@@ -10035,6 +10131,7 @@ ${plate.defs}${plate.body}
     take("bell", "bl", BELLS);
     take("peephole", "ey", PEEPHOLES);
     take("grab", "gb", BOWS);
+    take("grilleOn", "gs", GRILLE_ON);
     const rawStripes = p.get("sp");
     if (rawStripes != null) {
       const v = Number(rawStripes);
@@ -10061,7 +10158,7 @@ ${plate.defs}${plate.body}
   }
   var ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
   var BITS = {
-    version: 5,
+    version: 6,
     colour: 5,
     size: 3,
     handing: 2,
@@ -10082,7 +10179,14 @@ ${plate.defs}${plate.body}
        the pack order like the bell before it. Payload 54;
        `TOTAL_BITS` reserves the check nibble before rounding
        and stays at 60, so the code stays twelve characters. */
-    grab: 1
+    grab: 1,
+    /* Which leaf the design goes on, 1.11.2026: two bits for
+       three entries, APPENDED after the bow. Payload 58
+       with the wider version field;
+       `TOTAL_BITS` reserves the check nibble before rounding,
+       so it goes 60 -> 65 and the code thirteen characters
+       (see the note on `VERSION` 29). */
+    grilleOn: 2
   };
   var PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
   var CHECK_MIN = 4;
@@ -10123,7 +10227,8 @@ ${plate.defs}${plate.body}
       [Math.max(0, BELLS.findIndex((x) => x.id === state2.bell)), BITS.bell],
       [Math.max(0, PEEPHOLES.findIndex((x) => x.id === state2.peephole)), BITS.peephole],
       [Math.max(0, HANDLE_FINISHES.findIndex((x) => x.id === state2.handleFinish)), BITS.handleFinish],
-      [Math.max(0, BOWS.findIndex((x) => x.id === state2.grab)), BITS.grab]
+      [Math.max(0, BOWS.findIndex((x) => x.id === state2.grab)), BITS.grab],
+      [Math.max(0, GRILLE_ON.findIndex((x) => x.id === state2.grilleOn)), BITS.grilleOn]
     ];
     let bits = 0n;
     for (const [value, width] of parts) {
@@ -10171,7 +10276,8 @@ ${plate.defs}${plate.body}
     const peep = PEEPHOLES[read(BITS.peephole)];
     const hf = HANDLE_FINISHES[read(BITS.handleFinish)];
     const bow = BOWS[read(BITS.grab)];
-    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul || hLen === void 0 || !bell || !peep || !hf || !bow) return null;
+    const on = GRILLE_ON[read(BITS.grilleOn)];
+    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul || hLen === void 0 || !bell || !peep || !hf || !bow || !on) return null;
     return {
       colour: colour.id,
       size,
@@ -10188,6 +10294,7 @@ ${plate.defs}${plate.body}
       peephole: peep.id,
       handleFinish: hf.id,
       grab: bow.id,
+      grilleOn: on.id,
       handleLen: hLen,
       ...unpackStripes(sp)
     };
@@ -10817,6 +10924,31 @@ ${plate.defs}${plate.body}
         return [[T("g.grille.free"), free], [plus, paid]];
       }
     },
+    /* ⚠ WHICH LEAF THE DESIGN GOES ON — 1.11.2026, the owner's son: *"When
+       choosing the door-and-a-half and then choosing a design, it automatically
+       puts a design on the half door. Figure out where to put an option of
+       removing a design on either of the sides."* and *"The default when
+       choosing a design should be that it will be on both the doors."* Ours,
+       named so he can reverse it in a line: a THIRD group on the designs step,
+       under the design tiles — three square tiles, both leaves · the main leaf
+       only · the fixed leaf only — shown only where it has a subject (a design
+       on a door with two glazed leaves), by the finish group's `when`. Each tile
+       is the two leaves with THIS design where that choice puts it (`composite`
+       redraws them when the design or the paint moves) and prints what the
+       design costs there, off `priceParts` (`tilePrice` → the design's row).
+       Second in the step, so the band's `nowLabel` and the arrows beside the
+       door stay the designs'. */
+    {
+      key: "grilleOn",
+      title: "g.grilleOn",
+      in: "grd",
+      kind: "sq",
+      list: () => GRILLE_ON,
+      glyph: (o) => grilleOnGlyph(o, state),
+      hint: "g.grilleOn.h",
+      composite: (st) => `${st.grille}|${st.colour}`,
+      when: grilleOnHasSubject
+    },
     {
       key: "handle",
       title: "g.handle",
@@ -11086,7 +11218,12 @@ ${plate.defs}${plate.body}
       sub: "step.grd.s",
       lede: "step.grd.l",
       exp: "exp.grd",
-      expArgs: () => [formatAgorot(byId(GRILLES, "vine").delta), L(SIZES.half)],
+      /* {2}–{4}: the three leaf choices by their tiles' own names (1.11.2026). */
+      expArgs: () => [
+        formatAgorot(byId(GRILLES, "vine").delta),
+        L(SIZES.half),
+        ...GRILLE_ON.map((o) => L(o))
+      ],
       when: grilleHasSubject
     },
     {
@@ -11183,6 +11320,7 @@ ${plate.defs}${plate.body}
     setLang(pickLang(window.location.search));
     translateStatic();
     buildLangs();
+    wireRooms();
     const { state: parsed, notice, said, carries } = fromQuery(window.location.search);
     state = parsed;
     buildPanel();
@@ -12235,7 +12373,13 @@ ${plate.defs}${plate.body}
     if (stood.length) said.unshift(T("fix.back"));
     toast(said.join(" · "));
   }
-  var ROW_OF = { stripeDir: "stripes", stripeCount: "stripes", stripeTight: "stripes", handleLen: "handle" };
+  var ROW_OF = {
+    stripeDir: "stripes",
+    stripeCount: "stripes",
+    stripeTight: "stripes",
+    handleLen: "handle",
+    grilleOn: "grille"
+  };
   function confirmSentence(what, lost) {
     const rows = specRows(state);
     const keys = [...new Set(lost.map((k) => ROW_OF[k] || k))];
@@ -12398,7 +12542,9 @@ ${plate.defs}${plate.body}
         const g = GROUPS.find((x) => x.key === r.key);
         const o = g && g.list().find((x) => x.id === r.id);
         const said = String(r.value);
-        return o && said.includes(L(o)) ? L(o) : said.split(/ — | · /)[0];
+        const core = r.side ? said.slice(0, -`, ${r.side}`.length) : said;
+        const base = o && core.includes(L(o)) ? L(o) : core.split(/ — | · /)[0];
+        return r.side ? `${base}, ${r.side}` : base;
       };
       table.replaceChildren(...specRows(state).map((r) => {
         const step2 = stepFor(r.key);
@@ -12468,6 +12614,7 @@ ${plate.defs}${plate.body}
   var ROOMS = [
     {
       id: "tall",
+      set: "home",
       el: "room-src",
       floor: 1214.5 / 1448,
       aspect: 1086 / 1448,
@@ -12477,14 +12624,70 @@ ${plate.defs}${plate.body}
     },
     {
       id: "wide",
+      set: "home",
       el: "room-wide-src",
       floor: 827.4 / 941,
       aspect: 1672 / 941,
       lampCx: 452.5 / 1672,
       lampTop: 326 / 941,
       lampBot: 402 / 941
+    },
+    /* ⚠ TWO MORE ROOMS, ONE FRAMING EACH — 1.11.2026 (PROMPT J). The owner's
+       son: *"An option to change the background … Backgrounds that will show
+       how the door looks in a setting that is other than just a perfect
+       hall."* Each is its own SET: `pickRoom` chooses among one room's crops
+       and never across rooms, so a set holding one file always gets that file.
+       Every number is measured off the 1536 × 1024 original
+       (`research/backdrops/README.md` has the readings and the method):
+         floor    `npm run backdrop -- <name>` prints it — the skirting's FOOT,
+                  as on the owner's room (the street's skirting top at 864 is
+                  the stronger step and is not the floor): street 904.7, tilt
+                  0.006°, rms 0.24 px; stairwell 893.1, −0.015°, 0.62 px.
+         lamp*    the RIGHT fitting's body, off a threshold on the original —
+                  the street's dark box 1164..1211 × 360..418 (luma < 90), the
+                  stairwell's bright disc and its ring 1146..1217 × 305..377. The
+                  method run on the owner's wide room returns his 452.5 and
+                  326..403 exactly.
+       ⚠ NO SECOND CROP, AND IT IS ARITHMETIC: `placeRoom` scales by the
+       largest of three ratios and a crop can only raise one, so no crop of a
+       photograph keeps its lamps better than the whole of it does. On a stage
+       narrower than ~0.95 of its height (1100 × 800 and taller windows) these
+       two have nothing to fall back to and a lamp leaves the side; the
+       owner's room has his portrait framing there. CLAUDE.md §9. */
+    {
+      id: "gen-street",
+      set: "gen-street",
+      el: "room-gen-street",
+      floor: 904.7 / 1024,
+      aspect: 1536 / 1024,
+      lampCx: 419.5 / 1536,
+      lampTop: 360 / 1024,
+      lampBot: 418 / 1024
+    },
+    {
+      id: "gen-stairwell",
+      set: "gen-stairwell",
+      el: "room-gen-stairwell",
+      floor: 893.1 / 1024,
+      aspect: 1536 / 1024,
+      lampCx: 413.5 / 1536,
+      lampTop: 305 / 1024,
+      lampBot: 377 / 1024
     }
   ];
+  var roomSet = "home";
+  var ROOM_KEY = "dm.room.v1";
+  var ROOM_SETS = [...new Set(ROOMS.map((r) => r.set))];
+  function readRoom() {
+    try {
+      const v = localStorage.getItem(ROOM_KEY);
+      return ROOM_SETS.includes(v) ? v : "home";
+    } catch {
+      return "home";
+    }
+  }
+  var deskRooms = () => typeof window.matchMedia === "function" && window.matchMedia("(min-width: 1100px)").matches;
+  var shownSet = () => deskRooms() ? roomSet : "home";
   function placeRoom(room, boxW, boxH, yBase) {
     const h = Math.max(
       yBase / room.floor,
@@ -12503,9 +12706,10 @@ ${plate.defs}${plate.body}
       lampBot: top + room.lampBot * h
     };
   }
-  function pickRoom(boxW, boxH, yBase) {
+  function pickRoom(boxW, boxH, yBase, set2 = shownSet()) {
     const MARGIN = 6;
-    const scored = ROOMS.map((r) => {
+    const crops = ROOMS.filter((r) => r.set === set2);
+    const scored = (crops.length ? crops : ROOMS.filter((r) => r.set === "home")).map((r) => {
       const p = placeRoom(r, boxW, boxH, yBase);
       const half = p.w * 0.02;
       const lampH = p.lampBot - p.lampTop;
@@ -12522,10 +12726,20 @@ ${plate.defs}${plate.body}
       return { ...p, off };
     });
     const usable = scored.filter((s) => Number.isFinite(s.off));
-    if (!usable.length) return ROOMS[0];
+    if (!usable.length) return scored[0].room;
     return (usable.find((s) => s.off <= 0) || usable.slice().sort((a, b) => a.off - b.off)[0]).room;
   }
   var liveRoom = null;
+  var pendingRoom = null;
+  var roomsEl = null;
+  function roomHref(r) {
+    if (r.set === "home") {
+      const l = document.getElementById(r.el);
+      return l && l.href;
+    }
+    const b = roomsEl && roomsEl.querySelector(`[data-room="${r.set}"]`);
+    return b && b.dataset.href ? new URL(b.dataset.href, document.baseURI).href : null;
+  }
   var BAND_GAP = 8;
   function fitCrop(svg, box) {
     const fx = Number(svg.dataset.fitX), w = Number(svg.dataset.fitW);
@@ -12559,20 +12773,120 @@ ${plate.defs}${plate.body}
     if (!(box.width > 0 && box.height > 0 && fh > 0 && Number.isFinite(baseY))) return;
     const scale = Math.min(box.width / fw, box.height / fh);
     const want = pickRoom(box.width, box.height, (baseY - fy) * scale);
-    if (want === liveRoom) return;
-    const link = document.getElementById(want.el);
-    if (!link || !link.href) return;
-    const href = link.href;
+    if (want === liveRoom || want === pendingRoom) return;
+    const href = roomHref(want);
+    if (!href) return;
+    pendingRoom = want;
     const img = new Image();
     img.addEventListener("load", () => {
       const st = $("#stage");
-      if (!st) return;
+      if (pendingRoom === want) pendingRoom = null;
+      if (!st || want.set !== shownSet()) return;
       st.style.backgroundImage = `url("${href}")`;
       liveRoom = want;
       root.classList.add("is-photo");
       fitStage();
     });
+    img.addEventListener("error", () => {
+      if (pendingRoom === want) pendingRoom = null;
+    });
     img.src = href;
+  }
+  function chooseRoom(set2) {
+    if (!ROOM_SETS.includes(set2)) return;
+    roomSet = set2;
+    try {
+      localStorage.setItem(ROOM_KEY, set2);
+    } catch {
+    }
+    markRooms();
+    armRoom();
+  }
+  function markRooms() {
+    if (!roomsEl) return;
+    for (const b of roomsEl.querySelectorAll(".room")) {
+      const on = b.dataset.room === roomSet;
+      b.setAttribute("aria-checked", String(on));
+      b.tabIndex = on ? 0 : -1;
+    }
+  }
+  function wireRooms() {
+    roomsEl = document.querySelector(".stage__rooms");
+    if (!roomsEl) return;
+    roomSet = readRoom();
+    markRooms();
+    roomsEl.addEventListener("click", (e) => {
+      const b = e.target.closest(".room");
+      if (b) chooseRoom(b.dataset.room);
+    });
+    roomsEl.addEventListener("keydown", (e) => {
+      const rtl = document.documentElement.dir === "rtl";
+      const step2 = { ArrowDown: 1, ArrowUp: -1, ArrowRight: rtl ? -1 : 1, ArrowLeft: rtl ? 1 : -1 }[e.key];
+      if (!step2) return;
+      e.preventDefault();
+      const all = [...roomsEl.querySelectorAll(".room")];
+      const i = all.findIndex((b) => b.dataset.room === roomSet);
+      const next = all[(i + step2 + all.length) % all.length];
+      chooseRoom(next.dataset.room);
+      next.focus();
+    });
+  }
+  function placeRooms() {
+    if (!roomsEl) return;
+    const wrapEl = document.querySelector(".stage-wrap");
+    const stage = $("#stage");
+    const root = document.documentElement.classList;
+    if (!wrapEl || !stage || !deskRooms() || root.contains("is-bare") || root.contains("is-sheet")) {
+      if (roomsEl.isConnected) roomsEl.remove();
+      return;
+    }
+    if (!roomsEl.isConnected) {
+      const after = wrapEl.querySelector(".stage__arrow--next");
+      if (after) after.after(roomsEl);
+      else wrapEl.append(roomsEl);
+      translateStatic(roomsEl);
+    }
+    roomsEl.hidden = false;
+    const st = stage.getBoundingClientRect(), wrap = wrapEl.getBoundingClientRect();
+    if (!st.width) return;
+    const fEl = document.querySelector(".door-svg #frame"), sEl = fEl && fEl.ownerSVGElement;
+    const ctm = sEl && typeof fEl.getBBox === "function" ? sEl.getScreenCTM() : null;
+    const bb = ctm ? fEl.getBBox() : null;
+    const frame = bb && bb.width > 0 ? {
+      left: ctm.e + ctm.a * bb.x,
+      right: ctm.e + ctm.a * (bb.x + bb.width),
+      top: ctm.f + ctm.d * bb.y,
+      bottom: ctm.f + ctm.d * (bb.y + bb.height)
+    } : null;
+    const col = wrapEl.querySelector(":scope > .steps");
+    const colR = col && col.getClientRects().length ? col.getBoundingClientRect() : null;
+    const bd = document.querySelector("#breakdown");
+    const obstacles = [
+      frame,
+      colR,
+      ...[...wrapEl.querySelectorAll(".stage__arrow, .stage__hud .hud__slot, .stage__undo, .stage__band")].filter((e) => e.getClientRects().length).map((e) => e.getBoundingClientRect()),
+      ...[...document.querySelectorAll("#quote")].filter((q) => getComputedStyle(q).position !== "fixed").map((q) => q.getBoundingClientRect()),
+      ...bd && !bd.hidden ? [bd.getBoundingClientRect()] : []
+    ].filter((r) => r && r.right > r.left && r.bottom > r.top);
+    const words = [...document.querySelectorAll(".trust__i")].map((e) => e.getBoundingClientRect()).filter((r) => r.width && r.bottom > st.top && r.top < st.bottom);
+    const wordsTop = words.length ? Math.min(...words.map((r) => r.top)) : null;
+    const hits = (a, c) => a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
+    const lefts = [st.left + 8];
+    if (colR && colR.left < st.left + st.width / 2) lefts.push(colR.right + 8);
+    const rs = roomsEl.style;
+    const place = (left, mode) => {
+      roomsEl.dataset.mode = mode;
+      rs.setProperty("--rooms-l", `${Math.round(left - wrap.left)}px`);
+      rs.setProperty("--rooms-b", `${Math.round(wrap.bottom - st.bottom + 8)}px`);
+      let g = roomsEl.getBoundingClientRect();
+      if (wordsTop !== null && words.some((w) => w.left < g.right && w.right > g.left)) {
+        rs.setProperty("--rooms-b", `${Math.round(wrap.bottom - wordsTop + 8)}px`);
+        g = roomsEl.getBoundingClientRect();
+      }
+      return g.left >= st.left && g.right <= st.right && g.top >= st.top && !obstacles.some((o) => hits(g, o));
+    };
+    for (const left of lefts) for (const mode of ["row", "stack"]) if (place(left, mode)) return;
+    place(lefts[0], "row");
   }
   function placeUndo() {
     const box = document.querySelector(".stage__undo");
@@ -12732,11 +13046,15 @@ ${plate.defs}${plate.body}
       col.dataset.grd = "beside";
       fit();
       col.style.setProperty("--grd-top", `${glass.offsetTop}px`);
-      if (besideClear()) return;
+      if (besideClear()) {
+        placeRooms();
+        return;
+      }
     }
     delete col.dataset.grd;
     col.style.removeProperty("--grd-top");
     fit();
+    placeRooms();
   }
   function fitStage() {
     if (document.documentElement.classList.contains("is-bare")) return;
@@ -12819,6 +13137,7 @@ ${plate.defs}${plate.body}
       placeBand();
       placeUndo();
       placeSteps();
+      placeRooms();
       const root = document.documentElement.style;
       root.setProperty("--stage-l", `${Math.round(wrap.x)}px`);
       root.setProperty("--stage-w", `${Math.round(wrap.width)}px`);

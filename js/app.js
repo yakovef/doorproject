@@ -29,14 +29,14 @@
 
 import {
   BELLS, BOWS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS, finishHasSubject, grilleHasSubject,
-  GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LOCKSETS, MASHKOFS,
+  GRILLE_ON, grilleOnHasSubject, GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LOCKSETS, MASHKOFS,
   mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, BUILD_A,
   PEEPHOLES, PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_A, STRIPE_MAX, WINDOWS,
 } from './catalog.js';
 import { breakdownRows, deltaLabel, formatAgorot, priceAgorot, priceLabel, priceParts, tileAgorot }
   from './price.js';
 import {
-  describe, detailGlyph, grilleGlyph, handleGlyph, locksetGlyph,
+  describe, detailGlyph, grilleGlyph, grilleOnGlyph, handleGlyph, locksetGlyph,
   bellGlyph, bowGlyph, handleFinishGlyph, copyOf, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
   panelUnderGlass, specialLockGlyph, stripeTileGlyph,
   windowGlyph,
@@ -233,6 +233,25 @@ const GROUPS = [
         : T('g.grille.plusMany');
       return [[T('g.grille.free'), free], [plus, paid]];
     } },
+
+  /* ⚠ WHICH LEAF THE DESIGN GOES ON — 1.11.2026, the owner's son: *"When
+     choosing the door-and-a-half and then choosing a design, it automatically
+     puts a design on the half door. Figure out where to put an option of
+     removing a design on either of the sides."* and *"The default when
+     choosing a design should be that it will be on both the doors."* Ours,
+     named so he can reverse it in a line: a THIRD group on the designs step,
+     under the design tiles — three square tiles, both leaves · the main leaf
+     only · the fixed leaf only — shown only where it has a subject (a design
+     on a door with two glazed leaves), by the finish group's `when`. Each tile
+     is the two leaves with THIS design where that choice puts it (`composite`
+     redraws them when the design or the paint moves) and prints what the
+     design costs there, off `priceParts` (`tilePrice` → the design's row).
+     Second in the step, so the band's `nowLabel` and the arrows beside the
+     door stay the designs'. */
+  { key: 'grilleOn', title: 'g.grilleOn', in: 'grd', kind: 'sq', list: () => GRILLE_ON,
+    glyph: o => grilleOnGlyph(o, state), hint: 'g.grilleOn.h',
+    composite: st => `${st.grille}|${st.colour}`,
+    when: grilleOnHasSubject },
 
   { key: 'handle', title: 'g.handle', in: 'grip', kind: 'hw', list: () => HANDLES,
     glyph: handleGlyph, hint: 'g.handle.h' },
@@ -508,7 +527,9 @@ const SECTIONS = [
      arguments (§5.25): the etched designs' surcharge per window, and the
      double door that has two panes. */
   { key: 'grd',    title: 'step.grd.t',    sub: 'step.grd.s',    lede: 'step.grd.l', exp: 'exp.grd',
-    expArgs: () => [formatAgorot(byId(GRILLES, 'vine').delta), L(SIZES.half)],
+    /* {2}–{4}: the three leaf choices by their tiles' own names (1.11.2026). */
+    expArgs: () => [formatAgorot(byId(GRILLES, 'vine').delta), L(SIZES.half),
+                    ...GRILLE_ON.map(o => L(o))],
     when: grilleHasSubject },
   { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face',
     expArgs: () => [formatAgorot(STRIPE_A.h), formatAgorot(STRIPE_A.v),
@@ -661,6 +682,9 @@ function init() {
   setLang(pickLang(window.location.search));
   translateStatic();
   buildLangs();
+  /* the room picker's stored choice, before the first fit places it and
+     before `armRoom` asks for a file (1.11.2026) */
+  wireRooms();
 
   const { state: parsed, notice, said, carries } = fromQuery(window.location.search);
   state = parsed;
@@ -3084,7 +3108,8 @@ function commitChoice(key, { fixed, said, stood, memo }) {
  * — so nothing is typed here and a field added later names itself. A field
  * with no row of its own is named by the row it is shown on.
  */
-const ROW_OF = { stripeDir: 'stripes', stripeCount: 'stripes', stripeTight: 'stripes', handleLen: 'handle' };
+const ROW_OF = { stripeDir: 'stripes', stripeCount: 'stripes', stripeTight: 'stripes', handleLen: 'handle',
+                 grilleOn: 'grille' };
 function confirmSentence(what, lost) {
   const rows = specRows(state);
   const keys = [...new Set(lost.map(k => ROW_OF[k] || k))];
@@ -3569,7 +3594,12 @@ function paint() {
          the row's first phrase, so the name under the picture is always
          words of the order. */
       const said = String(r.value);
-      return o && said.includes(L(o)) ? L(o) : said.split(/ — | · /)[0];
+      /* ⚠ AND THE LEAF, WHEN THE DESIGN IS ON ONE (1.11.2026): the row's value
+         ends ", כנף ראשית בלבד", and the name under the picture keeps it — the
+         picture is the design's, so the words are what say which leaf. */
+      const core = r.side ? said.slice(0, -(`, ${r.side}`).length) : said;
+      const base = o && core.includes(L(o)) ? L(o) : core.split(/ — | · /)[0];
+      return r.side ? `${base}, ${r.side}` : base;
     };
     table.replaceChildren(...specRows(state).map(r => {
       const step = stepFor(r.key);
@@ -3792,13 +3822,58 @@ function markGroup(g, blocked) {
  * sconces' HORIZONTAL position only.
  */
 const ROOMS = [
-  { id: 'tall', el: 'room-src',
+  { id: 'tall', set: 'home', el: 'room-src',
     floor: 1214.5 / 1448, aspect: 1086 / 1448,
     lampCx: 450 / 1086, lampTop: 573 / 1448, lampBot: 659 / 1448 },
-  { id: 'wide', el: 'room-wide-src',
+  { id: 'wide', set: 'home', el: 'room-wide-src',
     floor: 827.4 / 941, aspect: 1672 / 941,
     lampCx: 452.5 / 1672, lampTop: 326 / 941, lampBot: 402 / 941 },
+  /* ⚠ TWO MORE ROOMS, ONE FRAMING EACH — 1.11.2026 (PROMPT J). The owner's
+     son: *"An option to change the background … Backgrounds that will show
+     how the door looks in a setting that is other than just a perfect
+     hall."* Each is its own SET: `pickRoom` chooses among one room's crops
+     and never across rooms, so a set holding one file always gets that file.
+     Every number is measured off the 1536 × 1024 original
+     (`research/backdrops/README.md` has the readings and the method):
+       floor    `npm run backdrop -- <name>` prints it — the skirting's FOOT,
+                as on the owner's room (the street's skirting top at 864 is
+                the stronger step and is not the floor): street 904.7, tilt
+                0.006°, rms 0.24 px; stairwell 893.1, −0.015°, 0.62 px.
+       lamp*    the RIGHT fitting's body, off a threshold on the original —
+                the street's dark box 1164..1211 × 360..418 (luma < 90), the
+                stairwell's bright disc and its ring 1146..1217 × 305..377. The
+                method run on the owner's wide room returns his 452.5 and
+                326..403 exactly.
+     ⚠ NO SECOND CROP, AND IT IS ARITHMETIC: `placeRoom` scales by the
+     largest of three ratios and a crop can only raise one, so no crop of a
+     photograph keeps its lamps better than the whole of it does. On a stage
+     narrower than ~0.95 of its height (1100 × 800 and taller windows) these
+     two have nothing to fall back to and a lamp leaves the side; the
+     owner's room has his portrait framing there. CLAUDE.md §9. */
+  { id: 'gen-street', set: 'gen-street', el: 'room-gen-street',
+    floor: 904.7 / 1024, aspect: 1536 / 1024,
+    lampCx: 419.5 / 1536, lampTop: 360 / 1024, lampBot: 418 / 1024 },
+  { id: 'gen-stairwell', set: 'gen-stairwell', el: 'room-gen-stairwell',
+    floor: 893.1 / 1024, aspect: 1536 / 1024,
+    lampCx: 413.5 / 1536, lampTop: 305 / 1024, lampBot: 377 / 1024 },
 ];
+/** The room on the stage — a SET of crops, never in the state, the address,
+ *  the code, the message or the sheet: staging, not the door (§3). */
+let roomSet = 'home';
+/** ⚠ REMEMBERED PER BROWSER, BEHIND A TRY (1.11.2026). The page opens on the
+ *  owner's room unless this browser chose another; storage refused or a value
+ *  this page does not know is the owner's room, never a throw. */
+const ROOM_KEY = 'dm.room.v1';
+const ROOM_SETS = [...new Set(ROOMS.map(r => r.set))];
+function readRoom() {
+  try { const v = localStorage.getItem(ROOM_KEY); return ROOM_SETS.includes(v) ? v : 'home'; }
+  catch { return 'home'; }
+}
+/** ⚠ DESKTOP ONLY — the owner's son: *"PC exclusive — I don't think there is
+ *  enough space on the phone."* Below 1100 the stage is the owner's room
+ *  whatever this browser chose; across the line the choice comes back. */
+const deskRooms = () => typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 1100px)').matches;
+const shownSet = () => (deskRooms() ? roomSet : 'home');
 
 /**
  * Where a room lands on a given stage: covering it, with its own floor line on
@@ -3836,9 +3911,12 @@ function placeRoom(room, boxW, boxH, yBase) {
  * that) the one whose lamps are least far out wins, so the answer degrades
  * instead of flipping to nonsense.
  */
-function pickRoom(boxW, boxH, yBase) {
+function pickRoom(boxW, boxH, yBase, set = shownSet()) {
   const MARGIN = 6;                       // px of lamp that must be showing
-  const scored = ROOMS.map(r => {
+  /* One room's crops only (1.11.2026): the owner's two framings are scored
+     against each other as they always were; a set of one is that one. */
+  const crops = ROOMS.filter(r => r.set === set);
+  const scored = (crops.length ? crops : ROOMS.filter(r => r.set === 'home')).map(r => {
     const p = placeRoom(r, boxW, boxH, yBase);
     /* How far outside the stage the sconce is, on whichever edge is worst.
        ⚠ EVERY TERM IS IN STAGE PIXELS AND COMES OFF `p`, NOT OFF `p.room`.
@@ -3869,7 +3947,7 @@ function pickRoom(boxW, boxH, yBase) {
      above produced a plausible wrong room instead of a failure. A room whose
      score is not a number is not a candidate. */
   const usable = scored.filter(s => Number.isFinite(s.off));
-  if (!usable.length) return ROOMS[0];
+  if (!usable.length) return scored[0].room;
   return (usable.find(s => s.off <= 0)
           || usable.slice().sort((a, b) => a.off - b.off)[0]).room;
 }
@@ -3904,7 +3982,18 @@ function pickRoom(boxW, boxH, yBase) {
  * dragging a window across the crossover work rather than leaving the wrong
  * crop stretched over the stage.
  */
-let liveRoom = null;
+let liveRoom = null, pendingRoom = null;
+/** The picker, held while it is out of the document (below 1100 it is not in
+ *  the phone's DOM at all — `placeRooms`). */
+let roomsEl = null;
+/** Where a room's file is: the owner's two in their `<link>`s in the head, the
+ *  others on their own button in the picker (`data-href`) — each URL written
+ *  once, in `index.html`, and stamped by the build. */
+function roomHref(r) {
+  if (r.set === 'home') { const l = document.getElementById(r.el); return l && l.href; }
+  const b = roomsEl && roomsEl.querySelector(`[data-room="${r.set}"]`);
+  return b && b.dataset.href ? new URL(b.dataset.href, document.baseURI).href : null;
+}
 
 /**
  * THE CROP, WITH EXACTLY THE WALL THE BAND NEEDS — 29.9.2026.
@@ -3970,20 +4059,141 @@ function armRoom() {
   if (!(box.width > 0 && box.height > 0 && fh > 0 && Number.isFinite(baseY))) return;
   const scale = Math.min(box.width / fw, box.height / fh);
   const want = pickRoom(box.width, box.height, (baseY - fy) * scale);
-  if (want === liveRoom) return;
-  const link = document.getElementById(want.el);
-  if (!link || !link.href) return;
-  const href = link.href;
+  if (want === liveRoom || want === pendingRoom) return;
+  const href = roomHref(want);
+  if (!href) return;
+  pendingRoom = want;
   const img = new Image();
   img.addEventListener('load', () => {
     const st = $('#stage');
-    if (!st) return;
+    if (pendingRoom === want) pendingRoom = null;
+    /* a later choice, or a resize across 1100, won while this one travelled */
+    if (!st || want.set !== shownSet()) return;
     st.style.backgroundImage = `url("${href}")`;
     liveRoom = want;
     root.classList.add('is-photo');
     fitStage();                 // the placement needs the class and the room
   });
+  /* a file that does not arrive leaves the room that is up, and may be asked
+     for again; the owner's room failing is the drawn room, as it always was */
+  img.addEventListener('error', () => { if (pendingRoom === want) pendingRoom = null; });
   img.src = href;
+}
+
+/**
+ * ⚠ THE ROOM PICKER — 1.11.2026 (PROMPT J). A radio group of three rooms on
+ * the wall, desktop only. A tap stores the room (`dm.room.v1`), marks it, and
+ * asks `armRoom` for that room's crop — `pickRoom` over THAT room's crops, the
+ * file fetched only now, `.is-photo` untouched — and nothing else: the door,
+ * the price, the address and the code do not move by a byte (the audit says
+ * so), because the room is staging and the state never hears of it.
+ */
+function chooseRoom(set) {
+  if (!ROOM_SETS.includes(set)) return;
+  roomSet = set;
+  try { localStorage.setItem(ROOM_KEY, set); } catch { /* remembered for this visit only */ }
+  markRooms();
+  armRoom();
+}
+function markRooms() {
+  if (!roomsEl) return;
+  for (const b of roomsEl.querySelectorAll('.room')) {
+    const on = b.dataset.room === roomSet;
+    b.setAttribute('aria-checked', String(on));
+    b.tabIndex = on ? 0 : -1;
+  }
+}
+function wireRooms() {
+  roomsEl = document.querySelector('.stage__rooms');
+  if (!roomsEl) return;
+  roomSet = readRoom();
+  markRooms();
+  roomsEl.addEventListener('click', e => {
+    const b = e.target.closest('.room');
+    if (b) chooseRoom(b.dataset.room);
+  });
+  /* A radio group's keys: the arrows move to the next room and choose it,
+     wrapping, in the direction the row reads (it mirrors with the interface,
+     like the language picker); Enter and Space are the button's own. */
+  roomsEl.addEventListener('keydown', e => {
+    const rtl = document.documentElement.dir === 'rtl';
+    const step = { ArrowDown: 1, ArrowUp: -1, ArrowRight: rtl ? -1 : 1, ArrowLeft: rtl ? 1 : -1 }[e.key];
+    if (!step) return;
+    e.preventDefault();
+    const all = [...roomsEl.querySelectorAll('.room')];
+    const i = all.findIndex(b => b.dataset.room === roomSet);
+    const next = all[(i + step + all.length) % all.length];
+    chooseRoom(next.dataset.room);
+    next.focus();
+  });
+}
+
+/**
+ * Where the picker stands: the stage's BOTTOM-LEFT corner, 8 px in, over the
+ * floor — the price's side, physically, in every language — and 8 px above
+ * the trust band's WORDS where its width meets them (`placeUndo`'s rule). Two
+ * shapes, `row` and `stack`, the first that touches nothing on the wall: the
+ * door's settled frame, an arrow, the price and an open breakdown, the wall's
+ * controls, the undo group, the band and the navigator column. ⚠ IN ENGLISH
+ * AND RUSSIAN THAT CORNER IS THE COLUMN'S (it faces the panel), so there the
+ * same two shapes are tried again beside it; the column never yields to the
+ * picker — it is the way through the page, the picker is staging. Below 1100,
+ * in bare mode and on the sheet the picker is taken out of the document.
+ */
+function placeRooms() {
+  if (!roomsEl) return;
+  const wrapEl = document.querySelector('.stage-wrap');
+  const stage = $('#stage');
+  const root = document.documentElement.classList;
+  if (!wrapEl || !stage || !deskRooms() || root.contains('is-bare') || root.contains('is-sheet')) {
+    if (roomsEl.isConnected) roomsEl.remove();
+    return;
+  }
+  if (!roomsEl.isConnected) {
+    const after = wrapEl.querySelector('.stage__arrow--next');
+    if (after) after.after(roomsEl); else wrapEl.append(roomsEl);
+    translateStatic(roomsEl);
+  }
+  roomsEl.hidden = false;
+  const st = stage.getBoundingClientRect(), wrap = wrapEl.getBoundingClientRect();
+  if (!st.width) return;
+  const fEl = document.querySelector('.door-svg #frame'), sEl = fEl && fEl.ownerSVGElement;
+  const ctm = sEl && typeof fEl.getBBox === 'function' ? sEl.getScreenCTM() : null;
+  const bb = ctm ? fEl.getBBox() : null;
+  const frame = bb && bb.width > 0
+    ? { left: ctm.e + ctm.a * bb.x, right: ctm.e + ctm.a * (bb.x + bb.width),
+        top: ctm.f + ctm.d * bb.y, bottom: ctm.f + ctm.d * (bb.y + bb.height) }
+    : null;
+  const col = wrapEl.querySelector(':scope > .steps');
+  const colR = col && col.getClientRects().length ? col.getBoundingClientRect() : null;
+  const bd = document.querySelector('#breakdown');
+  const obstacles = [frame, colR,
+    ...[...wrapEl.querySelectorAll('.stage__arrow, .stage__hud .hud__slot, .stage__undo, .stage__band')]
+      .filter(e => e.getClientRects().length).map(e => e.getBoundingClientRect()),
+    ...[...document.querySelectorAll('#quote')].filter(q => getComputedStyle(q).position !== 'fixed')
+      .map(q => q.getBoundingClientRect()),
+    ...(bd && !bd.hidden ? [bd.getBoundingClientRect()] : [])]
+    .filter(r => r && r.right > r.left && r.bottom > r.top);
+  const words = [...document.querySelectorAll('.trust__i')].map(e => e.getBoundingClientRect())
+    .filter(r => r.width && r.bottom > st.top && r.top < st.bottom);
+  const wordsTop = words.length ? Math.min(...words.map(r => r.top)) : null;
+  const hits = (a, c) => a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
+  const lefts = [st.left + 8];
+  if (colR && colR.left < st.left + st.width / 2) lefts.push(colR.right + 8);
+  const rs = roomsEl.style;
+  const place = (left, mode) => {
+    roomsEl.dataset.mode = mode;
+    rs.setProperty('--rooms-l', `${Math.round(left - wrap.left)}px`);
+    rs.setProperty('--rooms-b', `${Math.round(wrap.bottom - st.bottom + 8)}px`);
+    let g = roomsEl.getBoundingClientRect();
+    if (wordsTop !== null && words.some(w => w.left < g.right && w.right > g.left)) {
+      rs.setProperty('--rooms-b', `${Math.round(wrap.bottom - wordsTop + 8)}px`);
+      g = roomsEl.getBoundingClientRect();
+    }
+    return g.left >= st.left && g.right <= st.right && g.top >= st.top && !obstacles.some(o => hits(g, o));
+  };
+  for (const left of lefts) for (const mode of ['row', 'stack']) if (place(left, mode)) return;
+  place(lefts[0], 'row');
 }
 
 /**
@@ -4314,11 +4524,12 @@ function placeSteps() {
     col.dataset.grd = 'beside';
     fit();
     col.style.setProperty('--grd-top', `${glass.offsetTop}px`);
-    if (besideClear()) return;
+    if (besideClear()) { placeRooms(); return; }
   }
   delete col.dataset.grd;
   col.style.removeProperty('--grd-top');
   fit();
+  placeRooms();
 }
 
 function fitStage() {
@@ -4593,6 +4804,7 @@ function fitStage() {
        variables above so the price is already where they put it */
     placeUndo();
     placeSteps();
+    placeRooms();
 
     const root = document.documentElement.style;
     root.setProperty('--stage-l', `${Math.round(wrap.x)}px`);

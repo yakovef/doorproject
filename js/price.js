@@ -301,6 +301,10 @@ export function tileAgorot(groupKey, state) {
      the tiles stopped printing deltas). */
   if (groupKey === 'handleFinish') return byId(HANDLE_FINISHES, state.handleFinish).delta;
   const parts = priceParts(state);
+  /* ⚠ WHICH LEAF THE DESIGN GOES ON (1.11.2026) has no row of its own either:
+     it moves the DESIGN's row, per pane (`paneCount`), so its tile prints what
+     the design costs on the leaves that choice names — read off that row. */
+  if (groupKey === 'grilleOn') return parts.grille;
   return Object.prototype.hasOwnProperty.call(parts, groupKey)
     ? parts[groupKey] : undefined;
 }

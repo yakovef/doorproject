@@ -53,8 +53,8 @@
 
 import { L, T } from './copy.js';
 import { priceLabel } from './price.js';
-import { byId, DETAILS, finishHasSubject, glassRows, GRILLES, HANDLE_FINISHES, HANDLES, isGlazed, leafGlazed, LOCKSETS,
-         PEEPHOLES, STRIPE_MAX, WINDOWS }
+import { byId, DETAILS, finishHasSubject, glassRows, GRILLE_ON, grilleOnHasSubject, GRILLES, HANDLE_FINISHES,
+         HANDLES, isGlazed, leafGlazed, LOCKSETS, PEEPHOLES, STRIPE_MAX, WINDOWS }
   from './catalog.js';
 import { bowFits, gripFitsAnywhere,
          bellFits, panelUnderGlass,
@@ -285,6 +285,8 @@ export function conflicts(state) {
                 peephole: {}, bell: {},
                 /* The horizontal bow, a field of its own since 26.9.2026. */
                 grab: {},
+                /* Which leaf the window's design goes on, 1.11.2026. */
+                grilleOn: {},
                 /* GONE, 29.9.2026: `stripes`, a sentence rather than a map,
                    "because the stripes are no longer options with ids". They
                    are tiles again (`STRIPE_TILE`), greyed in `detail` like
@@ -704,6 +706,14 @@ export function conflicts(state) {
      was measuring fractions of the wrong door. A rule that cannot see the door
      it is judging is not a rule about that door. */
 
+  /* ⚠ ONE LEAF ONLY NEEDS TWO GLAZED LEAVES AND A DESIGN — 1.11.2026. The
+     page hides the whole group where it has no subject (its `when`), so this
+     reason is for the rules' other readers: a link, the fuzzer, the tests'
+     `buildable`. `repair` sends the field home to `both` there. */
+  if (!grilleOnHasSubject(state)) {
+    for (const o of GRILLE_ON.slice(1)) out.grilleOn[o.id] = T('why.grilleOnOne');
+  }
+
   return out;
 }
 
@@ -772,6 +782,9 @@ const SAID = {
   bowGone:      'fix.bowGone',
   /* 28.9.2026: no pull handle left for a finish to belong to — see repair. */
   finishHome:   'fix.finishHome',
+  /* 1.11.2026: the design on one leaf, where there are not two glazed leaves
+     with a design — see repair. */
+  grilleOnHome: 'fix.grilleOnHome',
 };
 
 /* Which reason a face greyed for the window gives, by what `panelUnderGlass`
@@ -808,7 +821,11 @@ const NOTHING = /^(none|no[a-z]*)$/;
    face-group tap under (`detail` for a face, `stripes` for a stripe tile) own
    the same four. */
 const FACE_FIELDS = ['detail', 'stripeDir', 'stripeCount', 'stripeTight'];
-const OWNED = { stripes: FACE_FIELDS, detail: FACE_FIELDS, handle: ['handle', 'handleLen'] };
+/* ⚠ AND A DESIGN TAP OWNS WHICH LEAF IT IS ON (1.11.2026): swapping the design
+   keeps "main leaf only", and taking the design off sends the leaf home with
+   it — neither is something else taken away, so neither asks. */
+const OWNED = { stripes: FACE_FIELDS, detail: FACE_FIELDS, handle: ['handle', 'handleLen'],
+                grille: ['grille', 'grilleOn'] };
 /** The fields a tap under this key answers for itself — never counted as
  *  taken away, and never recorded by the page's give-back memory. */
 export const ownedBy = key => OWNED[key] || [key];
@@ -1138,6 +1155,21 @@ export function repair(state, intent = null) {
   if (!finishHasSubject(s) && s.handleFinish && s.handleFinish !== HANDLE_FINISHES[0].id) {
     s.handleFinish = HANDLE_FINISHES[0].id;
     change('handleFinish', SAID.finishHome);
+  }
+
+  /* ⚠ AND THE DESIGN ON ONE LEAF GOES HOME TO BOTH WHERE THERE ARE NOT TWO
+     GLAZED LEAVES WITH A DESIGN — 1.11.2026 (`GRILLE_ON`). No design, no
+     window, or a size with no side leaf: "main leaf only" means nothing there,
+     and a field nobody can see or change riding in the address would come
+     back to life the day the door got its second leaf again. A rule in the
+     STATE, not at the boundary (§5.21) — a click, a link and a code all pass
+     through here. Last, because every repair above can take the window or the
+     design away. The confirm dialog counts it where it is a loss (a size with
+     no side leaf takes it), and a design tap owns it (`OWNED`). */
+  if (!grilleOnHasSubject(s) && s.grilleOn && s.grilleOn !== GRILLE_ON[0].id) {
+    const was = byId(GRILLE_ON, s.grilleOn);
+    s.grilleOn = GRILLE_ON[0].id;
+    change('grilleOn', SAID.grilleOnHome, L(was));
   }
 
   return { state: s, changed, said };

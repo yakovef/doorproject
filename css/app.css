@@ -1286,6 +1286,42 @@ html:not([dir="rtl"]) .stage__undo { flex-direction: row-reverse; }
 .stage__undo[data-mode="stack"], .stage__undo[data-mode="icon"],
 html:not([dir="rtl"]) .stage__undo[data-mode="stack"],
 html:not([dir="rtl"]) .stage__undo[data-mode="icon"] { flex-direction: column-reverse; }
+/* ── THE ROOM THE DOOR STANDS IN — 1.11.2026 (PROMPT J) ──────────────────
+   The owner's son: *"An option to change the background … PC exclusive — I
+   don't think there is enough space on the phone."* Three 44 px rooms on an ink
+   tab, the navigator's own ground; the chosen one in the navigator's live
+   square (`--surface`, the mark — here the room — inside it). Absolute in the
+   wrap for `.stage__hud`'s reason (nothing in the flow above 1100), placed by
+   `placeRooms` (js/app.js), which publishes `--rooms-l` and `--rooms-b` off the
+   stage's rect and picks `row` or `stack`, at the stage's bottom-left corner
+   or beside the column where the column holds it (English and Russian). Never
+   shown below 1100: `hidden` in the markup and removed from the document there
+   by script, so this rule is the only one the phone could ever reach. */
+.stage__rooms {
+  position: absolute; z-index: 4;
+  left: var(--rooms-l, 8px); bottom: var(--rooms-b, 8px);
+  display: flex; flex-direction: row; gap: 6px; padding: 6px;
+  background: var(--ink); border-radius: var(--r-card);
+  box-shadow: 0 6px 18px rgb(0 0 0 / .18);
+}
+.stage__rooms[hidden] { display: none; }
+.stage__rooms[data-mode="stack"] { flex-direction: column; }
+.room {
+  appearance: none; cursor: pointer; flex: none;
+  inline-size: 44px; block-size: 44px; padding: 3px; margin: 0;
+  border: 0; border-radius: 6px; background: transparent;
+  transition: background-color .12s;
+}
+.room img {
+  display: block; inline-size: 38px; block-size: 38px;
+  border-radius: 3px; object-fit: cover;
+}
+.room:hover { background: rgb(255 255 255 / .16); }
+.room[aria-checked="true"] { background: var(--surface); }
+.room:focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; }
+@media (max-width: 1099px) { .stage__rooms { display: none; } }
+@media (prefers-reduced-motion: reduce) { .room { transition: none; } }
+
 .undo-pill {
   pointer-events: auto; appearance: none; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
@@ -4631,7 +4667,7 @@ html.is-live .wa__off { display: none; }
    it. Anything added to the stage wrap belongs here the same day. */
 .is-bare .bar, .is-bare .strip, .is-bare .panel, .is-bare .stage__bar,
 .is-bare .stage__h1, .is-bare .steps, .is-bare .trust, .is-bare .saved,
-.is-bare .stage__hud, .is-bare .quote, .is-bare .stage__band, .is-bare .stage__arrow, .is-bare .stage__undo,
+.is-bare .stage__hud, .is-bare .quote, .is-bare .stage__band, .is-bare .stage__arrow, .is-bare .stage__undo, .is-bare .stage__rooms,
 /* ⚠ `.brand` JOINS THE LIST THE DAY IT IS ADDED, which is the standing rule
    for anything put inside `.stage-wrap` — the one page element `?bare=1`
    keeps. Bare mode exists so the harnesses photograph THE DRAWING and no page
@@ -4739,7 +4775,10 @@ html.is-live .wa__off { display: none; }
   animation: fitPart .30s var(--ease-fit) both;
 }
 #stage[data-changed="window"] #glazing,
-#stage[data-changed="grille"] #glazing { animation: openUp .36s var(--ease-fit) both; }
+#stage[data-changed="grille"] #glazing,
+/* Which leaf the design goes on, 1.11.2026: both leaves' panes, since one of
+   them gained the design and the other lost it. */
+#stage[data-changed="grilleOn"] [data-pane] { animation: openUp .36s var(--ease-fit) both; }
 @keyframes openUp { from { opacity: 0; transform: scaleY(.94); } }
 
 #stage[data-changed="handle"] [data-hw="handle"],
