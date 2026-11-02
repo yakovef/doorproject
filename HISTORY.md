@@ -52,6 +52,98 @@ into `research/colours/README.md`.
 
 ## Long-form entries since 27.9.2026 — newest first
 
+- **1.11 — THE REDESIGN ROUND'S FIRST PROMPT, MERGED INTO `main`.** The owner's
+  son asked on 2.10 to see it before it reached the main branch; it was never
+  shown and prompt H left it behind (28.10, "left behind, for him to say"). On
+  1.11: *"make a prompt to merge the redesign branch first"* and then *"now you
+  do all it takes, dont ruin anything"*. Merged with a merge commit, never
+  rebased; its two commits are `5ee5b8f` (the page) and `0de46af` (its sheets).
+  **Where `main` won** — the redesign was written on `9e780ad` (1.10), before
+  prompts C, D, F and G: the navigator COLUMN stays 56 px (the redesign made it
+  68; the designs' 56 px tab beside the glass mark, the 56 px arrows at
+  1100–1199 and the audit's ≤ 60 were all measured on 56), so the column's
+  marks are 48 px and the words .6rem with a two-word name on two lines;
+  `step.grd.n` (עיצוב / Design / Дизайн) added, since the designs' step came
+  after the words; the generated screenshots and stamped hashes taken from
+  `main` and rebuilt.
+  **Found on the way, fixed:** the gallery button's count ("30 дверей, которые
+  мы установили") does not wrap, and at 320 px in Russian it stood 9 px past the
+  screen's edge on `main` already; with the redesign's three small doors beside
+  it, 71 px. It now drops under the title, and ends in an ellipsis if even that
+  line is too narrow (0 px of overflow at 320 ru after).
+  **Measured:** `main` before, `npm test` 13,045,569 / 0 failed. The sheets on
+  the merge moved the 12 `shot` sheets and `.stamps.json` as predicted, and
+  FOUR bare sheets by 2–8 pixels of 1/255 each (`corpus-04`, `corpus-06`,
+  `recreate-d048`, `recreate-d087`). Regenerated on `main` itself in the same
+  container, they moved byte-identically — this container's Chromium, not the
+  merge — so `main`'s committed copies were kept and the bare sheets are
+  unchanged. Before/after pictures of the real page: `research/design/
+  merge-before.png`, `merge-after.png`.
+  **The audit found one thing of the merge's:** the font swap (1c). With the
+  redesign's tile names at .86rem and weight 500, 14 of 684 text blocks
+  changed height when Rubik replaced its fallback (the gate is 2 in 100; `main`
+  read 7 in this container) — the fallback is tuned to Rubik's regular, and
+  Rubik's medium is wider, so names like "ללא ידית משיכה", "Vertical strips"
+  and "Двустворчатая" wrapped in one face and not the other. Measured three
+  ways on the merged page: weight 400 → 9, weight 450 → 10, size .82rem at
+  500 → 12. **The names are .86rem at 400**: the larger size was the
+  redesign's point, the weight is what the fallback cannot follow.
+  **And two that are this container's, not the merge's:** the summary's
+  fallback marks for the bow and the stripes ink 4.76 % and 4.59 % of their
+  28 px box against the audit's 5 % floor — read identically on `main` with
+  the audit's own method in the same container (the 17.10 audit, elsewhere,
+  read them inside it). Not loosened, not redrawn; recorded for the next
+  audit on another machine. The audit's first complete run here was cut off
+  by the session's 30-minute limit on background jobs after Chromium died in
+  the arrow-order walk; it was re-run detached.
+  The redesign's own entry, as it was written on its branch:
+
+- **2.10 — THE REDESIGN ROUND, PROMPT 1: WORDS, DESTINATIONS, NAMES, AND
+  QUIETER CHROME.** The owner's son: *"look at the app i made inspect it, more
+  specificaly the ui and ux, your missions is to make the app more pleasent to
+  the eye and more intuative … take insparion from those sites … but before you
+  push that to the main branch i would like to see how it looks like."* So it
+  lives on the session branch `claude/eloquent-cori-i0kfjb` and is NOT merged
+  into `claude/door-builder-website-plan-rgg7gu` until they say so; the
+  before/after is on a design canvas sent to them.
+  **Read off the page first, with real taps** (a scripted `el.click()` leaves
+  `:focus-visible` on and drew a ring round every step title that no customer
+  ever sees — checked, not shipped as a finding). Measured: tile names 12.48
+  px, prices 9.92 px grey; the save 52 px; the undo pills 87×44 each; ~140 px
+  of eyebrow, title and lede before the first answer on a phone; and on the
+  phone summary the whole layout 2 px off with a white sliver down the left —
+  the visually hidden `<h1>` and `#live` stand 1 px past the inline-start edge
+  in RTL and the document could slide.
+  **What changed:** (1) the navigator's marks carry a word (`step.<key>.n`,
+  three languages) inside the 44 px mark — the row stays 62 px, the column
+  56 → 68 px (at 1100 beside the widest double the column ends 10 px short of
+  the door's arrow); (2) the desktop's "Next" names its destination
+  (`nav.nextTo`), the skip is a link, back keeps its outline — one primary;
+  (3) `.swatch__name` is shown under each chip, the code kept on it; (4) the
+  summary's tiles carry the row's label above the picture (`.spec__label`),
+  and inside the summary the send block is no longer a card in the card (and
+  its 46 px of padding went); (5) the gallery opener: three of the gallery's
+  own doors drawn small (chosen by what they show — a panelled face, a window
+  with ironwork, a tall window — not by index), paper ground, the accent only
+  on its hover border; (6) tiles a faint white card, names .86rem/500 (Russian
+  kept at .78rem — "Стандартная" broke inside the word at 1100), meta
+  .72rem/500; (7) Hebrew headings no longer tracked (`html[lang="he"]`); (8)
+  the step's counter on its title's row (`.sect:not([hidden])` a grid); (9)
+  `html { overflow-x: clip }`.
+  **Kept, because they are the owner's son's:** the floppy disk (27.9, *"an
+  old hard drive"*), the bronze undo pills and their corner (28–29.9), the
+  black column and its white square (27.9), every placement on the photograph.
+  The tan opener ground (27.9, *"more apparent, still in the palette"*) is the
+  one of his answered differently: apparent by its pictures instead — named so
+  he can reverse it in a line.
+  **The test that could not read `--ink-2`:** the opener's contrast check
+  parsed `var(--([a-z-]+))`, so a token with a digit read as `ink-` and
+  resolved to nothing; `[a-z0-9-]` now, ink-2 on paper-up 5.01:1.
+  **Gates:** `npm test` 6 failed before the sheets (5 stale-sheet, 1 the regex
+  above); the sheets moved the 12 `shot` sheets and `.stamps.json` only
+  (predicted: no bare sheet — the drawing is untouched). `npm run audit` not
+  yet run on this round.
+
 - **28.10 — PROMPT H: ONE BRANCH, `main`, AND THE PAGE DOES NOT MOVE.** His
   words: *"I want all the branches merged into main, and I don't want other
   branches to be made ever. I want everything to be pushed to main."* and

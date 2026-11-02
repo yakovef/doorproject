@@ -248,6 +248,11 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   window or the face — **Peretz's rule stands**, refused with its reason and
   no dialog offering to take the window away. (The swing bar lock, settled
   the same way as an option with its price to follow, was withdrawn 28.9.)
+  **Taken for them in the redesign round (2.10, merged 1.11)**, reversible in
+  a line: the gallery button's tan ground (his 27.9 *"more apparent, still in
+  the palette"*) answered differently — apparent by three of its own doors
+  drawn small on paper, the accent only on its hover border; the words in the
+  navigator's marks; the named way on ("הבא: צבע"); the skip as a link.
   And on 29.9: the saved doors keep **a small × on the picture** to delete,
   and the option's name over the door is set in **the title's own face**
   (Bona Nova). On 2.10: on a phone undo, redo and reset are **three icon
@@ -261,6 +266,14 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **1.11** THE REDESIGN ROUND'S FIRST PROMPT MERGED (*"make a prompt to merge
+  the redesign branch first"*, then *"now you do all it takes, dont ruin
+  anything"*): `claude/eloquent-cori-i0kfjb`'s `5ee5b8f` (2.10) — words in the
+  navigator's marks, "הבא: {step}", colour names under swatches, the summary's
+  questions over its pictures, the gallery button drawn with three doors, tiles
+  a card, Hebrew untracked, the counter on the title's row. `main` kept its later
+  decisions: the column stays 56 px (not 68); tile names .86rem at 400, not 500
+  (the font fallback cannot follow the medium weight). Long form: `HISTORY.md`.
 - **1.11** Two generated rooms for the room picker, saved as evidence only:
   `research/backdrops/gen-street.webp` (Jerusalem stone, outside) and
   `gen-stairwell.webp` (an older landing, terrazzo), 1536 × 1024, with a
@@ -1128,6 +1141,14 @@ for the same half of the leaf and `repair` trades between them.
   square"*) it is a 56 px ink COLUMN above 1100 and the same look on the
   phone's fixed 62 px row (the ink a fixed strip under it, so the row's fade
   cue still works). The live step is a light square.
+  ⚠ **Since the redesign's merge (1.11; written 2.10) each mark carries a WORD
+  under its icon** (`step.<key>.n`, `.steps__w`, `aria-hidden`; the title stays
+  the name), set INSIDE the 44 px mark so neither the row's height nor the
+  targets moved. The redesign widened the column to 68 px for it; the merge
+  kept 56 (the designs' tab, the 1100–1199 arrows and the audit's ≤ 60 were
+  all measured on 56): the column's marks are 48 px wide, the words .6rem, and
+  a two-word name ("מנעול נוסף", "Доп. замок") breaks onto a second line inside
+  the square.
   ⚠ **Since 28.9 the column stands ON THE PHOTOGRAPH** (*"…not endless, but just
   the size it needs … a little separated from the options choosing thing, the
   image needs to be behind it"*): `placeNav` moves `.steps` into `.stage-wrap`
