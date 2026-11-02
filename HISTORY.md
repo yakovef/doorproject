@@ -24,6 +24,83 @@ oldest lines move to the top of the "moved" section.
 
 ---
 
+## 1.11.2026 — PROMPT J, 2 of 2: the room picker, on the wall, desktop only
+
+His words: *"An option to change the background: some customers want to know
+how a door looks with different backgrounds. PC exclusive — I don't think
+there is enough space on the phone."*
+
+**What it is.** `.stage__rooms` in `index.html`, inside `.stage-wrap` and never
+inside `.stage` (whose markup `paint` rewrites): a `role="radiogroup"` labelled
+"רקע" / Background / Фон, holding three `<button role="radio">` — his room
+(מבואה), the street (כניסה לבניין), the stairwell (חדר מדרגות) — each a 38 px
+thumbnail in a 44 px button on an ink tab like the navigator column's, the
+chosen one in the column's live square (`--surface`). The thumbnails are
+`npm run backdrop`'s, 88 px squares of the graded rooms, ~1 KB each, stamped
+by the build; the two new rooms' URLs are on their buttons (`data-href`),
+stamped, so each URL is written once.
+
+**Behaviour.** A tap stores the room (`dm.room.v1`, behind a try), marks the
+radio and calls `armRoom`, which asks `pickRoom` for that room's crop (sets
+since commit 1) and fetches its file only now; the load handler drops a file
+that arrives after a later choice or a resize across 1100 (`shownSet`). Below
+1100 the stage is always his room, whatever is stored. Arrows choose the next
+room and wrap, in the row's reading direction; Enter and Space are the
+button's. `.room`'s 120 ms background transition is off under reduced motion;
+there is no fade on the room itself.
+
+**Desktop only, and absent below.** `hidden` in the markup (a page without
+script never shows it, its images lazy), and `placeRooms` takes the element OUT
+of the document below 1100, in bare mode and on the sheet, putting it back
+(and translating it) when the window crosses 1100 again.
+
+**Where it stands.** `placeRooms`, run at the end of `placeSteps` (which runs
+whenever the column might move) and from `fitStage`: the stage's bottom-left,
+8 px in, 8 px above the trust band's words where its width meets them
+(`placeUndo`'s rule); `row` then `stack`, the first touching no door (settled
+frame), arrow, price, open breakdown, wall control, undo group, band or
+column. ⚠ **Found while designing it:** in English and Russian that corner is
+the COLUMN's (it faces the panel), with its foot 8–70 px over the stage's
+foot at 1100–1366. Lifting the column over the picker would have pulled it up
+onto the price at 1100–1152 (it is already giving its gaps there), so the
+column never yields to staging: the same two shapes are tried BESIDE it.
+Measured by the audit, 8 widths (1100–1920) × three languages × six sizes,
+the breakdown shut and open: **288 readings, on nothing, none named** —
+`row` at the corner 166, `stack` at the corner 6 (Hebrew at 1100 beside the
+wider doors), `row` beside the column 60, `stack` beside it 56.
+
+**The audit**, a new block (`the room picker`) and restatements:
+- phone: no `.stage__rooms` in the document at 390 and 320, with the street
+  stored too; a phone's load asks for no thumbnail or new room;
+- desktop load: every request is the page, its type, his two rooms or the
+  three thumbnails;
+- placement: the 288 readings above;
+- taps: nine taps in three languages and three doors (the double in white, a
+  glazed door with a design) — the stage shows the room's file and the radio
+  says so; the drawing's markup, the price, `location.href`, the code, every
+  `[data-wa]` href, the frame's settled box and `--frame-*` byte-identical;
+- storage and keys: remembered across a reload; storage refused opens his
+  room and still works; arrow keys and Enter; 44 px;
+- motion, bare and tour: nothing running after a tap under reduced motion;
+  absent in bare mode and on the sheet; the tour's first cut-outs never on it.
+- restated: the price's contrast clause on all three rooms by a tap (27 → 81
+  readings, commit 1's injected reading retired); `.stage__rooms` joins the
+  wall-control lists of the price, band and column clauses.
+
+**Falsified**, each in a throwaway copy:
+- the room written into the address → the href clause fails, on every tap;
+- the picker kept below 1100 → four phone faults;
+- the obstacle test removed → 3,136 px² on the column in Russian at 1100;
+- a new room preloaded → five request faults;
+- the transition left on under reduced motion → the motion fault.
+⚠ **The brief's own falsification did not fail, and why:** "store the room in
+the state" (`state = { ...state, room }`) leaves the address, the code and the
+drawing unchanged, because `toQuery`, `encodeCode` and `render` read only the
+fields they know. The clause catches the room reaching the ADDRESS, which is
+the leak that matters; a field that dies at the serialiser is not one.
+
+**Gates:** see the commit message.
+
 ## 1.11.2026 — PROMPT J, 1 of 2: the two rooms graded and measured, as assets
 
 His words (the owner's son): *"An option to change the background: some
@@ -4476,6 +4553,11 @@ into `research/colours/README.md`.
 
 ## Moved from `CLAUDE.md` §0b after 26.9.2026 — one line each
 
+- **17.10** THE CARDS' NAMES ON THE CHART: eleven labels follow his deck's cards
+  (מוקה, אפור פשתן, אפור קלאסי, אפור בטון, שמנת חלבית, גרז', אפור בזלת — the
+  default —, גרפיט, קפוצ'ינו, ירוק פסגות, אפור שמיים), with plain English and
+  Russian. Ids, codes and aliases untouched; nothing typed a name. 0 bare
+  sheets. Long form: `HISTORY.md`.
 - **17.10** FOUR CARDS FROM HIS DECK (*"Add all of these colours … all of them
   except the three that are free should be +200"*): 7345D אפור אורבני, 8075D
   שוקולד קקאו, 8002D חמרה, 9077D חול ים APPENDED to `COLOURS` (21, no

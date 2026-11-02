@@ -110,6 +110,12 @@
        under an old name is a string nobody can find the history of. */
     "undo": ["ביטול השינוי האחרון", "Undo the last change", "Отменить последнее изменение"],
     "undo.group": ["ביטול, חזרה ואיפוס", "Undo, redo and reset", "Отменить, вернуть и сбросить"],
+    /* The room picker (1.11.2026, PROMPT J): a desktop-only radio group of three
+       rooms the door can be seen in. Staging — none of these reaches the order. */
+    "rooms.group": ["רקע", "Background", "Фон"],
+    "rooms.home": ["מבואה", "Hallway", "Холл"],
+    "rooms.gen-street": ["כניסה לבניין", "Building entrance", "Вход в здание"],
+    "rooms.gen-stairwell": ["חדר מדרגות", "Stairwell", "Лестничная клетка"],
     "redo": ["החזרת השינוי", "Redo the change", "Вернуть изменение"],
     "redo.done": ["החזרנו את השינוי", "Change restored", "Изменение возвращено"],
     "undo.done": ["הצעד האחרון בוטל", "Last step undone", "Последний шаг отменён"],
@@ -11288,6 +11294,7 @@ ${plate.defs}${plate.body}
     setLang(pickLang(window.location.search));
     translateStatic();
     buildLangs();
+    wireRooms();
     const { state: parsed, notice, said, carries } = fromQuery(window.location.search);
     state = parsed;
     buildPanel();
@@ -12636,6 +12643,18 @@ ${plate.defs}${plate.body}
     }
   ];
   var roomSet = "home";
+  var ROOM_KEY = "dm.room.v1";
+  var ROOM_SETS = [...new Set(ROOMS.map((r) => r.set))];
+  function readRoom() {
+    try {
+      const v = localStorage.getItem(ROOM_KEY);
+      return ROOM_SETS.includes(v) ? v : "home";
+    } catch {
+      return "home";
+    }
+  }
+  var deskRooms = () => typeof window.matchMedia === "function" && window.matchMedia("(min-width: 1100px)").matches;
+  var shownSet = () => deskRooms() ? roomSet : "home";
   function placeRoom(room, boxW, boxH, yBase) {
     const h = Math.max(
       yBase / room.floor,
@@ -12654,7 +12673,7 @@ ${plate.defs}${plate.body}
       lampBot: top + room.lampBot * h
     };
   }
-  function pickRoom(boxW, boxH, yBase, set2 = roomSet) {
+  function pickRoom(boxW, boxH, yBase, set2 = shownSet()) {
     const MARGIN = 6;
     const crops = ROOMS.filter((r) => r.set === set2);
     const scored = (crops.length ? crops : ROOMS.filter((r) => r.set === "home")).map((r) => {
@@ -12678,6 +12697,16 @@ ${plate.defs}${plate.body}
     return (usable.find((s) => s.off <= 0) || usable.slice().sort((a, b) => a.off - b.off)[0]).room;
   }
   var liveRoom = null;
+  var pendingRoom = null;
+  var roomsEl = null;
+  function roomHref(r) {
+    if (r.set === "home") {
+      const l = document.getElementById(r.el);
+      return l && l.href;
+    }
+    const b = roomsEl && roomsEl.querySelector(`[data-room="${r.set}"]`);
+    return b && b.dataset.href ? new URL(b.dataset.href, document.baseURI).href : null;
+  }
   var BAND_GAP = 8;
   function fitCrop(svg, box) {
     const fx = Number(svg.dataset.fitX), w = Number(svg.dataset.fitW);
@@ -12711,20 +12740,120 @@ ${plate.defs}${plate.body}
     if (!(box.width > 0 && box.height > 0 && fh > 0 && Number.isFinite(baseY))) return;
     const scale = Math.min(box.width / fw, box.height / fh);
     const want = pickRoom(box.width, box.height, (baseY - fy) * scale);
-    if (want === liveRoom) return;
-    const link = document.getElementById(want.el);
-    if (!link || !link.href) return;
-    const href = link.href;
+    if (want === liveRoom || want === pendingRoom) return;
+    const href = roomHref(want);
+    if (!href) return;
+    pendingRoom = want;
     const img = new Image();
     img.addEventListener("load", () => {
       const st = $("#stage");
-      if (!st) return;
+      if (pendingRoom === want) pendingRoom = null;
+      if (!st || want.set !== shownSet()) return;
       st.style.backgroundImage = `url("${href}")`;
       liveRoom = want;
       root.classList.add("is-photo");
       fitStage();
     });
+    img.addEventListener("error", () => {
+      if (pendingRoom === want) pendingRoom = null;
+    });
     img.src = href;
+  }
+  function chooseRoom(set2) {
+    if (!ROOM_SETS.includes(set2)) return;
+    roomSet = set2;
+    try {
+      localStorage.setItem(ROOM_KEY, set2);
+    } catch {
+    }
+    markRooms();
+    armRoom();
+  }
+  function markRooms() {
+    if (!roomsEl) return;
+    for (const b of roomsEl.querySelectorAll(".room")) {
+      const on = b.dataset.room === roomSet;
+      b.setAttribute("aria-checked", String(on));
+      b.tabIndex = on ? 0 : -1;
+    }
+  }
+  function wireRooms() {
+    roomsEl = document.querySelector(".stage__rooms");
+    if (!roomsEl) return;
+    roomSet = readRoom();
+    markRooms();
+    roomsEl.addEventListener("click", (e) => {
+      const b = e.target.closest(".room");
+      if (b) chooseRoom(b.dataset.room);
+    });
+    roomsEl.addEventListener("keydown", (e) => {
+      const rtl = document.documentElement.dir === "rtl";
+      const step2 = { ArrowDown: 1, ArrowUp: -1, ArrowRight: rtl ? -1 : 1, ArrowLeft: rtl ? 1 : -1 }[e.key];
+      if (!step2) return;
+      e.preventDefault();
+      const all = [...roomsEl.querySelectorAll(".room")];
+      const i = all.findIndex((b) => b.dataset.room === roomSet);
+      const next = all[(i + step2 + all.length) % all.length];
+      chooseRoom(next.dataset.room);
+      next.focus();
+    });
+  }
+  function placeRooms() {
+    if (!roomsEl) return;
+    const wrapEl = document.querySelector(".stage-wrap");
+    const stage = $("#stage");
+    const root = document.documentElement.classList;
+    if (!wrapEl || !stage || !deskRooms() || root.contains("is-bare") || root.contains("is-sheet")) {
+      if (roomsEl.isConnected) roomsEl.remove();
+      return;
+    }
+    if (!roomsEl.isConnected) {
+      const after = wrapEl.querySelector(".stage__arrow--next");
+      if (after) after.after(roomsEl);
+      else wrapEl.append(roomsEl);
+      translateStatic(roomsEl);
+    }
+    roomsEl.hidden = false;
+    const st = stage.getBoundingClientRect(), wrap = wrapEl.getBoundingClientRect();
+    if (!st.width) return;
+    const fEl = document.querySelector(".door-svg #frame"), sEl = fEl && fEl.ownerSVGElement;
+    const ctm = sEl && typeof fEl.getBBox === "function" ? sEl.getScreenCTM() : null;
+    const bb = ctm ? fEl.getBBox() : null;
+    const frame = bb && bb.width > 0 ? {
+      left: ctm.e + ctm.a * bb.x,
+      right: ctm.e + ctm.a * (bb.x + bb.width),
+      top: ctm.f + ctm.d * bb.y,
+      bottom: ctm.f + ctm.d * (bb.y + bb.height)
+    } : null;
+    const col = wrapEl.querySelector(":scope > .steps");
+    const colR = col && col.getClientRects().length ? col.getBoundingClientRect() : null;
+    const bd = document.querySelector("#breakdown");
+    const obstacles = [
+      frame,
+      colR,
+      ...[...wrapEl.querySelectorAll(".stage__arrow, .stage__hud .hud__slot, .stage__undo, .stage__band")].filter((e) => e.getClientRects().length).map((e) => e.getBoundingClientRect()),
+      ...[...document.querySelectorAll("#quote")].filter((q) => getComputedStyle(q).position !== "fixed").map((q) => q.getBoundingClientRect()),
+      ...bd && !bd.hidden ? [bd.getBoundingClientRect()] : []
+    ].filter((r) => r && r.right > r.left && r.bottom > r.top);
+    const words = [...document.querySelectorAll(".trust__i")].map((e) => e.getBoundingClientRect()).filter((r) => r.width && r.bottom > st.top && r.top < st.bottom);
+    const wordsTop = words.length ? Math.min(...words.map((r) => r.top)) : null;
+    const hits = (a, c) => a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
+    const lefts = [st.left + 8];
+    if (colR && colR.left < st.left + st.width / 2) lefts.push(colR.right + 8);
+    const rs = roomsEl.style;
+    const place = (left, mode) => {
+      roomsEl.dataset.mode = mode;
+      rs.setProperty("--rooms-l", `${Math.round(left - wrap.left)}px`);
+      rs.setProperty("--rooms-b", `${Math.round(wrap.bottom - st.bottom + 8)}px`);
+      let g = roomsEl.getBoundingClientRect();
+      if (wordsTop !== null && words.some((w) => w.left < g.right && w.right > g.left)) {
+        rs.setProperty("--rooms-b", `${Math.round(wrap.bottom - wordsTop + 8)}px`);
+        g = roomsEl.getBoundingClientRect();
+      }
+      return g.left >= st.left && g.right <= st.right && g.top >= st.top && !obstacles.some((o) => hits(g, o));
+    };
+    for (const left of lefts) for (const mode of ["row", "stack"]) if (place(left, mode)) return;
+    place(lefts[0], "row");
   }
   function placeUndo() {
     const box = document.querySelector(".stage__undo");
@@ -12884,11 +13013,15 @@ ${plate.defs}${plate.body}
       col.dataset.grd = "beside";
       fit();
       col.style.setProperty("--grd-top", `${glass.offsetTop}px`);
-      if (besideClear()) return;
+      if (besideClear()) {
+        placeRooms();
+        return;
+      }
     }
     delete col.dataset.grd;
     col.style.removeProperty("--grd-top");
     fit();
+    placeRooms();
   }
   function fitStage() {
     if (document.documentElement.classList.contains("is-bare")) return;
@@ -12971,6 +13104,7 @@ ${plate.defs}${plate.body}
       placeBand();
       placeUndo();
       placeSteps();
+      placeRooms();
       const root = document.documentElement.style;
       root.setProperty("--stage-l", `${Math.round(wrap.x)}px`);
       root.setProperty("--stage-w", `${Math.round(wrap.width)}px`);

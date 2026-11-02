@@ -80,6 +80,14 @@ function stampHtml() {
        80 KB with nothing visibly wrong. See the comment above those tags. */
     [/(href=")(assets\/room\.webp)(\?v=[0-9a-f]+)?(")/, 'assets/room.webp'],
     [/(href=")(assets\/room-wide\.webp)(\?v=[0-9a-f]+)?(")/, 'assets/room-wide.webp'],
+    /* The picker's two rooms and three thumbnails (1.11.2026, PROMPT J), each
+       written ONCE — on its own button in the room picker — for the same
+       reason: `js/app.js` reads the resolved `data-href` of the room chosen. */
+    [/(data-href=")(assets\/room-gen-street\.webp)(\?v=[0-9a-f]+)?(")/, 'assets/room-gen-street.webp'],
+    [/(data-href=")(assets\/room-gen-stairwell\.webp)(\?v=[0-9a-f]+)?(")/, 'assets/room-gen-stairwell.webp'],
+    [/(src=")(assets\/room-wide-thumb\.webp)(\?v=[0-9a-f]+)?(")/, 'assets/room-wide-thumb.webp'],
+    [/(src=")(assets\/room-gen-street-thumb\.webp)(\?v=[0-9a-f]+)?(")/, 'assets/room-gen-street-thumb.webp'],
+    [/(src=")(assets\/room-gen-stairwell-thumb\.webp)(\?v=[0-9a-f]+)?(")/, 'assets/room-gen-stairwell-thumb.webp'],
   ];
   /* ⚠ THE PAGE'S TYPE (28.9), ONE FILE PER SCRIPT PER FACE, EACH REFERENCED
      FROM ONE PLACE — its `@font-face` in the head — for the rooms' reason. The

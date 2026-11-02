@@ -259,6 +259,19 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
   `ASK-PERETZ.md` 0h2); `both` is the default, so every link and code ever
   sent opens as it was seen; the tiles draw the design where it goes and print
   each choice's price; the order says the leaf in words when it is not both.
+  **Taken for them in PROMPT J (1.11)**, each reversible in a line — his words:
+  *"An option to change the background … PC exclusive — I don't think there is
+  enough space on the phone"*, *"Backgrounds … other than just a perfect
+  hall"*: the room is STAGING (never in the state, the URL, the code, the
+  message or the sheet), remembered per browser (`dm.room.v1`, behind a try),
+  the page opening on his room; three 44 px rooms on an ink tab at the stage's
+  BOTTOM-LEFT, the chosen one in the navigator's live square, ≥ 1100 only and
+  absent from a phone's document; the order his room · the street · the
+  stairwell; every room graded to HIS wall (MIX solved per room — ours: his
+  0.6 left the stone 8 luma darker); in English and Russian, where that
+  corner is the column's, beside the column (ours: the column never yields to
+  staging); the names מבואה · כניסה לבניין · חדר מדרגות (ours). A fourth room
+  needs his photograph or his word, and a room is never generated here.
 
 ---
 
@@ -268,6 +281,12 @@ Older and long-form: **`HISTORY.md`** — the archive verbatim to 26.9.2026, and
 since 27.9 each change's long-form entry, written in the same commit as its
 lines here. Dates are the day of the change.
 
+- **1.11** THE ROOM PICKER (PROMPT J 2 of 2; *"PC exclusive"*): three 44 px
+  rooms on an ink tab at the stage's bottom-left (`.stage__rooms`, a radio
+  group, `placeRooms`), beside the column in en/ru; ≥ 1100 only, absent from a
+  phone's DOM; a tap fetches that room and changes nothing else — drawing,
+  price, address, code byte-identical (asserted); `dm.room.v1`. The price
+  read on all three rooms (81). 0 bare sheets. Long form: `HISTORY.md`.
 - **1.11** THE TWO ROOMS GRADED AND MEASURED (PROMPT J 1 of 2; *"Backgrounds
   that will show how the door looks in a setting that is other than just a
   perfect hall"*): `npm run backdrop -- <name>` → `assets/room-gen-street.webp`,
@@ -292,11 +311,6 @@ lines here. Dates are the day of the change.
   is the trunk's byte for byte, asserted by an empty diff. Only documents came
   over (PROMPTS.md, RENDER.md, UX-FINDINGS*.md); page commits left behind are
   listed by sha. §1, §0a, §10, AGENT.md name `main` only. Long form: `HISTORY.md`.
-- **17.10** THE CARDS' NAMES ON THE CHART: eleven labels follow his deck's cards
-  (מוקה, אפור פשתן, אפור קלאסי, אפור בטון, שמנת חלבית, גרז', אפור בזלת — the
-  default —, גרפיט, קפוצ'ינו, ירוק פסגות, אפור שמיים), with plain English and
-  Russian. Ids, codes and aliases untouched; nothing typed a name. 0 bare
-  sheets. Long form: `HISTORY.md`.
 
 ---
 
@@ -378,6 +392,24 @@ into the live step before its explainer — the owner's son: the note goes
 *"under the options"*. Above 1100 all three go home (the note under the
 picture). `buildPanel` rescues the note before it empties the panel. The save
 disc is 44 px on a phone (52 above).
+
+⚠ **THE ROOM PICKER, DESKTOP ONLY (1.11)** — the owner's son: *"An option to
+change the background: some customers want to know how a door looks with
+different backgrounds. PC exclusive — I don't think there is enough space on
+the phone."* `.stage__rooms`, a radio group ("רקע") of three 44 px rooms —
+his · the street · the stairwell — on an ink tab like the column's, the
+chosen one in its live square. `placeRooms` (js/app.js, run at the end of
+`placeSteps` and from `fitStage`) stands it at the stage's BOTTOM-LEFT, 8 px
+in, 8 px above the trust band's words where its width meets them, as a row or
+a stack — the first that touches no door, arrow, price, open breakdown, wall
+control, undo pill, band or column; in English and Russian that corner is the
+column's, so the same two shapes are tried beside it (measured: 288 readings,
+1100–1920 × three languages × six sizes, breakdown shut and open, on nothing).
+Below 1100 it is taken OUT of the document (`hidden` in the markup for a page
+without script; lazy images), and a phone shows his room whatever this
+browser stored. A tap stores the room, marks it and asks `armRoom` for that
+room's crop; the file is fetched only then; the door, the price, the address
+and the code do not move (asserted byte for byte).
 
 The page has no header. The language picker stands in the wall's top-right
 corner in every language (placed by the owner with circles on a screenshot,
@@ -704,6 +736,10 @@ works from `file://` and Peretz can open the folder on his own laptop.
   two more rooms, one framing each, graded by `npm run backdrop -- <name>`
   from `research/backdrops/<name>.webp` (no name: the owner's two, into their
   old file names, byte-identical). Measured in `research/backdrops/README.md`.
+  Each room's 88 px **`…-thumb.webp`** (his: `room-wide-thumb.webp`) is the
+  picker's tile, written by the same run. The two new rooms' URLs are on their
+  picker buttons (`data-href`), the thumbnails' on their `<img>`s, each
+  stamped by the build; a new room is fetched only when it is chosen.
 - **`assets/fonts/`** — the page's own type since 28.9: **Rubik** (the text,
   and the face Peretz's own site uses) and **Bona Nova** (the price, the `<h1>`,
   the band's title), nine woff2 files, one per script per face behind its
@@ -826,7 +862,8 @@ only by `.is-photo`.
 owner's entrance (two framings, `set: 'home'`) and two generated rooms — a
 Jerusalem-stone street entrance and an older stairwell (one framing each) —
 are SETS in `ROOMS` (js/app.js); `pickRoom` scores one set's crops and never
-across sets. Every one is graded by `tools/backdrop.mjs` to the SAME wall
+across sets. A customer chooses the set on a desktop with the room picker (§0c,
+`dm.room.v1`); below 1100 it is always his. Every one is graded by `tools/backdrop.mjs` to the SAME wall
 luma — his desktop room's 220, read off the file — because the ground under
 the swatch must not shift with the room: the curve, reference and band are
 his, and MIX is solved per room (his 0.6; the street 0.72, the stairwell
@@ -1806,7 +1843,8 @@ are not in `VIEWS`:
   out-of-room readings named, 2.10), the figure's ink ≥ 4.5:1 on the picture
   under it, the send a green pill (2.10: ground, no underline, ≥ 48 px, 1 rem
   at 700, flush with the price, ≤ 2 lines but the one named, white ≥ 3:1 on
-  it); the phone bar 67 px with a 48 px send at 700, its breakdown centred on the figure or held inside
+  it) — on each of the three rooms since 1.11, chosen by a tap (81 readings);
+  the phone bar 67 px with a 48 px send at 700, its breakdown centred on the figure or held inside
   the stage (named); the picker top-right in all three languages; the פרזול
   tiles redrawn when the lock furniture changes.
 - **repairs** — a real repair at every viewport, every sentence on screen, its
@@ -1874,6 +1912,16 @@ are not in `VIEWS`:
   window or switch plate under the settled `#frame` at every shape × size;
   and the price's ground ≥ 4.5:1 under the figure on each room at every
   width in three languages, the room laid where `placeRoom` puts it.
+- **the room picker** (1.11) — no `.stage__rooms` in the phone's document at
+  390 and 320 (with a room stored too), a phone's load asks for no thumbnail
+  or new room; a desktop load asks for nothing but the page, its type, his two
+  rooms and the three thumbnails; the picker on nothing at 8 widths × 3
+  languages × 6 sizes, breakdown shut and open; a tap shows that room and the
+  drawing, price, address, code, WhatsApp link, frame box and `--frame-*` are
+  byte-identical; remembered across a reload; storage refused opens his room
+  and still works; arrows choose and wrap, Enter chooses, 44 px; nothing
+  running after a tap under reduced motion; absent in bare mode and on the
+  sheet; the tour's first cut-outs never on it.
 - **pictures** — the navigator's eleven marks (21 px; the SEEN ones exactly the
   steps present, 2.10) and the spec's fourteen
   (28 px since 27.9 — the summary's fallback for a row whose step has no tile

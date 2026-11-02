@@ -271,6 +271,12 @@ export const UI = {
      under an old name is a string nobody can find the history of. */
   'undo':             ['ביטול השינוי האחרון', 'Undo the last change', 'Отменить последнее изменение'],
   'undo.group':       ['ביטול, חזרה ואיפוס', 'Undo, redo and reset', 'Отменить, вернуть и сбросить'],
+  /* The room picker (1.11.2026, PROMPT J): a desktop-only radio group of three
+     rooms the door can be seen in. Staging — none of these reaches the order. */
+  'rooms.group':        ['רקע', 'Background', 'Фон'],
+  'rooms.home':         ['מבואה', 'Hallway', 'Холл'],
+  'rooms.gen-street':   ['כניסה לבניין', 'Building entrance', 'Вход в здание'],
+  'rooms.gen-stairwell':['חדר מדרגות', 'Stairwell', 'Лестничная клетка'],
   'redo':             ['החזרת השינוי', 'Redo the change', 'Вернуть изменение'],
   'redo.done':        ['החזרנו את השינוי', 'Change restored', 'Изменение возвращено'],
   'undo.done':        ['הצעד האחרון בוטל', 'Last step undone', 'Последний шаг отменён'],

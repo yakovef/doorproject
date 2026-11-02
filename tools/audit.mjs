@@ -3676,17 +3676,15 @@ for (const v of VIEWS) {
        planter and pilaster and the soffit; the stairwell's window and its
        switch and bell plates) under the settled `#frame`, at every shape and
        every size;
-     4 THE PRICE IS READABLE ON EACH: the room laid on the stage exactly where
-       `placeRoom` puts it, the price's ink made transparent, the darkest 5 %
-       under the figure ≥ 4.5:1 against `--ink`, at every desktop width in
-       three languages — on the stone that is where the leaves' shadow is.
+     4 THE PRICE IS READABLE ON EACH — asked by the price sweep's clause 6 on
+       the real page since the picker (commit 2): every desktop width, three
+       languages, all three rooms chosen by a tap. Commit 1 laid each room on
+       the stage itself and read ≥ 9.77:1 on 66 pictures.
 
    ⚠ The constants are this file's own copy, measured off the originals
    (`research/backdrops/README.md`), not borrowed from js/app.js — an
    instrument that reads the implementation's table cannot notice it change.
-   ⚠ Until the picker exists the room is laid on the stage by this block
-   (the same three numbers `fitStage` writes); with the picker the price
-   sweep's clause 6 asks it of the real page on all three rooms. */
+   */
 {
   console.log('\nthe other rooms: graded to his wall, lamps in frame, only wall behind the door, the price readable');
   const before = faults;
@@ -3738,9 +3736,7 @@ for (const v of VIEWS) {
     }
   }
 
-  let shapes = 0, readings = 0, contrasts = 0, lowest = 99, lowestAt = '';
-  const rel = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
-  const INK = 0.2126 * rel(0x1C) + 0.7152 * rel(0x1A) + 0.0722 * rel(0x17);   // --ink
+  let shapes = 0, readings = 0;
   for (const lang of ['he', 'en', 'ru']) {
     for (const [vw, vh] of SHAPES) {
       await pg.setViewportSize({ width: vw, height: vh });
@@ -3790,35 +3786,6 @@ for (const v of VIEWS) {
             const ov = Math.max(0, Math.min(x1, g.fr[2]) - Math.max(x0, g.fr[0])) * Math.max(0, Math.min(y1, g.fr[3]) - Math.max(y0, g.fr[1]));
             if (ov > 0) fault('rooms', `${lang} ${tag} ${size} ${k}: the ${t} stands ${ov.toFixed(0)} px² behind the door`);
           }
-          /* 4 — the standard door, every width, three languages */
-          if (size === 'standard') {
-            const ok = await pg.evaluate(async ([d, w, h, top]) => {
-              const img = new Image(); img.src = 'data:image/webp;base64,' + d; await img.decode();
-              const st = document.querySelector('#stage');
-              st.style.backgroundImage = `url("${img.src}")`;
-              st.style.setProperty('--photo-w', `${w.toFixed(1)}px`);
-              st.style.setProperty('--photo-h', `${h.toFixed(1)}px`);
-              st.style.setProperty('--photo-y', `${top.toFixed(1)}px`);
-              await new Promise(r2 => requestAnimationFrame(() => requestAnimationFrame(r2)));
-              return true;
-            }, [readFileSync(r.file).toString('base64'), p.w, p.h, p.top]);
-            if (!ok) continue;
-            await pg.addStyleTag({ content: '.quote .send__figure, .quote .send__chev { color: transparent !important; }' });
-            const bx = g.fig, x0 = Math.max(0, bx.left);
-            const shot = `/tmp/audit-rooms-${process.pid}.png`;
-            await pg.screenshot({ path: shot, clip: { x: x0, y: Math.max(0, bx.top), width: Math.max(1, Math.min(bx.right, vw) - x0), height: Math.max(1, bx.height) } });
-            const im = load(shot), ls = [];
-            for (let i = 0; i < im.d.length; i += 4) ls.push(0.2126 * rel(im.d[i]) + 0.7152 * rel(im.d[i + 1]) + 0.0722 * rel(im.d[i + 2]));
-            ls.sort((u, v) => u - v);
-            const cr = (ls[Math.floor(ls.length * 0.05)] + 0.05) / (INK + 0.05);
-            contrasts++;
-            if (cr < lowest) { lowest = cr; lowestAt = `${lang} ${tag} ${k}`; }
-            if (cr < 4.5) fault('rooms', `${lang} ${tag} ${k}: the price is ink on a picture whose darkest 5 % reads ${cr.toFixed(2)}:1 — under 4.5`);
-            /* and the stage back to the owner's room for the next room */
-            await pg.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=${size}`);
-            await pg.waitForSelector('#stage svg #frame');
-            await pg.waitForTimeout(400);
-          }
         }
       }
     }
@@ -3826,11 +3793,247 @@ for (const v of VIEWS) {
   await pg.close();
   /* §5.15 — every clause found its subject */
   if (shapes < SHAPES.length * 2) fault('rooms', `the lamps were asked at ${shapes} shape-rooms — expected ${SHAPES.length * 2}`);
-  if (contrasts < SHAPES.length * 3 * 2) fault('rooms', `the price was read on ${contrasts} pictures — expected ${SHAPES.length * 3 * 2}`);
   for (const k of Object.keys(LAMP_KNOWN)) if (!lampSeen.has(k)) fault('rooms', `${k}: named as a lamp out of frame and it is whole now — take the exemption out`);
   if (faults === before) console.log(`  walls ${walls.join(', ')} against his ${Object.values(home).map(v => v.toFixed(1)).join(' / ')}; `
     + `lamps whole at ${shapes} shape-rooms (named: ${Object.keys(LAMP_KNOWN).join(', ')}); nothing but wall behind `
-    + `${readings} doors; the price ≥ ${lowest.toFixed(2)}:1 on ${contrasts} pictures (lowest ${lowestAt})`);
+    + `${readings} doors`);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   THE ROOM PICKER — DESKTOP ONLY, STAGING ONLY. 1.11.2026 (PROMPT J, 2 of 2).
+   ═══════════════════════════════════════════════════════════════════
+   The owner's son: *"An option to change the background … PC exclusive — I
+   don't think there is enough space on the phone."* Three 44 px rooms at the
+   stage's bottom-left (`.stage__rooms`, `placeRooms` in js/app.js). Asked:
+
+     1 THE PHONE NEVER HAS IT: no `.stage__rooms` in the document at 390 and
+       320, a phone's load asks for no thumbnail and no new room — with the
+       street stored in this browser too, and the stage is the owner's room;
+     2 THE LOAD'S REQUESTS ARE THE OLD ONES: on a desktop every request a load
+       makes is the page, its type, the owner's two rooms or the three
+       thumbnails — never a new room's file, which is fetched only when chosen;
+     3 IT STANDS ON NOTHING: at eight desktop shapes × three languages × six
+       sizes, inside the stage, off the door's settled frame, the arrows, the
+       price and its open breakdown, the wall's controls, the undo group, the
+       band and the column, and above the trust band's words where its width
+       meets them — the shape it took printed;
+     4 A TAP CHANGES THE ROOM AND NOTHING ELSE: the background is that room's
+       file and the radio says so, and the drawing, the price, the address and
+       the code are byte-identical before and after; the frame's settled box
+       and `--frame-*` identical on all three rooms;
+     5 REMEMBERED: a reload opens on the chosen room; with storage refused the
+       page opens on the owner's room, a tap still works, nothing throws;
+     6 A RADIO GROUP: the arrow keys move to the next room and choose it,
+       Enter chooses the focused one, every button ≥ 44 px;
+     7 NO MOTION UNDER `prefers-reduced-motion`: a tap leaves nothing running;
+     8 NOT IN BARE MODE OR ON THE SHEET, and the tour's first cut-outs leave it
+       under the scrim (it is not a target). */
+{
+  console.log('\nthe room picker: desktop only, on nothing, and the door does not hear of it');
+  const before = faults;
+  const PAGE = 'file://' + process.cwd() + '/index.html';
+  const root = 'file://' + process.cwd() + '/';
+  const NEWROOM = /room-gen-(street|stairwell)\.webp/, THUMB = /-thumb\.webp/;
+  const ALLOWED = /^(index\.html|css\/app\.css|assets\/bundle\.js|assets\/fonts\/[^/]+\.woff2|assets\/room(-wide)?\.webp|assets\/room-(wide|gen-street|gen-stairwell)-thumb\.webp)$/;
+  const settle = pg => pg.evaluate(async () => {
+    const finite = document.getAnimations().filter(a => a.effect && a.effect.getComputedTiming().iterations !== Infinity);
+    await Promise.race([Promise.all(finite.map(a => a.finished.catch(() => {}))), new Promise(r => setTimeout(r, 3000))]);
+  });
+  const bgFile = pg => pg.evaluate(() => (getComputedStyle(document.querySelector('#stage')).backgroundImage.match(/([a-z0-9-]+\.webp)/) || [])[1] || null);
+  const tapRoom = async (pg, k) => {
+    await pg.evaluate(k => document.querySelector(`.room[data-room="${k}"]`).click(), k);
+    const want = k === 'home' ? /^room(-wide)?\.webp$/ : new RegExp(`^room-${k}\\.webp$`);
+    for (let i = 0; i < 60; i++) { const f = await bgFile(pg); if (f && want.test(f)) return f; await pg.waitForTimeout(50); }
+    return await bgFile(pg);
+  };
+
+  /* 1 — the phone */
+  for (const [w, h] of [[390, 844], [320, 568]]) for (const stored of [null, 'gen-street']) {
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    if (stored) await pg.addInitScript(v => { try { localStorage.setItem('dm.room.v1', v); } catch {} }, stored);
+    const reqs = []; pg.on('request', r => reqs.push(r.url()));
+    await pg.goto(PAGE); await pg.waitForTimeout(1500);
+    const m = await pg.evaluate(() => ({ el: !!document.querySelector('.stage__rooms'), bg: getComputedStyle(document.querySelector('#stage')).backgroundImage }));
+    const tag = `${w}x${h}${stored ? ' (street stored)' : ''}`;
+    if (m.el) fault('rooms-picker', `${tag}: .stage__rooms is in the phone's document — "PC exclusive"`);
+    const bad = reqs.filter(u => NEWROOM.test(u) || THUMB.test(u));
+    if (bad.length) fault('rooms-picker', `${tag}: a phone's load asked for ${bad.map(u => u.split('/').pop()).join(', ')}`);
+    if (NEWROOM.test(m.bg)) fault('rooms-picker', `${tag}: the phone shows a stored desktop room (${m.bg.slice(-40)})`);
+    await pg.close();
+  }
+
+  /* 2 — a desktop load asks for nothing new but the thumbnails */
+  {
+    const pg = await b.newPage({ viewport: { width: 1280, height: 720 } });
+    const reqs = []; pg.on('request', r => reqs.push(r.url()));
+    await pg.goto(PAGE); await pg.waitForTimeout(1800);
+    const local = reqs.filter(u => u.startsWith(root)).map(u => u.slice(root.length).split('?')[0]);
+    const odd = [...new Set(local.filter(u => !ALLOWED.test(u)))];
+    if (odd.length) fault('rooms-picker', `a desktop load asked for ${odd.join(', ')} — not the page, its type, the owner's room or a thumbnail`);
+    if (local.some(u => NEWROOM.test(u))) fault('rooms-picker', 'a desktop load fetched a new room nobody chose');
+    const thumbs = new Set(local.filter(u => THUMB.test(u)));
+    if (thumbs.size !== 3) fault('rooms-picker', `a desktop load asked for ${thumbs.size} thumbnails — the picker shows three`);
+    await pg.close();
+  }
+
+  /* 3 — where it stands */
+  const SHAPES = [[1100, 800], [1152, 800], [1200, 800], [1280, 720], [1366, 768], [1440, 900], [1680, 950], [1920, 918]];
+  const KNOWN = {};                 // none named: every reading clears
+  const seen = new Set(); let placed = 0; const modes = {};
+  const pp = await b.newPage();
+  for (const lang of ['he', 'en', 'ru']) for (const [w, h] of SHAPES) {
+    await pp.setViewportSize({ width: w, height: h });
+    for (const size of Object.keys(SIZES)) {
+      await pp.goto(`${PAGE}?lang=${lang}&s=${size}`);
+      await pp.waitForSelector('#stage svg #frame'); await settle(pp);
+      /* on a step, where the arrows stand, not the summary a link opens on */
+      await pp.evaluate(() => document.querySelector('.steps__step[data-step="fit"]').click());
+      await pp.waitForTimeout(250); await settle(pp);
+      for (const open of [false, true]) {
+        if (open) { await pp.evaluate(() => document.querySelector('#price-toggle').click()); await pp.waitForTimeout(400); await settle(pp); }
+        const m = await pp.evaluate(() => {
+          const R = e => { const r = e.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width }; };
+          const el = document.querySelector('.stage__rooms');
+          if (!el || el.hidden || !el.getClientRects().length) return null;
+          const g = R(el), st = R(document.querySelector('#stage'));
+          const fEl = document.querySelector('.door-svg #frame'), M = fEl.getScreenCTM(), bb = fEl.getBBox();
+          const fr = { left: M.e + M.a * bb.x, right: M.e + M.a * (bb.x + bb.width), top: M.f + M.d * bb.y, bottom: M.f + M.d * (bb.y + bb.height) };
+          const ov = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
+          const vis = e => e && e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden';
+          const bd = document.querySelector('#breakdown');
+          const wall = [['the door', fr],
+            ...[...document.querySelectorAll('.stage__arrow')].filter(vis).map(e => ['an arrow', R(e)]),
+            ['the price', R(document.querySelector('#quote'))],
+            ...(bd && !bd.hidden ? [['the breakdown', R(bd)]] : []),
+            ...[...document.querySelectorAll('.stage__hud .hud__slot')].map(e => ['a wall control', R(e)]),
+            ...[...document.querySelectorAll('.stage__undo .undo-pill')].map(e => ['an undo pill', R(e)]),
+            ['the band', vis(document.querySelector('.stage__band')) ? R(document.querySelector('.stage__band')) : null],
+            ['the column', vis(document.querySelector('.stage-wrap > .steps')) ? R(document.querySelector('.stage-wrap > .steps')) : null]]
+            .filter(([, r]) => r && r.width);
+          const words = [...document.querySelectorAll('.trust__i')].map(R).filter(r => r.width && ov(g, r));
+          return { mode: el.dataset.mode, on: wall.map(([k, r]) => [k, ov(g, r)]).filter(([, o]) => o),
+            inside: g.left >= st.left - 0.5 && g.right <= st.right + 0.5 && g.top >= st.top - 0.5 && g.bottom <= st.bottom + 0.5,
+            words: words.length, corner: Math.round(g.left - st.left), open: !!(bd && !bd.hidden) };
+        });
+        const tag = `${lang} ${w}x${h} ${size}${open ? ' (breakdown open)' : ''}`;
+        if (!m) { fault('rooms-picker', `${tag}: no picker on the wall`); continue; }
+        if (open && !m.open) fault('rooms-picker', `${tag}: the breakdown did not open — that half of the clause has no subject`);
+        placed++; modes[`${m.mode}@${m.corner <= 9 ? 'corner' : 'beside'}`] = (modes[`${m.mode}@${m.corner <= 9 ? 'corner' : 'beside'}`] || 0) + 1;
+        if (!m.inside) fault('rooms-picker', `${tag}: the picker is not wholly on the stage`);
+        if (m.words) fault('rooms-picker', `${tag}: the picker stands on the trust band's words`);
+        for (const [k, o] of m.on) {
+          const known = KNOWN[`${tag} ${k}`];
+          if (known !== undefined) { seen.add(`${tag} ${k}`); if (o > known + 10) fault('rooms-picker', `${tag}: on ${k} ${o} px² — named at ${known}`); }
+          else fault('rooms-picker', `${tag}: the picker stands ${o} px² on ${k}`);
+        }
+      }
+    }
+  }
+  await pp.close();
+  for (const k of Object.keys(KNOWN)) if (!seen.has(k)) fault('rooms-picker', `${k}: named and clear now — take it out`);
+  if (placed < 3 * SHAPES.length * 6 * 2) fault('rooms-picker', `the picker was placed ${placed} times — expected ${3 * SHAPES.length * 12}`);
+
+  /* 4, 5, 6 — what a tap does, and what it does not */
+  const look = pg => pg.evaluate(() => ({
+    svg: document.querySelector('#stage svg').outerHTML, price: document.querySelector('#price').textContent,
+    href: location.href, code: document.querySelector('#code').textContent,
+    wa: [...document.querySelectorAll('[data-wa]')].map(a => a.href).join('|'),
+    vars: ['--frame-left', '--frame-right', '--frame-top', '--frame-bot', '--frame-mid']
+      .map(k => document.querySelector('.stage-wrap').style.getPropertyValue(k)).join(','),
+    box: (() => { const f = document.querySelector('.door-svg #frame'), M = f.getScreenCTM(), bb = f.getBBox();
+      return [M.e + M.a * bb.x, M.f + M.d * bb.y, M.a * bb.width, M.d * bb.height].map(v => v.toFixed(2)).join(','); })(),
+    checked: [...document.querySelectorAll('.room')].filter(b => b.getAttribute('aria-checked') === 'true').map(b => b.dataset.room),
+    stored: (() => { try { return localStorage.getItem('dm.room.v1'); } catch { return 'refused'; } })(),
+  }));
+  let taps = 0;
+  for (const [w, h, lang, q] of [[1440, 900, 'he', ''], [1280, 720, 'ru', '&s=halfextra2&c=rb-9016d'], [1920, 918, 'en', '&w=rect&g=vine']]) {
+    const pg = await b.newPage({ viewport: { width: w, height: h } });
+    const errs = []; pg.on('pageerror', e => errs.push(e.message));
+    await pg.goto(`${PAGE}?lang=${lang}${q}`); await pg.waitForSelector('#stage svg #frame'); await pg.waitForTimeout(900); await settle(pg);
+    const a = await look(pg);
+    for (const k of ['gen-street', 'gen-stairwell', 'home']) {
+      const f = await tapRoom(pg, k); await settle(pg); taps++;
+      const z = await look(pg);
+      const tag = `${lang} ${w}x${h} → ${k}`;
+      if (!(k === 'home' ? /^room(-wide)?\.webp$/ : new RegExp(`^room-${k}`)).test(f || '')) fault('rooms-picker', `${tag}: the stage shows ${f}`);
+      for (const key of ['svg', 'price', 'href', 'code', 'wa']) if (z[key] !== a[key]) fault('rooms-picker', `${tag}: the ${key === 'svg' ? 'drawing' : key === 'wa' ? 'WhatsApp link' : key} changed — the room is staging and must not reach the door`);
+      if (z.vars !== a.vars || z.box !== a.box) fault('rooms-picker', `${tag}: the frame moved (${a.box} → ${z.box}; ${a.vars} → ${z.vars})`);
+      if (z.checked.join() !== k) fault('rooms-picker', `${tag}: the radio says ${z.checked.join() || 'nothing'}`);
+      if (z.stored !== k) fault('rooms-picker', `${tag}: stored ${z.stored}`);
+    }
+    /* remembered */
+    await tapRoom(pg, 'gen-stairwell');
+    await pg.reload(); await pg.waitForTimeout(1500);
+    const back = await bgFile(pg);
+    if (!/^room-gen-stairwell/.test(back || '')) fault('rooms-picker', `${lang} ${w}x${h}: after a reload the stage shows ${back}, not the stairwell this browser chose`);
+    /* the keys */
+    await pg.evaluate(() => document.querySelector('.room[aria-checked="true"]').focus());
+    const nextKey = lang === 'he' ? 'ArrowLeft' : 'ArrowRight';
+    await pg.keyboard.press(nextKey); await pg.waitForTimeout(700);
+    const k1 = await look(pg);
+    if (k1.checked.join() !== 'home') fault('rooms-picker', `${lang}: ${nextKey} from the stairwell chose ${k1.checked.join()} — it wraps to the first`);
+    const foc = await pg.evaluate(() => document.activeElement && document.activeElement.dataset.room);
+    if (foc !== 'home') fault('rooms-picker', `${lang}: focus after ${nextKey} is on ${foc}`);
+    await pg.evaluate(() => document.querySelector('.room[data-room="gen-street"]').focus());
+    await pg.keyboard.press('Enter'); await pg.waitForTimeout(700);
+    if ((await look(pg)).checked.join() !== 'gen-street') fault('rooms-picker', `${lang}: Enter on the street did not choose it`);
+    const sz = await pg.evaluate(() => [...document.querySelectorAll('.room')].map(b => { const r = b.getBoundingClientRect(); return Math.min(r.width, r.height); }));
+    if (sz.length !== 3 || sz.some(s => s < 44)) fault('rooms-picker', `${lang}: the rooms measure ${sz.join(', ')} px — 44 on both axes (T14)`);
+    await pg.evaluate(() => { try { localStorage.removeItem('dm.room.v1'); } catch {} });
+    if (errs.length) fault('rooms-picker', `${lang} ${w}x${h}: ${errs.join('; ')}`);
+    await pg.close();
+  }
+  /* storage refused */
+  {
+    const pg = await b.newPage({ viewport: { width: 1280, height: 720 } });
+    await pg.addInitScript(() => { Object.defineProperty(window, 'localStorage', { get() { throw new Error('refused'); } }); });
+    const errs = []; pg.on('pageerror', e => errs.push(e.message));
+    await pg.goto(PAGE); await pg.waitForTimeout(1500);
+    const f0 = await bgFile(pg);
+    const f1 = await tapRoom(pg, 'gen-street');
+    if (!/^room(-wide)?\.webp$/.test(f0 || '')) fault('rooms-picker', `storage refused: the page opened on ${f0}`);
+    if (!/^room-gen-street/.test(f1 || '')) fault('rooms-picker', `storage refused: a tap showed ${f1}`);
+    if (errs.length) fault('rooms-picker', `storage refused: ${errs.join('; ')}`);
+    await pg.close();
+  }
+  /* 7 — reduced motion */
+  {
+    const pg = await b.newPage({ viewport: { width: 1440, height: 900 } });
+    await pg.emulateMedia({ reducedMotion: 'reduce' });
+    await pg.goto(PAGE); await pg.waitForTimeout(1500);
+    await pg.evaluate(() => document.querySelector('.room[data-room="gen-street"]').click());
+    await pg.waitForTimeout(30);
+    const still = await pg.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').map(a => a.animationName || a.transitionProperty || 'a transition'));
+    if (still.length) fault('rooms-picker', `reduced motion: a room tap left ${still.join(', ')} running`);
+    await pg.close();
+  }
+  /* 8 — bare, the sheet, and the tour */
+  for (const q of ['?bare=1', '?sheet=1']) {
+    const pg = await b.newPage({ viewport: { width: 1440, height: 900 } });
+    await pg.goto(PAGE + q); await pg.waitForTimeout(900);
+    const shown = await pg.evaluate(() => { const e = document.querySelector('.stage__rooms'); return !!(e && e.getClientRects().length); });
+    if (shown) fault('rooms-picker', `${q}: the picker shows`);
+    await pg.close();
+  }
+  {
+    const raw = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+    const pg = await raw.newPage({ viewport: { width: 1280, height: 720 } });
+    await pg.goto(PAGE); await pg.waitForSelector('dialog#tour[open]', { timeout: 6000 }).catch(() => {});
+    await pg.waitForTimeout(500);
+    const t = await pg.evaluate(() => {
+      const d = document.querySelector('dialog#tour[open]'), el = document.querySelector('.stage__rooms');
+      if (!d || !el) return null;
+      const g = el.getBoundingClientRect();
+      const holes = [...d.querySelectorAll('.tour__hole')].map(h => ({ l: +h.getAttribute('x'), t: +h.getAttribute('y'), r: +h.getAttribute('x') + +h.getAttribute('width'), b: +h.getAttribute('y') + +h.getAttribute('height') }));
+      return { n: holes.length, hit: holes.filter(h => h.l < g.right && h.r > g.left && h.t < g.bottom && h.b > g.top).length };
+    });
+    if (!t) fault('rooms-picker', 'the tour did not open on a first visit, or the picker is missing — this clause has no subject');
+    else if (!t.n) fault('rooms-picker', 'the tour\'s first step has no cut-out — this clause has no subject');
+    else if (t.hit) fault('rooms-picker', `the tour's first step cuts out the picker (${t.hit} of ${t.n} holes) — it is not a target`);
+    await raw.close();
+  }
+  if (faults === before) console.log(`  placed ${placed} times (${Object.entries(modes).map(([k, v]) => `${k} ${v}`).join(', ')}), on nothing; `
+    + `${taps} taps moved the room and nothing else; remembered, keyed, quiet under reduced motion; never on a phone`);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -8152,7 +8355,7 @@ for (const v of VIEWS) {
     if (!band || !stage || !fr || !band.getClientRects().length) return null;
     const bb = fr.getBBox(), M = fr.getScreenCTM();
     const a = new DOMPoint(bb.x, bb.y).matrixTransform(M), z = new DOMPoint(bb.x + bb.width, bb.y + bb.height).matrixTransform(M);
-    const others = [...document.querySelectorAll('.stage__hud .hud__slot, #quote, .stage__arrow, .stage-wrap > .steps')]
+    const others = [...document.querySelectorAll('.stage__hud .hud__slot, #quote, .stage__arrow, .stage-wrap > .steps, .stage__rooms')]
       .filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden')
       .map(e => ({ n: e.id || e.className.split(' ')[0], r: R(e) }));
     const t = band.querySelector('[data-band-title]'), n = band.querySelector('[data-band-now]');
@@ -8283,7 +8486,7 @@ for (const v of VIEWS) {
         const hits = [];
         if (f && ov(r, f)) hits.push(`the door ${ov(r, f)} px²`);
         for (const a of document.querySelectorAll('.stage__arrow')) if (ov(r, a.getBoundingClientRect())) hits.push(`an arrow ${ov(r, a.getBoundingClientRect())} px²`);
-        for (const a of document.querySelectorAll('.stage__hud .hud__slot')) if (ov(r, a.getBoundingClientRect())) hits.push(`a wall control ${ov(r, a.getBoundingClientRect())} px²`);
+        for (const a of document.querySelectorAll('.stage__hud .hud__slot, .stage__rooms')) if (ov(r, a.getBoundingClientRect())) hits.push(`a wall control ${ov(r, a.getBoundingClientRect())} px²`);
         const push = parseFloat(getComputedStyle(document.querySelector('.stage-wrap')).getPropertyValue('--steps-top'));
         return {
           n: steps.length,
@@ -8507,7 +8710,7 @@ for (const v of VIEWS) {
         const r = n.getBoundingClientRect(), W = document.querySelector('.stage-wrap').getBoundingClientRect();
         const ov = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
         const on = [['the door', document.querySelector('.door-svg #frame')], ...[...document.querySelectorAll('.stage__arrow')].map(e => ['an arrow', e]),
-                    ...[...document.querySelectorAll('.stage__hud .hud__slot')].map(e => ['a wall control', e])]
+                    ...[...document.querySelectorAll('.stage__hud .hud__slot, .stage__rooms')].map(e => ['a wall control', e])]
           .map(([k, e]) => [k, e ? ov(r, e.getBoundingClientRect()) : 0]).filter(([, o]) => o);
         const f = document.querySelector('.door-svg #frame')?.getBoundingClientRect();
         return { on, inWrap: r.top >= W.top - 1 && r.bottom <= W.bottom + 1,
@@ -8567,7 +8770,7 @@ for (const v of VIEWS) {
       const fr = m ? { left: m.e + m.a * bb.x, right: m.e + m.a * (bb.x + bb.width), top: m.f + m.d * bb.y, bottom: m.f + m.d * (bb.y + bb.height) } : null;
       const wall = [['the door', fr], ...[...document.querySelectorAll('.stage__arrow')].map(e => ['an arrow', R(e)]),
         ['the price', document.querySelector('#quote') && R(document.querySelector('#quote'))],
-        ...[...document.querySelectorAll('.stage__hud .hud__slot')].map(e => ['a wall control', R(e)]),
+        ...[...document.querySelectorAll('.stage__hud .hud__slot, .stage__rooms')].map(e => ['a wall control', R(e)]),
         ...[...document.querySelectorAll('.stage__undo .undo-pill')].map(e => ['an undo pill', R(e)])].filter(([, b]) => b && b.width);
       const on = b => wall.map(([k, o]) => [k, ov(b, o)]).filter(([, o]) => o);
       const gd = document.querySelector('.steps__step[data-step="grd"]'), gl = document.querySelector('.steps__step[data-step="glass"]');
@@ -9272,7 +9475,7 @@ try {
           const hudB = Math.max(0, ...[...document.querySelectorAll('.stage__hud .hud__slot')]
             .map(e => e.getBoundingClientRect().bottom));
           const ov = (a, c) => { const x = Math.min(a.right, c.right) - Math.max(a.left, c.left), y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); return x > 0 && y > 0 ? Math.round(x * y) : 0; };
-          const under = [...document.querySelectorAll('.stage__hud .hud__slot, .stage__arrow, .stage-wrap > .steps, .stage__band')]
+          const under = [...document.querySelectorAll('.stage__hud .hud__slot, .stage__arrow, .stage-wrap > .steps, .stage__band, .stage__rooms')]
             .filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden')
             .map(e => [e.id || e.className.split(' ')[0], ov(r, R(e))]).filter(x => x[1]);
           const langs = document.querySelector('#langs');
@@ -9391,7 +9594,25 @@ try {
              pill now, not on the picture, so their contrast is clause 8's
              (white on `--wa`); sampling the photograph under a pill would be
              measuring the wrong ground. Its subject changed, it did not go. */
-          for (const [k, bx] of [['figure', m.fig]]) {
+          /* ⚠ ON EVERY ROOM SINCE 1.11.2026 (PROMPT J): the picker chooses the
+             room the price stands on, so the price is read on all three,
+             chosen the way a customer chooses — a tap — with the stage's
+             background checked to be that room's file before the reading. */
+          for (const room of ['home', 'gen-street', 'gen-stairwell'])
+          for (const [k, bx] of [[`figure on ${room}`, m.fig]]) {
+            const okRoom = await p.evaluate(async room => {
+              const b2 = document.querySelector(`.room[data-room="${room}"]`);
+              if (!b2) return 'no picker';
+              b2.click();
+              const want = room === 'home' ? /room(-wide)?\.webp/ : new RegExp(`room-${room}\\.webp`);
+              for (let i = 0; i < 80; i++) {
+                if (want.test(getComputedStyle(document.querySelector('#stage')).backgroundImage)) return 'ok';
+                await new Promise(r => setTimeout(r, 50));
+              }
+              return getComputedStyle(document.querySelector('#stage')).backgroundImage.slice(-50);
+            }, room);
+            if (okRoom !== 'ok') { fault('quote-wall', `${tag}: could not put the ${room} room up (${okRoom}) — the price was not read on it`); continue; }
+            await p.waitForTimeout(80);
             const x0 = Math.max(0, bx.left), clip = { x: x0, y: Math.max(0, bx.top),
               width: Math.max(1, Math.min(bx.right, w) - x0), height: Math.max(1, bx.height) };
             await p.screenshot({ path: '/tmp/audit-price-ground.png', clip });
@@ -9405,6 +9626,7 @@ try {
             if (cr < 4.5) fault('quote-wall', `${tag}: the ${k} is ink on a picture whose darkest 5 % reads `
               + `${cr.toFixed(2)}:1 against it — under 4.5, so it needs a wash there (css/app.css, \`.quote\`)`);
           }
+          await p.evaluate(() => { try { localStorage.removeItem('dm.room.v1'); } catch {} });
         }
       }
       /* 3 — and the breakdown hangs centred on the figure, or held inside */
@@ -9466,8 +9688,9 @@ try {
       + 'is measuring almost nothing');
   }
   /* 27, not 54, since 2.10: the picture is sampled under the FIGURE only (the
-     send's words are clause 8's, on their pill) — 3 languages × 9 shapes */
-  if (contrasts < 27) fault('quote-wall', `only ${contrasts} of 27 contrast readings were made`);
+     send's words are clause 8's, on their pill) — 3 languages × 9 shapes; and
+     81 since 1.11.2026, on each of the three rooms the picker offers */
+  if (contrasts < 81) fault('quote-wall', `only ${contrasts} of 81 contrast readings were made — three rooms × nine widths × three languages`);
   /* and the exemption cannot outlive the fault */
   for (const tag of ON_DOOR_OK) {
     if (!stillOverlapping.has(tag)) {

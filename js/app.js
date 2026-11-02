@@ -682,6 +682,9 @@ function init() {
   setLang(pickLang(window.location.search));
   translateStatic();
   buildLangs();
+  /* the room picker's stored choice, before the first fit places it and
+     before `armRoom` asks for a file (1.11.2026) */
+  wireRooms();
 
   const { state: parsed, notice, said, carries } = fromQuery(window.location.search);
   state = parsed;
@@ -3824,6 +3827,20 @@ const ROOMS = [
 /** The room on the stage — a SET of crops, never in the state, the address,
  *  the code, the message or the sheet: staging, not the door (§3). */
 let roomSet = 'home';
+/** ⚠ REMEMBERED PER BROWSER, BEHIND A TRY (1.11.2026). The page opens on the
+ *  owner's room unless this browser chose another; storage refused or a value
+ *  this page does not know is the owner's room, never a throw. */
+const ROOM_KEY = 'dm.room.v1';
+const ROOM_SETS = [...new Set(ROOMS.map(r => r.set))];
+function readRoom() {
+  try { const v = localStorage.getItem(ROOM_KEY); return ROOM_SETS.includes(v) ? v : 'home'; }
+  catch { return 'home'; }
+}
+/** ⚠ DESKTOP ONLY — the owner's son: *"PC exclusive — I don't think there is
+ *  enough space on the phone."* Below 1100 the stage is the owner's room
+ *  whatever this browser chose; across the line the choice comes back. */
+const deskRooms = () => typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 1100px)').matches;
+const shownSet = () => (deskRooms() ? roomSet : 'home');
 
 /**
  * Where a room lands on a given stage: covering it, with its own floor line on
@@ -3861,7 +3878,7 @@ function placeRoom(room, boxW, boxH, yBase) {
  * that) the one whose lamps are least far out wins, so the answer degrades
  * instead of flipping to nonsense.
  */
-function pickRoom(boxW, boxH, yBase, set = roomSet) {
+function pickRoom(boxW, boxH, yBase, set = shownSet()) {
   const MARGIN = 6;                       // px of lamp that must be showing
   /* One room's crops only (1.11.2026): the owner's two framings are scored
      against each other as they always were; a set of one is that one. */
@@ -3932,7 +3949,18 @@ function pickRoom(boxW, boxH, yBase, set = roomSet) {
  * dragging a window across the crossover work rather than leaving the wrong
  * crop stretched over the stage.
  */
-let liveRoom = null;
+let liveRoom = null, pendingRoom = null;
+/** The picker, held while it is out of the document (below 1100 it is not in
+ *  the phone's DOM at all — `placeRooms`). */
+let roomsEl = null;
+/** Where a room's file is: the owner's two in their `<link>`s in the head, the
+ *  others on their own button in the picker (`data-href`) — each URL written
+ *  once, in `index.html`, and stamped by the build. */
+function roomHref(r) {
+  if (r.set === 'home') { const l = document.getElementById(r.el); return l && l.href; }
+  const b = roomsEl && roomsEl.querySelector(`[data-room="${r.set}"]`);
+  return b && b.dataset.href ? new URL(b.dataset.href, document.baseURI).href : null;
+}
 
 /**
  * THE CROP, WITH EXACTLY THE WALL THE BAND NEEDS — 29.9.2026.
@@ -3998,20 +4026,141 @@ function armRoom() {
   if (!(box.width > 0 && box.height > 0 && fh > 0 && Number.isFinite(baseY))) return;
   const scale = Math.min(box.width / fw, box.height / fh);
   const want = pickRoom(box.width, box.height, (baseY - fy) * scale);
-  if (want === liveRoom) return;
-  const link = document.getElementById(want.el);
-  if (!link || !link.href) return;
-  const href = link.href;
+  if (want === liveRoom || want === pendingRoom) return;
+  const href = roomHref(want);
+  if (!href) return;
+  pendingRoom = want;
   const img = new Image();
   img.addEventListener('load', () => {
     const st = $('#stage');
-    if (!st) return;
+    if (pendingRoom === want) pendingRoom = null;
+    /* a later choice, or a resize across 1100, won while this one travelled */
+    if (!st || want.set !== shownSet()) return;
     st.style.backgroundImage = `url("${href}")`;
     liveRoom = want;
     root.classList.add('is-photo');
     fitStage();                 // the placement needs the class and the room
   });
+  /* a file that does not arrive leaves the room that is up, and may be asked
+     for again; the owner's room failing is the drawn room, as it always was */
+  img.addEventListener('error', () => { if (pendingRoom === want) pendingRoom = null; });
   img.src = href;
+}
+
+/**
+ * ⚠ THE ROOM PICKER — 1.11.2026 (PROMPT J). A radio group of three rooms on
+ * the wall, desktop only. A tap stores the room (`dm.room.v1`), marks it, and
+ * asks `armRoom` for that room's crop — `pickRoom` over THAT room's crops, the
+ * file fetched only now, `.is-photo` untouched — and nothing else: the door,
+ * the price, the address and the code do not move by a byte (the audit says
+ * so), because the room is staging and the state never hears of it.
+ */
+function chooseRoom(set) {
+  if (!ROOM_SETS.includes(set)) return;
+  roomSet = set;
+  try { localStorage.setItem(ROOM_KEY, set); } catch { /* remembered for this visit only */ }
+  markRooms();
+  armRoom();
+}
+function markRooms() {
+  if (!roomsEl) return;
+  for (const b of roomsEl.querySelectorAll('.room')) {
+    const on = b.dataset.room === roomSet;
+    b.setAttribute('aria-checked', String(on));
+    b.tabIndex = on ? 0 : -1;
+  }
+}
+function wireRooms() {
+  roomsEl = document.querySelector('.stage__rooms');
+  if (!roomsEl) return;
+  roomSet = readRoom();
+  markRooms();
+  roomsEl.addEventListener('click', e => {
+    const b = e.target.closest('.room');
+    if (b) chooseRoom(b.dataset.room);
+  });
+  /* A radio group's keys: the arrows move to the next room and choose it,
+     wrapping, in the direction the row reads (it mirrors with the interface,
+     like the language picker); Enter and Space are the button's own. */
+  roomsEl.addEventListener('keydown', e => {
+    const rtl = document.documentElement.dir === 'rtl';
+    const step = { ArrowDown: 1, ArrowUp: -1, ArrowRight: rtl ? -1 : 1, ArrowLeft: rtl ? 1 : -1 }[e.key];
+    if (!step) return;
+    e.preventDefault();
+    const all = [...roomsEl.querySelectorAll('.room')];
+    const i = all.findIndex(b => b.dataset.room === roomSet);
+    const next = all[(i + step + all.length) % all.length];
+    chooseRoom(next.dataset.room);
+    next.focus();
+  });
+}
+
+/**
+ * Where the picker stands: the stage's BOTTOM-LEFT corner, 8 px in, over the
+ * floor — the price's side, physically, in every language — and 8 px above
+ * the trust band's WORDS where its width meets them (`placeUndo`'s rule). Two
+ * shapes, `row` and `stack`, the first that touches nothing on the wall: the
+ * door's settled frame, an arrow, the price and an open breakdown, the wall's
+ * controls, the undo group, the band and the navigator column. ⚠ IN ENGLISH
+ * AND RUSSIAN THAT CORNER IS THE COLUMN'S (it faces the panel), so there the
+ * same two shapes are tried again beside it; the column never yields to the
+ * picker — it is the way through the page, the picker is staging. Below 1100,
+ * in bare mode and on the sheet the picker is taken out of the document.
+ */
+function placeRooms() {
+  if (!roomsEl) return;
+  const wrapEl = document.querySelector('.stage-wrap');
+  const stage = $('#stage');
+  const root = document.documentElement.classList;
+  if (!wrapEl || !stage || !deskRooms() || root.contains('is-bare') || root.contains('is-sheet')) {
+    if (roomsEl.isConnected) roomsEl.remove();
+    return;
+  }
+  if (!roomsEl.isConnected) {
+    const after = wrapEl.querySelector('.stage__arrow--next');
+    if (after) after.after(roomsEl); else wrapEl.append(roomsEl);
+    translateStatic(roomsEl);
+  }
+  roomsEl.hidden = false;
+  const st = stage.getBoundingClientRect(), wrap = wrapEl.getBoundingClientRect();
+  if (!st.width) return;
+  const fEl = document.querySelector('.door-svg #frame'), sEl = fEl && fEl.ownerSVGElement;
+  const ctm = sEl && typeof fEl.getBBox === 'function' ? sEl.getScreenCTM() : null;
+  const bb = ctm ? fEl.getBBox() : null;
+  const frame = bb && bb.width > 0
+    ? { left: ctm.e + ctm.a * bb.x, right: ctm.e + ctm.a * (bb.x + bb.width),
+        top: ctm.f + ctm.d * bb.y, bottom: ctm.f + ctm.d * (bb.y + bb.height) }
+    : null;
+  const col = wrapEl.querySelector(':scope > .steps');
+  const colR = col && col.getClientRects().length ? col.getBoundingClientRect() : null;
+  const bd = document.querySelector('#breakdown');
+  const obstacles = [frame, colR,
+    ...[...wrapEl.querySelectorAll('.stage__arrow, .stage__hud .hud__slot, .stage__undo, .stage__band')]
+      .filter(e => e.getClientRects().length).map(e => e.getBoundingClientRect()),
+    ...[...document.querySelectorAll('#quote')].filter(q => getComputedStyle(q).position !== 'fixed')
+      .map(q => q.getBoundingClientRect()),
+    ...(bd && !bd.hidden ? [bd.getBoundingClientRect()] : [])]
+    .filter(r => r && r.right > r.left && r.bottom > r.top);
+  const words = [...document.querySelectorAll('.trust__i')].map(e => e.getBoundingClientRect())
+    .filter(r => r.width && r.bottom > st.top && r.top < st.bottom);
+  const wordsTop = words.length ? Math.min(...words.map(r => r.top)) : null;
+  const hits = (a, c) => a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
+  const lefts = [st.left + 8];
+  if (colR && colR.left < st.left + st.width / 2) lefts.push(colR.right + 8);
+  const rs = roomsEl.style;
+  const place = (left, mode) => {
+    roomsEl.dataset.mode = mode;
+    rs.setProperty('--rooms-l', `${Math.round(left - wrap.left)}px`);
+    rs.setProperty('--rooms-b', `${Math.round(wrap.bottom - st.bottom + 8)}px`);
+    let g = roomsEl.getBoundingClientRect();
+    if (wordsTop !== null && words.some(w => w.left < g.right && w.right > g.left)) {
+      rs.setProperty('--rooms-b', `${Math.round(wrap.bottom - wordsTop + 8)}px`);
+      g = roomsEl.getBoundingClientRect();
+    }
+    return g.left >= st.left && g.right <= st.right && g.top >= st.top && !obstacles.some(o => hits(g, o));
+  };
+  for (const left of lefts) for (const mode of ['row', 'stack']) if (place(left, mode)) return;
+  place(lefts[0], 'row');
 }
 
 /**
@@ -4342,11 +4491,12 @@ function placeSteps() {
     col.dataset.grd = 'beside';
     fit();
     col.style.setProperty('--grd-top', `${glass.offsetTop}px`);
-    if (besideClear()) return;
+    if (besideClear()) { placeRooms(); return; }
   }
   delete col.dataset.grd;
   col.style.removeProperty('--grd-top');
   fit();
+  placeRooms();
 }
 
 function fitStage() {
@@ -4621,6 +4771,7 @@ function fitStage() {
        variables above so the price is already where they put it */
     placeUndo();
     placeSteps();
+    placeRooms();
 
     const root = document.documentElement.style;
     root.setProperty('--stage-l', `${Math.round(wrap.x)}px`);

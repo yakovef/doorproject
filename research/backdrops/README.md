@@ -122,6 +122,13 @@ stairwell's left one 9.6 px out (named in the audit). His room has the
 portrait framing there; these have none, and no crop can make one. A taller
 photograph of each would.
 
+### The picker's tiles
+
+`npm run backdrop` writes each room's tile beside it, `…-thumb.webp`: the
+centred square of the whole graded height (both lamps and the floor line are
+inside it on all three), drawn to 88 px — the 44 px tile at 2× — about 1 KB
+each. His is cut from his wide framing, the one a desktop shows.
+
 ### The price on each room
 
 The room laid on the stage exactly where `placeRoom` puts it, the price's ink

@@ -126,7 +126,7 @@ const HOME = [
   { src: 'research/backdrops/attached-1.webp', out: 'assets/room-wide.webp',
     /* Same measurement on the landscape original: y = 827.4 of 941, tilt
        -0.224°, residual 1.28 px over 314 columns. */
-    floorFrac: 827.4 / 941, what: 'landscape 16:9 — desktops and wide stages' },
+    floorFrac: 827.4 / 941, what: 'landscape 16:9 — desktops and wide stages', thumb: true },
 ];
 
 /**
@@ -244,7 +244,7 @@ const bandLuma = (p, floorFrac) => {
 const WALL_TARGET = NAME ? bandLuma(await decode(HOME[1].out), HOME[1].floorFrac) : null;
 
 const ROOMS = NAME
-  ? [{ src: `research/backdrops/${NAME}.webp`, out: `assets/room-${NAME}.webp`, ...NAMED[NAME] }]
+  ? [{ src: `research/backdrops/${NAME}.webp`, out: `assets/room-${NAME}.webp`, thumb: true, ...NAMED[NAME] }]
   : HOME;
 
 for (const room of ROOMS) {
@@ -332,6 +332,27 @@ for (const room of ROOMS) {
     if (buf.length <= 400 * 1024 || q === 0.62) { writeFileSync(room.out, buf); wrote = { q, n: buf.length }; break; }
   }
 
+  /* ⚠ THE PICKER'S THUMBNAIL (1.11.2026, PROMPT J 2 of 2) — from the GRADED
+     picture, so the tile shows the wall the stage will: the centred square of
+     the whole height (both lamps and the floor line are inside it on all three
+     rooms), drawn down to 88 px — the 44 px tile at 2× — and written beside
+     the room as `<out>-thumb.webp`. One per room: his room's is his wide
+     framing's, the one a desktop shows. */
+  if (room.thumb) {
+    const t = await page.evaluate(async (d) => {
+      const img = new Image(); img.src = 'data:image/png;base64,' + d; await img.decode();
+      const S = img.naturalHeight, x0 = Math.round((img.naturalWidth - S) / 2);
+      const c = document.createElement('canvas'); c.width = 88; c.height = 88;
+      const x = c.getContext('2d'); x.imageSmoothingQuality = 'high';
+      x.drawImage(img, x0, 0, S, S, 0, 0, 88, 88);
+      return c.toDataURL('image/webp', 0.8);
+    }, pngB64);
+    const tb = Buffer.from(t.split(',')[1], 'base64');
+    room.thumbOut = room.out.replace(/\.webp$/, '-thumb.webp');
+    writeFileSync(room.thumbOut, tb);
+    room.thumbKB = (tb.length / 1024).toFixed(1);
+  }
+
   console.log(`\n${room.out}   ${room.what}`);
   console.log(`  source     ${room.src}  ${W}x${H}  ${(statSync(room.src).size / 1024).toFixed(1)} KB`);
   console.log(`  floor line ${room.floorFrac.toFixed(5)} of height  (y=${(room.floorFrac * H).toFixed(1)})${room.floorNote ? '  ' + room.floorNote : ''}`);
@@ -342,6 +363,7 @@ for (const room of ROOMS) {
             + `  ->  ${hex(got)} luma ${luma(got).toFixed(0)} r/b ${(got[0] / got[2]).toFixed(3)}`);
   console.log(`             exponents ${exps.map(v => v.toFixed(4)).join(' / ')}`);
   console.log(`  written    webp q${wrote.q}  ${(wrote.n / 1024).toFixed(1)} KB   (budget 400 KB)`);
+  if (room.thumbOut) console.log(`  thumbnail  ${room.thumbOut}  88x88  ${room.thumbKB} KB`);
 }
 await b.close();
 
